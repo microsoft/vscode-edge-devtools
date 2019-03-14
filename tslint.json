@@ -1,0 +1,11 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "member-ordering": [
+            true,
+            {
+                "order": "instance-sandwich"
+            }
+        ]
+    }
+}
