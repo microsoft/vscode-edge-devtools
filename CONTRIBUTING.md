@@ -22,6 +22,11 @@ Contributions are always welcome! We only ask that you open an issue first so we
 * Select `Launch Extension` debug configuration
 * Press `F5` to launch the VSCode extension host environment and debug the extension
 
+Here are a list of recommended VSCode extensions to use when developing for vscode-edge-devtools:
+* [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+* [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin)
+
+
 ## Testing
 * There are a set of jest tests which can be run with `npm run test`.
 * You may also run `npm run lint` separately to check your code against our tslint rules.
