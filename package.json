@@ -1,0 +1,83 @@
+{
+    "name": "vscode-edge-devtools",
+    "displayName": "DevTools for Edge",
+    "description": "A VSCode extension that allows you to use browser devtools from within the editor.",
+    "version": "0.1.0",
+    "license": "SEE LICENSE IN LICENSE",
+    "publisher": "Microsoft",
+    "preview": true,
+    "icon": "icon.png",
+    "homepage": "https://github.com/Microsoft/vscode-edge-devtools/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Microsoft/vscode-edge-devtools"
+    },
+    "galleryBanner": {
+        "color": "#5c2d91",
+        "theme": "dark"
+    },
+    "keywords": [
+        "browser",
+        "elements",
+        "styling",
+        "console",
+        "debugger",
+        "dom",
+        "remote"
+    ],
+    "engines": {
+        "vscode": "^1.25.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./out/extension",
+    "jest": {
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "testRegex": "/src/.+\\.test\\.tsx?$",
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
+        ]
+    },
+    "scripts": {
+        "package": "vsce package --out vscode-edge-devtools.vsix",
+        "vscode:prepublish": "npm run build-and-lint",
+        "build": "npm run build-wp && npm run build-post",
+        "build-wp": "webpack",
+        "build-post": "ts-node postBuildStep.ts",
+        "build-watch": "npm run build && npm run watch",
+        "build-and-lint": "npm run build && npm run lint",
+        "watch": "npm run watch-wp",
+        "watch-wp": "webpack --watch",
+        "lint": "tslint -c tslint.json -p tsconfig.json",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run lint && jest --coverage"
+    },
+    "dependencies": {
+        "vsce": "1.58.0",
+        "vscode": "1.1.30",
+        "ws": "6.2.0"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "5.0.5",
+        "@types/jest": "24.0.11",
+        "@types/node": "11.11.3",
+        "@types/ws": "6.0.1",
+        "fs-extra": "7.0.1",
+        "jest": "24.5.0",
+        "ts-jest": "24.0.0",
+        "ts-loader": "5.3.3",
+        "ts-node": "8.0.3",
+        "tslint": "5.14.0",
+        "typescript": "3.3.3",
+        "webpack": "4.29.6",
+        "webpack-cli": "3.2.3"
+    }
+}
