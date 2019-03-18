@@ -32,6 +32,39 @@
         "Other"
     ],
     "main": "./out/extension",
+    "activationEvents": [
+        "onCommand:vscode-edge-devtools.attach"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "vscode-edge-devtools.attach",
+                "title": "Attach to a target",
+                "category": "DevTools for Edge"
+            }
+        ]
+    },
+    "configuration": {
+        "title": "DevTools for Edge",
+        "type": "object",
+        "properties": {
+            "vscode-edge-devtools.hostname": {
+                "type": "string",
+                "default": "localhost",
+                "description": "The hostname on which to search for remote debuggable edge instances"
+            },
+            "vscode-edge-devtools.port": {
+                "type": "number",
+                "default": 9222,
+                "description": "The port on which to search for remote debuggable edge instances"
+            },
+            "vscode-edge-devtools.edgePath": {
+                "type": "string",
+                "default": null,
+                "description": "The path to MSEdge.exe to use rather than searching for the default"
+            }
+        }
+    },
     "jest": {
         "transform": {
             "^.+\\.tsx?$": "ts-jest"

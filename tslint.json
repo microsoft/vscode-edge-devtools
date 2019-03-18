@@ -6,6 +6,13 @@
             {
                 "order": "instance-sandwich"
             }
+        ],
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-leading-underscore", // So that we can prefix unused variables
+            "require-const-for-all-caps"
         ]
     }
 }
