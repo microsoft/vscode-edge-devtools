@@ -57,11 +57,6 @@
                 "type": "number",
                 "default": 9222,
                 "description": "The port on which to search for remote debuggable edge instances"
-            },
-            "vscode-edge-devtools.edgePath": {
-                "type": "string",
-                "default": null,
-                "description": "The path to MSEdge.exe to use rather than searching for the default"
             }
         }
     },
