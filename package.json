@@ -32,6 +32,39 @@
         "Other"
     ],
     "main": "./out/extension",
+    "activationEvents": [
+        "onCommand:vscode-edge-devtools.attach"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "vscode-edge-devtools.attach",
+                "title": "Attach to a target",
+                "category": "DevTools for Edge"
+            }
+        ]
+    },
+    "configuration": {
+        "title": "DevTools for Edge",
+        "type": "object",
+        "properties": {
+            "vscode-edge-devtools.hostname": {
+                "type": "string",
+                "default": "localhost",
+                "description": "The hostname on which to search for remote debuggable edge instances"
+            },
+            "vscode-edge-devtools.port": {
+                "type": "number",
+                "default": 9222,
+                "description": "The port on which to search for remote debuggable edge instances"
+            },
+            "vscode-edge-devtools.useHttps": {
+                "type": "boolean",
+                "default": false,
+                "description": "Should we request the remote target list using https rather than http"
+            }
+        }
+    },
     "jest": {
         "transform": {
             "^.+\\.tsx?$": "ts-jest"

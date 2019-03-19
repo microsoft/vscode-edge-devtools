@@ -6,6 +6,12 @@
             {
                 "order": "instance-sandwich"
             }
+        ],
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "require-const-for-all-caps"
         ]
     }
 }

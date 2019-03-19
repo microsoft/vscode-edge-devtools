@@ -7,7 +7,9 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "out",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "noUnusedLocals": true,
+        "strict": true
     },
     "include": [
         "./**/*"
