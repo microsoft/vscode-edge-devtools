@@ -20,27 +20,25 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export async function attach(context: vscode.ExtensionContext, viaConfig: boolean, targetUrl?: string) {
-    const { hostname, port } = getRemoteEndpointSettings();
-    const responseArray = await getListOfTargets(hostname, port);
+    const { hostname, port, useHttps } = getRemoteEndpointSettings();
+    const responseArray = await getListOfTargets(hostname, port, useHttps);
     if (Array.isArray(responseArray)) {
-        const items: vscode.QuickPickItem[] = [];
-
         // Fix up the response targets with the correct web socket
-        responseArray.forEach((i: IRemoteTargetJson) => {
+        const items = responseArray.map((i: IRemoteTargetJson) => {
             i = fixRemoteWebSocket(hostname, port, i);
-            items.push({
+            return {
                 description: i.url,
                 detail: i.webSocketDebuggerUrl,
                 label: i.title,
-            });
+            } as vscode.QuickPickItem;
         });
 
         // Try to match the given target with the list of targets we received from the endpoint
         let targetWebsocketUrl = "";
         if (targetUrl && targetUrl !== DEFAULT_LAUNCH_URL) {
             const matches = items.filter((i) =>
-                targetUrl.localeCompare(i.description, "en", { sensitivity: "base" }) === 0);
-            if (matches && matches.length > 0) {
+                i.description && targetUrl.localeCompare(i.description, "en", { sensitivity: "base" }) === 0);
+            if (matches && matches.length > 0 && matches[0].detail) {
                 targetWebsocketUrl = matches[0].detail;
             } else {
                 vscode.window.showErrorMessage(`Couldn't attach to ${targetUrl}.`);
@@ -49,12 +47,12 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
 
         if (targetWebsocketUrl) {
             // Auto connect to found target
-            DevToolsPanel.createOrShow(context, targetWebsocketUrl as string);
+            DevToolsPanel.createOrShow(context, targetWebsocketUrl);
         } else {
             // Show the target list and allow the user to select one
             const selection = await vscode.window.showQuickPick(items);
-            if (selection) {
-                DevToolsPanel.createOrShow(context, selection.detail as string);
+            if (selection && selection.detail) {
+                DevToolsPanel.createOrShow(context, selection.detail);
             }
         }
     }

@@ -8,6 +8,9 @@ import * as vscode from "vscode";
 
 export const SETTINGS_STORE_NAME = "vscode-edge-devtools";
 export const SETTINGS_PREF_NAME = "devtools-preferences";
+export const SETTINGS_DEFAULT_USE_HTTPS = false;
+export const SETTINGS_DEFAULT_HOSTNAME = "localhost";
+export const SETTINGS_DEFAULT_PORT = 9222;
 
 export interface IRemoteTargetJson {
     description: string;
@@ -81,23 +84,25 @@ export function fixRemoteWebSocket(
  * @param hostname The remote hostname
  * @param port The remote port
  */
-export async function getListOfTargets(hostname: string, port: number): Promise<any[]> {
+export async function getListOfTargets(hostname: string, port: number, useHttps: boolean): Promise<any[]> {
     const checkDiscoveryEndpoint = (uri: string) => {
         return fetchUri(uri, { headers: { Host: "localhost" } });
     };
 
+    const protocol = (useHttps ? "https" : "http");
+
     let jsonResponse: string;
     try {
-        jsonResponse = await checkDiscoveryEndpoint(`http://${hostname}:${port}/json/list`);
+        jsonResponse = await checkDiscoveryEndpoint(`${protocol}://${hostname}:${port}/json/list`);
     } catch (ex) {
-        jsonResponse = await checkDiscoveryEndpoint(`http://${hostname}:${port}/json`);
+        jsonResponse = await checkDiscoveryEndpoint(`${protocol}://${hostname}:${port}/json`);
     }
 
     let result: IRemoteTargetJson[];
     try {
         result = JSON.parse(jsonResponse);
     } catch (ex) {
-        result = undefined;
+        result = [];
     }
     return result;
 }
@@ -105,10 +110,11 @@ export async function getListOfTargets(hostname: string, port: number): Promise<
 /**
  * Get the remote endpoint settings from the vscode configuration
  */
-export function getRemoteEndpointSettings(): { hostname: string, port: number } {
+export function getRemoteEndpointSettings(): { hostname: string, port: number, useHttps: boolean } {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const hostname = settings.get("hostname") as string || "localhost";
-    const port = settings.get("port") as number || 9222;
+    const hostname: string = settings.get("hostname") || SETTINGS_DEFAULT_HOSTNAME;
+    const port: number = settings.get("port") || SETTINGS_DEFAULT_PORT;
+    const useHttps: boolean = settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
 
-    return { hostname, port };
+    return { hostname, port, useHttps };
 }

@@ -57,6 +57,11 @@
                 "type": "number",
                 "default": 9222,
                 "description": "The port on which to search for remote debuggable edge instances"
+            },
+            "vscode-edge-devtools.useHttps": {
+                "type": "boolean",
+                "default": false,
+                "description": "Should we request the remote target list using https rather than http"
             }
         }
     },

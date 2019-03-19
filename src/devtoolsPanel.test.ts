@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext } from "vscode";
+import { createFakeExtensionContext } from "./test/helpers";
 
 jest.mock("vscode", () => "mock", { virtual: true });
 
@@ -9,14 +10,7 @@ describe("devtoolsPanel", () => {
     let context: ExtensionContext;
 
     beforeEach(() => {
-        context = {
-            extensionPath: "",
-            subscriptions: [],
-            workspaceState: {
-                get: jest.fn(),
-                update: jest.fn(),
-            },
-        } as any as ExtensionContext;
+        context = createFakeExtensionContext();
     });
 
     describe("createOrShow", () => {

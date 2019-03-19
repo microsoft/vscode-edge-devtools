@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext } from "vscode";
+import { createFakeExtensionContext } from "./test/helpers";
 import { IRemoteTargetJson, SETTINGS_STORE_NAME } from "./utils";
 
 jest.mock("vscode", () => "mock", { virtual: true });
@@ -13,9 +14,7 @@ describe("extension", () => {
 
         beforeEach(() => {
             // Initialize a fake context
-            context = {
-                subscriptions: [],
-            } as ExtensionContext;
+            context = createFakeExtensionContext();
 
             // Mock out vscode command registration
             commandMock = jest.fn();
@@ -37,7 +36,7 @@ describe("extension", () => {
 
         it("requests targets on attach command", async () => {
             // Store the attach command that will be subscribed by extension activation
-            let attachCommand: () => Promise<void>;
+            let attachCommand: (() => Promise<void>) | undefined;
             commandMock.mockImplementation((name, callback) => {
                 if (name === `${SETTINGS_STORE_NAME}.attach`) {
                     attachCommand = callback;
@@ -60,7 +59,7 @@ describe("extension", () => {
             // Ensure that attaching will request targets
             mockUtils.getRemoteEndpointSettings.mockReturnValue({ host: "localhost", port: 9222 });
             mockUtils.getListOfTargets.mockResolvedValue(null);
-            attachCommand();
+            attachCommand!();
             expect(mockUtils.getListOfTargets).toBeCalled();
         });
     });
@@ -114,13 +113,13 @@ describe("extension", () => {
             mocks.utils.getListOfTargets.mockResolvedValueOnce(allTargets);
 
             const newExtension = await import("./extension");
-            await newExtension.attach(null, false);
+            await newExtension.attach(createFakeExtensionContext(), false);
             expect(mocks.utils.fixRemoteWebSocket).toBeCalledTimes(expectedCount);
         });
 
         it("shows quick pick window if no target", async () => {
             const newExtension = await import("./extension");
-            await newExtension.attach(null, false);
+            await newExtension.attach(createFakeExtensionContext(), false);
             expect(mocks.vscode.showQuickPick).toBeCalledTimes(1);
         });
 
@@ -130,9 +129,10 @@ describe("extension", () => {
             };
             mocks.vscode.showQuickPick.mockResolvedValueOnce(expectedPick);
 
+            const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
-            await newExtension.attach(null, false);
-            expect(mocks.panel.DevToolsPanel.createOrShow).toBeCalledWith(null, expectedPick.detail);
+            await newExtension.attach(expectedContext, false);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toBeCalledWith(expectedContext, expectedPick.detail);
         });
 
         it("opens devtools against given target", async () => {
@@ -146,16 +146,17 @@ describe("extension", () => {
 
             mocks.utils.fixRemoteWebSocket.mockReturnValueOnce(target);
 
+            const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
-            await newExtension.attach(null, false, expectedUrl);
-            expect(mocks.panel.DevToolsPanel.createOrShow).toBeCalledWith(null, expectedWS);
+            await newExtension.attach(expectedContext, false, expectedUrl);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toBeCalledWith(expectedContext, expectedWS);
         });
 
         it("shows error if it can't find given target", async () => {
             const expectedMissingUrl = "some non-existent target";
 
             const newExtension = await import("./extension");
-            await newExtension.attach(null, false, expectedMissingUrl);
+            await newExtension.attach(createFakeExtensionContext(), false, expectedMissingUrl);
             expect(mocks.vscode.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
         });
     });
