@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext } from "vscode";
-import { createFakeExtensionContext } from "./test/helpers";
+import { createFakeExtensionContext, createFakeVSCode } from "./test/helpers";
 import { IRemoteTargetJson, SETTINGS_STORE_NAME } from "./utils";
 
-jest.mock("vscode", () => "mock", { virtual: true });
+jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("extension", () => {
     describe("activate", () => {
@@ -17,8 +17,8 @@ describe("extension", () => {
             context = createFakeExtensionContext();
 
             // Mock out vscode command registration
-            commandMock = jest.fn();
-            const mockVSCode = { commands: { registerCommand: commandMock } };
+            const mockVSCode = createFakeVSCode();
+            commandMock = mockVSCode.commands.registerCommand;
             jest.doMock("vscode", () => mockVSCode, { virtual: true });
             jest.resetModules();
         });
@@ -88,16 +88,16 @@ describe("extension", () => {
                 utils: {
                     fixRemoteWebSocket: jest.fn().mockReturnValue(target),
                     getListOfTargets: jest.fn().mockResolvedValue([target]),
-                    getRemoteEndpointSettings: jest.fn().mockReturnValue({ hostname: "hostname", port: "port" }),
+                    getRemoteEndpointSettings: jest.fn().mockReturnValue({
+                        hostname: "hostname",
+                        port: "port",
+                        useHttps: false,
+                    }),
                 },
-                vscode: {
-                    showErrorMessage: jest.fn(),
-                    showQuickPick: jest.fn().mockResolvedValue(null),
-                },
+                vscode: createFakeVSCode(),
             };
 
-            const mockVSCode = { window: mocks.vscode };
-            jest.doMock("vscode", () => mockVSCode, { virtual: true });
+            jest.doMock("vscode", () => mocks.vscode, { virtual: true });
             jest.doMock("./devtoolsPanel", () => mocks.panel);
             jest.doMock("./utils", () => mocks.utils);
             jest.resetModules();
@@ -120,14 +120,14 @@ describe("extension", () => {
         it("shows quick pick window if no target", async () => {
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false);
-            expect(mocks.vscode.showQuickPick).toBeCalledTimes(1);
+            expect(mocks.vscode.window.showQuickPick).toBeCalledTimes(1);
         });
 
         it("opens devtools against quick pick target", async () => {
             const expectedPick = {
                 detail: "http://target:9222",
             };
-            mocks.vscode.showQuickPick.mockResolvedValueOnce(expectedPick);
+            mocks.vscode.window.showQuickPick.mockResolvedValueOnce(expectedPick);
 
             const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
@@ -157,7 +157,7 @@ describe("extension", () => {
 
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false, expectedMissingUrl);
-            expect(mocks.vscode.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
+            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
         });
     });
 });

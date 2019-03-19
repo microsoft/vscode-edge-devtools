@@ -61,6 +61,7 @@ export function fetchUri(uri: string, options: https.RequestOptions = {}): Promi
  * Replace the json target payload's websocket address with the ones used to attach.
  * This makes sure that even on a remote machine with custom port forwarding, we will always connect to the address
  * specified in the options rather than what the remote Edge is actually using on the other machine.
+ * If a websocket address is not found, the target will be returned unchanged.
  * @param remoteAddress The address of the remote instance of Edge
  * @param remotePort The port used by the remote instance of Edge
  * @param target The target object from the json/list payload
@@ -102,6 +103,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
     try {
         result = JSON.parse(jsonResponse);
     } catch (ex) {
+        vscode.window.showErrorMessage(`Could not list targets: ${ex.message}`);
         result = [];
     }
     return result;

@@ -7,6 +7,30 @@
 import { ExtensionContext } from "vscode";
 
 /**
+ * Create a fake VSCode API object that can be used in tests
+ * Since the VSCode API is only available in the extension host you must use this as a virtual mock:
+ * E.g. jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
+ * Tests can then override the default behavior for their specific scenario by using requireMock:
+ * E.g. const mock = await jest.requireMock("vscode"); mock.window.showErrorMessage = () => null;
+ */
+export function createFakeVSCode() {
+    return {
+        commands: {
+            registerCommand: jest.fn(),
+        },
+        window: {
+            showErrorMessage: jest.fn(),
+            showQuickPick: jest.fn().mockResolvedValue(null),
+        },
+        workspace: {
+            getConfiguration: jest.fn(() => {
+                return { get: (name: string) => "" };
+            }),
+        },
+    };
+}
+
+/**
  * Create a fake VSCode extension context that can be used in tests
  */
 export function createFakeExtensionContext() {

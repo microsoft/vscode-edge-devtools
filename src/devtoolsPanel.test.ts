@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext } from "vscode";
-import { createFakeExtensionContext } from "./test/helpers";
+import { createFakeExtensionContext, createFakeVSCode } from "./test/helpers";
 
-jest.mock("vscode", () => "mock", { virtual: true });
+jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("devtoolsPanel", () => {
     let context: ExtensionContext;

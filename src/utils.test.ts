@@ -6,12 +6,12 @@
 
 import * as http from "http";
 import * as https from "https";
-import { createFakeGet } from "./test/helpers";
+import { createFakeGet, createFakeVSCode } from "./test/helpers";
 import * as utils from "./utils";
 
 jest.mock("http");
 jest.mock("https");
-jest.mock("vscode", () => "mock", { virtual: true });
+jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("utils", () => {
     describe("fixRemoteWebSocket", () => {
@@ -68,7 +68,7 @@ describe("utils", () => {
             (http.get as jest.Mock).mockImplementation(
                 createFakeGet(() => expectedHttpResponse, () => 200).get);
 
-            const response = await utils.fetchUri("http://fake-http-url/json/list");
+            const response = await utils.fetchUri("http://fake-http-url.test/json/list");
             expect(response).toBe(expectedHttpResponse);
         });
 
@@ -77,7 +77,7 @@ describe("utils", () => {
             (https.get as jest.Mock).mockImplementation(
                 createFakeGet(() => expectedHttpsResponse, () => 200).get);
 
-            const response = await utils.fetchUri("https://fake-https-url/json/list");
+            const response = await utils.fetchUri("https://fake-https-url.test/json/list");
             expect(response).toBe(expectedHttpsResponse);
         });
 
@@ -98,7 +98,7 @@ describe("utils", () => {
             // Call the fetchUri api and handle the rejection so that debugging won't stop on an
             // unhandled exception
             let promiseRejectCount = 0;
-            const responsePromise = utils.fetchUri("http://fake-http-url/json/list").catch((e) => {
+            const responsePromise = utils.fetchUri("http://fake-http-url.test/json/list").catch((e) => {
                 promiseRejectCount++;
                 return Promise.reject(e);
             });
@@ -180,6 +180,18 @@ describe("utils", () => {
                 utils.SETTINGS_DEFAULT_PORT,
                 utils.SETTINGS_DEFAULT_USE_HTTPS);
             expect(targets).toEqual([]);
+        });
+
+        it("shows error message on exception", async () => {
+            expectedListResponse = "Error: Some bad json which will throw an exception";
+
+            const vscodeMock = await jest.requireMock("vscode");
+
+            await utils.getListOfTargets(
+                utils.SETTINGS_DEFAULT_HOSTNAME,
+                utils.SETTINGS_DEFAULT_PORT,
+                utils.SETTINGS_DEFAULT_USE_HTTPS);
+            expect(vscodeMock.window.showErrorMessage).toHaveBeenCalled();
         });
 
         it("uses correct remote address", async () => {
@@ -270,33 +282,23 @@ describe("utils", () => {
                 useHttps: true,
             };
 
-            const configMock = jest.fn().mockReturnValue({
+            // Override the configuration mock to return our custom test values
+            const configMock = {
                 get: (name: string) => (expected as any)[name],
-            });
-            const mockVSCode = { workspace: { getConfiguration: configMock } };
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
-            jest.doMock("vscode", () => mockVSCode, { virtual: true });
-            jest.resetModules();
-
-            const newUtils = await import("./utils");
-            const { hostname, port, useHttps } = newUtils.getRemoteEndpointSettings();
+            // Ensure the new values are returned
+            const { hostname, port, useHttps } = utils.getRemoteEndpointSettings();
             expect(hostname).toBe(expected.hostname);
             expect(port).toBe(expected.port);
             expect(useHttps).toBe(expected.useHttps);
-            expect(configMock).toBeCalledWith(newUtils.SETTINGS_STORE_NAME);
+            expect(vscodeMock.workspace.getConfiguration).toBeCalledWith(utils.SETTINGS_STORE_NAME);
         });
 
         it("uses correct fallbacks on failure", async () => {
-            const configMock = jest.fn().mockReturnValue({
-                get: (name: string) => "",
-            });
-            const mockVSCode = { workspace: { getConfiguration: configMock } };
-
-            jest.doMock("vscode", () => mockVSCode, { virtual: true });
-            jest.resetModules();
-
-            const newUtils = await import("./utils");
-            const { hostname, port, useHttps } = newUtils.getRemoteEndpointSettings();
+            const { hostname, port, useHttps } = utils.getRemoteEndpointSettings();
             expect(hostname).toBe(utils.SETTINGS_DEFAULT_HOSTNAME);
             expect(port).toBe(utils.SETTINGS_DEFAULT_PORT);
             expect(useHttps).toBe(utils.SETTINGS_DEFAULT_USE_HTTPS);
