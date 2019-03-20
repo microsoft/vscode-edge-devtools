@@ -15,10 +15,15 @@ import { ExtensionContext } from "vscode";
  */
 export function createFakeVSCode() {
     return {
+        Uri: {
+            file: jest.fn().mockReturnValue({ with: jest.fn() }),
+        },
+        ViewColumn: { Two: 2 },
         commands: {
             registerCommand: jest.fn(),
         },
         window: {
+            createWebviewPanel: jest.fn(),
             showErrorMessage: jest.fn(),
             showQuickPick: jest.fn().mockResolvedValue(null),
         },
