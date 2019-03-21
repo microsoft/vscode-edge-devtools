@@ -1,7 +1,7 @@
 import path from "path";
 
 const commonConfig = {
-    devtool: "inline-source-map",
+    devtool: "source-map",
     mode: "development",
     module: {
         rules: [
@@ -40,6 +40,7 @@ module.exports = [
         },
         name: "extension",
         output: {
+            devtoolModuleFilenameTemplate: "../[resource-path]",
             filename: "[name].js",
             libraryTarget: "commonjs2",
             path: path.resolve(__dirname, "out"),
