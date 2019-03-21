@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { ExtensionContext } from "vscode";
-import { createFakeExtensionContext, createFakeVSCode } from "./test/helpers";
+import { ExtensionContext, WebviewPanel } from "vscode";
+import { createFakeExtensionContext, createFakeVSCode, Mocked } from "./test/helpers";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("devtoolsPanel", () => {
     let context: ExtensionContext;
-    let mockPanel: any;
+    let mockPanel: Mocked<WebviewPanel>;
 
     beforeEach(() => {
         context = createFakeExtensionContext();
@@ -22,7 +22,7 @@ describe("devtoolsPanel", () => {
                 onDidReceiveMessage: jest.fn(),
                 postMessage: jest.fn(),
             },
-        };
+        } as Mocked<WebviewPanel>;
 
         const mockVSCode = createFakeVSCode();
         mockVSCode.window.createWebviewPanel.mockReturnValue(mockPanel);
@@ -49,16 +49,10 @@ describe("devtoolsPanel", () => {
     describe("dispose", () => {
         it("calls dispose on all event handlers", async () => {
             const expectedDisposables: Array<{ dispose: () => void }> = [];
-            let expectedDisposeCallback: (() => void) | undefined;
-            let expectedDisposeThis: object | undefined;
 
-            // Create the function used for each event handler so that we can store the disposable object
-            // and ensure it gets correctly disposed later
+            // Create the function used for each event handler so that we can store the disposable objects
+            // and ensure they get correctly disposed later
             const addDisposable = (isDispose: boolean) => (callback: () => void, thisArg: any, disposables: any[]) => {
-                if (isDispose) {
-                    expectedDisposeCallback = callback;
-                    expectedDisposeThis = thisArg;
-                }
                 const disposable = {
                     dispose: jest.fn(),
                 };
@@ -67,18 +61,19 @@ describe("devtoolsPanel", () => {
             };
 
             // Mock out each callback
-            mockPanel.onDidDispose.mockImplementation(addDisposable(true));
-            mockPanel.onDidChangeViewState.mockImplementation(addDisposable(false));
-            mockPanel.webview.onDidReceiveMessage.mockImplementation(addDisposable(false));
+            mockPanel.onDidDispose.mockImplementation(addDisposable(true) as any);
+            mockPanel.onDidChangeViewState.mockImplementation(addDisposable(false) as any);
+            mockPanel.webview.onDidReceiveMessage.mockImplementation(addDisposable(false) as any);
 
             // Create the panel
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, "");
-            expect(expectedDisposeCallback).toBeDefined();
-            expect(expectedDisposeThis).toBeDefined();
+            expect(mockPanel.onDidDispose.mock.calls.length).toBeGreaterThan(0);
 
             // Ensure that dispose correctly called each disposable
-            expectedDisposeCallback!.call(expectedDisposeThis);
+            const disposeCallback = mockPanel.onDidDispose.mock.calls[0][0];
+            const disposeThis = mockPanel.onDidDispose.mock.instances[0];
+            disposeCallback.call(disposeThis);
             expect(mockPanel.dispose).toHaveBeenCalled();
             for (const d of expectedDisposables) {
                 expect(d.dispose).toHaveBeenCalled();
@@ -88,26 +83,21 @@ describe("devtoolsPanel", () => {
 
     describe("update", () => {
         it("adds html to the webview only when visible", async () => {
-            let updateCallback: (() => void) | undefined;
-            let updateThis: object | undefined;
-            mockPanel.onDidChangeViewState.mockImplementation((callback: () => void, thisArg: any) => {
-                updateCallback = callback;
-                updateThis = thisArg;
-            });
-
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, "");
-            expect(updateCallback).toBeDefined();
-            expect(updateThis).toBeDefined();
+            expect(mockPanel.onDidChangeViewState.mock.calls.length).toBeGreaterThan(0);
+
+            const updateCallback = mockPanel.onDidChangeViewState.mock.calls[0][0];
+            const updateThis = mockPanel.onDidChangeViewState.mock.instances[0];
 
             // Not visible
-            mockPanel.visible = false;
-            updateCallback!.call(updateThis);
+            (mockPanel as any).visible = false;
+            updateCallback.call(updateThis);
             expect(mockPanel.webview.html).toBeUndefined();
 
             // Visible
-            mockPanel.visible = true;
-            updateCallback!.call(updateThis);
+            (mockPanel as any).visible = true;
+            updateCallback.call(updateThis);
             expect(mockPanel.webview.html).toBeDefined();
         });
     });

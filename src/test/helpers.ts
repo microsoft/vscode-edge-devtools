@@ -6,6 +6,13 @@
 
 import { ExtensionContext } from "vscode";
 
+export type Mocked<T> = {
+    // tslint:disable-next-line: ban-types
+    [P in keyof T]: T[P] extends Function ?
+    jest.Mock<T[P]> : T[P] extends object ?
+    Mocked<T[P]> : T[P];
+};
+
 /**
  * Create a fake VSCode API object that can be used in tests
  * Since the VSCode API is only available in the extension host you must use this as a virtual mock:
