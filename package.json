@@ -33,7 +33,8 @@
     ],
     "main": "./out/extension",
     "activationEvents": [
-        "onCommand:vscode-edge-devtools.attach"
+        "onCommand:vscode-edge-devtools.attach",
+        "onWebviewPanel:vscode-edge-devtools"
     ],
     "contributes": {
         "commands": [

@@ -11,6 +11,7 @@ export const SETTINGS_PREF_NAME = "devtools-preferences";
 export const SETTINGS_DEFAULT_USE_HTTPS = false;
 export const SETTINGS_DEFAULT_HOSTNAME = "localhost";
 export const SETTINGS_DEFAULT_PORT = 9222;
+export const SETTINGS_WEBVIEW_NAME = "DevTools";
 
 export interface IRemoteTargetJson {
     description: string;
