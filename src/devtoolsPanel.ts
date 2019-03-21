@@ -7,13 +7,15 @@ import { SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME } from "./utils";
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
+    private readonly context: vscode.ExtensionContext;
     private readonly disposables: vscode.Disposable[] = [];
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
 
     private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, targetUrl: string) {
         this.panel = panel;
-        this.extensionPath = context.extensionPath;
+        this.context = context;
+        this.extensionPath = this.context.extensionPath;
 
         // TODO: Create a websocket connection to the target url
 
@@ -77,7 +79,7 @@ export class DevToolsPanel {
     }
 
     public static createOrShow(context: vscode.ExtensionContext, targetUrl: string) {
-        const column = vscode.ViewColumn.Two;
+        const column = vscode.ViewColumn.Beside;
 
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);

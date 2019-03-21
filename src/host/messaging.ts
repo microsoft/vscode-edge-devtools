@@ -8,12 +8,11 @@ export function initializeMessaging() {
 
     let toolsWindow: Window | null;
 
-    window.addEventListener("message", (messageEvent) => {
-        if (!toolsWindow) {
-            // Find the iframe that contains the devtools
-            toolsWindow = (document.getElementById("host") as HTMLIFrameElement).contentWindow;
-        }
+    window.addEventListener("DOMContentLoaded", () => {
+        toolsWindow = (document.getElementById("host") as HTMLIFrameElement).contentWindow;
+    });
 
+    window.addEventListener("message", (messageEvent) => {
         if (messageEvent.origin === "vscode-resource://") {
             // Pass the message onto the extension
             vscode.postMessage(messageEvent.data);
