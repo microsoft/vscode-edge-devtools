@@ -3,7 +3,15 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME } from "./utils";
+import { postMessageAcrossChannel, WebviewEvents } from "./common/webviewEvents";
+import { PanelSocket } from "./panelSocket";
+import {
+    fetchUri,
+    SETTINGS_PREF_DEFAULTS,
+    SETTINGS_PREF_NAME,
+    SETTINGS_STORE_NAME,
+    SETTINGS_WEBVIEW_NAME,
+} from "./utils";
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -11,13 +19,23 @@ export class DevToolsPanel {
     private readonly disposables: vscode.Disposable[] = [];
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
+    private readonly targetUrl: string;
+    private panelSocket: PanelSocket;
 
     private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, targetUrl: string) {
         this.panel = panel;
         this.context = context;
         this.extensionPath = this.context.extensionPath;
+        this.targetUrl = targetUrl;
 
-        // TODO: Create a websocket connection to the target url
+        // Hook up the socket events
+        this.panelSocket = new PanelSocket(this.targetUrl, (msg) => this.postToDevTools(msg));
+        this.panelSocket.on(WebviewEvents.websocket, () => this.onSocketMessage());
+        this.panelSocket.on(WebviewEvents.ready, () => this.onSocketReady());
+        this.panelSocket.on(WebviewEvents.telemetry, (msg) => this.onSocketTelemetry(msg));
+        this.panelSocket.on(WebviewEvents.getState, (msg) => this.onSocketGetState(msg));
+        this.panelSocket.on(WebviewEvents.setState, (msg) => this.onSocketSetState(msg));
+        this.panelSocket.on(WebviewEvents.getUrl, (msg) => this.onSocketGetUrl(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -30,12 +48,18 @@ export class DevToolsPanel {
                 this.update();
             }
         }, this, this.disposables);
+
+        // Handle messages from the webview
+        this.panel.webview.onDidReceiveMessage((message) => {
+            this.panelSocket.onMessageFromWebview(message);
+        }, this, this.disposables);
     }
 
     public dispose() {
         DevToolsPanel.instance = undefined;
 
         this.panel.dispose();
+        this.panelSocket.dispose();
 
         while (this.disposables.length) {
             const d = this.disposables.pop();
@@ -43,6 +67,50 @@ export class DevToolsPanel {
                 d.dispose();
             }
         }
+    }
+
+    private postToDevTools(message: string) {
+        postMessageAcrossChannel(WebviewEvents.websocket, message, this.panel.webview);
+    }
+
+    private onSocketReady() {
+        // TODO: Report success telemetry
+    }
+
+    private onSocketMessage() {
+        // NO-OP
+    }
+
+    private onSocketTelemetry(message: string) {
+        // TODO: Fire telemetry
+    }
+
+    private onSocketGetState(message: string) {
+        const { id } = JSON.parse(message) as { id: number };
+        const preferences: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
+        postMessageAcrossChannel(WebviewEvents.getState, { id, preferences }, this.panel.webview);
+    }
+
+    private onSocketSetState(message: string) {
+        // Parse the preference from the message and store it
+        const { name, value } = JSON.parse(message) as { name: string, value: string };
+        const allPref: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || {};
+        allPref[name] = value;
+        this.context.workspaceState.update(SETTINGS_PREF_NAME, allPref);
+    }
+
+    private async onSocketGetUrl(message: string) {
+        // Parse the request from the message and store it
+        const request = JSON.parse(message) as { id: number, url: string };
+
+        let content = "";
+        try {
+            content = await fetchUri(request.url);
+        } catch (ex) {
+            content = "";
+        }
+
+        postMessageAcrossChannel(WebviewEvents.getUrl, { id: request.id, content }, this.panel.webview);
     }
 
     private update() {
