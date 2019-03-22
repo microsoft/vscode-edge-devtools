@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 
 import WebSocket from "ws";
-import { WebviewEvents } from "./common/webviewEvents";
+import { webviewEventNames } from "./common/webviewEvents";
 import { Mocked } from "./test/helpers";
 
 describe("panelSocket", () => {
+    const readyMessage = "ready:args";
     let mockWebSocket: Mocked<WebSocket>;
 
     beforeEach(() => {
@@ -16,14 +17,11 @@ describe("panelSocket", () => {
             onmessage: jest.fn(),
             onopen: jest.fn(),
             send: jest.fn(),
-        } as object as Mocked<WebSocket>;
+        } as Mocked<WebSocket>;
 
+        // We need to use a non-arrow function here as it is used as a constructor.
         // tslint:disable-next-line: object-literal-shorthand only-arrow-functions
-        const mockWebSocketFactory = function() {
-            return mockWebSocket;
-        };
-
-        jest.doMock("ws", () => mockWebSocketFactory);
+        jest.doMock("ws", () => function() { return mockWebSocket; });
         jest.resetModules();
     });
 
@@ -37,7 +35,7 @@ describe("panelSocket", () => {
         const ps = await import("./panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
-        panelSocket.onMessageFromWebview(`${WebviewEvents.websocket}:""`);
+        panelSocket.onMessageFromWebview(`websocket:""`);
         expect(mockWebSocket.onclose).not.toEqual(expected.onclose);
         expect(mockWebSocket.onerror).not.toEqual(expected.onerror);
         expect(mockWebSocket.onmessage).not.toEqual(expected.onmessage);
@@ -54,7 +52,7 @@ describe("panelSocket", () => {
         const ps = await import("./panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
         expect(mockWebSocket.onclose).not.toEqual(expected.onclose);
         expect(mockWebSocket.onerror).not.toEqual(expected.onerror);
         expect(mockWebSocket.onmessage).not.toEqual(expected.onmessage);
@@ -65,7 +63,7 @@ describe("panelSocket", () => {
         expected.onmessage = mockWebSocket.onmessage;
         expected.onopen = mockWebSocket.onopen;
 
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
         expect(mockWebSocket.onclose).not.toEqual(expected.onclose);
         expect(mockWebSocket.onerror).not.toEqual(expected.onerror);
         expect(mockWebSocket.onmessage).not.toEqual(expected.onmessage);
@@ -76,12 +74,8 @@ describe("panelSocket", () => {
         const ps = await import("./panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
         panelSocket.dispose();
-        expect(mockWebSocket.onclose).toBeUndefined();
-        expect(mockWebSocket.onerror).toBeUndefined();
-        expect(mockWebSocket.onmessage).toBeUndefined();
-        expect(mockWebSocket.onopen).toBeUndefined();
         expect(mockWebSocket.close).toHaveBeenCalled();
     });
 
@@ -95,24 +89,24 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         // Create the websocket
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
 
         // Queue up some messages and make sure they haven't been sent
         for (const m of expectedMessages) {
-            panelSocket.onMessageFromWebview(`${WebviewEvents.websocket}:"${m}"`);
+            panelSocket.onMessageFromWebview(`websocket:"${m}"`);
         }
         expect(mockWebSocket.send).not.toBeCalled();
 
         // Connect the websocket and ensure the messages are now pumped through
         mockWebSocket.onopen.call(mockWebSocket);
-        for (let i = 0; i < expectedMessages.length; i++) {
-            expect(mockWebSocket.send).toHaveBeenNthCalledWith(i + 1, expectedMessages[i]);
-        }
         expect(mockWebSocket.send).toHaveBeenCalledTimes(expectedMessages.length);
+        expectedMessages.forEach((msg, index) => {
+            expect(mockWebSocket.send).toHaveBeenNthCalledWith(index + 1, msg);
+        });
 
         // Now the websocket is open, send a final message that should not be queued up
-        panelSocket.onMessageFromWebview(`${WebviewEvents.websocket}:"{final}"`);
-        expect(mockWebSocket.send).toHaveBeenNthCalledWith(expectedMessages.length + 1, "{final}");
+        panelSocket.onMessageFromWebview(`websocket:"{final}"`);
+        expect(mockWebSocket.send).toHaveBeenLastCalledWith("{final}");
     });
 
     it("posts back messages once connected", async () => {
@@ -122,7 +116,7 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", mockPost);
 
         // Create the websocket
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
 
         // Should ignore messages before the socket is open
         mockWebSocket.onmessage.call(mockWebSocket, expectedMessage);
@@ -143,7 +137,7 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", mockPost);
 
         // Create the websocket
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
 
         // Should ignore messages before the socket is open
         mockWebSocket.onerror.call(mockWebSocket);
@@ -161,7 +155,7 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", mockPost);
 
         // Create the websocket
-        panelSocket.onMessageFromWebview(`${WebviewEvents.ready}:args`);
+        panelSocket.onMessageFromWebview(readyMessage);
 
         // Should ignore messages before the socket is open
         mockWebSocket.onclose.call(mockWebSocket);
@@ -182,22 +176,19 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         const actualMessages: string[] = [];
-        for (const e in WebviewEvents) {
-            if (!WebviewEvents.hasOwnProperty(e)) { continue; }
+        for (const e of webviewEventNames) {
             panelSocket.on(e, (msg: string) => {
                 actualMessages.push(`${e}:${msg}`);
             });
         }
 
         // Should emit each event
-        for (const e in WebviewEvents) {
-            if (!WebviewEvents.hasOwnProperty(e)) { continue; }
+        for (const e of webviewEventNames) {
             panelSocket.onMessageFromWebview(`${e}:${JSON.stringify(e)}`);
         }
-        expect(actualMessages.length).toEqual(Object.keys(WebviewEvents).length);
+        expect(actualMessages.length).toEqual(webviewEventNames.length);
         for (const e of actualMessages) {
-            const i = e.indexOf(":");
-            const name = e.substr(0, i);
+            const [name] = e.split(":");
             expect(e).toEqual(`${name}:${JSON.stringify(name)}`);
         }
     });

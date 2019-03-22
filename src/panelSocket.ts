@@ -3,7 +3,7 @@
 
 import { EventEmitter } from "events";
 import WebSocket from "ws";
-import { parseMessageFromChannel, WebviewEvents } from "./common/webviewEvents";
+import { parseMessageFromChannel, WebviewEvent } from "./common/webviewEvents";
 
 export class PanelSocket extends EventEmitter {
     private readonly targetUrl: string;
@@ -19,29 +19,25 @@ export class PanelSocket extends EventEmitter {
     }
 
     public onMessageFromWebview(message: string) {
-        parseMessageFromChannel(message, (name, args) => this.onMessageParsed(name, args));
+        parseMessageFromChannel(message, (eventName, args) => this.onMessageParsed(eventName, args));
     }
 
     public dispose() {
         if (this.socket) {
-            this.socket.onopen = undefined as any;
-            this.socket.onmessage = undefined as any;
-            this.socket.onerror = undefined as any;
-            this.socket.onclose = undefined as any;
             this.socket.close();
             this.socket = undefined;
         }
     }
 
-    private onMessageParsed(event: string | symbol, ...args: any[]): boolean {
-        if (event === WebviewEvents.ready) {
+    private onMessageParsed(eventName: WebviewEvent, ...args: any[]): boolean {
+        if (eventName === "ready") {
             this.dispose();
 
             // First message, so connect a real websocket to the target
             this.connectToTarget();
         }
 
-        if (event === WebviewEvents.websocket) {
+        if (eventName === "websocket") {
             if (!this.socket) {
                 // Reconnect if we no longer have a websocket
                 this.connectToTarget();
@@ -59,7 +55,7 @@ export class PanelSocket extends EventEmitter {
             }
         }
 
-        return this.emit(event, args);
+        return this.emit(eventName, args);
     }
 
     private connectToTarget() {
@@ -88,7 +84,7 @@ export class PanelSocket extends EventEmitter {
     private onMessage(message: { data: WebSocket.Data }) {
         if (this.isConnected) {
             // Forward the message onto the devtools
-            this.postMessageToDevTools(message.data as string);
+            this.postMessageToDevTools(message.data.toString());
         }
     }
 

@@ -1,14 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export enum WebviewEvents {
-    getState = "getState",
-    getUrl = "getUrl",
-    ready = "ready",
-    setState = "setState",
-    telemetry = "telemetry",
-    websocket = "websocket",
-}
+export type WebviewEvent = "getState" | "getUrl" | "ready" | "setState" | "telemetry" | "websocket";
+export const webviewEventNames: WebviewEvent[] = [
+    "getState",
+    "getUrl",
+    "ready",
+    "setState",
+    "telemetry",
+    "websocket",
+];
 
 /**
  * Parse out the WebviewEvents type from a message and call the appropriate emit event
@@ -17,8 +18,8 @@ export enum WebviewEvents {
  */
 export function parseMessageFromChannel(
     message: string,
-    emit: (event: string | symbol, ...args: any[]) => boolean): boolean {
-    for (const e in WebviewEvents) {
+    emit: (eventName: WebviewEvent, ...args: any[]) => boolean): boolean {
+    for (const e of webviewEventNames) {
         if (message.substr(0, e.length) === e && message[e.length] === ":") {
             emit(e, message.substr(e.length + 1));
             return true;
@@ -38,12 +39,12 @@ export function parseMessageFromChannel(
  * @param origin The origin (if any) to use with the postMessage call
  */
 export function postMessageAcrossChannel(
-    eventType: WebviewEvents,
-    args: any,
+    eventType: WebviewEvent,
+    args: any[] | undefined,
     postMessageObject: { postMessage: (data: string, origin?: string) => void },
     origin?: string) {
     const message = `${eventType}:${JSON.stringify(args)}`;
-    if (typeof (origin) !== "undefined") {
+    if (origin) {
         postMessageObject.postMessage.call(postMessageObject, message, origin);
     } else {
         postMessageObject.postMessage.call(postMessageObject, message);
