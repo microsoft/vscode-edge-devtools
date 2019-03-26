@@ -33,15 +33,15 @@ export function parseMessageFromChannel(
  * Encode an event and arguments into a string and then post that message across via the
  * supplied object containing the postMessage function.
  * The message can be parsed on the other side using parseMessageFromChannel
+ * @param postMessageObject The object which contains the postMessage function
  * @param eventType The type of the message to post
  * @param args Any arguments to encode and post
- * @param postMessageObject The object which contains the postMessage function
  * @param origin The origin (if any) to use with the postMessage call
  */
 export function postMessageAcrossChannel(
+    postMessageObject: { postMessage: (data: string, origin?: string) => void },
     eventType: WebviewEvent,
     args: any[] | undefined,
-    postMessageObject: { postMessage: (data: string, origin?: string) => void },
     origin?: string) {
     const message = `${eventType}:${JSON.stringify(args)}`;
     if (origin) {

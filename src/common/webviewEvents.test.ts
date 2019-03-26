@@ -20,7 +20,7 @@ describe("webviewEvents", () => {
                 const mockPostMessageObject = {
                     postMessage: jest.fn(),
                 };
-                postMessageAcrossChannel(e, expectedArgs, mockPostMessageObject);
+                postMessageAcrossChannel(mockPostMessageObject, e, expectedArgs);
 
                 // Grab the data from the postMessage
                 expect(mockPostMessageObject.postMessage).toHaveBeenCalled();
@@ -54,10 +54,10 @@ describe("webviewEvents", () => {
                 const mockPostMessageObject = {
                     postMessage: jest.fn(),
                 };
-                postMessageAcrossChannel(e, expectedArgs, mockPostMessageObject);
+                postMessageAcrossChannel(mockPostMessageObject, e, expectedArgs);
                 expect(mockPostMessageObject.postMessage).toHaveBeenCalledWith(expectedFormat);
 
-                postMessageAcrossChannel(e, expectedArgs, mockPostMessageObject, expectedOrigin);
+                postMessageAcrossChannel(mockPostMessageObject, e, expectedArgs, expectedOrigin);
                 expect(mockPostMessageObject.postMessage).toHaveBeenCalledWith(expectedFormat, expectedOrigin);
             }
         });
