@@ -8,7 +8,7 @@ import { ExtensionContext } from "vscode";
 
 export type Mocked<T> = {
     // tslint:disable-next-line: ban-types
-    [P in keyof T]: T[P] extends Function ?
+    -readonly [P in keyof T]: T[P] extends Function ?
     jest.Mock<T[P]> : T[P] extends object ?
     Mocked<T[P]> : T[P];
 };
@@ -82,4 +82,13 @@ export function createFakeGet(getResponse: () => string, getStatusCode: () => nu
     };
 
     return { get: fakeGet, on: getOnMock };
+}
+
+/**
+ * Get a callable function from the first invocation of a mock function
+ * @param mock The mock function that got passed the callback as an argument
+ * @param callbackArgIndex The index of the argument that contains the callback
+ */
+export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0) {
+    return { callback: mock.mock.calls[0][callbackArgIndex], thisObj: mock.mock.instances[0] };
 }
