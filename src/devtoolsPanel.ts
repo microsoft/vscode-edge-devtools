@@ -3,7 +3,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { postMessageAcrossChannel, WebviewEvents } from "./common/webviewEvents";
+import { postMessageAcrossChannel } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
     fetchUri,
@@ -30,12 +30,12 @@ export class DevToolsPanel {
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (msg) => this.postToDevTools(msg));
-        this.panelSocket.on(WebviewEvents.websocket, () => this.onSocketMessage());
-        this.panelSocket.on(WebviewEvents.ready, () => this.onSocketReady());
-        this.panelSocket.on(WebviewEvents.telemetry, (msg) => this.onSocketTelemetry(msg));
-        this.panelSocket.on(WebviewEvents.getState, (msg) => this.onSocketGetState(msg));
-        this.panelSocket.on(WebviewEvents.setState, (msg) => this.onSocketSetState(msg));
-        this.panelSocket.on(WebviewEvents.getUrl, (msg) => this.onSocketGetUrl(msg));
+        this.panelSocket.on("ready", () => this.onSocketReady());
+        this.panelSocket.on("websocket", () => this.onSocketMessage());
+        this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
+        this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
+        this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
+        this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -70,7 +70,7 @@ export class DevToolsPanel {
     }
 
     private postToDevTools(message: string) {
-        postMessageAcrossChannel(WebviewEvents.websocket, message, this.panel.webview);
+        postMessageAcrossChannel(this.panel.webview, "websocket", [message]);
     }
 
     private onSocketReady() {
@@ -78,7 +78,7 @@ export class DevToolsPanel {
     }
 
     private onSocketMessage() {
-        // NO-OP
+        // TODO: Handle message
     }
 
     private onSocketTelemetry(message: string) {
@@ -88,7 +88,7 @@ export class DevToolsPanel {
     private onSocketGetState(message: string) {
         const { id } = JSON.parse(message) as { id: number };
         const preferences: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
-        postMessageAcrossChannel(WebviewEvents.getState, { id, preferences }, this.panel.webview);
+        postMessageAcrossChannel(this.panel.webview, "getState", [{ id, preferences }]);
     }
 
     private onSocketSetState(message: string) {
@@ -110,7 +110,7 @@ export class DevToolsPanel {
             content = "";
         }
 
-        postMessageAcrossChannel(WebviewEvents.getUrl, { id: request.id, content }, this.panel.webview);
+        postMessageAcrossChannel(this.panel.webview, "getUrl", [{ id: request.id, content }]);
     }
 
     private update() {
