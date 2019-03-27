@@ -106,8 +106,8 @@ export class DevToolsPanel {
         let content = "";
         try {
             content = await fetchUri(request.url);
-        } catch (ex) {
-            content = "";
+        } catch {
+            // Response will not have content
         }
 
         postMessageAcrossChannel(this.panel.webview, "getUrl", [{ id: request.id, content }]);

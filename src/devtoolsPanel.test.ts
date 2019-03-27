@@ -131,8 +131,7 @@ describe("devtoolsPanel", () => {
     describe("panelSocket", () => {
         it("listens for all the emit events", async () => {
             const hookedEvents: string[] = [];
-            mockPanelSocket.on.mockImplementation(((...args: any) => {
-                const [name] = args;
+            mockPanelSocket.on.mockImplementation(((name: string, ...args: any) => {
                 hookedEvents.push(name);
                 return jest.fn();
             }));
@@ -174,11 +173,12 @@ describe("devtoolsPanel", () => {
             let hookedEvents: Map<string, (msg: string) => void>;
             beforeEach(() => {
                 hookedEvents = new Map();
-                mockPanelSocket.on.mockImplementation(((...args: any) => {
-                    const [name, callback] = args;
-                    hookedEvents.set(name, callback);
-                    return jest.fn();
-                }));
+                mockPanelSocket.on.mockImplementation((
+                    (name: string, callback: (msg: string) => void, ...args: any) => {
+                        hookedEvents.set(name, callback);
+                        return jest.fn();
+                    }),
+                );
             });
 
             it("does nothing yet for ready", async () => {
