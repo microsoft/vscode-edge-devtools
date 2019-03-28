@@ -159,13 +159,14 @@ describe("devtoolsPanel", () => {
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, "");
 
+            const expectedEvent = "message";
             const expectedMessage = "some message that should be passed through";
             const { callback, thisObj } = getFirstCallback(mockPanelSocketFactory.PanelSocket, 1);
-            callback.call(thisObj, expectedMessage);
+            callback.call(thisObj, expectedEvent, expectedMessage);
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "websocket",
-                [expectedMessage],
+                [expectedEvent, expectedMessage],
             );
 
             // Ensure that the encoded message is actually passed over to the webview

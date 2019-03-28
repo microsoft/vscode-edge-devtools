@@ -3,16 +3,18 @@
 
 import { EventEmitter } from "events";
 import WebSocket from "ws";
-import { parseMessageFromChannel, WebviewEvent } from "./common/webviewEvents";
+import { parseMessageFromChannel, WebSocketEvent, WebviewEvent } from "./common/webviewEvents";
+
+export type IDevToolsPostMessageCallback = (e: WebSocketEvent, message?: string) => void;
 
 export class PanelSocket extends EventEmitter {
     private readonly targetUrl: string;
-    private readonly postMessageToDevTools: (message: string) => void;
+    private readonly postMessageToDevTools: IDevToolsPostMessageCallback;
     private socket: WebSocket | undefined;
     private isConnected: boolean = false;
     private messages: string[] = [];
 
-    constructor(targetUrl: string, postMessageToDevTools: (message: string) => void) {
+    constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback) {
         super();
         this.targetUrl = targetUrl;
         this.postMessageToDevTools = postMessageToDevTools;
@@ -84,7 +86,7 @@ export class PanelSocket extends EventEmitter {
     private onMessage(message: { data: WebSocket.Data }) {
         if (this.isConnected) {
             // Forward the message onto the devtools
-            this.postMessageToDevTools(message.data.toString());
+            this.postMessageToDevTools("message", message.data.toString());
         }
     }
 

@@ -11,6 +11,14 @@ export const webviewEventNames: WebviewEvent[] = [
     "websocket",
 ];
 
+export type WebSocketEvent = "open" | "close" | "error" | "message";
+export const webSocketEventNames: WebSocketEvent[] = [
+    "open",
+    "close",
+    "error",
+    "message",
+];
+
 /**
  * Parse out the WebviewEvents type from a message and call the appropriate emit event
  * @param message The message to parse

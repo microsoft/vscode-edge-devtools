@@ -128,7 +128,7 @@ describe("panelSocket", () => {
 
         // Once open we should get the message posted
         mockWebSocket.onmessage.call(mockWebSocket, expectedMessage);
-        expect(mockPost).toHaveBeenNthCalledWith(2, expectedMessage.data);
+        expect(mockPost).toHaveBeenNthCalledWith(2, "message", expectedMessage.data);
     });
 
     it("posts back errors once connected", async () => {
