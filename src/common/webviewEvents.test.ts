@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+    encodeMessageForChannel,
     parseMessageFromChannel,
-    postMessageAcrossChannel,
     webviewEventNames,
 } from "../common/webviewEvents";
 
@@ -17,14 +17,8 @@ describe("webviewEvents", () => {
                 }];
 
                 // Generate a message we can use for parsing
-                const mockPostMessageObject = {
-                    postMessage: jest.fn(),
-                };
-                postMessageAcrossChannel(mockPostMessageObject, e, expectedArgs);
-
-                // Grab the data from the postMessage
-                expect(mockPostMessageObject.postMessage).toHaveBeenCalled();
-                const data = mockPostMessageObject.postMessage.mock.calls[0][0];
+                let data = "";
+                encodeMessageForChannel((msg) => data = msg, e, expectedArgs);
 
                 // Ensure parsing it calls the correct emit event
                 const mockEmit = jest.fn();
@@ -42,23 +36,17 @@ describe("webviewEvents", () => {
     });
 
     describe("postMessageAcrossChannel", () => {
-        it("calls postMessage with origin", async () => {
+        it("calls postMessageCallback with encoded data", async () => {
             for (const e of webviewEventNames) {
-                const expectedOrigin = "*";
                 const expectedArgs = [{
                     name: e,
                     someArg: "hello",
                 }];
                 const expectedFormat = `${e}:${JSON.stringify(expectedArgs)}`;
 
-                const mockPostMessageObject = {
-                    postMessage: jest.fn(),
-                };
-                postMessageAcrossChannel(mockPostMessageObject, e, expectedArgs);
-                expect(mockPostMessageObject.postMessage).toHaveBeenCalledWith(expectedFormat);
-
-                postMessageAcrossChannel(mockPostMessageObject, e, expectedArgs, expectedOrigin);
-                expect(mockPostMessageObject.postMessage).toHaveBeenCalledWith(expectedFormat, expectedOrigin);
+                const mockPostMessage = jest.fn();
+                encodeMessageForChannel(mockPostMessage, e, expectedArgs);
+                expect(mockPostMessage).toHaveBeenCalledWith(expectedFormat);
             }
         });
     });
