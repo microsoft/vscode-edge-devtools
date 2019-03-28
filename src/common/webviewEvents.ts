@@ -38,15 +38,10 @@ export function parseMessageFromChannel(
  * @param args Any arguments to encode and post
  * @param origin The origin (if any) to use with the postMessage call
  */
-export function postMessageAcrossChannel(
-    postMessageObject: { postMessage: (data: string, origin?: string) => void },
+export function encodeMessageForChannel(
+    postMessageCallback: (message: string) => void,
     eventType: WebviewEvent,
-    args: any[] | undefined,
-    origin?: string) {
+    args?: any[]) {
     const message = `${eventType}:${JSON.stringify(args)}`;
-    if (origin) {
-        postMessageObject.postMessage.call(postMessageObject, message, origin);
-    } else {
-        postMessageObject.postMessage.call(postMessageObject, message);
-    }
+    postMessageCallback(message);
 }

@@ -17,7 +17,7 @@ describe("devtoolsPanel", () => {
     let mockPanel: Mocked<WebviewPanel>;
     let mockPanelSocket: Mocked<PanelSocket>;
     let mockPanelSocketFactory: { PanelSocket: jest.Mock };
-    let mockWebviewEvents: { postMessageAcrossChannel: jest.Mock };
+    let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
 
     beforeEach(() => {
         context = createFakeExtensionContext();
@@ -45,7 +45,7 @@ describe("devtoolsPanel", () => {
         jest.doMock("./panelSocket", () => mockPanelSocketFactory);
 
         mockWebviewEvents = {
-            postMessageAcrossChannel: jest.fn(),
+            encodeMessageForChannel: jest.fn(),
         };
         jest.doMock("./common/webviewEvents", () => mockWebviewEvents);
 
@@ -162,11 +162,17 @@ describe("devtoolsPanel", () => {
             const expectedMessage = "some message that should be passed through";
             const { callback, thisObj } = getFirstCallback(mockPanelSocketFactory.PanelSocket, 1);
             callback.call(thisObj, expectedMessage);
-            expect(mockWebviewEvents.postMessageAcrossChannel).toHaveBeenCalledWith(
-                mockPanel.webview,
+            expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                expect.any(Function),
                 "websocket",
                 [expectedMessage],
             );
+
+            // Ensure that the encoded message is actually passed over to the webview
+            const expectedPostedMessage = "encodedMessage";
+            const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
+            postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
+            expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
         });
 
         describe("events", () => {
@@ -214,11 +220,17 @@ describe("devtoolsPanel", () => {
                 dtp.DevToolsPanel.createOrShow(context, "");
 
                 hookedEvents.get("getState")!(JSON.stringify(expectedId));
-                expect(mockWebviewEvents.postMessageAcrossChannel).toHaveBeenCalledWith(
-                    mockPanel.webview,
+                expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                    expect.any(Function),
                     "getState",
                     [{ ...expectedId, preferences: expectedState }],
                 );
+
+                // Ensure that the encoded message is actually passed over to the webview
+                const expectedPostedMessage = "encodedMessage";
+                const { callback, thisObj } = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
+                callback.call(thisObj, expectedPostedMessage);
+                expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
             });
 
             it("posts defaults for get state", async () => {
@@ -230,8 +242,8 @@ describe("devtoolsPanel", () => {
                 const expectedId = { id: 0 };
 
                 hookedEvents.get("getState")!(JSON.stringify(expectedId));
-                expect(mockWebviewEvents.postMessageAcrossChannel).toHaveBeenCalledWith(
-                    mockPanel.webview,
+                expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                    expect.any(Function),
                     "getState",
                     [{ ...expectedId, preferences: SETTINGS_PREF_DEFAULTS }],
                 );
@@ -290,11 +302,17 @@ describe("devtoolsPanel", () => {
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
                 expect(mockUtils.fetchUri).toBeCalledWith(expectedRequest.url);
 
-                expect(mockWebviewEvents.postMessageAcrossChannel).toHaveBeenCalledWith(
-                    mockPanel.webview,
+                expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                    expect.any(Function),
                     "getUrl",
                     [{ id: expectedRequest.id, content: expectedContent }],
                 );
+
+                // Ensure that the encoded message is actually passed over to the webview
+                const expectedPostedMessage = "encodedMessage";
+                const { callback, thisObj } = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
+                callback.call(thisObj, expectedPostedMessage);
+                expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
             });
 
             it("posts empty string for failed get url", async () => {
@@ -313,8 +331,8 @@ describe("devtoolsPanel", () => {
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
                 expect(mockUtils.fetchUri).toBeCalledWith(expectedRequest.url);
-                expect(mockWebviewEvents.postMessageAcrossChannel).toHaveBeenCalledWith(
-                    mockPanel.webview,
+                expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                    expect.any(Function),
                     "getUrl",
                     [{ id: expectedRequest.id, content: "" }],
                 );
