@@ -89,8 +89,9 @@ export function createFakeGet(getResponse: () => string, getStatusCode: () => nu
  * @param mock The mock function that got passed the callback as an argument
  * @param callbackArgIndex The index of the argument that contains the callback
  */
-export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0) {
+export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
     // Allow us to type the callback as a general 'Function' so that we at least get enough typing to use .call();
     // tslint:disable-next-line: ban-types
-    return { callback: mock.mock.calls[0][callbackArgIndex] as Function, thisObj: mock.mock.instances[0] as object };
+    { callback: Function, thisObj: object } {
+    return { callback: mock.mock.calls[0][callbackArgIndex], thisObj: mock.mock.instances[0] };
 }
