@@ -3,7 +3,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { encodeMessageForChannel } from "./common/webviewEvents";
+import { encodeMessageForChannel, WebSocketEvent } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
     fetchUri,
@@ -29,7 +29,7 @@ export class DevToolsPanel {
         this.targetUrl = targetUrl;
 
         // Hook up the socket events
-        this.panelSocket = new PanelSocket(this.targetUrl, (msg) => this.postToDevTools(msg));
+        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
         this.panelSocket.on("ready", () => this.onSocketReady());
         this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
@@ -69,8 +69,8 @@ export class DevToolsPanel {
         }
     }
 
-    private postToDevTools(message: string) {
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", [message]);
+    private postToDevTools(e: WebSocketEvent, message?: string) {
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", [e, message]);
     }
 
     private onSocketReady() {
