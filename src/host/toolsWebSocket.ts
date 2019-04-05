@@ -13,7 +13,7 @@ interface IMessageEvent {
  * so instead we replace it and forward all messages to/from the extension
  * which is able to create the real websocket connection to the target page.
  */
-export class ToolsWebSocket {
+export default class ToolsWebSocket {
     private static devtoolsWebSocket: ToolsWebSocket;
     public static get instance() {
         return ToolsWebSocket.devtoolsWebSocket;

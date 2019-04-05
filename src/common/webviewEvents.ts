@@ -20,10 +20,6 @@ export const webSocketEventNames: WebSocketEvent[] = [
 ];
 
 export type TelemetryEvent = "enumerated" | "performance";
-export const telemetryEventNames: TelemetryEvent[] = [
-    "enumerated",
-    "performance",
-];
 
 export interface ITelemetryData {
     event: TelemetryEvent;

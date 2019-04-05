@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, ITelemetryData, WebviewEvent } from "../common/webviewEvents";
-import { ToolsWebSocket } from "./toolsWebSocket";
+import { encodeMessageForChannel, ITelemetryData, WebSocketEvent, WebviewEvent } from "../common/webviewEvents";
+import ToolsWebSocket from "./toolsWebSocket";
 
-export class ToolsHost {
+export default class ToolsHost {
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
 
@@ -46,17 +46,20 @@ export class ToolsHost {
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {
-                this.fireGetStateCallback(args);
+                const { id, preferences } = JSON.parse(args);
+                this.fireGetStateCallback(id, preferences);
                 break;
             }
 
             case "getUrl": {
-                this.fireGetUrlCallback(args);
+                const { id, content } = JSON.parse(args);
+                this.fireGetUrlCallback(id, content);
                 break;
             }
 
             case "websocket": {
-                this.fireWebSocketCallback(args);
+                const [webSocketEvent, message] = JSON.parse(args);
+                this.fireWebSocketCallback(webSocketEvent, message);
                 break;
             }
         }
@@ -68,22 +71,19 @@ export class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", [telemetry]);
     }
 
-    private fireGetStateCallback(response: string) {
-        const { id, preferences } = JSON.parse(response);
-
+    private fireGetStateCallback(id: number, preferences: object) {
         if (this.getStateCallbacks.has(id)) {
             this.getStateCallbacks.get(id)!(preferences);
             this.getStateCallbacks.delete(id);
         }
     }
 
-    private fireGetUrlCallback(response: string) {
+    private fireGetUrlCallback(id: number, content: string) {
         // TODO: Send response content to DevTools
     }
 
-    private fireWebSocketCallback(response: string) {
+    private fireWebSocketCallback(e: WebSocketEvent, message: string) {
         // Send response message to DevTools
-        const [e, message] = JSON.parse(response);
         ToolsWebSocket.instance.onMessageFromChannel(e, message);
     }
 }

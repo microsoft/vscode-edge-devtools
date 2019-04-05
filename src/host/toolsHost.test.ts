@@ -17,8 +17,8 @@ describe("toolsHost", () => {
 
     describe("isHostedMode", () => {
         it("returns true", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             expect(host.isHostedMode()).toEqual(true);
         });
@@ -26,8 +26,8 @@ describe("toolsHost", () => {
 
     describe("getPreferences", () => {
         it("calls across to webview", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             const mockCallback = jest.fn();
             host.getPreferences(mockCallback);
@@ -46,8 +46,8 @@ describe("toolsHost", () => {
         });
 
         it("fires callbacks on response from extension", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             const mockCallback = jest.fn();
             host.getPreferences(mockCallback);
@@ -69,8 +69,8 @@ describe("toolsHost", () => {
 
     describe("setPreferences", () => {
         it("calls across to webview", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             const expectedPref = {
                 name: "myPreference",
@@ -94,8 +94,8 @@ describe("toolsHost", () => {
 
     describe("recordEnumeratedHistogram", () => {
         it("calls across to extension", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             const expectedTelemetry = {
                 data: 1000,
@@ -120,8 +120,8 @@ describe("toolsHost", () => {
 
     describe("recordPerformanceHistogram", () => {
         it("calls across to extension", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             const expectedTelemetry = {
                 data: 500,
@@ -146,11 +146,11 @@ describe("toolsHost", () => {
 
     describe("onMessageFromChannel", () => {
         it("does nothing yet on getUrl message", async () => {
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
-            const expectedArgs = "some content";
-            host.onMessageFromChannel("getUrl", expectedArgs);
+            const expectedArgs = {id: 0, content: "some content"};
+            host.onMessageFromChannel("getUrl", JSON.stringify(expectedArgs));
 
             // TODO: Change test once implemented
             expect(window.parent.postMessage).not.toHaveBeenCalled();
@@ -158,21 +158,19 @@ describe("toolsHost", () => {
 
         it("calls onMessageFromChannel on websocket message", async () => {
             const mockToolsWS = {
-                ToolsWebSocket: {
-                    instance: {
-                        onMessageFromChannel: jest.fn(),
-                    },
+                instance: {
+                    onMessageFromChannel: jest.fn(),
                 },
             };
             jest.doMock("./toolsWebSocket", () => mockToolsWS);
 
-            const th = await import("./toolsHost");
-            const host = new th.ToolsHost();
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
 
             const expectedArgs = ["message", "some websocket message"];
             host.onMessageFromChannel("websocket", JSON.stringify(expectedArgs));
 
-            expect(mockToolsWS.ToolsWebSocket.instance.onMessageFromChannel).toHaveBeenCalledWith(
+            expect(mockToolsWS.instance.onMessageFromChannel).toHaveBeenCalledWith(
                 expectedArgs[0],
                 expectedArgs[1],
             );
