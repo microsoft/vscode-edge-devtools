@@ -1,7 +1,7 @@
-import { getFirstCallback } from "../test/helpers";
-
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+import { getFirstCallback } from "../test/helpers";
 
 describe("toolsHost", () => {
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
