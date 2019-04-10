@@ -19,6 +19,13 @@ export const webSocketEventNames: WebSocketEvent[] = [
     "message",
 ];
 
+export type TelemetryEvent = "enumerated" | "performance";
+
+export interface ITelemetryData {
+    event: TelemetryEvent;
+    name: string;
+    data: number;
+}
 /**
  * Parse out the WebviewEvents type from a message and call the appropriate emit event
  * @param message The message to parse

@@ -18,18 +18,18 @@ describe("toolsWebSocket", () => {
 
     describe("constructor", () => {
         it("updates instance property", async () => {
-            const tws = await import("./toolsWebSocket");
+            const { default: toolsWebSocket } = await import("./toolsWebSocket");
 
-            const websocket = new tws.ToolsWebSocket("some url");
-            expect(tws.ToolsWebSocket.instance).toEqual(websocket);
+            const websocket = new toolsWebSocket("some url");
+            expect(toolsWebSocket.instance).toEqual(websocket);
 
-            const websocket2 = new tws.ToolsWebSocket("some other url");
-            expect(tws.ToolsWebSocket.instance).toEqual(websocket2);
+            const websocket2 = new toolsWebSocket("some other url");
+            expect(toolsWebSocket.instance).toEqual(websocket2);
         });
 
         it("sends ready event", async () => {
-            const tws = await import("./toolsWebSocket");
-            const websocket = new tws.ToolsWebSocket("some url");
+            const { default: toolsWebSocket } = await import("./toolsWebSocket");
+            const websocket = new toolsWebSocket("some url");
             expect(websocket).toBeDefined();
 
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
@@ -47,8 +47,8 @@ describe("toolsWebSocket", () => {
 
     describe("send", () => {
         it("forwards messages correctly", async () => {
-            const tws = await import("./toolsWebSocket");
-            const websocket = new tws.ToolsWebSocket("some url");
+            const { default: toolsWebSocket } = await import("./toolsWebSocket");
+            const websocket = new toolsWebSocket("some url");
             mockWebviewEvents.encodeMessageForChannel.mockClear();
 
             const expectedMessage = "some message string";
@@ -68,8 +68,8 @@ describe("toolsWebSocket", () => {
 
     describe("onMessageFromChannel", () => {
         it("parses control messages and calls correct handlers", async () => {
-            const tws = await import("./toolsWebSocket");
-            const websocket = new tws.ToolsWebSocket("some url");
+            const { default: toolsWebSocket } = await import("./toolsWebSocket");
+            const websocket = new toolsWebSocket("some url");
 
             websocket.onerror = jest.fn();
             websocket.onMessageFromChannel("error");
@@ -85,8 +85,8 @@ describe("toolsWebSocket", () => {
         });
 
         it("forwards websocket messages to onmessage", async () => {
-            const tws = await import("./toolsWebSocket");
-            const websocket = new tws.ToolsWebSocket("some url");
+            const { default: toolsWebSocket } = await import("./toolsWebSocket");
+            const websocket = new toolsWebSocket("some url");
 
             websocket.onmessage = jest.fn();
 
@@ -100,8 +100,8 @@ describe("toolsWebSocket", () => {
         });
 
         it("ignores websocket messages with no message data", async () => {
-            const tws = await import("./toolsWebSocket");
-            const websocket = new tws.ToolsWebSocket("some url");
+            const { default: toolsWebSocket } = await import("./toolsWebSocket");
+            const websocket = new toolsWebSocket("some url");
 
             websocket.onmessage = jest.fn();
 
