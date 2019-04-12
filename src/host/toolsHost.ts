@@ -2,11 +2,17 @@
 // Licensed under the MIT License.
 
 import { encodeMessageForChannel, ITelemetryData, WebSocketEvent, WebviewEvent } from "../common/webviewEvents";
+import { ToolsResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export default class ToolsHost {
+    private resourceLoader: Readonly<ToolsResourceLoader>;
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
+
+    constructor(resourceLoader: Readonly<ToolsResourceLoader>) {
+        this.resourceLoader = resourceLoader;
+    }
 
     public isHostedMode() {
         // DevTools will always be inside a webview
@@ -79,7 +85,8 @@ export default class ToolsHost {
     }
 
     private fireGetUrlCallback(id: number, content: string) {
-        // TODO: Send response content to DevTools
+        // Send response content to DevTools
+        this.resourceLoader.onResolvedUrlFromChannel(id, content);
     }
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {

@@ -4,10 +4,10 @@
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
 
-import { ExtensionContext, WebviewPanel } from "vscode";
+import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
 import { webviewEventNames } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
-import { createFakeExtensionContext, createFakeVSCode, getFirstCallback, Mocked } from "./test/helpers";
+import { createFakeExtensionContext, createFakeVSCode, getFirstCallback, Mocked, Writable } from "./test/helpers";
 import { SETTINGS_PREF_DEFAULTS, SETTINGS_PREF_NAME } from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
@@ -77,14 +77,14 @@ describe("devtoolsPanel", () => {
 
             // Create the function used for each event handler so that we can store the disposable objects
             // and ensure they get correctly disposed later
-            const addDisposable = () => (...args: any) => {
+            const addDisposable = () => (...args: any): Disposable => {
                 const [, , disposables] = args;
                 const disposable = {
                     dispose: jest.fn(),
                 };
                 expectedDisposables.push(disposable);
                 disposables.push(disposable);
-                return jest.fn();
+                return { dispose: jest.fn() };
             };
 
             // Mock out each callback
@@ -116,13 +116,15 @@ describe("devtoolsPanel", () => {
 
             const { callback, thisObj } = getFirstCallback(mockPanel.onDidChangeViewState);
 
+            const testPanel: Writable<WebviewPanel> = mockPanel;
+
             // Not visible
-            mockPanel.visible = false;
+            testPanel.visible = false;
             callback.call(thisObj);
             expect(mockPanel.webview.html).toBeUndefined();
 
             // Visible
-            mockPanel.visible = true;
+            testPanel.visible = true;
             callback.call(thisObj);
             expect(mockPanel.webview.html).toBeDefined();
         });
@@ -131,9 +133,9 @@ describe("devtoolsPanel", () => {
     describe("panelSocket", () => {
         it("listens for all the emit events", async () => {
             const hookedEvents: string[] = [];
-            mockPanelSocket.on.mockImplementation(((name: string, ...args: any) => {
-                hookedEvents.push(name);
-                return jest.fn();
+            mockPanelSocket.on.mockImplementation(((name: string | symbol, ...args: any) => {
+                hookedEvents.push(name.toString());
+                return mockPanelSocket;
             }));
 
             const dtp = await import("./devtoolsPanel");
@@ -181,9 +183,9 @@ describe("devtoolsPanel", () => {
             beforeEach(() => {
                 hookedEvents = new Map();
                 mockPanelSocket.on.mockImplementation((
-                    (name: string, callback: (msg: string) => void, ...args: any) => {
-                        hookedEvents.set(name, callback);
-                        return jest.fn();
+                    (name: string | symbol, callback: (msg: string) => void, ...args: any) => {
+                        hookedEvents.set(name.toString(), callback);
+                        return mockPanelSocket;
                     }),
                 );
             });

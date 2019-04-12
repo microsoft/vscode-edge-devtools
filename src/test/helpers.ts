@@ -7,10 +7,15 @@
 import { ExtensionContext } from "vscode";
 
 export type Mocked<T> = {
+    -readonly [P in keyof T]:
+    T[P] extends (...args: any[]) => any ? jest.Mock<ReturnType<T[P]>, jest.ArgsType<T[P]>> :
     // tslint:disable-next-line: ban-types
-    -readonly [P in keyof T]: T[P] extends Function ?
-    jest.Mock<T[P]> : T[P] extends object ?
-    Mocked<T[P]> : T[P];
+    T[P] extends Function ? jest.Mocked<T[P]> :
+    T[P] extends object ? Mocked<T[P]> : T[P];
+} & T;
+
+export type Writable<T> = {
+    -readonly [P in keyof T]: T[P];
 };
 
 /**
