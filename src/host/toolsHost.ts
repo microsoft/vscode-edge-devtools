@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { encodeMessageForChannel, ITelemetryData, WebSocketEvent, WebviewEvent } from "../common/webviewEvents";
-import { ToolsResourceLoader } from "./toolsResourceLoader";
+import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export default class ToolsHost {

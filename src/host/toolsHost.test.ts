@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { getFirstCallback, Mocked } from "../test/helpers";
-import { ToolsResourceLoader } from "./toolsResourceLoader";
+import ToolsResourceLoader from "./toolsResourceLoader";
 
 describe("toolsHost", () => {
     let mockResourceLoader: Mocked<ToolsResourceLoader>;
