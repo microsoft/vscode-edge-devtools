@@ -21,7 +21,7 @@ module.exports = [
     {
         ...commonConfig,
         entry: {
-            host: "./src/host/main.ts",
+            host: "./src/host/mainHost.ts",
             messaging: "./src/host/mainMessaging.ts",
         },
         name: "host",
