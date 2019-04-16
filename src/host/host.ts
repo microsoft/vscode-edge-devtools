@@ -12,7 +12,7 @@ export interface IDevToolsWindow extends Window {
     Runtime: IRuntimeResourceLoader;
 }
 
-export default function initialize(devToolsFrame: HTMLIFrameElement) {
+export function initialize(devToolsFrame: HTMLIFrameElement) {
     devToolsFrame.onload = () => {
         if (!devToolsFrame.contentWindow) {
             return;
@@ -31,10 +31,12 @@ export default function initialize(devToolsFrame: HTMLIFrameElement) {
         });
 
         // Listen for messages from the extension and forward to the tools
+        const messageCallback =
+            dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
         window.addEventListener("message", (e) => {
             parseMessageFromChannel(
                 e.data,
-                dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost),
+                messageCallback,
             );
         });
     };

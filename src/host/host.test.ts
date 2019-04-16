@@ -25,8 +25,8 @@ describe("host", () => {
 
     describe("initialize", () => {
         it("hooks events correctly", async () => {
-            const { default: initialize } = await import("./host");
-            initialize(mockIframe);
+            const host = await import("./host");
+            host.initialize(mockIframe);
 
             expect(mockIframe.onload).toBeDefined();
         });
@@ -49,8 +49,8 @@ describe("host", () => {
         });
 
         it("skips events if there is no contentWindow", async () => {
-            const { default: initialize } = await import("./host");
-            initialize(mockIframe);
+            const host = await import("./host");
+            host.initialize(mockIframe);
 
             const overwrite: Writable<Mocked<HTMLIFrameElement>> = mockIframe;
             overwrite.contentWindow = null;
@@ -63,8 +63,8 @@ describe("host", () => {
         });
 
         it("hooks events correctly", async () => {
-            const { default: initialize } = await import("./host");
-            initialize(mockIframe);
+            const host = await import("./host");
+            host.initialize(mockIframe);
 
             expect(mockIframe.onload).toBeDefined();
             mockIframe.onload!(new Event("load"));
@@ -75,8 +75,8 @@ describe("host", () => {
         });
 
         it("hides local storage", async () => {
-            const { default: initialize } = await import("./host");
-            initialize(mockIframe);
+            const host = await import("./host");
+            host.initialize(mockIframe);
             mockIframe.onload!(new Event("load"));
 
             expect(mockDevToolsWindow.localStorage).toBeUndefined();
@@ -96,8 +96,8 @@ describe("host", () => {
             jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
             jest.resetModules();
 
-            const { default: initialize } = await import("./host");
-            initialize(mockIframe);
+            const host = await import("./host");
+            host.initialize(mockIframe);
             mockIframe.onload!(new Event("load"));
 
             const onMessage = getFirstCallback(mockGlobal.addEventListener, 1);

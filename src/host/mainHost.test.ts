@@ -4,7 +4,7 @@
 describe("mainHost", () => {
     it("calls initialize", async () => {
         const mockInitialize = jest.fn();
-        jest.doMock("./host", () => mockInitialize);
+        jest.doMock("./host", () => ({ initialize: mockInitialize }));
 
         const expectedFrame = {};
         (global as object as Window).document.getElementById = jest.fn().mockReturnValue(expectedFrame);
