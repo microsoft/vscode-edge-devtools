@@ -42,7 +42,7 @@ describe("toolsHost", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "getState",
-                expect.objectContaining([{ id: 0 }]),
+                expect.objectContaining({ id: 0 }),
             );
 
             // Ensure that the encoded message is actually passed over to the extension
@@ -88,7 +88,7 @@ describe("toolsHost", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "setState",
-                [expectedPref],
+                expectedPref,
             );
 
             // Ensure that the encoded message is actually passed over to the extension
@@ -114,7 +114,7 @@ describe("toolsHost", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "telemetry",
-                expect.objectContaining([expectedTelemetry]),
+                expect.objectContaining(expectedTelemetry),
             );
 
             // Ensure that the encoded message is actually passed over to the extension
@@ -140,7 +140,7 @@ describe("toolsHost", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "telemetry",
-                expect.objectContaining([expectedTelemetry]),
+                expect.objectContaining(expectedTelemetry),
             );
 
             // Ensure that the encoded message is actually passed over to the extension
@@ -156,7 +156,7 @@ describe("toolsHost", () => {
             const { default: toolsHost } = await import("./toolsHost");
             const host = new toolsHost(mockResourceLoader);
 
-            const expectedArgs = {id: 0, content: "some content"};
+            const expectedArgs = { id: 0, content: "some content" };
             host.onMessageFromChannel("getUrl", JSON.stringify(expectedArgs));
 
             expect(mockResourceLoader.onResolvedUrlFromChannel).toHaveBeenCalledWith(
@@ -176,12 +176,12 @@ describe("toolsHost", () => {
             const { default: toolsHost } = await import("./toolsHost");
             const host = new toolsHost(mockResourceLoader);
 
-            const expectedArgs = ["message", "some websocket message"];
+            const expectedArgs = { event: "message", message: "some websocket message" };
             host.onMessageFromChannel("websocket", JSON.stringify(expectedArgs));
 
             expect(mockToolsWS.instance.onMessageFromChannel).toHaveBeenCalledWith(
-                expectedArgs[0],
-                expectedArgs[1],
+                expectedArgs.event,
+                expectedArgs.message,
             );
         });
     });

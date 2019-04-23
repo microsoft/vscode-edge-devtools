@@ -27,12 +27,12 @@ export default class ToolsWebSocket {
     constructor(url: string) {
         ToolsWebSocket.devtoolsWebSocket = this;
         // Inform the extension that we are ready to receive messages
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "ready", [""]);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "ready");
     }
 
     public send(message: string) {
         // Forward the message to the extension
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "websocket", [message]);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "websocket", { message });
     }
 
     public onMessageFromChannel(e: WebSocketEvent, message?: string) {

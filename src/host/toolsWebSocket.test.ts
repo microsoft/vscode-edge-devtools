@@ -35,7 +35,6 @@ describe("toolsWebSocket", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "ready",
-                [""],
             );
 
             const expectedPostedMessage = "encodedMessage";
@@ -56,7 +55,7 @@ describe("toolsWebSocket", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "websocket",
-                [expectedMessage],
+                { message: expectedMessage },
             );
 
             const expectedPostedMessage = "encodedMessage";

@@ -23,12 +23,12 @@ export default class ToolsHost {
         // Load the preference via the extension workspaceState
         const id = this.getStateNextId++;
         this.getStateCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getState", [{ id }]);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getState", { id });
     }
 
     public setPreference(name: string, value: string) {
         // Save the preference via the extension workspaceState
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", [{ name, value }]);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
     }
 
     public recordEnumeratedHistogram(actionName: string, actionCode: number, bucketSize: number) {
@@ -64,8 +64,8 @@ export default class ToolsHost {
             }
 
             case "websocket": {
-                const [webSocketEvent, message] = JSON.parse(args);
-                this.fireWebSocketCallback(webSocketEvent, message);
+                const { event, message } = JSON.parse(args);
+                this.fireWebSocketCallback(event, message);
                 break;
             }
         }
@@ -74,7 +74,7 @@ export default class ToolsHost {
 
     private sendTelemetry(telemetry: ITelemetryData) {
         // Forward the data to the extension
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", [telemetry]);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", telemetry);
     }
 
     private fireGetStateCallback(id: number, preferences: object) {
