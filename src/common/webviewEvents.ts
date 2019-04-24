@@ -50,13 +50,13 @@ export function parseMessageFromChannel(
  * The message can be parsed on the other side using parseMessageFromChannel
  * @param postMessageObject The object which contains the postMessage function
  * @param eventType The type of the message to post
- * @param args Any arguments to encode and post
+ * @param args The argument object to encode and post
  * @param origin The origin (if any) to use with the postMessage call
  */
 export function encodeMessageForChannel(
     postMessageCallback: (message: string) => void,
     eventType: WebviewEvent,
-    args?: any[]) {
+    args?: object) {
     const message = `${eventType}:${JSON.stringify(args)}`;
     postMessageCallback(message);
 }

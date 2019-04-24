@@ -70,7 +70,7 @@ export class DevToolsPanel {
     }
 
     private postToDevTools(e: WebSocketEvent, message?: string) {
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", [e, message]);
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: e, message });
     }
 
     private onSocketReady() {
@@ -88,7 +88,7 @@ export class DevToolsPanel {
     private onSocketGetState(message: string) {
         const { id } = JSON.parse(message) as { id: number };
         const preferences: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getState", [{ id, preferences }]);
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getState", { id, preferences });
     }
 
     private onSocketSetState(message: string) {
@@ -110,7 +110,7 @@ export class DevToolsPanel {
             // Response will not have content
         }
 
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", [{ id: request.id, content }]);
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", { id: request.id, content });
     }
 
     private update() {

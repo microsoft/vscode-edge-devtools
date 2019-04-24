@@ -45,14 +45,14 @@ export class PanelSocket extends EventEmitter {
                 this.connectToTarget();
             }
 
-            const data = JSON.parse(args[0]);
-            if (data && data[0] === "{") {
+            const { message } = JSON.parse(args[0]);
+            if (message && message[0] === "{") {
                 if (!this.isConnected) {
                     // DevTools are sending a message before the real websocket has finished opening so cache it
-                    this.messages.push(data);
+                    this.messages.push(message);
                 } else {
                     // Websocket ready so send the message directly
-                    this.socket!.send(data);
+                    this.socket!.send(message);
                 }
             }
         }

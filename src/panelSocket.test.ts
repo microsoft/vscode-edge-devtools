@@ -93,7 +93,7 @@ describe("panelSocket", () => {
 
         // Queue up some messages and make sure they haven't been sent
         for (const m of expectedMessages) {
-            panelSocket.onMessageFromWebview(`websocket:"${m}"`);
+            panelSocket.onMessageFromWebview(`websocket:${JSON.stringify({ message: m })}`);
         }
         expect(mockWebSocket.send).not.toBeCalled();
 
@@ -105,8 +105,9 @@ describe("panelSocket", () => {
         });
 
         // Now the websocket is open, send a final message that should not be queued up
-        panelSocket.onMessageFromWebview(`websocket:"{final}"`);
-        expect(mockWebSocket.send).toHaveBeenLastCalledWith("{final}");
+        const expectedFinalMessage = "{final}";
+        panelSocket.onMessageFromWebview(`websocket:${JSON.stringify({ message: expectedFinalMessage })}`);
+        expect(mockWebSocket.send).toHaveBeenLastCalledWith(expectedFinalMessage);
     });
 
     it("posts back messages once connected", async () => {

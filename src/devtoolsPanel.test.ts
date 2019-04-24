@@ -168,7 +168,7 @@ describe("devtoolsPanel", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "websocket",
-                [expectedEvent, expectedMessage],
+                {event: expectedEvent, message: expectedMessage},
             );
 
             // Ensure that the encoded message is actually passed over to the webview
@@ -226,7 +226,7 @@ describe("devtoolsPanel", () => {
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
                     "getState",
-                    [{ ...expectedId, preferences: expectedState }],
+                    { ...expectedId, preferences: expectedState },
                 );
 
                 // Ensure that the encoded message is actually passed over to the webview
@@ -248,7 +248,7 @@ describe("devtoolsPanel", () => {
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
                     "getState",
-                    [{ ...expectedId, preferences: SETTINGS_PREF_DEFAULTS }],
+                    { ...expectedId, preferences: SETTINGS_PREF_DEFAULTS },
                 );
             });
 
@@ -308,7 +308,7 @@ describe("devtoolsPanel", () => {
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
                     "getUrl",
-                    [{ id: expectedRequest.id, content: expectedContent }],
+                    { id: expectedRequest.id, content: expectedContent },
                 );
 
                 // Ensure that the encoded message is actually passed over to the webview
@@ -337,7 +337,7 @@ describe("devtoolsPanel", () => {
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
                     "getUrl",
-                    [{ id: expectedRequest.id, content: "" }],
+                    { id: expectedRequest.id, content: "" },
                 );
             });
         });

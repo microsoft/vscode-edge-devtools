@@ -11,10 +11,10 @@ describe("webviewEvents", () => {
     describe("parseMessageFromChannel", () => {
         it("calls emit on events", async () => {
             for (const e of webviewEventNames) {
-                const expectedArgs = [{
+                const expectedArgs = {
                     name: e,
                     someArg: "hello",
-                }];
+                };
 
                 // Generate a message we can use for parsing
                 let data = "";
@@ -38,10 +38,10 @@ describe("webviewEvents", () => {
     describe("postMessageAcrossChannel", () => {
         it("calls postMessageCallback with encoded data", async () => {
             for (const e of webviewEventNames) {
-                const expectedArgs = [{
+                const expectedArgs = {
                     name: e,
                     someArg: "hello",
-                }];
+                };
                 const expectedFormat = `${e}:${JSON.stringify(expectedArgs)}`;
 
                 const mockPostMessage = jest.fn();
