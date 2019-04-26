@@ -4,21 +4,33 @@
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
 
-import * as http from "http";
-import * as https from "https";
-import { createFakeGet, createFakeVSCode } from "./test/helpers";
-import * as utils from "./utils";
+import { createFakeExtensionContext, createFakeGet, createFakeVSCode } from "./test/helpers";
+import { IRemoteTargetJson } from "./utils";
 
-jest.mock("http");
-jest.mock("https");
-jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
+jest.mock("vscode", () => null, { virtual: true });
 
 describe("utils", () => {
+    let utils: typeof import("./utils");
+    let mockGetHttp: jest.Mock;
+    let mockGetHttps: jest.Mock;
+
+    beforeEach(async () => {
+        jest.doMock("http");
+        jest.doMock("https");
+        jest.doMock("vscode", () => createFakeVSCode(), { virtual: true });
+        jest.resetModules();
+
+        mockGetHttp = jest.requireMock("http").get;
+        mockGetHttps = jest.requireMock("https").get;
+
+        utils = await import("./utils");
+    });
+
     describe("fixRemoteWebSocket", () => {
         it("replaces address and port correctly", async () => {
             const target = {
                 webSocketDebuggerUrl: "ws://127.0.0.1:1000/devtools/page/ABC",
-            } as utils.IRemoteTargetJson;
+            } as IRemoteTargetJson;
 
             const expectedHostName = "machine";
             const expectedPort = 8080;
@@ -29,7 +41,7 @@ describe("utils", () => {
         it("replaces no port with the specified port correctly", async () => {
             const target = {
                 webSocketDebuggerUrl: "ws://localhost/devtools/page/DEF",
-            } as utils.IRemoteTargetJson;
+            } as IRemoteTargetJson;
 
             const expectedHostName = "remote";
             const expectedPort = 8081;
@@ -41,7 +53,7 @@ describe("utils", () => {
             const expectedWSUrl = "unknown websocket";
             const target = {
                 webSocketDebuggerUrl: expectedWSUrl,
-            } as utils.IRemoteTargetJson;
+            } as IRemoteTargetJson;
 
             const fixed = utils.fixRemoteWebSocket("localhost", 9222, target);
             expect(fixed.webSocketDebuggerUrl).toBe(expectedWSUrl);
@@ -50,13 +62,13 @@ describe("utils", () => {
 
     describe("fetchUri", () => {
         beforeEach(() => {
-            (http.get as jest.Mock).mockClear();
-            (https.get as jest.Mock).mockClear();
+            mockGetHttp.mockClear();
+            mockGetHttps.mockClear();
         });
 
         it("uses 'get' response object correctly for chunking", async () => {
             const fake = createFakeGet(() => "[]", () => 200);
-            (http.get as jest.Mock).mockImplementation(fake.get);
+            mockGetHttp.mockImplementation(fake.get);
 
             await utils.fetchUri("http://somedomain.com/json/list");
             expect(fake.on).toHaveBeenNthCalledWith(1, "data", expect.any(Function));
@@ -65,7 +77,7 @@ describe("utils", () => {
 
         it("requests http url correctly", async () => {
             const expectedHttpResponse = "[{},{}]";
-            (http.get as jest.Mock).mockImplementation(
+            mockGetHttp.mockImplementation(
                 createFakeGet(() => expectedHttpResponse, () => 200).get);
 
             const response = await utils.fetchUri("http://fake-http-url.test/json/list");
@@ -74,7 +86,7 @@ describe("utils", () => {
 
         it("requests https url correctly", async () => {
             const expectedHttpsResponse = "[{}]";
-            (https.get as jest.Mock).mockImplementation(
+            mockGetHttps.mockImplementation(
                 createFakeGet(() => expectedHttpsResponse, () => 200).get);
 
             const response = await utils.fetchUri("https://fake-https-url.test/json/list");
@@ -85,7 +97,7 @@ describe("utils", () => {
             let onErrorCallback: ((e: string) => void) | undefined;
 
             // Setup the get mock so that we store the on("error") callback
-            const httpGetMock = (http.get as jest.Mock);
+            const httpGetMock = mockGetHttp;
             const mockOnReturn = jest.fn((_name, callback) => {
                 onErrorCallback = callback;
             });
@@ -130,7 +142,7 @@ describe("utils", () => {
                 () => 404,
                 getOnMock,
             );
-            const httpGetMock = (http.get as jest.Mock);
+            const httpGetMock = mockGetHttp;
             httpGetMock.mockImplementation(fake.get);
 
             // Call the fetchUri api and handle the rejection so that debugging won't stop on an
@@ -152,12 +164,12 @@ describe("utils", () => {
         let expectedListResponse = "";
 
         beforeEach(() => {
-            (http.get as jest.Mock).mockClear();
-            (http.get as jest.Mock).mockImplementation(
+            mockGetHttp.mockClear();
+            mockGetHttp.mockImplementation(
                 createFakeGet(() => expectedListResponse, () => 200).get);
 
-            (https.get as jest.Mock).mockClear();
-            (https.get as jest.Mock).mockImplementation(
+            mockGetHttps.mockClear();
+            mockGetHttps.mockImplementation(
                 createFakeGet(() => expectedListResponse, () => 200).get);
         });
 
@@ -197,7 +209,7 @@ describe("utils", () => {
         it("uses correct remote address", async () => {
             const expectedHostName = "127.0.0.1";
             const expectedPort = 8080;
-            const httpGetMock = (http.get as jest.Mock);
+            const httpGetMock = mockGetHttp;
 
             await utils.getListOfTargets(expectedHostName, expectedPort, utils.SETTINGS_DEFAULT_USE_HTTPS);
             expect(httpGetMock).toHaveBeenCalledWith(expect.objectContaining({
@@ -207,8 +219,8 @@ describe("utils", () => {
         });
 
         it("uses correct protocol", async () => {
-            const httpsGetMock = (https.get as jest.Mock);
-            const httpGetMock = (http.get as jest.Mock);
+            const httpsGetMock = mockGetHttps;
+            const httpGetMock = mockGetHttp;
 
             // HTTPS
             await utils.getListOfTargets(
@@ -234,7 +246,7 @@ describe("utils", () => {
             expectedListResponse = JSON.stringify(expectedTargets);
 
             // Setup the get mock so that we fail the first get but succeed on subsequent ones
-            const httpGetMock = (http.get as jest.Mock);
+            const httpGetMock = mockGetHttp;
             httpGetMock.mockClear();
 
             const mockOn = jest.fn()
@@ -302,6 +314,48 @@ describe("utils", () => {
             expect(hostname).toBe(utils.SETTINGS_DEFAULT_HOSTNAME);
             expect(port).toBe(utils.SETTINGS_DEFAULT_PORT);
             expect(useHttps).toBe(utils.SETTINGS_DEFAULT_USE_HTTPS);
+        });
+    });
+
+    describe("createTelemetryReporter", () => {
+        const mockReporter = {};
+        beforeEach(async () => {
+            jest.doMock("./package.json", () => ({}), { virtual: true });
+            jest.doMock("./debugTelemetryReporter", () => function debug() { return mockReporter; });
+            jest.resetModules();
+
+            utils = await import("./utils");
+        });
+
+        it("returns a debug version when no package info in debug env", async () => {
+            jest.doMock("./package.json", () => null, { virtual: true });
+            jest.resetModules();
+
+            const mockContext = createFakeExtensionContext();
+            const reporter = utils.createTelemetryReporter(mockContext);
+            expect(reporter).toBeDefined();
+            expect(reporter).toEqual(mockReporter);
+        });
+
+        it("returns a debug version when valid package in debug env", async () => {
+            const mockContext = createFakeExtensionContext();
+            const reporter = utils.createTelemetryReporter(mockContext);
+            expect(reporter).toBeDefined();
+            expect(reporter).toEqual(mockReporter);
+        });
+
+        it("returns a retail version when valid package in retail env", async () => {
+            const retailReporter = {};
+            jest.doMock("vscode-extension-telemetry", () => function retail() { return retailReporter; });
+            jest.resetModules();
+            jest.requireMock("vscode").env.machineId = "12345";
+
+            utils = await import("./utils");
+
+            const mockContext = createFakeExtensionContext();
+            const reporter = utils.createTelemetryReporter(mockContext);
+            expect(reporter).toBeDefined();
+            expect(reporter).toEqual(retailReporter);
         });
     });
 });

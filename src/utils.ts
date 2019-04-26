@@ -5,6 +5,8 @@ import * as http from "http";
 import * as https from "https";
 import * as url from "url";
 import * as vscode from "vscode";
+import TelemetryReporter from "vscode-extension-telemetry";
+import DebugTelemetryReporter from "./debugTelemetryReporter";
 
 export const SETTINGS_STORE_NAME = "vscode-edge-devtools";
 export const SETTINGS_DEFAULT_USE_HTTPS = false;
@@ -124,4 +126,19 @@ export function getRemoteEndpointSettings(): { hostname: string, port: number, u
     const useHttps: boolean = settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
 
     return { hostname, port, useHttps };
+}
+
+/**
+ * Create a telemetry reporter that can be used for this extension
+ * @param context The vscode context
+ */
+export function createTelemetryReporter(context: vscode.ExtensionContext) {
+    const extensionPackage = require(context.asAbsolutePath("./package.json"));
+    if (extensionPackage && vscode.env.machineId !== "someValue.machineId") {
+        // Use the real telemetry reporter
+        return new TelemetryReporter(extensionPackage.name, extensionPackage.version, extensionPackage.aiKey);
+    } else {
+        // Fallback to a fake telemetry reporter
+        return new DebugTelemetryReporter();
+    }
 }
