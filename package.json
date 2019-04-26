@@ -104,7 +104,6 @@
         "@types/fs-extra": "5.0.5",
         "@types/jest": "24.0.11",
         "@types/node": "11.11.3",
-        "@types/webpack": "4.4.27",
         "@types/ws": "6.0.1",
         "fs-extra": "7.0.1",
         "jest": "24.5.0",
