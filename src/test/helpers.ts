@@ -55,7 +55,6 @@ export function createFakeVSCode() {
  */
 export function createFakeExtensionContext() {
     return {
-        asAbsolutePath: jest.fn((path) => path),
         extensionPath: "",
         subscriptions: [],
         workspaceState: {
