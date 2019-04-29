@@ -5,6 +5,7 @@
 // tslint:disable: variable-name
 
 import { ExtensionContext } from "vscode";
+import TelemetryReporter from "vscode-extension-telemetry";
 
 export type Mocked<T> = {
     -readonly [P in keyof T]:
@@ -34,6 +35,7 @@ export function createFakeVSCode() {
         commands: {
             registerCommand: jest.fn(),
         },
+        env: { machineId: "someValue.machineId" },
         window: {
             createWebviewPanel: jest.fn(),
             showErrorMessage: jest.fn(),
@@ -43,6 +45,7 @@ export function createFakeVSCode() {
             getConfiguration: jest.fn(() => {
                 return { get: (name: string) => "" };
             }),
+            onDidChangeConfiguration: jest.fn(),
         },
     };
 }
@@ -52,6 +55,7 @@ export function createFakeVSCode() {
  */
 export function createFakeExtensionContext() {
     return {
+        asAbsolutePath: jest.fn((path) => path),
         extensionPath: "",
         subscriptions: [],
         workspaceState: {
@@ -59,6 +63,16 @@ export function createFakeExtensionContext() {
             update: jest.fn(),
         },
     } as object as ExtensionContext;
+}
+
+/**
+ * Create a fake TelemetryReporter that can be used in tests
+ */
+export function createFakeTelemetryReporter(): Mocked<Readonly<TelemetryReporter>> {
+    return {
+        dispose: jest.fn(),
+        sendTelemetryEvent: jest.fn(),
+    };
 }
 
 /**
