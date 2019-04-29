@@ -20,7 +20,7 @@ export class PanelSocket extends EventEmitter {
         this.postMessageToDevTools = postMessageToDevTools;
     }
 
-    public get IsConnected() {
+    public get isConnectedToTarget() {
         return this.isConnected;
     }
 
