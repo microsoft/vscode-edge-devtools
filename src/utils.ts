@@ -6,6 +6,7 @@ import * as https from "https";
 import * as url from "url";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
+import packageJson from "../package.json";
 import DebugTelemetryReporter from "./debugTelemetryReporter";
 
 export const SETTINGS_STORE_NAME = "vscode-edge-devtools";
@@ -133,10 +134,9 @@ export function getRemoteEndpointSettings(): { hostname: string, port: number, u
  * @param context The vscode context
  */
 export function createTelemetryReporter(context: vscode.ExtensionContext) {
-    const extensionPackage = require(context.asAbsolutePath("./package.json"));
-    if (extensionPackage && vscode.env.machineId !== "someValue.machineId") {
+    if (packageJson && vscode.env.machineId !== "someValue.machineId") {
         // Use the real telemetry reporter
-        return new TelemetryReporter(extensionPackage.name, extensionPackage.version, extensionPackage.aiKey);
+        return new TelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
     } else {
         // Fallback to a fake telemetry reporter
         return new DebugTelemetryReporter();

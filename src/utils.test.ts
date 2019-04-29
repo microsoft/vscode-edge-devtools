@@ -320,7 +320,7 @@ describe("utils", () => {
     describe("createTelemetryReporter", () => {
         const mockReporter = {};
         beforeEach(async () => {
-            jest.doMock("./package.json", () => ({}), { virtual: true });
+            jest.doMock("../package.json", () => ({}), { virtual: true });
             jest.doMock("./debugTelemetryReporter", () => function debug() { return mockReporter; });
             jest.resetModules();
 
@@ -328,7 +328,7 @@ describe("utils", () => {
         });
 
         it("returns a debug version when no package info in debug env", async () => {
-            jest.doMock("./package.json", () => null, { virtual: true });
+            jest.doMock("../package.json", () => null, { virtual: true });
             jest.resetModules();
 
             const mockContext = createFakeExtensionContext();

@@ -20,6 +20,10 @@ export class PanelSocket extends EventEmitter {
         this.postMessageToDevTools = postMessageToDevTools;
     }
 
+    public get IsConnected() {
+        return this.isConnected;
+    }
+
     public onMessageFromWebview(message: string) {
         parseMessageFromChannel(message, (eventName, args) => this.onMessageParsed(eventName, args));
     }
