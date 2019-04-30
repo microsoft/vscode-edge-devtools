@@ -5,15 +5,24 @@
 // tslint:disable: variable-name
 
 import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
-import { webviewEventNames } from "./common/webviewEvents";
+import TelemetryReporter from "vscode-extension-telemetry";
+import { ITelemetryData, webviewEventNames } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
-import { createFakeExtensionContext, createFakeVSCode, getFirstCallback, Mocked, Writable } from "./test/helpers";
+import {
+    createFakeExtensionContext,
+    createFakeTelemetryReporter,
+    createFakeVSCode,
+    getFirstCallback,
+    Mocked,
+    Writable,
+} from "./test/helpers";
 import { SETTINGS_PREF_DEFAULTS, SETTINGS_PREF_NAME } from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("devtoolsPanel", () => {
     let context: ExtensionContext;
+    let mockTelemetry: Mocked<Readonly<TelemetryReporter>>;
     let mockPanel: Mocked<WebviewPanel>;
     let mockPanelSocket: Mocked<PanelSocket>;
     let mockPanelSocketFactory: { PanelSocket: jest.Mock };
@@ -21,6 +30,8 @@ describe("devtoolsPanel", () => {
 
     beforeEach(() => {
         context = createFakeExtensionContext();
+
+        mockTelemetry = createFakeTelemetryReporter();
 
         mockPanel = {
             dispose: jest.fn(),
@@ -58,15 +69,15 @@ describe("devtoolsPanel", () => {
     describe("createOrShow", () => {
         it("registers panel events correctly", async () => {
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
             expect(mockPanel.onDidChangeViewState).toHaveBeenCalled();
             expect(mockPanel.onDidDispose).toHaveBeenCalled();
         });
 
         it("calls reveal on existing instance", async () => {
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
             expect(mockPanel.reveal).toHaveBeenCalled();
         });
     });
@@ -94,7 +105,7 @@ describe("devtoolsPanel", () => {
 
             // Create the panel
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
             expect(mockPanel.onDidDispose).toHaveBeenCalled();
 
             // Ensure that dispose correctly called each disposable
@@ -111,7 +122,7 @@ describe("devtoolsPanel", () => {
     describe("update", () => {
         it("adds html to the webview only when visible", async () => {
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
             expect(mockPanel.onDidChangeViewState).toHaveBeenCalled();
 
             const { callback, thisObj } = getFirstCallback(mockPanel.onDidChangeViewState);
@@ -139,7 +150,7 @@ describe("devtoolsPanel", () => {
             }));
 
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
             expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length);
             for (const e of webviewEventNames) {
@@ -149,7 +160,7 @@ describe("devtoolsPanel", () => {
 
         it("forwards webview messages to the panel socket", async () => {
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
             const expectedMessage = "some message that should be passed through";
             const { callback, thisObj } = getFirstCallback(mockPanel.webview.onDidReceiveMessage);
@@ -159,7 +170,7 @@ describe("devtoolsPanel", () => {
 
         it("forwards panel socket messages to the webview", async () => {
             const dtp = await import("./devtoolsPanel");
-            dtp.DevToolsPanel.createOrShow(context, "");
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
             const expectedEvent = "message";
             const expectedMessage = "some message that should be passed through";
@@ -168,7 +179,7 @@ describe("devtoolsPanel", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "websocket",
-                {event: expectedEvent, message: expectedMessage},
+                { event: expectedEvent, message: expectedMessage },
             );
 
             // Ensure that the encoded message is actually passed over to the webview
@@ -176,42 +187,75 @@ describe("devtoolsPanel", () => {
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
             expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
+
+            // Ensure it posts telemetry
+            callback.call(thisObj, "open");
+            expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                "websocket/open",
+            );
         });
 
         describe("events", () => {
-            let hookedEvents: Map<string, (msg: string) => void>;
+            let hookedEvents: Map<string, (msg?: object | string) => void>;
             beforeEach(() => {
                 hookedEvents = new Map();
                 mockPanelSocket.on.mockImplementation((
-                    (name: string | symbol, callback: (msg: string) => void, ...args: any) => {
+                    (name: string | symbol, callback: (msg?: object | string) => void, ...args: any) => {
                         hookedEvents.set(name.toString(), callback);
                         return mockPanelSocket;
                     }),
                 );
             });
 
-            it("does nothing yet for ready", async () => {
+            it("sends telemetry for ready", async () => {
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
-                hookedEvents.get("ready")!(JSON.stringify({}));
-                expect(context.workspaceState.get).not.toHaveBeenCalled();
+                // Ensure it sends connect initially
+                hookedEvents.get("ready")!();
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith("websocket/connect");
+
+                // Ensure it sends reconnect when already connected
+                const socket: Writable<PanelSocket> = mockPanelSocket;
+                socket.isConnectedToTarget = true;
+                hookedEvents.get("ready")!();
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith("websocket/reconnect");
             });
 
             it("does nothing yet for websocket", async () => {
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
-                hookedEvents.get("websocket")!(JSON.stringify({}));
+                hookedEvents.get("websocket")!();
                 expect(context.workspaceState.get).not.toHaveBeenCalled();
             });
 
-            it("does nothing yet for telemetry", async () => {
+            it("sends telemetry for telemetry", async () => {
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
-                hookedEvents.get("telemetry")!(JSON.stringify({}));
-                expect(context.workspaceState.get).not.toHaveBeenCalled();
+                const expectedPerf: ITelemetryData = {
+                    data: 100,
+                    event: "performance",
+                    name: "myHistogram",
+                };
+                hookedEvents.get("telemetry")!(JSON.stringify(expectedPerf));
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                    `devtools/${expectedPerf.name}`,
+                    undefined,
+                    expect.objectContaining({ "myHistogram.duration": 100 }),
+                );
+
+                const expectedEnum: ITelemetryData = {
+                    data: 2,
+                    event: "enumerated",
+                    name: "myHistogram2",
+                };
+                hookedEvents.get("telemetry")!(JSON.stringify(expectedEnum));
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                    `devtools/${expectedEnum.name}`,
+                    expect.objectContaining({ "myHistogram2.actionCode": "2" }),
+                );
             });
 
             it("posts result of get state", async () => {
@@ -220,7 +264,7 @@ describe("devtoolsPanel", () => {
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
 
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
                 hookedEvents.get("getState")!(JSON.stringify(expectedId));
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
@@ -240,7 +284,7 @@ describe("devtoolsPanel", () => {
                 (context.workspaceState.get as jest.Mock).mockReturnValue(null);
 
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
                 const expectedId = { id: 0 };
 
@@ -262,7 +306,7 @@ describe("devtoolsPanel", () => {
                 });
 
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
                 hookedEvents.get("setState")!(JSON.stringify({
                     name: "key2",
@@ -278,7 +322,7 @@ describe("devtoolsPanel", () => {
                 (context.workspaceState.get as jest.Mock).mockReturnValue(null);
 
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
                 hookedEvents.get("setState")!(JSON.stringify({
                     name: "key1",
@@ -300,7 +344,7 @@ describe("devtoolsPanel", () => {
                 jest.doMock("./utils", () => mockUtils);
 
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
                 expect(mockUtils.fetchUri).toBeCalledWith(expectedRequest.url);
@@ -330,7 +374,7 @@ describe("devtoolsPanel", () => {
                 jest.doMock("./utils", () => mockUtils);
 
                 const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, "");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
                 expect(mockUtils.fetchUri).toBeCalledWith(expectedRequest.url);
