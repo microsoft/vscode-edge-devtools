@@ -196,11 +196,11 @@ describe("devtoolsPanel", () => {
         });
 
         describe("events", () => {
-            let hookedEvents: Map<string, (msg?: object | string) => void>;
+            let hookedEvents: Map<string, (msg?: string) => void>;
             beforeEach(() => {
                 hookedEvents = new Map();
                 mockPanelSocket.on.mockImplementation((
-                    (name: string | symbol, callback: (msg?: object | string) => void, ...args: any) => {
+                    (name: string | symbol, callback: (msg?: string) => void, ...args: any) => {
                         hookedEvents.set(name.toString(), callback);
                         return mockPanelSocket;
                     }),
