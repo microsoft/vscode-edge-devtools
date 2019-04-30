@@ -122,10 +122,12 @@ describe("panelSocket", () => {
         // Should ignore messages before the socket is open
         mockWebSocket.onmessage.call(mockWebSocket, expectedMessage);
         expect(mockPost).not.toHaveBeenCalled();
+        expect(panelSocket.isConnectedToTarget).toEqual(false);
 
         // Opening should post a message to say it was connected
         mockWebSocket.onopen.call(mockWebSocket);
         expect(mockPost).toHaveBeenNthCalledWith(1, "open");
+        expect(panelSocket.isConnectedToTarget).toEqual(true);
 
         // Once open we should get the message posted
         mockWebSocket.onmessage.call(mockWebSocket, expectedMessage);
