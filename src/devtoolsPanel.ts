@@ -4,7 +4,13 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { encodeMessageForChannel, ITelemetryData, WebSocketEvent } from "./common/webviewEvents";
+import {
+    encodeMessageForChannel,
+    ITelemetryData,
+    ITelemetryMeasures,
+    ITelemetryProps,
+    WebSocketEvent,
+} from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
     fetchUri,
@@ -105,22 +111,22 @@ export class DevToolsPanel {
         // Fire telemetry
         switch (telemetry.event) {
             case "performance":
-                const measures: { [key: string]: number; } = {};
+                const measures: ITelemetryMeasures = {};
                 measures[`${telemetry.name}.duration`] = telemetry.data;
                 this.telemetryReporter.sendTelemetryEvent(
                     `devtools/${telemetry.name}`,
                     undefined,
                     measures);
                 break;
+
             case "enumerated":
-                const properties: { [key: string]: string; } = {};
+                const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.actionCode`] = telemetry.data.toString();
                 this.telemetryReporter.sendTelemetryEvent(
                     `devtools/${telemetry.name}`,
                     properties);
                 break;
         }
-
     }
 
     private onSocketGetState(message: string) {

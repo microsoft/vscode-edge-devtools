@@ -133,7 +133,7 @@ export function getRemoteEndpointSettings(): { hostname: string, port: number, u
  * Create a telemetry reporter that can be used for this extension
  * @param context The vscode context
  */
-export function createTelemetryReporter(context: vscode.ExtensionContext) {
+export function createTelemetryReporter(context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
     if (packageJson && vscode.env.machineId !== "someValue.machineId") {
         // Use the real telemetry reporter
         return new TelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
