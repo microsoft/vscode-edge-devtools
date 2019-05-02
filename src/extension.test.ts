@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext } from "vscode";
-import { createFakeExtensionContext, createFakeVSCode } from "./test/helpers";
+import TelemetryReporter from "vscode-extension-telemetry";
+import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
 import { IRemoteTargetJson, SETTINGS_STORE_NAME } from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
@@ -11,16 +12,34 @@ describe("extension", () => {
     describe("activate", () => {
         let context: ExtensionContext;
         let commandMock: jest.Mock;
+        let mockUtils: Partial<Mocked<typeof import("./utils")>>;
 
         beforeEach(() => {
             // Initialize a fake context
             context = createFakeExtensionContext();
+
+            // Mock out the imported utils
+            mockUtils = {
+                SETTINGS_STORE_NAME,
+                createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
+                getListOfTargets: jest.fn(),
+                getRemoteEndpointSettings: jest.fn(),
+            };
+            jest.doMock("./utils", () => mockUtils);
 
             // Mock out vscode command registration
             const mockVSCode = createFakeVSCode();
             commandMock = mockVSCode.commands.registerCommand;
             jest.doMock("vscode", () => mockVSCode, { virtual: true });
             jest.resetModules();
+        });
+
+        it("creates a telemetry reporter", async () => {
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            newExtension.activate(context);
+            expect(mockUtils.createTelemetryReporter).toHaveBeenCalled();
         });
 
         it("registers commands correctly", async () => {
@@ -43,22 +62,18 @@ describe("extension", () => {
                 }
             });
 
-            // Mock out the imported utils
-            const mockUtils = {
-                SETTINGS_STORE_NAME,
-                getListOfTargets: jest.fn(),
-                getRemoteEndpointSettings: jest.fn(),
-            };
-            jest.doMock("./utils", () => mockUtils);
-
             // Activate the extension
             const newExtension = await import("./extension");
             newExtension.activate(context);
             expect(attachCommand).toBeDefined();
 
             // Ensure that attaching will request targets
-            mockUtils.getRemoteEndpointSettings.mockReturnValue({ host: "localhost", port: 9222 });
-            mockUtils.getListOfTargets.mockResolvedValue(null);
+            mockUtils.getRemoteEndpointSettings!.mockReturnValue({
+                hostname: "localhost",
+                port: 9222,
+                useHttps: false,
+            });
+            mockUtils.getListOfTargets!.mockResolvedValue([]);
             attachCommand!();
             expect(mockUtils.getListOfTargets).toBeCalled();
         });
@@ -68,9 +83,10 @@ describe("extension", () => {
         let target: IRemoteTargetJson;
         let mocks: {
             panel: any,
-            utils: any,
+            utils: Partial<Mocked<typeof import("./utils")>>,
             vscode: any,
         };
+        let mockTelemetry: Mocked<Readonly<TelemetryReporter>>;
 
         beforeEach(() => {
             target = {
@@ -79,6 +95,8 @@ describe("extension", () => {
                 webSocketDebuggerUrl: "ws",
             } as IRemoteTargetJson;
 
+            mockTelemetry = createFakeTelemetryReporter();
+
             mocks = {
                 panel: {
                     DevToolsPanel: {
@@ -86,6 +104,7 @@ describe("extension", () => {
                     },
                 },
                 utils: {
+                    createTelemetryReporter: jest.fn((_: ExtensionContext) => mockTelemetry),
                     fixRemoteWebSocket: jest.fn().mockReturnValue(target),
                     getListOfTargets: jest.fn().mockResolvedValue([target]),
                     getRemoteEndpointSettings: jest.fn().mockReturnValue({
@@ -103,6 +122,14 @@ describe("extension", () => {
             jest.resetModules();
         });
 
+        it("creates a telemetry reporter", async () => {
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            await newExtension.attach(createFakeExtensionContext(), false);
+            expect(mocks.utils.createTelemetryReporter).toHaveBeenCalled();
+        });
+
         it("calls fixRemoteWebSocket for all targets", async () => {
             const expectedCount = 5;
             const allTargets = [];
@@ -110,7 +137,7 @@ describe("extension", () => {
                 allTargets.push(target);
             }
 
-            mocks.utils.getListOfTargets.mockResolvedValueOnce(allTargets);
+            mocks.utils.getListOfTargets!.mockResolvedValueOnce(allTargets);
 
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false);
@@ -132,7 +159,11 @@ describe("extension", () => {
             const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
             await newExtension.attach(expectedContext, false);
-            expect(mocks.panel.DevToolsPanel.createOrShow).toBeCalledWith(expectedContext, expectedPick.detail);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
+                expectedContext,
+                mockTelemetry,
+                expectedPick.detail,
+            );
         });
 
         it("opens devtools against given target", async () => {
@@ -144,12 +175,16 @@ describe("extension", () => {
                 webSocketDebuggerUrl: expectedWS,
             } as IRemoteTargetJson;
 
-            mocks.utils.fixRemoteWebSocket.mockReturnValueOnce(target);
+            mocks.utils.fixRemoteWebSocket!.mockReturnValueOnce(target);
 
             const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
             await newExtension.attach(expectedContext, false, expectedUrl);
-            expect(mocks.panel.DevToolsPanel.createOrShow).toBeCalledWith(expectedContext, expectedWS);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
+                expectedContext,
+                mockTelemetry,
+                expectedWS,
+            );
         });
 
         it("shows error if it can't find given target", async () => {
@@ -158,6 +193,14 @@ describe("extension", () => {
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false, expectedMissingUrl);
             expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
+        });
+
+        it("reports telemetry if failed to get targets", async () => {
+            mocks.utils.getListOfTargets!.mockResolvedValueOnce(null as any);
+
+            const newExtension = await import("./extension");
+            await newExtension.attach(createFakeExtensionContext(), false);
+            expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalled();
         });
     });
 });

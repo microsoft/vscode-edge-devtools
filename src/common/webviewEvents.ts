@@ -21,6 +21,9 @@ export const webSocketEventNames: WebSocketEvent[] = [
 
 export type TelemetryEvent = "enumerated" | "performance";
 
+export interface ITelemetryMeasures { [key: string]: number; }
+export interface ITelemetryProps { [key: string]: string; }
+
 export interface ITelemetryData {
     event: TelemetryEvent;
     name: string;
@@ -33,7 +36,7 @@ export interface ITelemetryData {
  */
 export function parseMessageFromChannel(
     message: string,
-    emit: (eventName: WebviewEvent, ...args: any[]) => boolean): boolean {
+    emit: (eventName: WebviewEvent, args: string) => boolean): boolean {
     for (const e of webviewEventNames) {
         if (message.substr(0, e.length) === e && message[e.length] === ":") {
             emit(e, message.substr(e.length + 1));

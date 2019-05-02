@@ -3,7 +3,14 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { encodeMessageForChannel, WebSocketEvent } from "./common/webviewEvents";
+import TelemetryReporter from "vscode-extension-telemetry";
+import {
+    encodeMessageForChannel,
+    ITelemetryData,
+    ITelemetryMeasures,
+    ITelemetryProps,
+    WebSocketEvent,
+} from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
     fetchUri,
@@ -19,12 +26,18 @@ export class DevToolsPanel {
     private readonly disposables: vscode.Disposable[] = [];
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
+    private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
 
-    private constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, targetUrl: string) {
+    private constructor(
+        panel: vscode.WebviewPanel,
+        context: vscode.ExtensionContext,
+        telemetryReporter: Readonly<TelemetryReporter>,
+        targetUrl: string) {
         this.panel = panel;
         this.context = context;
+        this.telemetryReporter = telemetryReporter;
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
 
@@ -61,6 +74,8 @@ export class DevToolsPanel {
         this.panel.dispose();
         this.panelSocket.dispose();
 
+        this.telemetryReporter.sendTelemetryEvent("websocket/dispose");
+
         while (this.disposables.length) {
             const d = this.disposables.pop();
             if (d) {
@@ -70,11 +85,20 @@ export class DevToolsPanel {
     }
 
     private postToDevTools(e: WebSocketEvent, message?: string) {
+        switch (e) {
+            case "open":
+            case "close":
+            case "error":
+                this.telemetryReporter.sendTelemetryEvent(`websocket/${e}`);
+                break;
+        }
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: e, message });
     }
 
     private onSocketReady() {
-        // TODO: Report success telemetry
+        // Report success telemetry
+        this.telemetryReporter.sendTelemetryEvent(
+            this.panelSocket.isConnectedToTarget ? "websocket/reconnect" : "websocket/connect");
     }
 
     private onSocketMessage() {
@@ -82,7 +106,27 @@ export class DevToolsPanel {
     }
 
     private onSocketTelemetry(message: string) {
-        // TODO: Fire telemetry
+        const telemetry: ITelemetryData = JSON.parse(message);
+
+        // Fire telemetry
+        switch (telemetry.event) {
+            case "performance":
+                const measures: ITelemetryMeasures = {};
+                measures[`${telemetry.name}.duration`] = telemetry.data;
+                this.telemetryReporter.sendTelemetryEvent(
+                    `devtools/${telemetry.name}`,
+                    undefined,
+                    measures);
+                break;
+
+            case "enumerated":
+                const properties: ITelemetryProps = {};
+                properties[`${telemetry.name}.actionCode`] = telemetry.data.toString();
+                this.telemetryReporter.sendTelemetryEvent(
+                    `devtools/${telemetry.name}`,
+                    properties);
+                break;
+        }
     }
 
     private onSocketGetState(message: string) {
@@ -146,7 +190,10 @@ export class DevToolsPanel {
             `;
     }
 
-    public static createOrShow(context: vscode.ExtensionContext, targetUrl: string) {
+    public static createOrShow(
+        context: vscode.ExtensionContext,
+        telemetryReporter: Readonly<TelemetryReporter>,
+        targetUrl: string) {
         const column = vscode.ViewColumn.Beside;
 
         if (DevToolsPanel.instance) {
@@ -158,7 +205,7 @@ export class DevToolsPanel {
                 retainContextWhenHidden: true,
             });
 
-            DevToolsPanel.instance = new DevToolsPanel(panel, context, targetUrl);
+            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl);
         }
     }
 }
