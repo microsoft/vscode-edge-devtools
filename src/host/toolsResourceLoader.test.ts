@@ -103,5 +103,47 @@ describe("toolsResourceLoader", () => {
             expect(originalLoader).toBeCalledWith(expectedUrl);
             expect(content).toEqual(expectedContent);
         });
+
+        it("overrides content of patched files", async () => {
+            const originalLoader = mockLoader.loadResourcePromise;
+
+            const expectedContent = "this is some fake content";
+
+            const mockCustomElements = {
+                applyCreateElementPatch: jest.fn(() => expectedContent),
+                applyUIUtilsPatch: jest.fn(() => expectedContent),
+            };
+            const mockTextSelection = jest.fn(() => expectedContent);
+            jest.doMock("./polyfills/customElements", () => mockCustomElements);
+            jest.doMock("./polyfills/textSelection", () => mockTextSelection);
+            jest.resetModules();
+
+            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
+            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+            expect(resourceLoader).toBeDefined();
+
+            originalLoader.mockResolvedValue(expectedContent);
+
+            // Ensure UIUtils is patched
+            const expectedUIUtilsUrl = "ui/UIUtils.js";
+            const content = await mockLoader.loadResourcePromise(expectedUIUtilsUrl);
+            expect(originalLoader).toBeCalledWith(expectedUIUtilsUrl);
+            expect(mockCustomElements.applyUIUtilsPatch).toHaveBeenCalledWith(expectedContent);
+            expect(content).toEqual(expectedContent);
+
+            // Ensure DOMExtension is patched
+            const expectedDOMExtensionUrl = "/dom_extension/DOMExtension.js";
+            const content2 = await mockLoader.loadResourcePromise(expectedDOMExtensionUrl);
+            expect(originalLoader).toBeCalledWith(expectedDOMExtensionUrl);
+            expect(mockCustomElements.applyCreateElementPatch).toHaveBeenCalledWith(expectedContent);
+            expect(content2).toEqual(expectedContent);
+
+            // Ensure ElementsPanel is patched
+            const expectedElementsPanelUrl = "elements/ElementsPanel.js";
+            const content3 = await mockLoader.loadResourcePromise(expectedElementsPanelUrl);
+            expect(originalLoader).toBeCalledWith(expectedElementsPanelUrl);
+            expect(mockTextSelection).toHaveBeenCalledWith(expectedContent);
+            expect(content3).toEqual(expectedContent);
+        });
     });
 });

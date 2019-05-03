@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import { encodeMessageForChannel } from "../common/webviewEvents";
+import { applyCreateElementPatch, applyUIUtilsPatch } from "./polyfills/customElements";
+import applySetupTextSelectionPatch from "./polyfills/textSelection";
 
 export interface IRuntimeResourceLoader {
     loadResourcePromise: (url: string) => Promise<string>;
@@ -34,6 +36,15 @@ export default class ToolsResourceLoader {
                 this.urlLoadResolvers.set(id, resolve);
                 encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getUrl", [{ id, url }]);
             });
+        } else if (url.endsWith("ui/UIUtils.js")) {
+            // Patch custom elements v1 usage with workaround until it is supported in VSCode/Electron version
+            return applyUIUtilsPatch(await this.originalLoadResource(url));
+        } else if (url.endsWith("/dom_extension/DOMExtension.js")) {
+            // Patch custom elements v1 usage with workaround until it is supported in VSCode/Electron version
+            return applyCreateElementPatch(await this.originalLoadResource(url));
+        } else if (url.endsWith("elements/ElementsPanel.js")) {
+            // Remove the text selection hack as that causes issues when hosted in a webview
+            return applySetupTextSelectionPatch(await this.originalLoadResource(url));
         } else {
             return this.originalLoadResource(url);
         }
