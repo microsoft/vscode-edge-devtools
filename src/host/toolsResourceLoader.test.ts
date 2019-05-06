@@ -145,5 +145,29 @@ describe("toolsResourceLoader", () => {
             expect(mockTextSelection).toHaveBeenCalledWith(expectedContent);
             expect(content3).toEqual(expectedContent);
         });
+
+        it("ignores overrides on later webview versions", async () => {
+            const originalLoader = mockLoader.loadResourcePromise;
+
+            const expectedContent = "this is some fake content";
+            const mockTextSelection = jest.fn(() => expectedContent);
+            jest.doMock("./polyfills/textSelection", () => mockTextSelection);
+            jest.resetModules();
+
+            const value = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
+                AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3777.0 Safari/537.36 Edg/76.0.147.0";
+            Object.defineProperty((global as any).navigator , "userAgent", { value, writable: true });
+
+            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
+            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+            expect(resourceLoader).toBeDefined();
+
+            // Ensure ElementsPanel is not patched
+            const expectedElementsPanelUrl = "elements/ElementsPanel.js";
+            const content = await mockLoader.loadResourcePromise(expectedElementsPanelUrl);
+            expect(originalLoader).toBeCalledWith(expectedElementsPanelUrl);
+            expect(mockTextSelection).not.toHaveBeenCalled();
+            expect(content).toBeUndefined();
+        });
     });
 });
