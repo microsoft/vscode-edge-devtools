@@ -17,6 +17,10 @@ Contributions are always welcome! We only ask that you open an issue first so we
 ## Development setup
 * Clone this repo
 * Run `npm install` in '/vscode-edge-devtools'
+* Download a copy of the Edge chromium build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com)
+* Extract the zip and follow the instructions located at `src/docs/edge_build_instructions.md`
+* Set the `EDGE_CHROMIUM_PATH` environment variable to the same value you used for `EDGE_ROOT`
+* Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to your output folder (which is `Release` by default)
 * Run `npm run build` or `npm run watch`
 * Open the directory in VSCode
 * Select `Launch Extension` debug configuration
