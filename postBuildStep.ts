@@ -2,9 +2,13 @@
 // Licensed under the MIT License.
 
 import * as fse from "fs-extra";
+import path from "path";
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
-    await fse.copy(`${srcDir}${name}`, `${outDir}${name}`);
+    await fse.copy(
+        path.join(srcDir, name),
+        path.join(outDir, name),
+    );
 }
 
 async function copyStaticFiles() {
@@ -21,14 +25,14 @@ async function copyStaticFiles() {
 
     const toolsSrcDir =
         `${process.env.EDGE_CHROMIUM_PATH}/third_party/blink/renderer/devtools/front_end/`;
-    if (!toolsSrcDir || !isDir(toolsSrcDir)) {
+    if (!isDirectory(toolsSrcDir)) {
         throw new Error(`Could not find Edge Chromium DevTools path at '${toolsSrcDir}'. ` +
             "Did you set the EDGE_CHROMIUM_PATH environment variable?");
     }
 
     const toolsGenDir =
         `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/resources/inspector/`;
-    if (!toolsGenDir || !isDir(toolsGenDir)) {
+    if (!isDirectory(toolsGenDir)) {
         throw new Error(`Could not find Edge Chromium output path at '${toolsGenDir}'. ` +
             "Did you set the EDGE_CHROMIUM_OUT_DIR environment variable?");
     }
@@ -41,14 +45,18 @@ async function copyStaticFiles() {
     // Copy the devtools generated files to the out directory
     await copyFile(toolsGenDir, toolsOutDir, "InspectorBackendCommands.js");
     await copyFile(toolsGenDir, toolsOutDir, "SupportedCSSProperties.js");
-    await copyFile(`${toolsGenDir}accessibility/`, `${toolsOutDir}accessibility/`, "ARIAProperties.js");
+    await copyFile(
+        path.join(toolsGenDir, "accessibility"),
+        path.join(toolsOutDir, "accessibility"),
+        "ARIAProperties.js",
+    );
 
 }
 
-function isDir(path: string) {
+function isDirectory(fullPath: string) {
     try {
-        return fse.statSync(path).isDirectory();
-    } catch (error) {
+        return fse.statSync(fullPath).isDirectory();
+    } catch {
         return false;
     }
 }
