@@ -44,26 +44,26 @@
                 "title": "Attach to a target",
                 "category": "DevTools for Edge"
             }
-        ]
-    },
-    "configuration": {
-        "title": "DevTools for Edge",
-        "type": "object",
-        "properties": {
-            "vscode-edge-devtools.hostname": {
-                "type": "string",
-                "default": "localhost",
-                "description": "The hostname on which to search for remote debuggable edge instances"
-            },
-            "vscode-edge-devtools.port": {
-                "type": "number",
-                "default": 9222,
-                "description": "The port on which to search for remote debuggable edge instances"
-            },
-            "vscode-edge-devtools.useHttps": {
-                "type": "boolean",
-                "default": false,
-                "description": "Should we request the remote target list using https rather than http"
+        ],
+        "configuration": {
+            "title": "DevTools for Edge",
+            "type": "object",
+            "properties": {
+                "vscode-edge-devtools.hostname": {
+                    "type": "string",
+                    "default": "localhost",
+                    "description": "The hostname on which to search for remote debuggable edge instances"
+                },
+                "vscode-edge-devtools.port": {
+                    "type": "number",
+                    "default": 9222,
+                    "description": "The port on which to search for remote debuggable edge instances"
+                },
+                "vscode-edge-devtools.useHttps": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Should we request the remote target list using https rather than http"
+                }
             }
         }
     },
@@ -96,8 +96,6 @@
         "test": "npm run lint && jest --coverage"
     },
     "dependencies": {
-        "vsce": "1.58.0",
-        "vscode": "1.1.30",
         "vscode-extension-telemetry": "0.1.1",
         "ws": "6.2.0"
     },
@@ -113,6 +111,8 @@
         "ts-node": "8.0.3",
         "tslint": "5.14.0",
         "typescript": "3.3.3",
+        "vsce": "1.61.0",
+        "vscode": "^1.1.34",
         "webpack": "4.29.6",
         "webpack-cli": "3.2.3"
     }
