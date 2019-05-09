@@ -3,6 +3,8 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
+import CDPTarget from "./cdpTarget";
+import CDPTargetsProvider from "./cdpTargetsProvider";
 import { DevToolsPanel } from "./devtoolsPanel";
 import {
     createTelemetryReporter,
@@ -11,6 +13,7 @@ import {
     getRemoteEndpointSettings,
     IRemoteTargetJson,
     SETTINGS_STORE_NAME,
+    SETTINGS_VIEW_NAME,
 } from "./utils";
 
 export const DEFAULT_LAUNCH_URL: string = "about:blank";
@@ -25,6 +28,21 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, async () => {
         attach(context, /*viaConfig=*/ false);
     }));
+
+    // Register the side-panel view and its commands
+    const cdpTargetsProvider = new CDPTargetsProvider(context);
+    context.subscriptions.push(vscode.window.registerTreeDataProvider(
+        `${SETTINGS_VIEW_NAME}.targets`,
+        cdpTargetsProvider));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.refresh`,
+        () => cdpTargetsProvider.refresh()));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.attach`,
+        (target: CDPTarget) => DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl)));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.copyItem`,
+        (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
 }
 
 export async function attach(context: vscode.ExtensionContext, viaConfig: boolean, targetUrl?: string) {

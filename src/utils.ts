@@ -19,8 +19,10 @@ export const SETTINGS_PREF_DEFAULTS = {
     screencastEnabled: false,
     uiTheme: '"dark"',
 };
+export const SETTINGS_VIEW_NAME = "vscode-edge-devtools-view";
 
 export interface IRemoteTargetJson {
+    [index: string]: string;
     description: string;
     devtoolsFrontendUrl: string;
     faviconUrl: string;
