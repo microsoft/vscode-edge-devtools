@@ -66,6 +66,10 @@ export class DevToolsPanel {
         this.panel.webview.onDidReceiveMessage((message) => {
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
+
+        // Report telemetry so we can see how many people use specific settings
+        const { useFullToolsView } = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+        this.telemetryReporter.sendTelemetryEvent("panel/settings", { useFullToolsView });
     }
 
     public dispose() {
@@ -168,6 +172,11 @@ export class DevToolsPanel {
         const scriptPath = vscode.Uri.file(path.join(this.extensionPath, "out", "host", "messaging.bundle.js"));
         const scriptUri = scriptPath.with({ scheme: "vscode-resource" });
 
+        // Add any settings that need to be known at load time via the query string
+        const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+        const useFullToolsView = settings.get("useFullToolsView") || false;
+        const htmlUriWithQuery = `${htmlUri}?fullToolsView=${useFullToolsView}`;
+
         return `
             <!doctype html>
             <html>
@@ -185,7 +194,7 @@ export class DevToolsPanel {
                 </style>
                 <script src="${scriptUri}"></script>
             </head>
-            <iframe id="host" style="width: 100%; height: 100%" frameBorder="0" src="${htmlUri}"></iframe>
+            <iframe id="host" style="width: 100%; height: 100%" frameBorder="0" src="${htmlUriWithQuery}"></iframe>
             </html>
             `;
     }

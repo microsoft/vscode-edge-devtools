@@ -104,70 +104,102 @@ describe("toolsResourceLoader", () => {
             expect(content).toEqual(expectedContent);
         });
 
-        it("overrides content of patched files", async () => {
-            const originalLoader = mockLoader.loadResourcePromise;
+        describe("overrides", () => {
+            async function ensureOverride(
+                expectedUrl: string,
+                expectedContent: string,
+                patch: jest.Mock,
+                originalLoader: jest.Mock) {
+                const content = await mockLoader.loadResourcePromise(expectedUrl);
+                expect(originalLoader).toBeCalledWith(expectedUrl);
+                expect(patch).toHaveBeenCalledWith(expectedContent);
+                expect(content).toEqual(expectedContent);
+            }
 
-            const expectedContent = "this is some fake content";
+            it("overrides content of patched files", async () => {
+                const originalLoader = mockLoader.loadResourcePromise;
 
-            const mockCustomElements = {
-                applyCreateElementPatch: jest.fn(() => expectedContent),
-                applyUIUtilsPatch: jest.fn(() => expectedContent),
-            };
-            const mockTextSelection = jest.fn(() => expectedContent);
-            jest.doMock("./polyfills/customElements", () => mockCustomElements);
-            jest.doMock("./polyfills/textSelection", () => mockTextSelection);
-            jest.resetModules();
+                const expectedContent = "this is some fake content";
 
-            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
-            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
-            expect(resourceLoader).toBeDefined();
+                const mockCustomElements = {
+                    applyCreateElementPatch: jest.fn(() => expectedContent),
+                    applyUIUtilsPatch: jest.fn(() => expectedContent),
+                };
+                const mockTextSelection = jest.fn(() => expectedContent);
+                jest.doMock("./polyfills/customElements", () => mockCustomElements);
+                jest.doMock("./polyfills/textSelection", () => mockTextSelection);
+                jest.resetModules();
 
-            originalLoader.mockResolvedValue(expectedContent);
+                const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
+                const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+                expect(resourceLoader).toBeDefined();
 
-            // Ensure UIUtils is patched
-            const expectedUIUtilsUrl = "ui/UIUtils.js";
-            const content = await mockLoader.loadResourcePromise(expectedUIUtilsUrl);
-            expect(originalLoader).toBeCalledWith(expectedUIUtilsUrl);
-            expect(mockCustomElements.applyUIUtilsPatch).toHaveBeenCalledWith(expectedContent);
-            expect(content).toEqual(expectedContent);
+                originalLoader.mockResolvedValue(expectedContent);
 
-            // Ensure DOMExtension is patched
-            const expectedDOMExtensionUrl = "/dom_extension/DOMExtension.js";
-            const content2 = await mockLoader.loadResourcePromise(expectedDOMExtensionUrl);
-            expect(originalLoader).toBeCalledWith(expectedDOMExtensionUrl);
-            expect(mockCustomElements.applyCreateElementPatch).toHaveBeenCalledWith(expectedContent);
-            expect(content2).toEqual(expectedContent);
+                await ensureOverride("ui/UIUtils.js", expectedContent,
+                    mockCustomElements.applyUIUtilsPatch, originalLoader);
+                await ensureOverride("/dom_extension/DOMExtension.js", expectedContent,
+                    mockCustomElements.applyCreateElementPatch, originalLoader);
+                await ensureOverride("elements/ElementsPanel.js", expectedContent,
+                    mockTextSelection, originalLoader);
+            });
 
-            // Ensure ElementsPanel is patched
-            const expectedElementsPanelUrl = "elements/ElementsPanel.js";
-            const content3 = await mockLoader.loadResourcePromise(expectedElementsPanelUrl);
-            expect(originalLoader).toBeCalledWith(expectedElementsPanelUrl);
-            expect(mockTextSelection).toHaveBeenCalledWith(expectedContent);
-            expect(content3).toEqual(expectedContent);
-        });
+            it("overrides content of patched files for simple view", async () => {
+                const originalLoader = mockLoader.loadResourcePromise;
 
-        it("ignores overrides on later webview versions", async () => {
-            const originalLoader = mockLoader.loadResourcePromise;
+                const expectedContent = "this is some fake content";
 
-            const expectedContent = "this is some fake content";
-            const mockTextSelection = jest.fn(() => expectedContent);
-            jest.doMock("./polyfills/textSelection", () => mockTextSelection);
-            jest.resetModules();
+                const mockView = {
+                    applyCommonRevealerPatch: jest.fn(() => expectedContent),
+                    applyInspectorCommonCssPatch: jest.fn(() => expectedContent),
+                    applyInspectorViewPatch: jest.fn(() => expectedContent),
+                    applyMainViewPatch: jest.fn(() => expectedContent),
+                    applySelectTabPatch: jest.fn(() => expectedContent),
+                };
+                jest.doMock("./polyfills/simpleView", () => mockView);
+                jest.resetModules();
 
-            const value = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
-                AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3777.0 Safari/537.36 Edg/76.0.147.0";
-            Object.defineProperty((global as any).navigator , "userAgent", { value, writable: true });
+                const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
+                const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+                expect(resourceLoader).toBeDefined();
 
-            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
-            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
-            expect(resourceLoader).toBeDefined();
+                originalLoader.mockResolvedValue(expectedContent);
 
-            // Ensure ElementsPanel is not patched
-            const expectedElementsPanelUrl = "elements/ElementsPanel.js";
-            const content = await mockLoader.loadResourcePromise(expectedElementsPanelUrl);
-            expect(originalLoader).toBeCalledWith(expectedElementsPanelUrl);
-            expect(mockTextSelection).not.toHaveBeenCalled();
-            expect(content).toBeUndefined();
+                await ensureOverride("ui/inspectorCommon.css", expectedContent,
+                    mockView.applyInspectorCommonCssPatch, originalLoader);
+                await ensureOverride("common/ModuleExtensionInterfaces.js", expectedContent,
+                    mockView.applyCommonRevealerPatch, originalLoader);
+                await ensureOverride("main/Main.js", expectedContent,
+                    mockView.applyMainViewPatch, originalLoader);
+                await ensureOverride("ui/InspectorView.js", expectedContent,
+                    mockView.applyInspectorViewPatch, originalLoader);
+                await ensureOverride("ui/TabbedPane.js", expectedContent,
+                    mockView.applySelectTabPatch, originalLoader);
+            });
+
+            it("ignores overrides on later webview versions", async () => {
+                const originalLoader = mockLoader.loadResourcePromise;
+
+                const expectedContent = "this is some fake content";
+                const mockTextSelection = jest.fn(() => expectedContent);
+                jest.doMock("./polyfills/textSelection", () => mockTextSelection);
+                jest.resetModules();
+
+                const value = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
+                    AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3777.0 Safari/537.36 Edg/76.0.147.0";
+                Object.defineProperty((global as any).navigator, "userAgent", { value, writable: true });
+
+                const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
+                const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+                expect(resourceLoader).toBeDefined();
+
+                // Ensure ElementsPanel is not patched
+                const expectedElementsPanelUrl = "elements/ElementsPanel.js";
+                const content = await mockLoader.loadResourcePromise(expectedElementsPanelUrl);
+                expect(originalLoader).toBeCalledWith(expectedElementsPanelUrl);
+                expect(mockTextSelection).not.toHaveBeenCalled();
+                expect(content).toBeUndefined();
+            });
         });
     });
 });

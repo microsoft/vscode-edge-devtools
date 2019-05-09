@@ -63,6 +63,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Should we request the remote target list using https rather than http"
+                },
+                "vscode-edge-devtools.useFullToolsView": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show the full suite of DevTools rather than a simplified view"
                 }
             }
         }
