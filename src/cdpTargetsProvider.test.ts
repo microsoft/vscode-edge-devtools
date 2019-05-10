@@ -5,17 +5,20 @@
 // tslint:disable: variable-name
 
 import { ExtensionContext } from "vscode";
+import TelemetryReporter from "vscode-extension-telemetry";
 import CDPTarget from "./cdpTarget";
-import { createFakeExtensionContext, createFakeVSCode } from "./test/helpers";
+import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
 import { IRemoteTargetJson } from "./utils";
 
 describe("CDPTargetsProvider", () => {
     let mockContext: ExtensionContext;
     let mockVSCode: typeof import("vscode");
+    let mockReporter: Mocked<Readonly<TelemetryReporter>>;
 
     beforeEach(() => {
         mockContext = createFakeExtensionContext();
         mockVSCode = createFakeVSCode() as any;
+        mockReporter = createFakeTelemetryReporter();
 
         jest.doMock("./cdpTarget", () => jest.fn());
         jest.doMock("vscode", () => mockVSCode, { virtual: true });
@@ -24,13 +27,13 @@ describe("CDPTargetsProvider", () => {
 
     it("gets created successfully", async () => {
         const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext);
+        const provider = new cdpTargetsProvider(mockContext, mockReporter);
         expect(provider).toBeDefined();
     });
 
     it("returns the element from getTreeItem", async () => {
         const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext);
+        const provider = new cdpTargetsProvider(mockContext, mockReporter);
         const expectedElement = {} as CDPTarget;
         expect(provider.getTreeItem(expectedElement)).toEqual(expectedElement);
     });
@@ -44,14 +47,15 @@ describe("CDPTargetsProvider", () => {
         } as any;
 
         const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext);
+        const provider = new cdpTargetsProvider(mockContext, mockReporter);
         provider.refresh();
         expect(mockFire).toHaveBeenCalled();
+        expect(mockReporter.sendTelemetryEvent).toHaveBeenCalled();
     });
 
     it("calls getChildren on the element", async () => {
         const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext);
+        const provider = new cdpTargetsProvider(mockContext, mockReporter);
         const expectedChildren = [1, 2, 3];
         const mockElement = {
             getChildren: jest.fn(() => expectedChildren),
@@ -60,7 +64,7 @@ describe("CDPTargetsProvider", () => {
         expect(result).toEqual(expectedChildren);
     });
 
-    it("calls getChildren on the element", async () => {
+    it("requests targets in getChildren when no element", async () => {
         const allTargets = [
             { title: "a", type: "page" },
             { title: "a", type: "page" },
@@ -89,8 +93,14 @@ describe("CDPTargetsProvider", () => {
         jest.resetModules();
 
         const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext);
+        const provider = new cdpTargetsProvider(mockContext, mockReporter);
         const result = await provider.getChildren();
         expect(result.length).toEqual(allTargets.length);
+
+        // Ensure that a bad response fires telemetry
+        mockUtils.getListOfTargets!.mockResolvedValueOnce(null as any);
+        const result2 = await provider.getChildren();
+        expect(result2.length).toEqual(0);
+        expect(mockReporter.sendTelemetryEvent).toHaveBeenCalled();
     });
 });

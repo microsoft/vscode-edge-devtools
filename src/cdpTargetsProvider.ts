@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
+import TelemetryReporter from "vscode-extension-telemetry";
 import CDPTarget from "./cdpTarget";
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson } from "./utils";
 
@@ -9,11 +10,13 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     public readonly onDidChangeTreeData: vscode.Event<CDPTarget | undefined>;
     private changeDataEvent: vscode.EventEmitter<CDPTarget | undefined>;
     private extensionPath: string;
+    private telemetryReporter: Readonly<TelemetryReporter>;
 
-    constructor(context: vscode.ExtensionContext) {
+    constructor(context: vscode.ExtensionContext, telemetryReporter: Readonly<TelemetryReporter>) {
         this.changeDataEvent = new vscode.EventEmitter<CDPTarget | undefined>();
         this.onDidChangeTreeData = this.changeDataEvent.event;
         this.extensionPath = context.extensionPath;
+        this.telemetryReporter = telemetryReporter;
     }
 
     public getTreeItem(element: CDPTarget): vscode.TreeItem {
@@ -28,10 +31,18 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
             const { hostname, port, useHttps } = getRemoteEndpointSettings();
             const responseArray = await getListOfTargets(hostname, port, useHttps);
             if (Array.isArray(responseArray)) {
+                this.telemetryReporter.sendTelemetryEvent(
+                    "view/list",
+                    undefined,
+                    { targetCount: responseArray.length },
+                );
+
                 responseArray.forEach((i: IRemoteTargetJson) => {
                     i = fixRemoteWebSocket(hostname, port, i);
                     targets.push(new CDPTarget(i, "", this.extensionPath));
                 });
+            } else {
+                this.telemetryReporter.sendTelemetryEvent("view/error/no_json_array");
             }
 
             // Sort the targets by type and then title, but keep 'page' types at the top
@@ -56,6 +67,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     }
 
     public refresh(): void {
+        this.telemetryReporter.sendTelemetryEvent("view/refresh");
         this.changeDataEvent.fire();
     }
 }
