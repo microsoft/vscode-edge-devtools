@@ -4,12 +4,16 @@
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { DevToolsPanel } from "./devtoolsPanel";
+import LaunchDebugProvider from "./launchDebugProvider";
 import {
     createTelemetryReporter,
     fixRemoteWebSocket,
+    getBrowserPath,
     getListOfTargets,
     getRemoteEndpointSettings,
     IRemoteTargetJson,
+    launchBrowser,
+    openNewTab,
     SETTINGS_STORE_NAME,
 } from "./utils";
 
@@ -25,6 +29,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, async () => {
         attach(context, /*viaConfig=*/ false);
     }));
+
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, async () => {
+        launch(context);
+    }));
+
+    vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
+        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 }
 
 export async function attach(context: vscode.ExtensionContext, viaConfig: boolean, targetUrl?: string) {
@@ -74,5 +85,46 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
         }
     } else {
         telemetryReporter.sendTelemetryEvent("attach/error/no_json_array", telemetryProps);
+    }
+}
+
+export async function launch(
+    context: vscode.ExtensionContext, launchUrl?: string, browserPathFromLaunchConfig?: string) {
+    if (!telemetryReporter) {
+        telemetryReporter = createTelemetryReporter(context);
+    }
+
+    const viaConfig = !!(launchUrl || browserPathFromLaunchConfig);
+    const telemetryProps = { viaConfig: `${viaConfig}` };
+    telemetryReporter.sendTelemetryEvent("command/launch", telemetryProps);
+
+    const { hostname, port } = getRemoteEndpointSettings();
+    let target = await openNewTab(hostname, port, launchUrl);
+    if (!target) {
+        const browserPath = getBrowserPath(browserPathFromLaunchConfig);
+
+        if (!browserPath) {
+            telemetryReporter.sendTelemetryEvent("command/launch/error/browser_not_found", telemetryProps);
+            vscode.window.showErrorMessage(
+                "Microsoft Edge could not be found. " +
+                "Ensure you have installed Microsoft Edge, " +
+                "or try specifying a custom path via the 'browserPath' setting.");
+            return;
+        }
+
+        launchBrowser(browserPath, port, DEFAULT_LAUNCH_URL);
+
+        target = await openNewTab(hostname, port, launchUrl);
+    }
+
+    if (target && target.webSocketDebuggerUrl) {
+        // Show the devtools
+        telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
+        DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl);
+    } else {
+        // Error
+        telemetryReporter.sendTelemetryEvent("command/launch/error/tab_not_found", telemetryProps);
+        vscode.window.showErrorMessage(`Could not find the launched browser tab: (${launchUrl}).`);
+        attach(context, viaConfig, DEFAULT_LAUNCH_URL);
     }
 }

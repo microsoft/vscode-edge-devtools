@@ -35,7 +35,9 @@
     "main": "./out/extension",
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
-        "onWebviewPanel:vscode-edge-devtools"
+        "onCommand:vscode-edge-devtools.launch",
+        "onWebviewPanel:vscode-edge-devtools",
+        "onDebug"
     ],
     "contributes": {
         "commands": [
@@ -43,12 +45,22 @@
                 "command": "vscode-edge-devtools.attach",
                 "title": "Attach to a target",
                 "category": "DevTools for Edge"
+            },
+            {
+                "command": "vscode-edge-devtools.launch",
+                "title": "Launch Edge and then attach to a target",
+                "category": "DevTools for Edge"
             }
         ],
         "configuration": {
             "title": "DevTools for Edge",
             "type": "object",
             "properties": {
+                "vscode-edge-devtools.browserPath": {
+                    "type": "string",
+                    "default": null,
+                    "description": "The path to the Edge browser to be use, rather than searching for the default"
+                },
                 "vscode-edge-devtools.hostname": {
                     "type": "string",
                     "default": "localhost",
@@ -65,7 +77,75 @@
                     "description": "Should we request the remote target list using https rather than http"
                 }
             }
-        }
+        },
+        "debuggers": [
+            {
+                "type": "vscode-edge-devtools.debug",
+                "label": "DevTools for Edge",
+                "configurationSnippets": [
+                    {
+                        "label": "DevTools for Edge: Launch",
+                        "description": "Launch Edge to debug a URL",
+                        "body": {
+                            "type": "vscode-edge-devtools.debug",
+                            "request": "launch",
+                            "name": "Launch Edge and open DevTools",
+                            "url": "http://localhost:8080"
+                        }
+                    },
+                    {
+                        "label": "DevTools for Edge: Attach",
+                        "description": "Attach to an instance of Edge already in debug mode",
+                        "body": {
+                            "type": "vscode-edge-devtools.debug",
+                            "request": "attach",
+                            "name": "Attach DevTools to Edge",
+                            "url": "http://localhost:8080"
+                        }
+                    }
+                ],
+                "configurationAttributes": {
+                    "launch": {
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "description": "Absolute uri to launch",
+                                "default": "http://localhost:8080"
+                            },
+                            "file": {
+                                "type": "string",
+                                "description": "File path to launch",
+                                "default": "${workspaceFolder}/index.html"
+                            },
+                            "browserPath": {
+                                "type": "string",
+                                "description": "Absolute path to the Edge browser instance to launch",
+                                "default": ""
+                            }
+                        }
+                    },
+                    "attach": {
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "description": "Absolute uri to launch.",
+                                "default": "http://localhost:8080"
+                            },
+                            "file": {
+                                "type": "string",
+                                "description": "File path to launch.",
+                                "default": "${workspaceFolder}/index.html"
+                            },
+                            "browserPath": {
+                                "type": "string",
+                                "description": "Absolute path to the Edge browser instance to launch.",
+                                "default": ""
+                            }
+                        }
+                    }
+                }
+            }
+        ]
     },
     "jest": {
         "transform": {

@@ -4,7 +4,7 @@
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
 
-import { createFakeExtensionContext, createFakeGet, createFakeVSCode } from "./test/helpers";
+import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./test/helpers";
 import { IRemoteTargetJson } from "./utils";
 
 jest.mock("vscode", () => null, { virtual: true });
@@ -356,6 +356,150 @@ describe("utils", () => {
             const reporter = utils.createTelemetryReporter(mockContext);
             expect(reporter).toBeDefined();
             expect(reporter).toEqual(retailReporter);
+        });
+    });
+
+    describe("getPlatform", () => {
+        it("returns the correct platform", async () => {
+            jest.doMock("os");
+            jest.resetModules();
+            utils = await import("./utils");
+
+            const os: Mocked<typeof import("os")> = jest.requireMock("os");
+            os.platform.mockReturnValue("darwin");
+            expect(utils.getPlatform()).toEqual("OSX");
+
+            os.platform.mockReturnValue("win32");
+            expect(utils.getPlatform()).toEqual("Windows");
+
+            os.platform.mockReturnValue("linux");
+            expect(utils.getPlatform()).toEqual("Linux");
+
+            os.platform.mockReturnValue("openbsd");
+            expect(utils.getPlatform()).toEqual("Linux");
+        });
+    });
+
+    describe("getBrowserPath", () => {
+        let fse: Mocked<typeof import("fs-extra")>;
+        let os: Mocked<typeof import("os")>;
+
+        beforeEach(async () => {
+            jest.doMock("fs-extra");
+            jest.doMock("os");
+            jest.resetModules();
+            utils = await import("./utils");
+
+            fse = jest.requireMock("fs-extra");
+            os = jest.requireMock("os");
+
+            // Mock that the path always exists
+            fse.pathExistsSync.mockReturnValue(true);
+
+            // Mock no path in settings
+            const configMock = {
+                get: (name: string) => "",
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => configMock);
+        });
+
+        it("returns the custom path or empty string", async () => {
+            const expectedPath = "someCustomPath.exe";
+
+            // Ensure we get a valid path back
+            fse.pathExistsSync.mockReturnValue(true);
+            expect(utils.getBrowserPath(expectedPath)).toEqual(expectedPath);
+
+            // Ensure we get "" on bad path
+            fse.pathExistsSync.mockReturnValue(false);
+            expect(utils.getBrowserPath(expectedPath)).toEqual("");
+        });
+
+        it("returns the settings path", async () => {
+            const expectedPath = "someCustomPath.exe";
+            const configMock = {
+                get: (name: string) => expectedPath,
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
+            expect(utils.getBrowserPath()).toEqual(expectedPath);
+        });
+
+        it("searches for path", async () => {
+            // Check Windows
+            global.process.env.LOCALAPPDATA = "";
+            os.platform.mockReturnValue("win32");
+            fse.pathExistsSync.mockImplementation(() => {
+                return (fse.pathExistsSync.mock.calls.length === 8);
+            });
+            expect(utils.getBrowserPath()).toEqual(expect.stringMatching(/.+msedge.exe/g));
+
+            fse.pathExistsSync.mockClear();
+
+            // Check OSX
+            os.platform.mockReturnValue("darwin");
+            fse.pathExistsSync.mockImplementation(() => {
+                return (fse.pathExistsSync.mock.calls.length === 4);
+            });
+            expect(utils.getBrowserPath()).toEqual(expect.stringMatching(/.+Microsoft Edge Canary/g));
+
+            fse.pathExistsSync.mockClear();
+
+            // Check Linux
+            os.platform.mockReturnValue("linux");
+            fse.pathExistsSync.mockReturnValue(false);
+            expect(utils.getBrowserPath()).toEqual("");
+        });
+    });
+
+    describe("launchBrowser", () => {
+        it("spawns the process", async () => {
+            jest.doMock("child_process");
+            jest.resetModules();
+            utils = await import("./utils");
+
+            const cp = jest.requireMock("child_process");
+            cp.spawn.mockReturnValue({
+                unref: jest.fn(),
+            });
+
+            const expectedPath = "somePath";
+            const expectedPort = 9222;
+            const expectedUrl = "http://example.com";
+            utils.launchBrowser(expectedPath, expectedPort, expectedUrl);
+
+            expect(cp.spawn).toHaveBeenCalledWith(
+                expectedPath,
+                expect.arrayContaining([`--remote-debugging-port=${expectedPort}`, expectedUrl]),
+                expect.any(Object));
+        });
+    });
+
+    describe("openNewTab", () => {
+        it("uses endpoint to request tab", async () => {
+            const expectedTarget = { title: "1" };
+            const expectedListResponse = JSON.stringify(expectedTarget);
+
+            mockGetHttp.mockClear();
+            mockGetHttp.mockImplementation(
+                createFakeGet(() => expectedListResponse, () => 200).get);
+
+            const expectedHost = "localhost";
+            const expectedPort = 9222;
+            const expectedUrl = "http://www.bing.com";
+            const target = await utils.openNewTab(expectedHost, expectedPort, expectedUrl);
+            expect(target).toEqual(expectedTarget);
+        });
+
+        it("returns undefined on an exception", async () => {
+            mockGetHttp.mockClear();
+            mockGetHttp.mockImplementation(
+                createFakeGet(() => { throw new Error(); }, () => 200).get);
+
+            const target = await utils.openNewTab("localhost", 8080);
+            expect(target).toBeUndefined();
         });
     });
 });

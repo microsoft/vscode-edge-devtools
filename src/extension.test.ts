@@ -26,6 +26,7 @@ describe("extension", () => {
                 getRemoteEndpointSettings: jest.fn(),
             };
             jest.doMock("./utils", () => mockUtils);
+            jest.doMock("./launchDebugProvider");
 
             // Mock out vscode command registration
             const mockVSCode = createFakeVSCode();
@@ -47,10 +48,12 @@ describe("extension", () => {
 
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
-            expect(context.subscriptions.length).toBe(1);
-            expect(commandMock).toHaveBeenCalledTimes(1);
+            expect(context.subscriptions.length).toBe(2);
+            expect(commandMock).toHaveBeenCalledTimes(2);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(2, `${SETTINGS_STORE_NAME}.launch`, expect.any(Function));
         });
 
         it("requests targets on attach command", async () => {
@@ -201,6 +204,127 @@ describe("extension", () => {
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false);
             expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalled();
+        });
+    });
+
+    describe("launch", () => {
+        let mockReporter: Mocked<Readonly<TelemetryReporter>>;
+        let mockUtils: Partial<Mocked<typeof import("./utils")>>;
+        let mockPanel: Partial<Mocked<typeof import("./devtoolsPanel")>>;
+
+        beforeEach(() => {
+            mockReporter = createFakeTelemetryReporter();
+
+            mockUtils = {
+                createTelemetryReporter: jest.fn((_: ExtensionContext) => mockReporter),
+                getBrowserPath: jest.fn().mockReturnValue("path"),
+                getListOfTargets: jest.fn().mockResolvedValue(null),
+                getRemoteEndpointSettings: jest.fn().mockReturnValue({
+                    hostname: "hostname",
+                    port: "port",
+                    useHttps: false,
+                }),
+                launchBrowser: jest.fn(),
+                openNewTab: jest.fn().mockResolvedValue(null),
+            };
+
+            mockPanel = {
+                DevToolsPanel: {
+                    createOrShow: jest.fn(),
+                } as any,
+            };
+
+            jest.doMock("vscode", () => createFakeVSCode(), { virtual: true });
+            jest.doMock("./utils", () => mockUtils);
+            jest.doMock("./devtoolsPanel", () => mockPanel);
+            jest.resetModules();
+        });
+
+        it("calls launch on launch command", async () => {
+            const vscode = jest.requireMock("vscode");
+            const context = createFakeExtensionContext();
+
+            // Activate the extension
+            const newExtension = await import("./extension");
+            newExtension.activate(context);
+
+            // Get the launch command that was added by extension activation
+            const callback = vscode.commands.registerCommand.mock.calls[1][1];
+            expect(callback).toBeDefined();
+
+            const result = await callback!(context);
+            expect(result).toBeUndefined();
+        });
+
+        it("creates a telemetry reporter", async () => {
+            const target = {
+                webSocketDebuggerUrl: "ws://localhost:9222",
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockUtils.createTelemetryReporter).toHaveBeenCalled();
+        });
+
+        it("shows the devtools against the target", async () => {
+            const target = {
+                webSocketDebuggerUrl: "ws://localhost:9222",
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockPanel.DevToolsPanel!.createOrShow).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                target.webSocketDebuggerUrl,
+            );
+        });
+
+        it("shows the error with no browser path", async () => {
+            mockUtils.getBrowserPath!.mockReturnValueOnce("");
+
+            const vscode = jest.requireMock("vscode");
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            const result = await newExtension.launch(createFakeExtensionContext());
+            expect(result).toBeUndefined();
+            expect(vscode.window.showErrorMessage).toHaveBeenCalled();
+        });
+
+        it("launches the browser", async () => {
+            const target = {
+                webSocketDebuggerUrl: "ws://localhost:9222",
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(undefined);
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockUtils.launchBrowser).toHaveBeenCalled();
+            expect(mockPanel.DevToolsPanel!.createOrShow).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                target.webSocketDebuggerUrl,
+            );
+        });
+
+        it("tries to attach on error", async () => {
+            const target = {
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const vscode = jest.requireMock("vscode");
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            await newExtension.launch(createFakeExtensionContext());
+            expect(vscode.window.showErrorMessage).toHaveBeenCalled();
+            expect(mockUtils.getListOfTargets).toHaveBeenCalled();
         });
     });
 });

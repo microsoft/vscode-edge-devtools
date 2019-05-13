@@ -35,6 +35,9 @@ export function createFakeVSCode() {
         commands: {
             registerCommand: jest.fn(),
         },
+        debug: {
+            registerDebugConfigurationProvider: jest.fn(),
+        },
         env: { machineId: "someValue.machineId" },
         window: {
             createWebviewPanel: jest.fn(),
