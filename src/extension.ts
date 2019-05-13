@@ -3,6 +3,8 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
+import CDPTarget from "./cdpTarget";
+import CDPTargetsProvider from "./cdpTargetsProvider";
 import { DevToolsPanel } from "./devtoolsPanel";
 import LaunchDebugProvider from "./launchDebugProvider";
 import {
@@ -15,6 +17,7 @@ import {
     launchBrowser,
     openNewTab,
     SETTINGS_STORE_NAME,
+    SETTINGS_VIEW_NAME,
 } from "./utils";
 
 export const DEFAULT_LAUNCH_URL: string = "about:blank";
@@ -34,8 +37,27 @@ export function activate(context: vscode.ExtensionContext) {
         launch(context);
     }));
 
+    // Register the launch provider
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
+
+    // Register the side-panel view and its commands
+    const cdpTargetsProvider = new CDPTargetsProvider(context, telemetryReporter);
+    context.subscriptions.push(vscode.window.registerTreeDataProvider(
+        `${SETTINGS_VIEW_NAME}.targets`,
+        cdpTargetsProvider));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.refresh`,
+        () => cdpTargetsProvider.refresh()));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.attach`,
+        (target: CDPTarget) => {
+            telemetryReporter.sendTelemetryEvent("view/devtools");
+            DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl);
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.copyItem`,
+        (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
 }
 
 export async function attach(context: vscode.ExtensionContext, viaConfig: boolean, targetUrl?: string) {
@@ -43,13 +65,17 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const telemetryProps = { viaConfig: `${viaConfig}` };
-    telemetryReporter.sendTelemetryEvent("attach", telemetryProps);
+    const telemetryProps = { viaConfig: `${viaConfig}`, withTargetUrl: `${!!targetUrl}` };
+    telemetryReporter.sendTelemetryEvent("command/attach", telemetryProps);
 
     const { hostname, port, useHttps } = getRemoteEndpointSettings();
     const responseArray = await getListOfTargets(hostname, port, useHttps);
     if (Array.isArray(responseArray)) {
-        telemetryReporter.sendTelemetryEvent("attach/list", telemetryProps, { targetCount: responseArray.length });
+        telemetryReporter.sendTelemetryEvent(
+            "command/attach/list",
+            telemetryProps,
+            { targetCount: responseArray.length },
+        );
 
         // Fix up the response targets with the correct web socket
         const items = responseArray.map((i: IRemoteTargetJson) => {
@@ -75,16 +101,18 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
 
         if (targetWebsocketUrl) {
             // Auto connect to found target
+            telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
             DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl);
         } else {
             // Show the target list and allow the user to select one
             const selection = await vscode.window.showQuickPick(items);
             if (selection && selection.detail) {
+                telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
                 DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail);
             }
         }
     } else {
-        telemetryReporter.sendTelemetryEvent("attach/error/no_json_array", telemetryProps);
+        telemetryReporter.sendTelemetryEvent("command/attach/error/no_json_array", telemetryProps);
     }
 }
 

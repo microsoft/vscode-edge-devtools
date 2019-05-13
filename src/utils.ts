@@ -25,6 +25,7 @@ export const SETTINGS_PREF_DEFAULTS = {
     screencastEnabled: false,
     uiTheme: '"dark"',
 };
+export const SETTINGS_VIEW_NAME = "vscode-edge-devtools-view";
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || "/";
 const WIN_MSEDGE_PATHS = [
@@ -45,6 +46,7 @@ const OSX_MSEDGE_PATHS = [
 ];
 
 export interface IRemoteTargetJson {
+    [index: string]: string;
     description: string;
     devtoolsFrontendUrl: string;
     faviconUrl: string;

@@ -26,7 +26,7 @@
         "remote"
     ],
     "engines": {
-        "vscode": "^1.25.0"
+        "vscode": "^1.33.1"
     },
     "categories": [
         "Other"
@@ -37,6 +37,7 @@
         "onCommand:vscode-edge-devtools.attach",
         "onCommand:vscode-edge-devtools.launch",
         "onWebviewPanel:vscode-edge-devtools",
+        "onView:vscode-edge-devtools-view.targets",
         "onDebug"
     ],
     "contributes": {
@@ -50,6 +51,29 @@
                 "command": "vscode-edge-devtools.launch",
                 "title": "Launch Edge and then attach to a target",
                 "category": "DevTools for Edge"
+            },
+            {
+                "command": "vscode-edge-devtools-view.refresh",
+                "category": "DevTools for Edge",
+                "title": "Refresh Targets",
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
+            },
+            {
+                "command": "vscode-edge-devtools-view.attach",
+                "category": "DevTools for Edge",
+                "title": "Attach DevTools",
+                "icon": {
+                    "light": "resources/light/attach.svg",
+                    "dark": "resources/dark/attach.svg"
+                }
+            },
+            {
+                "command": "vscode-edge-devtools-view.copyItem",
+                "category": "DevTools for Edge",
+                "title": "Copy Value"
             }
         ],
         "configuration": {
@@ -145,7 +169,59 @@
                     }
                 }
             }
-        ]
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "vscode-edge-devtools-view.attach",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.refresh",
+                    "when": "view == vscode-edge-devtools-view.targets"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.copyItem",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTargetProperty"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "vscode-edge-devtools-view.refresh",
+                    "when": "view == vscode-edge-devtools-view.targets",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "vscode-edge-devtools-view.attach",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
+                    "group": "inline"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.copyItem",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTargetProperty",
+                    "group": "2_contextMenu"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "vscode-edge-devtools-view",
+                    "title": "DevTools for Edge",
+                    "icon": "resources/viewIcon.svg"
+                }
+            ]
+        },
+        "views": {
+            "vscode-edge-devtools-view": [
+                {
+                    "id": "vscode-edge-devtools-view.targets",
+                    "name": "Targets"
+                }
+            ]
+        }
     },
     "jest": {
         "transform": {
