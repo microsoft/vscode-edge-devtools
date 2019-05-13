@@ -4,7 +4,7 @@
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson, SETTINGS_STORE_NAME } from "./utils";
+import { IRemoteTargetJson, SETTINGS_STORE_NAME, SETTINGS_VIEW_NAME } from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
@@ -13,6 +13,9 @@ describe("extension", () => {
         let context: ExtensionContext;
         let commandMock: jest.Mock;
         let mockUtils: Partial<Mocked<typeof import("./utils")>>;
+        let mockRegisterTree: jest.Mock;
+        let mockProviderRefresh: jest.Mock;
+        let mockClipboard: jest.Mock;
 
         beforeEach(() => {
             // Initialize a fake context
@@ -21,15 +24,25 @@ describe("extension", () => {
             // Mock out the imported utils
             mockUtils = {
                 SETTINGS_STORE_NAME,
+                SETTINGS_VIEW_NAME,
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
                 getListOfTargets: jest.fn(),
                 getRemoteEndpointSettings: jest.fn(),
             };
             jest.doMock("./utils", () => mockUtils);
 
+            mockProviderRefresh = jest.fn();
+            jest.doMock("./cdpTargetsProvider", () => function CDPTargetsProvider() {
+                return {
+                    refresh: mockProviderRefresh,
+                };
+            });
+
             // Mock out vscode command registration
             const mockVSCode = createFakeVSCode();
             commandMock = mockVSCode.commands.registerCommand;
+            mockRegisterTree = mockVSCode.window.registerTreeDataProvider;
+            mockClipboard = mockVSCode.env.clipboard.writeText;
             jest.doMock("vscode", () => mockVSCode, { virtual: true });
             jest.resetModules();
         });
@@ -47,10 +60,18 @@ describe("extension", () => {
 
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
-            expect(context.subscriptions.length).toBe(1);
-            expect(commandMock).toHaveBeenCalledTimes(1);
+            expect(context.subscriptions.length).toBe(5);
+            expect(commandMock).toHaveBeenCalledTimes(4);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(2, `${SETTINGS_VIEW_NAME}.refresh`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(3, `${SETTINGS_VIEW_NAME}.attach`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(4, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
+            expect(mockRegisterTree)
+                .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
 
         it("requests targets on attach command", async () => {
@@ -76,6 +97,35 @@ describe("extension", () => {
             mockUtils.getListOfTargets!.mockResolvedValue([]);
             attachCommand!();
             expect(mockUtils.getListOfTargets).toBeCalled();
+        });
+
+        it("performs registered commands correctly", async () => {
+            const mockPanelShow = jest.fn();
+            jest.doMock("./devtoolsPanel", () => ({
+                DevToolsPanel: {
+                    createOrShow: mockPanelShow,
+                },
+            }));
+            jest.resetModules();
+
+            const newExtension = await import("./extension");
+            newExtension.activate(context);
+
+            function getCommandCallback(index: number) {
+                return { callback: commandMock.mock.calls[index][1], thisObj: commandMock.mock.instances[index] };
+            }
+
+            const refresh = getCommandCallback(1);
+            refresh.callback.call(refresh.thisObj);
+            expect(mockProviderRefresh).toHaveBeenCalled();
+
+            const attach = getCommandCallback(2);
+            attach.callback.call(attach.thisObj, { websocketUrl: "" });
+            expect(mockPanelShow).toHaveBeenCalled();
+
+            const copy = getCommandCallback(3);
+            copy.callback.call(copy.thisObj, { tooltip: "something" });
+            expect(mockClipboard).toHaveBeenCalledWith("something");
         });
     });
 
