@@ -55,7 +55,7 @@
             {
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "DevTools for Edge",
-                "title": "Launch Browser",
+                "title": "Open a new tab",
                 "icon": {
                     "light": "resources/light/launch.svg",
                     "dark": "resources/dark/launch.svg"
@@ -117,7 +117,7 @@
                 "vscode-edge-devtools.userDataDirectory": {
                     "type": "string",
                     "default": "",
-                    "description": "The user data directory to use when launching the browser"
+                    "description": "A custom user data directory to use when launching the browser"
                 }
             }
         },
