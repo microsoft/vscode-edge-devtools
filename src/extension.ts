@@ -47,6 +47,12 @@ export function activate(context: vscode.ExtensionContext) {
         `${SETTINGS_VIEW_NAME}.targets`,
         cdpTargetsProvider));
     context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.launch`,
+        async () => {
+            await launch(context);
+            cdpTargetsProvider.refresh();
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.refresh`,
         () => cdpTargetsProvider.refresh()));
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -89,7 +95,7 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
 
         // Try to match the given target with the list of targets we received from the endpoint
         let targetWebsocketUrl = "";
-        if (targetUrl && targetUrl !== DEFAULT_LAUNCH_URL) {
+        if (targetUrl) {
             const matches = items.filter((i) =>
                 i.description && targetUrl.localeCompare(i.description, "en", { sensitivity: "base" }) === 0);
             if (matches && matches.length > 0 && matches[0].detail) {
@@ -127,10 +133,14 @@ export async function launch(
     telemetryReporter.sendTelemetryEvent("command/launch", telemetryProps);
 
     const { hostname, port } = getRemoteEndpointSettings();
-    let target = await openNewTab(hostname, port, launchUrl);
-    if (!target) {
+    const target = await openNewTab(hostname, port, launchUrl);
+    if (target && target.webSocketDebuggerUrl) {
+        // Show the devtools
+        telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
+        DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl);
+    } else {
+        // Launch a new instance
         const browserPath = getBrowserPath(browserPathFromLaunchConfig);
-
         if (!browserPath) {
             telemetryReporter.sendTelemetryEvent("command/launch/error/browser_not_found", telemetryProps);
             vscode.window.showErrorMessage(
@@ -140,19 +150,8 @@ export async function launch(
             return;
         }
 
-        launchBrowser(browserPath, port, DEFAULT_LAUNCH_URL);
-
-        target = await openNewTab(hostname, port, launchUrl);
-    }
-
-    if (target && target.webSocketDebuggerUrl) {
-        // Show the devtools
-        telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
-        DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl);
-    } else {
-        // Error
-        telemetryReporter.sendTelemetryEvent("command/launch/error/tab_not_found", telemetryProps);
-        vscode.window.showErrorMessage(`Could not find the launched browser tab: (${launchUrl}).`);
-        attach(context, viaConfig, DEFAULT_LAUNCH_URL);
+        const url = launchUrl || DEFAULT_LAUNCH_URL;
+        launchBrowser(browserPath, port, url);
+        await attach(context, viaConfig, url);
     }
 }
