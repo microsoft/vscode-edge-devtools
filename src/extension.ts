@@ -20,8 +20,6 @@ import {
     SETTINGS_VIEW_NAME,
 } from "./utils";
 
-export const DEFAULT_LAUNCH_URL: string = "about:blank";
-
 let telemetryReporter: Readonly<TelemetryReporter>;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -132,8 +130,9 @@ export async function launch(
     const telemetryProps = { viaConfig: `${viaConfig}` };
     telemetryReporter.sendTelemetryEvent("command/launch", telemetryProps);
 
-    const { hostname, port } = getRemoteEndpointSettings();
-    const target = await openNewTab(hostname, port, launchUrl);
+    const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings();
+    const url = launchUrl || defaultUrl;
+    const target = await openNewTab(hostname, port, url);
     if (target && target.webSocketDebuggerUrl) {
         // Show the devtools
         telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
@@ -150,8 +149,7 @@ export async function launch(
             return;
         }
 
-        const url = launchUrl || DEFAULT_LAUNCH_URL;
-        launchBrowser(browserPath, port, url);
+        launchBrowser(browserPath, port, url, userDataDir);
         await attach(context, viaConfig, url);
     }
 }

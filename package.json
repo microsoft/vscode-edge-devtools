@@ -108,6 +108,16 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Should we request the remote target list using https rather than http"
+                },
+                "vscode-edge-devtools.defaultUrl": {
+                    "type": "string",
+                    "default": "about:blank",
+                    "description": "The default url to open when launching the browser without a target"
+                },
+                "vscode-edge-devtools.userDataDirectory": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The user data directory to use when launching the browser"
                 }
             }
         },

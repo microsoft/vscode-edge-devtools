@@ -96,9 +96,11 @@ describe("extension", () => {
 
             // Ensure that attaching will request targets
             mockUtils.getRemoteEndpointSettings!.mockReturnValue({
+                defaultUrl: "url",
                 hostname: "localhost",
                 port: 9222,
                 useHttps: false,
+                userDataDir: "profile",
             });
             mockUtils.getListOfTargets!.mockResolvedValue([]);
             attachCommand!();

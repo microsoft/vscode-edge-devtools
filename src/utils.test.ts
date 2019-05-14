@@ -289,9 +289,11 @@ describe("utils", () => {
     describe("getRemoteEndpointSettings", () => {
         it("returns the stored settings", async () => {
             const expected = {
+                defaultUrl: "url",
                 hostname: "someHost",
                 port: 9999,
                 useHttps: true,
+                userDataDirectory: "default",
             };
 
             // Override the configuration mock to return our custom test values
@@ -302,18 +304,22 @@ describe("utils", () => {
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
             // Ensure the new values are returned
-            const { hostname, port, useHttps } = utils.getRemoteEndpointSettings();
+            const { hostname, port, useHttps, defaultUrl, userDataDir } = utils.getRemoteEndpointSettings();
             expect(hostname).toBe(expected.hostname);
             expect(port).toBe(expected.port);
             expect(useHttps).toBe(expected.useHttps);
+            expect(defaultUrl).toBe(expected.defaultUrl);
+            expect(userDataDir).toBe(expected.userDataDirectory);
             expect(vscodeMock.workspace.getConfiguration).toBeCalledWith(utils.SETTINGS_STORE_NAME);
         });
 
         it("uses correct fallbacks on failure", async () => {
-            const { hostname, port, useHttps } = utils.getRemoteEndpointSettings();
+            const { hostname, port, useHttps, defaultUrl, userDataDir } = utils.getRemoteEndpointSettings();
             expect(hostname).toBe(utils.SETTINGS_DEFAULT_HOSTNAME);
             expect(port).toBe(utils.SETTINGS_DEFAULT_PORT);
             expect(useHttps).toBe(utils.SETTINGS_DEFAULT_USE_HTTPS);
+            expect(defaultUrl).toBe(utils.SETTINGS_DEFAULT_URL);
+            expect(userDataDir).toBe(utils.SETTINGS_DEFAULT_USER_DATA_DIR);
         });
     });
 
@@ -468,11 +474,23 @@ describe("utils", () => {
             const expectedPath = "somePath";
             const expectedPort = 9222;
             const expectedUrl = "http://example.com";
-            utils.launchBrowser(expectedPath, expectedPort, expectedUrl);
+            const expectedUserDataDir = "profile";
+            utils.launchBrowser(expectedPath, expectedPort, expectedUrl, expectedUserDataDir);
 
             expect(cp.spawn).toHaveBeenCalledWith(
                 expectedPath,
-                expect.arrayContaining([`--remote-debugging-port=${expectedPort}`, expectedUrl]),
+                expect.arrayContaining([
+                    `--user-data-dir=${expectedUserDataDir}`,
+                    `--remote-debugging-port=${expectedPort}`,
+                    expectedUrl]),
+                expect.any(Object));
+
+            utils.launchBrowser(expectedPath, expectedPort, expectedUrl);
+            expect(cp.spawn).toHaveBeenCalledWith(
+                expectedPath,
+                expect.arrayContaining([
+                    `--remote-debugging-port=${expectedPort}`,
+                    expectedUrl]),
                 expect.any(Object));
         });
     });
