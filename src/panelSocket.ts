@@ -30,6 +30,7 @@ export class PanelSocket extends EventEmitter {
 
     public dispose() {
         if (this.socket) {
+            this.isConnected = false;
             this.socket.close();
             this.socket = undefined;
         }
