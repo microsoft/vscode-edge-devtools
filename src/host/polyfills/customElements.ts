@@ -10,7 +10,7 @@ export function registerCustomElementOverride(
     // Replace the class definition with the custom elements v0 version
     const code = definition.toString();
     const classObjectDef = code.replace(/super\(\);/g, "")
-        .replace(/constructor\(\) {/g, "createdCallback() {");
+    .replace(/constructor\(\)\s*{/g, "createdCallback() {");
 
     // tslint:disable-next-line: no-eval
     const classObject = eval(`(${classObjectDef})`);
@@ -27,15 +27,15 @@ export function registerCustomElementOverride(
 
 export function applyUIUtilsPatch(content: string) {
     const newContent = content.replace(
-        "UI.registerCustomElement = function",
-        "UI.deprecatedRegisterCustomElement = function",
+        /UI.registerCustomElement\s*=\s*function/g,
+        `UI.registerCustomElement = ${registerCustomElementOverride.toString()};
+        UI.deprecatedRegisterCustomElement = function`,
     );
-    const newFunction = `UI.registerCustomElement = ${registerCustomElementOverride.toString()}`;
-    return newFunction.concat(newContent);
+    return newContent;
 }
 
 export function applyCreateElementPatch(content: string) {
     return content.replace(
-        /\.createElement\((.+){is: customElementType}/g,
+        /\.createElement\((.+){is:\s*customElementType}/g,
         ".createElement($1 customElementType || ''");
 }
