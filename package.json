@@ -35,8 +35,10 @@
     "main": "./out/extension",
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
+        "onCommand:vscode-edge-devtools.launch",
         "onWebviewPanel:vscode-edge-devtools",
-        "onView:vscode-edge-devtools-view.targets"
+        "onView:vscode-edge-devtools-view.targets",
+        "onDebug"
     ],
     "contributes": {
         "commands": [
@@ -44,6 +46,20 @@
                 "command": "vscode-edge-devtools.attach",
                 "title": "Attach to a target",
                 "category": "DevTools for Edge"
+            },
+            {
+                "command": "vscode-edge-devtools.launch",
+                "title": "Launch Edge and then attach to a target",
+                "category": "DevTools for Edge"
+            },
+            {
+                "command": "vscode-edge-devtools-view.launch",
+                "category": "DevTools for Edge",
+                "title": "Open a new tab",
+                "icon": {
+                    "light": "resources/light/launch.svg",
+                    "dark": "resources/dark/launch.svg"
+                }
             },
             {
                 "command": "vscode-edge-devtools-view.refresh",
@@ -73,6 +89,11 @@
             "title": "DevTools for Edge",
             "type": "object",
             "properties": {
+                "vscode-edge-devtools.browserPath": {
+                    "type": "string",
+                    "default": null,
+                    "description": "The path to the Edge browser to be use, rather than searching for the default"
+                },
                 "vscode-edge-devtools.hostname": {
                     "type": "string",
                     "default": "localhost",
@@ -87,14 +108,96 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Should we request the remote target list using https rather than http"
+                },
+                "vscode-edge-devtools.defaultUrl": {
+                    "type": "string",
+                    "default": "about:blank",
+                    "description": "The default url to open when launching the browser without a target"
+                },
+                "vscode-edge-devtools.userDataDirectory": {
+                    "type": "string",
+                    "default": "",
+                    "description": "A custom user data directory to use when launching the browser"
                 }
             }
         },
+        "debuggers": [
+            {
+                "type": "vscode-edge-devtools.debug",
+                "label": "DevTools for Edge",
+                "configurationSnippets": [
+                    {
+                        "label": "DevTools for Edge: Launch",
+                        "description": "Launch Edge to debug a URL",
+                        "body": {
+                            "type": "vscode-edge-devtools.debug",
+                            "request": "launch",
+                            "name": "Launch Edge and open DevTools",
+                            "url": "http://localhost:8080"
+                        }
+                    },
+                    {
+                        "label": "DevTools for Edge: Attach",
+                        "description": "Attach to an instance of Edge already in debug mode",
+                        "body": {
+                            "type": "vscode-edge-devtools.debug",
+                            "request": "attach",
+                            "name": "Attach DevTools to Edge",
+                            "url": "http://localhost:8080"
+                        }
+                    }
+                ],
+                "configurationAttributes": {
+                    "launch": {
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "description": "Absolute uri to launch",
+                                "default": "http://localhost:8080"
+                            },
+                            "file": {
+                                "type": "string",
+                                "description": "File path to launch",
+                                "default": "${workspaceFolder}/index.html"
+                            },
+                            "browserPath": {
+                                "type": "string",
+                                "description": "Absolute path to the Edge browser instance to launch",
+                                "default": ""
+                            }
+                        }
+                    },
+                    "attach": {
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "description": "Absolute uri to launch.",
+                                "default": "http://localhost:8080"
+                            },
+                            "file": {
+                                "type": "string",
+                                "description": "File path to launch.",
+                                "default": "${workspaceFolder}/index.html"
+                            },
+                            "browserPath": {
+                                "type": "string",
+                                "description": "Absolute path to the Edge browser instance to launch.",
+                                "default": ""
+                            }
+                        }
+                    }
+                }
+            }
+        ],
         "menus": {
             "commandPalette": [
                 {
                     "command": "vscode-edge-devtools-view.attach",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.launch",
+                    "when": "view == vscode-edge-devtools-view.targets"
                 },
                 {
                     "command": "vscode-edge-devtools-view.refresh",
@@ -106,6 +209,11 @@
                 }
             ],
             "view/title": [
+                {
+                    "command": "vscode-edge-devtools-view.launch",
+                    "when": "view == vscode-edge-devtools-view.targets",
+                    "group": "navigation"
+                },
                 {
                     "command": "vscode-edge-devtools-view.refresh",
                     "when": "view == vscode-edge-devtools-view.targets",

@@ -30,6 +30,7 @@ describe("extension", () => {
                 getRemoteEndpointSettings: jest.fn(),
             };
             jest.doMock("./utils", () => mockUtils);
+            jest.doMock("./launchDebugProvider");
 
             mockProviderRefresh = jest.fn();
             jest.doMock("./cdpTargetsProvider", () => function CDPTargetsProvider() {
@@ -60,16 +61,21 @@ describe("extension", () => {
 
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
-            expect(context.subscriptions.length).toBe(5);
-            expect(commandMock).toHaveBeenCalledTimes(4);
+
+            expect(context.subscriptions.length).toBe(7);
+            expect(commandMock).toHaveBeenCalledTimes(6);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(2, `${SETTINGS_VIEW_NAME}.refresh`, expect.any(Function));
+                .toHaveBeenNthCalledWith(2, `${SETTINGS_STORE_NAME}.launch`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(3, `${SETTINGS_VIEW_NAME}.attach`, expect.any(Function));
+                .toHaveBeenNthCalledWith(3, `${SETTINGS_VIEW_NAME}.launch`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(4, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
+                .toHaveBeenNthCalledWith(4, `${SETTINGS_VIEW_NAME}.refresh`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(5, `${SETTINGS_VIEW_NAME}.attach`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(6, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
             expect(mockRegisterTree)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
@@ -90,9 +96,11 @@ describe("extension", () => {
 
             // Ensure that attaching will request targets
             mockUtils.getRemoteEndpointSettings!.mockReturnValue({
+                defaultUrl: "url",
                 hostname: "localhost",
                 port: 9222,
                 useHttps: false,
+                userDataDir: "profile",
             });
             mockUtils.getListOfTargets!.mockResolvedValue([]);
             attachCommand!();
@@ -115,15 +123,15 @@ describe("extension", () => {
                 return { callback: commandMock.mock.calls[index][1], thisObj: commandMock.mock.instances[index] };
             }
 
-            const refresh = getCommandCallback(1);
+            const refresh = getCommandCallback(3);
             refresh.callback.call(refresh.thisObj);
             expect(mockProviderRefresh).toHaveBeenCalled();
 
-            const attach = getCommandCallback(2);
+            const attach = getCommandCallback(4);
             attach.callback.call(attach.thisObj, { websocketUrl: "" });
             expect(mockPanelShow).toHaveBeenCalled();
 
-            const copy = getCommandCallback(3);
+            const copy = getCommandCallback(5);
             copy.callback.call(copy.thisObj, { tooltip: "something" });
             expect(mockClipboard).toHaveBeenCalledWith("something");
         });
@@ -251,6 +259,122 @@ describe("extension", () => {
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false);
             expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalled();
+        });
+    });
+
+    describe("launch", () => {
+        let mockReporter: Mocked<Readonly<TelemetryReporter>>;
+        let mockUtils: Partial<Mocked<typeof import("./utils")>>;
+        let mockPanel: Partial<Mocked<typeof import("./devtoolsPanel")>>;
+
+        beforeEach(() => {
+            mockReporter = createFakeTelemetryReporter();
+
+            mockUtils = {
+                createTelemetryReporter: jest.fn((_: ExtensionContext) => mockReporter),
+                getBrowserPath: jest.fn().mockResolvedValue("path"),
+                getListOfTargets: jest.fn().mockResolvedValue(null),
+                getRemoteEndpointSettings: jest.fn().mockReturnValue({
+                    hostname: "hostname",
+                    port: "port",
+                    useHttps: false,
+                }),
+                launchBrowser: jest.fn(),
+                openNewTab: jest.fn().mockResolvedValue(null),
+            };
+
+            mockPanel = {
+                DevToolsPanel: {
+                    createOrShow: jest.fn(),
+                } as any,
+            };
+
+            jest.doMock("vscode", () => createFakeVSCode(), { virtual: true });
+            jest.doMock("./utils", () => mockUtils);
+            jest.doMock("./devtoolsPanel", () => mockPanel);
+            jest.resetModules();
+        });
+
+        it("calls launch on launch command", async () => {
+            const vscode = jest.requireMock("vscode");
+            const context = createFakeExtensionContext();
+
+            // Activate the extension
+            const newExtension = await import("./extension");
+            newExtension.activate(context);
+
+            // Get the launch command that was added by extension activation
+            const callback = vscode.commands.registerCommand.mock.calls[1][1];
+            expect(callback).toBeDefined();
+
+            const result = await callback!(context);
+            expect(result).toBeUndefined();
+        });
+
+        it("calls launch on launch view command", async () => {
+            const vscode = jest.requireMock("vscode");
+            const context = createFakeExtensionContext();
+
+            // Activate the extension
+            const newExtension = await import("./extension");
+            newExtension.activate(context);
+
+            // Get the launch command that was added by extension activation
+            const callback = vscode.commands.registerCommand.mock.calls[2][1];
+            expect(callback).toBeDefined();
+
+            const result = await callback!(context);
+            expect(result).toBeUndefined();
+        });
+
+        it("creates a telemetry reporter", async () => {
+            const target = {
+                webSocketDebuggerUrl: "ws://localhost:9222",
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockUtils.createTelemetryReporter).toHaveBeenCalled();
+        });
+
+        it("shows the devtools against the target", async () => {
+            const target = {
+                webSocketDebuggerUrl: "ws://localhost:9222",
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const newExtension = await import("./extension");
+
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockPanel.DevToolsPanel!.createOrShow).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                target.webSocketDebuggerUrl,
+            );
+        });
+
+        it("shows the error with no browser path", async () => {
+            mockUtils.getBrowserPath!.mockResolvedValueOnce("");
+
+            const vscode = jest.requireMock("vscode");
+            const newExtension = await import("./extension");
+
+            const result = await newExtension.launch(createFakeExtensionContext());
+            expect(result).toBeUndefined();
+            expect(vscode.window.showErrorMessage).toHaveBeenCalled();
+        });
+
+        it("launches the browser", async () => {
+            const target = {
+                webSocketDebuggerUrl: "ws://localhost:9222",
+            };
+            mockUtils.openNewTab!.mockResolvedValueOnce(undefined);
+            mockUtils.openNewTab!.mockResolvedValueOnce(target as any);
+            const newExtension = await import("./extension");
+
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockUtils.launchBrowser).toHaveBeenCalled();
         });
     });
 });

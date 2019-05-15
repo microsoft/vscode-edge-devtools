@@ -39,6 +39,9 @@ export function createFakeVSCode() {
         commands: {
             registerCommand: jest.fn(),
         },
+        debug: {
+            registerDebugConfigurationProvider: jest.fn(),
+        },
         env: {
             clipboard: { writeText: jest.fn() },
             machineId: "someValue.machineId",
