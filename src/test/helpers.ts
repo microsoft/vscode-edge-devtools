@@ -28,6 +28,10 @@ export type Writable<T> = {
  */
 export function createFakeVSCode() {
     return {
+        EventEmitter: jest.fn(),
+        TreeDataProvider: jest.fn(),
+        TreeItem: jest.fn(),
+        TreeItemCollapsibleState: { None: 0, Collapsed: 1 },
         Uri: {
             file: jest.fn().mockReturnValue({ with: jest.fn() }),
         },
@@ -35,9 +39,16 @@ export function createFakeVSCode() {
         commands: {
             registerCommand: jest.fn(),
         },
-        env: { machineId: "someValue.machineId" },
+        debug: {
+            registerDebugConfigurationProvider: jest.fn(),
+        },
+        env: {
+            clipboard: { writeText: jest.fn() },
+            machineId: "someValue.machineId",
+        },
         window: {
             createWebviewPanel: jest.fn(),
+            registerTreeDataProvider: jest.fn(),
             showErrorMessage: jest.fn(),
             showQuickPick: jest.fn().mockResolvedValue(null),
         },
