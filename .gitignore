@@ -63,3 +63,4 @@ typings/
 # project specific
 out/
 coverage/
+*.vsix
