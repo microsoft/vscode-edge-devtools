@@ -136,18 +136,22 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
 
     const protocol = (useHttps ? "https" : "http");
 
-    let jsonResponse: string;
-    try {
-        jsonResponse = await checkDiscoveryEndpoint(`${protocol}://${hostname}:${port}/json/list`);
-    } catch (ex) {
-        jsonResponse = await checkDiscoveryEndpoint(`${protocol}://${hostname}:${port}/json`);
+    let jsonResponse = "";
+    for (const endpoint of ["/json/list", "/json"]) {
+        try {
+            jsonResponse = await checkDiscoveryEndpoint(`${protocol}://${hostname}:${port}${endpoint}`);
+            if (jsonResponse) {
+                break;
+            }
+        } catch {
+            // Do nothing
+        }
     }
 
     let result: IRemoteTargetJson[];
     try {
         result = JSON.parse(jsonResponse);
-    } catch (ex) {
-        vscode.window.showErrorMessage(`Could not list targets: ${ex.message}`);
+    } catch {
         result = [];
     }
     return result;

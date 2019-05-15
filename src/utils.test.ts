@@ -194,18 +194,6 @@ describe("utils", () => {
             expect(targets).toEqual([]);
         });
 
-        it("shows error message on exception", async () => {
-            expectedListResponse = "Error: Some bad json which will throw an exception";
-
-            const vscodeMock = await jest.requireMock("vscode");
-
-            await utils.getListOfTargets(
-                utils.SETTINGS_DEFAULT_HOSTNAME,
-                utils.SETTINGS_DEFAULT_PORT,
-                utils.SETTINGS_DEFAULT_USE_HTTPS);
-            expect(vscodeMock.window.showErrorMessage).toHaveBeenCalled();
-        });
-
         it("uses correct remote address", async () => {
             const expectedHostName = "127.0.0.1";
             const expectedPort = 8080;
