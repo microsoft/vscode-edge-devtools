@@ -86,7 +86,9 @@ export default class ToolsHost {
 
     private fireGetUrlCallback(id: number, content: string) {
         // Send response content to DevTools
-        this.resourceLoader!.onResolvedUrlFromChannel(id, content);
+        if (this.resourceLoader) {
+            this.resourceLoader.onResolvedUrlFromChannel(id, content);
+        }
     }
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
