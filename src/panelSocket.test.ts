@@ -75,8 +75,12 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         panelSocket.onMessageFromWebview(readyMessage);
+        mockWebSocket.onopen.call(mockWebSocket);
+        expect(panelSocket.isConnectedToTarget).toEqual(true);
+
         panelSocket.dispose();
         expect(mockWebSocket.close).toHaveBeenCalled();
+        expect(panelSocket.isConnectedToTarget).toEqual(false);
     });
 
     it("buffers messages until connection is open", async () => {
