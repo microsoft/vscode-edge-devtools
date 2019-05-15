@@ -3,6 +3,15 @@
 
 import * as fse from "fs-extra";
 import path from "path";
+import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
+import {
+    applyCommonRevealerPatch,
+    applyInspectorCommonCssPatch,
+    applyInspectorViewPatch,
+    applyMainViewPatch,
+    applySelectTabPatch,
+} from "./src/host/polyfills/simpleView";
+import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
@@ -43,14 +52,58 @@ async function copyStaticFiles() {
     await fse.copy(toolsSrcDir, toolsOutDir);
 
     // Copy the devtools generated files to the out directory
-    await copyFile(toolsGenDir, toolsOutDir, "InspectorBackendCommands.js");
-    await copyFile(toolsGenDir, toolsOutDir, "SupportedCSSProperties.js");
-    await copyFile(
-        path.join(toolsGenDir, "accessibility"),
-        path.join(toolsOutDir, "accessibility"),
-        "ARIAProperties.js",
-    );
+    await fse.copy(toolsGenDir, toolsOutDir);
 
+    // Patch older versions of the webview with our workarounds
+    await patchFilesForWebView(toolsOutDir);
+}
+
+async function patchFilesForWebView(toolsOutDir: string) {
+    // Release file versions
+    patchFileForWebView("shell.js", toolsOutDir, true, [
+        applyUIUtilsPatch,
+        applyCreateElementPatch,
+        applyInspectorCommonCssPatch,
+        applyCommonRevealerPatch,
+        applyMainViewPatch,
+        applyInspectorViewPatch,
+        applySelectTabPatch,
+    ]);
+    patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [applySetupTextSelectionPatch]);
+
+    // Debug file versions
+    patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
+    patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
+    patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
+    patchFileForWebView("ui/inspectorCommon.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
+    patchFileForWebView("common/ModuleExtensionInterfaces.js", toolsOutDir, false, [applyCommonRevealerPatch]);
+    patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
+    patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
+    patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
+}
+
+async function patchFileForWebView(
+    filename: string,
+    dir: string,
+    isRelease: boolean,
+    patches: Array<(content: string, isRelease?: boolean) => string>) {
+    const file = path.join(dir, filename);
+
+    // Ignore missing files
+    if (!await fse.pathExists(file)) {
+        return;
+    }
+
+    // Read in the file
+    let content = (await fse.readFile(file)).toString();
+
+    // Apply each patch in order
+    patches.forEach((patchFunction) => {
+        content = patchFunction(content, isRelease);
+    });
+
+    // Write out the final content
+    fse.writeFile(file, content);
 }
 
 function isDirectory(fullPath: string) {

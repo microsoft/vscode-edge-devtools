@@ -3,7 +3,7 @@
 
 export default function applySetupTextSelectionPatch(content: string) {
     return content.replace(
-        /_setupTextSelectionHack\(stylePaneWrapperElement\) {/g,
+        /_setupTextSelectionHack\(stylePaneWrapperElement\)\s*{/g,
         "_setupTextSelectionHack() { return;",
     );
 }
