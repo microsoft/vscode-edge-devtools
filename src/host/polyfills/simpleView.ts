@@ -53,16 +53,16 @@ export function applySelectTabPatch(content: string) {
 
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
     const separator = (isRelease ? "\\n" : "\n"); // Release css is embedded in js
-    const css = `
-    .main-tabbed-pane .tabbed-pane-header-contents {
-        display: none !important;
-    }
-    .main-tabbed-pane .tabbed-pane-right-toolbar {
-        display: none !important;
-    }
-    .tabbed-pane-tab-slider {
-        display: none !important;
-    }`.replace(/\n/g, separator);
+    const css =
+        `.main-tabbed-pane .tabbed-pane-header-contents {
+            display: none !important;
+        }
+        .main-tabbed-pane .tabbed-pane-right-toolbar {
+            display: none !important;
+        }
+        .tabbed-pane-tab-slider {
+            display: none !important;
+        }`.replace(/\n/g, separator);
 
     return content.replace(
         /(:host-context\(\.platform-mac\)\s*\.monospace,)/g,

@@ -24,16 +24,6 @@ describe("customElements", () => {
             expect.stringContaining("UI.registerCustomElement = function registerCustomElementOverride("));
     });
 
-    it("applyUIUtilsPatch always applies the register function", async () => {
-        const apply = await import("./customElements");
-        const expectedText = "hello world";
-        const result = apply.applyUIUtilsPatch(expectedText);
-        expect(result).toEqual(
-            expect.stringContaining("UI.registerCustomElement = function registerCustomElementOverride("));
-        expect(result).toEqual(
-            expect.stringContaining(expectedText));
-    });
-
     it("registerCustomElementOverride returns a constructor", async () => {
         const apply = await import("./customElements");
 

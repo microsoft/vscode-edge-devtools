@@ -155,6 +155,7 @@ describe("toolsHost", () => {
         it("calls onResolvedUrlFromChannel on getUrl message", async () => {
             const { default: toolsHost } = await import("./toolsHost");
             const host = new toolsHost();
+            host.setResourceLoader(mockResourceLoader);
 
             const expectedArgs = { id: 0, content: "some content" };
             host.onMessageFromChannel("getUrl", JSON.stringify(expectedArgs));

@@ -33,8 +33,19 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssPatch correctly changes text", async () => {
+        const expectedCss = ":host-context(.platform-mac) .monospace,";
         const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssPatch("// some amount of code");
-        expect(result).toEqual(expect.stringContaining("// some amount of code\n.main-tabbed-pane"));
+        const result = apply.applyInspectorCommonCssPatch(expectedCss);
+        expect(result.startsWith(".main")).toEqual(true);
+        expect(result.endsWith(".monospace,")).toEqual(true);
+    });
+
+    it("applyInspectorCommonCssPatch correctly changes text in release mode", async () => {
+        const expectedCss = ":host-context(.platform-mac) .monospace,";
+        const apply = await import("./simpleView");
+        const result = apply.applyInspectorCommonCssPatch(expectedCss, true);
+        expect(result.startsWith(".main")).toEqual(true);
+        expect(result.endsWith(".monospace,")).toEqual(true);
+        expect(result.indexOf("\\n") > -1).toEqual(true);
     });
 });
