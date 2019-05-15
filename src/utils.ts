@@ -143,7 +143,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             if (jsonResponse) {
                 break;
             }
-        } catch (ex) {
+        } catch {
             // Do nothing
         }
     }
@@ -151,7 +151,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
     let result: IRemoteTargetJson[];
     try {
         result = JSON.parse(jsonResponse);
-    } catch (ex) {
+    } catch {
         result = [];
     }
     return result;
