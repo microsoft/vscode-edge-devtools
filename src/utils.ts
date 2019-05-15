@@ -198,7 +198,7 @@ export function getPlatform(): Platform {
  * For windows we will try: program files > local app data
  * @param launchConfigPath The path specified by a launch config, if any
  */
-export function getBrowserPath(launchConfigPath?: string) {
+export async function getBrowserPath(launchConfigPath?: string) {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const browserPath = launchConfigPath || settings.get("browserPath") || "";
 
@@ -210,14 +210,14 @@ export function getBrowserPath(launchConfigPath?: string) {
 
         // Find the first one that exists
         for (const p of searchPaths) {
-            if (fse.pathExistsSync(p)) {
+            if (await fse.pathExists(p)) {
                 return p;
             }
         }
     }
 
     // Only return it if it exists
-    return (fse.pathExistsSync(browserPath) ? browserPath : "");
+    return (await fse.pathExists(browserPath) ? browserPath : "");
 }
 
 /**

@@ -272,7 +272,7 @@ describe("extension", () => {
 
             mockUtils = {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => mockReporter),
-                getBrowserPath: jest.fn().mockReturnValue("path"),
+                getBrowserPath: jest.fn().mockResolvedValue("path"),
                 getListOfTargets: jest.fn().mockResolvedValue(null),
                 getRemoteEndpointSettings: jest.fn().mockReturnValue({
                     hostname: "hostname",
@@ -355,7 +355,7 @@ describe("extension", () => {
         });
 
         it("shows the error with no browser path", async () => {
-            mockUtils.getBrowserPath!.mockReturnValueOnce("");
+            mockUtils.getBrowserPath!.mockResolvedValueOnce("");
 
             const vscode = jest.requireMock("vscode");
             const newExtension = await import("./extension");

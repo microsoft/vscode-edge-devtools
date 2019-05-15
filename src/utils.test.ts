@@ -400,7 +400,7 @@ describe("utils", () => {
             os = jest.requireMock("os");
 
             // Mock that the path always exists
-            fse.pathExistsSync.mockReturnValue(true);
+            fse.pathExists.mockImplementation(() => Promise.resolve(true));
 
             // Mock no path in settings
             const configMock = {
@@ -414,12 +414,12 @@ describe("utils", () => {
             const expectedPath = "someCustomPath.exe";
 
             // Ensure we get a valid path back
-            fse.pathExistsSync.mockReturnValue(true);
-            expect(utils.getBrowserPath(expectedPath)).toEqual(expectedPath);
+            fse.pathExists.mockImplementation(() => Promise.resolve(true));
+            expect(await utils.getBrowserPath(expectedPath)).toEqual(expectedPath);
 
             // Ensure we get "" on bad path
-            fse.pathExistsSync.mockReturnValue(false);
-            expect(utils.getBrowserPath(expectedPath)).toEqual("");
+            fse.pathExists.mockImplementation(() => Promise.resolve(false));
+            expect(await utils.getBrowserPath(expectedPath)).toEqual("");
         });
 
         it("returns the settings path", async () => {
@@ -430,33 +430,33 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
-            expect(utils.getBrowserPath()).toEqual(expectedPath);
+            expect(await utils.getBrowserPath()).toEqual(expectedPath);
         });
 
         it("searches for path", async () => {
             // Check Windows
             global.process.env.LOCALAPPDATA = "";
             os.platform.mockReturnValue("win32");
-            fse.pathExistsSync.mockImplementation(() => {
-                return (fse.pathExistsSync.mock.calls.length === 8);
+            fse.pathExists.mockImplementation(() => {
+                return Promise.resolve(fse.pathExists.mock.calls.length === 8);
             });
-            expect(utils.getBrowserPath()).toEqual(expect.stringMatching(/.+msedge.exe/g));
+            expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(/.+msedge.exe/g));
 
-            fse.pathExistsSync.mockClear();
+            fse.pathExists.mockClear();
 
             // Check OSX
             os.platform.mockReturnValue("darwin");
-            fse.pathExistsSync.mockImplementation(() => {
-                return (fse.pathExistsSync.mock.calls.length === 4);
+            fse.pathExists.mockImplementation(() => {
+                return Promise.resolve(fse.pathExists.mock.calls.length === 4);
             });
-            expect(utils.getBrowserPath()).toEqual(expect.stringMatching(/.+Microsoft Edge Canary/g));
+            expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(/.+Microsoft Edge Canary/g));
 
-            fse.pathExistsSync.mockClear();
+            fse.pathExists.mockClear();
 
             // Check Linux
             os.platform.mockReturnValue("linux");
-            fse.pathExistsSync.mockReturnValue(false);
-            expect(utils.getBrowserPath()).toEqual("");
+            fse.pathExists.mockImplementation(() => Promise.resolve(false));
+            expect(await utils.getBrowserPath()).toEqual("");
         });
     });
 

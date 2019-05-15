@@ -139,7 +139,7 @@ export async function launch(
         DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl);
     } else {
         // Launch a new instance
-        const browserPath = getBrowserPath(browserPathFromLaunchConfig);
+        const browserPath = await getBrowserPath(browserPathFromLaunchConfig);
         if (!browserPath) {
             telemetryReporter.sendTelemetryEvent("command/launch/error/browser_not_found", telemetryProps);
             vscode.window.showErrorMessage(
