@@ -3,6 +3,7 @@
 
 import * as fse from "fs-extra";
 import path from "path";
+import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
@@ -31,11 +32,14 @@ async function copyStaticFiles() {
     }
 
     const toolsGenDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/resources/inspector/`;
+        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
     if (!isDirectory(toolsGenDir)) {
         throw new Error(`Could not find Edge Chromium output path at '${toolsGenDir}'. ` +
             "Did you set the EDGE_CHROMIUM_OUT_DIR environment variable?");
     }
+
+    const toolsResDir =
+        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/resources/inspector/`;
 
     // Copy the devtools to the out directory
     const toolsOutDir = "./out/tools/front_end/";
@@ -43,14 +47,57 @@ async function copyStaticFiles() {
     await fse.copy(toolsSrcDir, toolsOutDir);
 
     // Copy the devtools generated files to the out directory
-    await copyFile(toolsGenDir, toolsOutDir, "InspectorBackendCommands.js");
-    await copyFile(toolsGenDir, toolsOutDir, "SupportedCSSProperties.js");
-    await copyFile(
-        path.join(toolsGenDir, "accessibility"),
-        path.join(toolsOutDir, "accessibility"),
-        "ARIAProperties.js",
-    );
+    await fse.copy(toolsGenDir, toolsOutDir);
 
+    // Copy the optional devtools resource files to the out directory
+    if (isDirectory(toolsResDir)) {
+        await copyFile(toolsResDir, toolsOutDir, "InspectorBackendCommands.js");
+        await copyFile(toolsResDir, toolsOutDir, "SupportedCSSProperties.js");
+        await copyFile(
+            path.join(toolsResDir, "accessibility"),
+            path.join(toolsOutDir, "accessibility"),
+            "ARIAProperties.js",
+        );
+    }
+
+    // Patch older versions of the webview with our workarounds
+    await patchFilesForWebView(toolsOutDir);
+}
+
+async function patchFilesForWebView(toolsOutDir: string) {
+    // Release file versions
+    await patchFileForWebView("shell.js", toolsOutDir, true, [
+        applyUIUtilsPatch,
+        applyCreateElementPatch,
+    ]);
+
+    // Debug file versions
+    await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
+    await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
+}
+
+async function patchFileForWebView(
+    filename: string,
+    dir: string,
+    isRelease: boolean,
+    patches: Array<(content: string, isRelease?: boolean) => string>) {
+    const file = path.join(dir, filename);
+
+    // Ignore missing files
+    if (!await fse.pathExists(file)) {
+        return;
+    }
+
+    // Read in the file
+    let content = (await fse.readFile(file)).toString();
+
+    // Apply each patch in order
+    patches.forEach((patchFunction) => {
+        content = patchFunction(content, isRelease);
+    });
+
+    // Write out the final content
+    await fse.writeFile(file, content);
 }
 
 function isDirectory(fullPath: string) {

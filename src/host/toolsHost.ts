@@ -6,11 +6,11 @@ import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export default class ToolsHost {
-    private resourceLoader: Readonly<ToolsResourceLoader>;
+    private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
 
-    constructor(resourceLoader: Readonly<ToolsResourceLoader>) {
+    public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
     }
 
@@ -86,7 +86,9 @@ export default class ToolsHost {
 
     private fireGetUrlCallback(id: number, content: string) {
         // Send response content to DevTools
-        this.resourceLoader.onResolvedUrlFromChannel(id, content);
+        if (this.resourceLoader) {
+            this.resourceLoader.onResolvedUrlFromChannel(id, content);
+        }
     }
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {

@@ -28,56 +28,29 @@ describe("host", () => {
             const host = await import("./host");
             host.initialize(mockIframe);
 
-            expect(mockIframe.onload).toBeDefined();
-        });
-    });
-
-    describe("onload", () => {
-        beforeEach(() => {
-            // Disable lint rule so we can mock a constructor function that can be called with 'new'
-            // tslint:disable-next-line: object-literal-shorthand only-arrow-functions
-            jest.doMock("./toolsHost", () => (function ToolsHost() {
-                return {
-                    onMessageFromChannel: jest.fn(),
-                };
-            }));
-            jest.doMock("./toolsResourceLoader", () => ({
-                overrideResourceLoading: jest.fn(),
-            }));
-            jest.doMock("./toolsWebSocket");
-            jest.resetModules();
-        });
-
-        it("skips events if there is no contentWindow", async () => {
-            const host = await import("./host");
-            host.initialize(mockIframe);
-
-            const overwrite: Writable<Mocked<HTMLIFrameElement>> = mockIframe;
-            overwrite.contentWindow = null;
-
-            expect(mockIframe.onload).toBeDefined();
-            mockIframe.onload!(new Event("load"));
-
-            expect(mockDevToolsWindow.InspectorFrontendHost).toBeUndefined();
-            expect(mockDevToolsWindow.WebSocket).toBeUndefined();
-        });
-
-        it("hooks events correctly", async () => {
-            const host = await import("./host");
-            host.initialize(mockIframe);
-
-            expect(mockIframe.onload).toBeDefined();
-            mockIframe.onload!(new Event("load"));
+            expect(mockGlobal.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
+            expect(mockDevToolsWindow.addEventListener).toHaveBeenCalledWith("DOMContentLoaded", expect.any(Function));
 
             expect(mockDevToolsWindow.InspectorFrontendHost).toBeDefined();
             expect(mockDevToolsWindow.WebSocket).toBeDefined();
-            expect(mockGlobal.addEventListener).toBeCalledWith("message", expect.any(Function));
+        });
+
+        it("skips events if there is no contentWindow", async () => {
+            const overwrite: Writable<Mocked<HTMLIFrameElement>> = mockIframe;
+            overwrite.contentWindow = null;
+
+            const host = await import("./host");
+            host.initialize(mockIframe);
+
+            expect(mockGlobal.addEventListener).not.toHaveBeenCalled();
+            expect(mockDevToolsWindow.addEventListener).not.toHaveBeenCalled();
+            expect(mockDevToolsWindow.InspectorFrontendHost).toBeUndefined();
+            expect(mockDevToolsWindow.WebSocket).toBeUndefined();
         });
 
         it("hides local storage", async () => {
             const host = await import("./host");
             host.initialize(mockIframe);
-            mockIframe.onload!(new Event("load"));
 
             expect(mockDevToolsWindow.localStorage).toBeUndefined();
 
@@ -88,17 +61,39 @@ describe("host", () => {
         });
     });
 
+    describe("DOMContentLoaded", () => {
+        it("sets resource loader", async () => {
+            const mockOverride = jest.fn();
+            jest.doMock("./toolsResourceLoader", () => ({
+                overrideResourceLoading: mockOverride,
+            }));
+            jest.resetModules();
+
+            const host = await import("./host");
+            host.initialize(mockIframe);
+
+            const { callback, thisObj } = getFirstCallback(mockDevToolsWindow.addEventListener as jest.Mock, 1);
+            callback.call(thisObj);
+
+            expect(mockOverride).toHaveBeenCalled();
+        });
+    });
+
     describe("message", () => {
         it("forwards message events correctly", async () => {
             const mockWebviewEvents = {
                 parseMessageFromChannel: jest.fn(),
             };
             jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
+            jest.doMock("./toolsHost", () => (function toolsHost() {
+                return {
+                    onMessageFromChannel: jest.fn(),
+                };
+            }));
             jest.resetModules();
 
             const host = await import("./host");
             host.initialize(mockIframe);
-            mockIframe.onload!(new Event("load"));
 
             const onMessage = getFirstCallback(mockGlobal.addEventListener, 1);
             expect(onMessage).toBeDefined();
@@ -116,7 +111,7 @@ describe("host", () => {
 
             // Ensure that the parsed data is passed on to the devtools via the host
             const expectedEvent = "websocket";
-            const expectedData = "some data";
+            const expectedData = JSON.stringify({ event: "event", message: "some message" });
             onParsed.callback.call(onParsed.thisObj, expectedEvent, expectedData);
             expect(mockDevToolsWindow.InspectorFrontendHost.onMessageFromChannel).toHaveBeenCalledWith(
                 expectedEvent,
