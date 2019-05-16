@@ -1,7 +1,7 @@
 {
     "name": "vscode-edge-devtools",
-    "displayName": "DevTools for Edge",
-    "description": "A VSCode extension that allows you to use browser devtools from within the editor.",
+    "displayName": "Elements for Edge",
+    "description": "Inspect and edit elements and css styles elements in the Microsoft Edge browser",
     "version": "0.1.0",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "Microsoft",
@@ -45,16 +45,16 @@
             {
                 "command": "vscode-edge-devtools.attach",
                 "title": "Attach to a target",
-                "category": "DevTools for Edge"
+                "category": "Elements for Edge"
             },
             {
                 "command": "vscode-edge-devtools.launch",
                 "title": "Launch Edge and then attach to a target",
-                "category": "DevTools for Edge"
+                "category": "Elements for Edge"
             },
             {
                 "command": "vscode-edge-devtools-view.launch",
-                "category": "DevTools for Edge",
+                "category": "Elements for Edge",
                 "title": "Open a new tab",
                 "icon": {
                     "light": "resources/light/launch.svg",
@@ -63,7 +63,7 @@
             },
             {
                 "command": "vscode-edge-devtools-view.refresh",
-                "category": "DevTools for Edge",
+                "category": "Elements for Edge",
                 "title": "Refresh Targets",
                 "icon": {
                     "light": "resources/light/refresh.svg",
@@ -72,8 +72,8 @@
             },
             {
                 "command": "vscode-edge-devtools-view.attach",
-                "category": "DevTools for Edge",
-                "title": "Attach DevTools",
+                "category": "Elements for Edge",
+                "title": "Attach and open Elements",
                 "icon": {
                     "light": "resources/light/attach.svg",
                     "dark": "resources/dark/attach.svg"
@@ -81,28 +81,28 @@
             },
             {
                 "command": "vscode-edge-devtools-view.copyItem",
-                "category": "DevTools for Edge",
+                "category": "Elements for Edge",
                 "title": "Copy Value"
             }
         ],
         "configuration": {
-            "title": "DevTools for Edge",
+            "title": "Elements for Edge",
             "type": "object",
             "properties": {
                 "vscode-edge-devtools.browserPath": {
                     "type": "string",
                     "default": null,
-                    "description": "The path to the Edge browser to be use, rather than searching for the default"
+                    "description": "The path to the browser to use, rather than searching for the default"
                 },
                 "vscode-edge-devtools.hostname": {
                     "type": "string",
                     "default": "localhost",
-                    "description": "The hostname on which to search for remote debuggable edge instances"
+                    "description": "The hostname on which to search for remote debuggable instances"
                 },
                 "vscode-edge-devtools.port": {
                     "type": "number",
                     "default": 9222,
-                    "description": "The port on which to search for remote debuggable edge instances"
+                    "description": "The port on which to search for remote debuggable instances"
                 },
                 "vscode-edge-devtools.useHttps": {
                     "type": "boolean",
@@ -124,25 +124,25 @@
         "debuggers": [
             {
                 "type": "vscode-edge-devtools.debug",
-                "label": "DevTools for Edge",
+                "label": "Elements for Edge",
                 "configurationSnippets": [
                     {
-                        "label": "DevTools for Edge: Launch",
-                        "description": "Launch Edge to debug a URL",
+                        "label": "Elements for Edge: Launch",
+                        "description": "Launch Microsoft Edge to a URL",
                         "body": {
                             "type": "vscode-edge-devtools.debug",
                             "request": "launch",
-                            "name": "Launch Edge and open DevTools",
+                            "name": "Launch Edge and open the Elements tool",
                             "url": "http://localhost:8080"
                         }
                     },
                     {
-                        "label": "DevTools for Edge: Attach",
-                        "description": "Attach to an instance of Edge already in debug mode",
+                        "label": "Elements for Edge: Attach",
+                        "description": "Attach to an instance of Microsoft Edge already in debug mode",
                         "body": {
                             "type": "vscode-edge-devtools.debug",
                             "request": "attach",
-                            "name": "Attach DevTools to Edge",
+                            "name": "Attach to Edge and open the Elements tool",
                             "url": "http://localhost:8080"
                         }
                     }
@@ -162,7 +162,7 @@
                             },
                             "browserPath": {
                                 "type": "string",
-                                "description": "Absolute path to the Edge browser instance to launch",
+                                "description": "Absolute path to the browser instance to launch",
                                 "default": ""
                             }
                         }
@@ -181,7 +181,7 @@
                             },
                             "browserPath": {
                                 "type": "string",
-                                "description": "Absolute path to the Edge browser instance to launch.",
+                                "description": "Absolute path to the browser instance to launch.",
                                 "default": ""
                             }
                         }
@@ -237,7 +237,7 @@
             "activitybar": [
                 {
                     "id": "vscode-edge-devtools-view",
-                    "title": "DevTools for Edge",
+                    "title": "Elements for Edge",
                     "icon": "resources/viewIcon.svg"
                 }
             ]
