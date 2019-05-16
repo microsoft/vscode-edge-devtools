@@ -10,7 +10,7 @@ export function registerCustomElementOverride(
     // Replace the class definition with the custom elements v0 version
     const code = definition.toString();
     const classObjectDef = code.replace(/super\(\);/g, "")
-        .replace(/constructor\(\)\s*{/g, "createdCallback() {");
+    .replace(/constructor\(\)\s*{/g, "createdCallback() {");
 
     // tslint:disable-next-line: no-eval
     const classObject = eval(`(${classObjectDef})`);
