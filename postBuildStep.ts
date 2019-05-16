@@ -66,14 +66,14 @@ async function copyStaticFiles() {
 
 async function patchFilesForWebView(toolsOutDir: string) {
     // Release file versions
-    patchFileForWebView("shell.js", toolsOutDir, true, [
+    await patchFileForWebView("shell.js", toolsOutDir, true, [
         applyUIUtilsPatch,
         applyCreateElementPatch,
     ]);
 
     // Debug file versions
-    patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
-    patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
+    await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
+    await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
 }
 
 async function patchFileForWebView(
@@ -97,7 +97,7 @@ async function patchFileForWebView(
     });
 
     // Write out the final content
-    fse.writeFile(file, content);
+    await fse.writeFile(file, content);
 }
 
 function isDirectory(fullPath: string) {
