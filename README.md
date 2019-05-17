@@ -11,6 +11,8 @@ A VS Code extension that allows you to use the browser's Elements tool from with
 
 **Note**: This extension only supports Microsoft Edge (Chromium)
 
+![Elements for Edge - Demo](demo.gif)
+
 **Supported Features**
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
