@@ -4,6 +4,14 @@
 import * as fse from "fs-extra";
 import path from "path";
 import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
+import {
+    applyCommonRevealerPatch,
+    applyInspectorCommonCssPatch,
+    applyInspectorViewPatch,
+    applyMainViewPatch,
+    applySelectTabPatch,
+} from "./src/host/polyfills/simpleView";
+import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
@@ -69,11 +77,23 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("shell.js", toolsOutDir, true, [
         applyUIUtilsPatch,
         applyCreateElementPatch,
+        applyInspectorCommonCssPatch,
+        applyCommonRevealerPatch,
+        applyMainViewPatch,
+        applyInspectorViewPatch,
+        applySelectTabPatch,
     ]);
+    await patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [applySetupTextSelectionPatch]);
 
     // Debug file versions
     await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
     await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
+    await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
+    await patchFileForWebView("ui/inspectorCommon.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
+    await patchFileForWebView("common/ModuleExtensionInterfaces.js", toolsOutDir, false, [applyCommonRevealerPatch]);
+    await patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
+    await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
+    await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
 }
 
 async function patchFileForWebView(
