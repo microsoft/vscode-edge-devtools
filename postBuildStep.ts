@@ -3,6 +3,7 @@
 
 import * as fse from "fs-extra";
 import path from "path";
+import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
 import {
     applyCommonRevealerPatch,
@@ -83,7 +84,10 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorViewPatch,
         applySelectTabPatch,
     ]);
-    await patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [applySetupTextSelectionPatch]);
+    await patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [
+        applySetupTextSelectionPatch,
+        applyPaddingInlineCssPatch,
+    ]);
 
     // Debug file versions
     await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
@@ -94,6 +98,8 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
     await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
     await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
+    await patchFileForWebView("elements/elementsTreeOutline.js", toolsOutDir, false, [applyPaddingInlineCssPatch]);
+    await patchFileForWebView("elements/stylesSectionTree.js", toolsOutDir, false, [applyPaddingInlineCssPatch]);
 }
 
 async function patchFileForWebView(
