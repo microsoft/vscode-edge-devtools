@@ -186,8 +186,20 @@ describe("extension", () => {
             const newExtension = await import("./extension");
 
             // Activation should create a new reporter
-            await newExtension.attach(createFakeExtensionContext(), false);
+            await newExtension.attach(createFakeExtensionContext());
             expect(mocks.utils.createTelemetryReporter).toHaveBeenCalled();
+        });
+
+        it("uses user config", async () => {
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            const config = {
+                port: 9273,
+                url: "something",
+            };
+            await newExtension.attach(createFakeExtensionContext(), "url", config);
+            expect(mocks.utils.getRemoteEndpointSettings).toHaveBeenCalledWith(config);
         });
 
         it("calls fixRemoteWebSocket for all targets", async () => {
@@ -200,13 +212,13 @@ describe("extension", () => {
             mocks.utils.getListOfTargets!.mockResolvedValueOnce(allTargets);
 
             const newExtension = await import("./extension");
-            await newExtension.attach(createFakeExtensionContext(), false);
+            await newExtension.attach(createFakeExtensionContext());
             expect(mocks.utils.fixRemoteWebSocket).toBeCalledTimes(expectedCount);
         });
 
         it("shows quick pick window if no target", async () => {
             const newExtension = await import("./extension");
-            await newExtension.attach(createFakeExtensionContext(), false);
+            await newExtension.attach(createFakeExtensionContext());
             expect(mocks.vscode.window.showQuickPick).toBeCalledTimes(1);
         });
 
@@ -218,7 +230,7 @@ describe("extension", () => {
 
             const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
-            await newExtension.attach(expectedContext, false);
+            await newExtension.attach(expectedContext);
             expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
                 expectedContext,
                 mockTelemetry,
@@ -239,7 +251,7 @@ describe("extension", () => {
 
             const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
-            await newExtension.attach(expectedContext, false, expectedUrl);
+            await newExtension.attach(expectedContext, expectedUrl);
             expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
                 expectedContext,
                 mockTelemetry,
@@ -260,7 +272,7 @@ describe("extension", () => {
 
             const expectedContext = createFakeExtensionContext();
             const newExtension = await import("./extension");
-            await newExtension.attach(expectedContext, false, expectedUrl);
+            await newExtension.attach(expectedContext, expectedUrl);
             expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
                 expectedContext,
                 mockTelemetry,
@@ -269,7 +281,7 @@ describe("extension", () => {
 
             // Reverse the mismatched slashes
             target.url = expectedUrl;
-            await newExtension.attach(expectedContext, false, `${expectedUrl}/`);
+            await newExtension.attach(expectedContext, `${expectedUrl}/`);
             expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
                 expectedContext,
                 mockTelemetry,
@@ -281,7 +293,7 @@ describe("extension", () => {
             const expectedMissingUrl = "some non-existent target";
 
             const newExtension = await import("./extension");
-            await newExtension.attach(createFakeExtensionContext(), false, expectedMissingUrl);
+            await newExtension.attach(createFakeExtensionContext(), expectedMissingUrl);
             expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
         });
 
@@ -290,7 +302,7 @@ describe("extension", () => {
             delete target.url;
 
             const newExtension = await import("./extension");
-            await newExtension.attach(createFakeExtensionContext(), false, expectedUrl);
+            await newExtension.attach(createFakeExtensionContext(), expectedUrl);
             expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedUrl));
         });
 
@@ -298,7 +310,7 @@ describe("extension", () => {
             mocks.utils.getListOfTargets!.mockResolvedValueOnce(null as any);
 
             const newExtension = await import("./extension");
-            await newExtension.attach(createFakeExtensionContext(), false);
+            await newExtension.attach(createFakeExtensionContext());
             expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalled();
         });
     });
@@ -379,6 +391,18 @@ describe("extension", () => {
             // Activation should create a new reporter
             await newExtension.launch(createFakeExtensionContext());
             expect(mockUtils.createTelemetryReporter).toHaveBeenCalled();
+        });
+
+        it("uses user config", async () => {
+            const newExtension = await import("./extension");
+
+            // Activation should create a new reporter
+            const config = {
+                port: 9273,
+                url: "something",
+            };
+            await newExtension.launch(createFakeExtensionContext(), "url", config);
+            expect(mockUtils.getRemoteEndpointSettings).toHaveBeenCalledWith(config);
         });
 
         it("shows the devtools against the target", async () => {

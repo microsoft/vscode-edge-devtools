@@ -14,6 +14,7 @@ import {
     getListOfTargets,
     getRemoteEndpointSettings,
     IRemoteTargetJson,
+    IUserConfig,
     launchBrowser,
     openNewTab,
     removeTrailingSlash,
@@ -29,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, async () => {
-        attach(context, /*viaConfig=*/ false);
+        attach(context);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, async () => {
@@ -65,15 +66,15 @@ export function activate(context: vscode.ExtensionContext) {
         (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
 }
 
-export async function attach(context: vscode.ExtensionContext, viaConfig: boolean, targetUrl?: string) {
+export async function attach(context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>) {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const telemetryProps = { viaConfig: `${viaConfig}`, withTargetUrl: `${!!targetUrl}` };
+    const telemetryProps = { viaConfig: `${!!config}`, withTargetUrl: `${!!attachUrl}` };
     telemetryReporter.sendTelemetryEvent("command/attach", telemetryProps);
 
-    const { hostname, port, useHttps } = getRemoteEndpointSettings();
+    const { hostname, port, useHttps } = getRemoteEndpointSettings(config);
     const responseArray = await getListOfTargets(hostname, port, useHttps);
     if (Array.isArray(responseArray)) {
         telemetryReporter.sendTelemetryEvent(
@@ -94,8 +95,8 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
 
         // Try to match the given target with the list of targets we received from the endpoint
         let targetWebsocketUrl = "";
-        if (targetUrl) {
-            const noTrailingSlashTarget = removeTrailingSlash(targetUrl);
+        if (attachUrl) {
+            const noTrailingSlashTarget = removeTrailingSlash(attachUrl);
             const matches = items.filter((i) => {
                 if (i.description) {
                     const noTrailingSlash = removeTrailingSlash(i.description);
@@ -106,7 +107,7 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
             if (matches && matches.length > 0 && matches[0].detail) {
                 targetWebsocketUrl = matches[0].detail;
             } else {
-                vscode.window.showErrorMessage(`Couldn't attach to ${targetUrl}.`);
+                vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
             }
         }
 
@@ -127,17 +128,15 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
     }
 }
 
-export async function launch(
-    context: vscode.ExtensionContext, launchUrl?: string, browserPathFromLaunchConfig?: string) {
+export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>) {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const viaConfig = !!(launchUrl || browserPathFromLaunchConfig);
-    const telemetryProps = { viaConfig: `${viaConfig}` };
+    const telemetryProps = { viaConfig: `${!!config}` };
     telemetryReporter.sendTelemetryEvent("command/launch", telemetryProps);
 
-    const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings();
+    const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);
     const url = launchUrl || defaultUrl;
     const target = await openNewTab(hostname, port, url);
     if (target && target.webSocketDebuggerUrl) {
@@ -146,7 +145,7 @@ export async function launch(
         DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl);
     } else {
         // Launch a new instance
-        const browserPath = await getBrowserPath(browserPathFromLaunchConfig);
+        const browserPath = await getBrowserPath(config);
         if (!browserPath) {
             telemetryReporter.sendTelemetryEvent("command/launch/error/browser_not_found", telemetryProps);
             vscode.window.showErrorMessage(
@@ -157,6 +156,6 @@ export async function launch(
         }
 
         launchBrowser(browserPath, port, url, userDataDir);
-        await attach(context, viaConfig, url);
+        await attach(context, url, config);
     }
 }

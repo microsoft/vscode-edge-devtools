@@ -21,6 +21,15 @@ export interface IDevToolsSettings {
     userDataDir: string;
 }
 
+export interface IUserConfig {
+    url: string;
+    browserPath: string;
+    hostname: string;
+    port: number;
+    useHttps: boolean;
+    userDataDirectory: string;
+}
+
 export type Platform = "Windows" | "OSX" | "Linux";
 
 export const SETTINGS_STORE_NAME = "vscode-edge-devtools";
@@ -159,14 +168,20 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
 
 /**
  * Get the remote endpoint settings from the vscode configuration
+ * @param config The settings specified by a launch config, if any
  */
-export function getRemoteEndpointSettings(): IDevToolsSettings {
+export function getRemoteEndpointSettings(config?: Partial<IUserConfig>): IDevToolsSettings {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const hostname: string = settings.get("hostname") || SETTINGS_DEFAULT_HOSTNAME;
-    const port: number = settings.get("port") || SETTINGS_DEFAULT_PORT;
-    const useHttps: boolean = settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
-    const defaultUrl: string = settings.get("defaultUrl") || SETTINGS_DEFAULT_URL;
-    const userDataDir: string = settings.get("userDataDirectory") || SETTINGS_DEFAULT_USER_DATA_DIR;
+    const hostname: string = (config ? config.hostname : undefined) ||
+        settings.get("hostname") || SETTINGS_DEFAULT_HOSTNAME;
+    const port: number = (config ? config.port : undefined) ||
+        settings.get("port") || SETTINGS_DEFAULT_PORT;
+    const useHttps: boolean = (config ? config.useHttps : undefined) ||
+        settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
+    const defaultUrl: string = (config ? config.url : undefined) ||
+        settings.get("defaultUrl") || SETTINGS_DEFAULT_URL;
+    const userDataDir: string = (config ? config.userDataDirectory : undefined) ||
+        settings.get("userDataDirectory") || SETTINGS_DEFAULT_USER_DATA_DIR;
 
     return { hostname, port, useHttps, defaultUrl, userDataDir };
 }
@@ -200,11 +215,11 @@ export function getPlatform(): Platform {
  * The search order is: launchConfig > vscode setting > platform default
  * For each platform the order is: stable > beta > dev > canary
  * For windows we will try: program files > local app data
- * @param launchConfigPath The path specified by a launch config, if any
+ * @param config The settings specified by a launch config, if any
  */
-export async function getBrowserPath(launchConfigPath?: string) {
+export async function getBrowserPath(config?: Partial<IUserConfig>) {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const browserPath = launchConfigPath || settings.get("browserPath") || "";
+    const browserPath = (config ? config.browserPath : undefined) || settings.get("browserPath") || "";
 
     if (!browserPath) {
         const platform = getPlatform();
