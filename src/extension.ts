@@ -94,8 +94,14 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
         // Try to match the given target with the list of targets we received from the endpoint
         let targetWebsocketUrl = "";
         if (targetUrl) {
-            const matches = items.filter((i) =>
-                i.description && targetUrl.localeCompare(i.description, "en", { sensitivity: "base" }) === 0);
+            const noTrailingSlashTarget = (targetUrl.endsWith("/") ? targetUrl.slice(0, -1) : targetUrl);
+            const matches = items.filter((i) => {
+                if (i.description) {
+                    const noTrailingSlash = (i.description.endsWith("/") ? i.description.slice(0, -1) : i.description);
+                    return noTrailingSlashTarget.localeCompare(noTrailingSlash, "en", { sensitivity: "base" }) === 0;
+                }
+                return false;
+            });
             if (matches && matches.length > 0 && matches[0].detail) {
                 targetWebsocketUrl = matches[0].detail;
             } else {
