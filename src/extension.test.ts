@@ -4,7 +4,7 @@
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson, SETTINGS_STORE_NAME, SETTINGS_VIEW_NAME } from "./utils";
+import { IRemoteTargetJson, removeTrailingSlash, SETTINGS_STORE_NAME, SETTINGS_VIEW_NAME } from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
@@ -28,6 +28,7 @@ describe("extension", () => {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
                 getListOfTargets: jest.fn(),
                 getRemoteEndpointSettings: jest.fn(),
+                removeTrailingSlash: jest.fn(removeTrailingSlash),
             };
             jest.doMock("./utils", () => mockUtils);
             jest.doMock("./launchDebugProvider");
@@ -170,6 +171,7 @@ describe("extension", () => {
                         port: "port",
                         useHttps: false,
                     }),
+                    removeTrailingSlash: jest.fn(removeTrailingSlash),
                 },
                 vscode: createFakeVSCode(),
             };
@@ -245,12 +247,51 @@ describe("extension", () => {
             );
         });
 
+        it("opens devtools against given target with unmatched trailing slashes", async () => {
+            const expectedUrl = "http://www.bing.com";
+            const expectedWS = "ws://target:9222";
+            target = {
+                title: "title",
+                url: `${expectedUrl}/`,
+                webSocketDebuggerUrl: expectedWS,
+            } as IRemoteTargetJson;
+
+            mocks.utils.fixRemoteWebSocket!.mockReturnValueOnce(target);
+
+            const expectedContext = createFakeExtensionContext();
+            const newExtension = await import("./extension");
+            await newExtension.attach(expectedContext, false, expectedUrl);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
+                expectedContext,
+                mockTelemetry,
+                expectedWS,
+            );
+
+            // Reverse the mismatched slashes
+            target.url = expectedUrl;
+            await newExtension.attach(expectedContext, false, `${expectedUrl}/`);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
+                expectedContext,
+                mockTelemetry,
+                expectedWS,
+            );
+        });
+
         it("shows error if it can't find given target", async () => {
             const expectedMissingUrl = "some non-existent target";
 
             const newExtension = await import("./extension");
             await newExtension.attach(createFakeExtensionContext(), false, expectedMissingUrl);
             expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
+        });
+
+        it("shows error if it can't find given target due to missing urls", async () => {
+            const expectedUrl = target.url;
+            delete target.url;
+
+            const newExtension = await import("./extension");
+            await newExtension.attach(createFakeExtensionContext(), false, expectedUrl);
+            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedUrl));
         });
 
         it("reports telemetry if failed to get targets", async () => {
@@ -281,6 +322,7 @@ describe("extension", () => {
                 }),
                 launchBrowser: jest.fn(),
                 openNewTab: jest.fn().mockResolvedValue(null),
+                removeTrailingSlash: jest.fn(removeTrailingSlash),
             };
 
             mockPanel = {

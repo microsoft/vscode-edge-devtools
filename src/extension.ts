@@ -16,6 +16,7 @@ import {
     IRemoteTargetJson,
     launchBrowser,
     openNewTab,
+    removeTrailingSlash,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
 } from "./utils";
@@ -94,8 +95,14 @@ export async function attach(context: vscode.ExtensionContext, viaConfig: boolea
         // Try to match the given target with the list of targets we received from the endpoint
         let targetWebsocketUrl = "";
         if (targetUrl) {
-            const matches = items.filter((i) =>
-                i.description && targetUrl.localeCompare(i.description, "en", { sensitivity: "base" }) === 0);
+            const noTrailingSlashTarget = removeTrailingSlash(targetUrl);
+            const matches = items.filter((i) => {
+                if (i.description) {
+                    const noTrailingSlash = removeTrailingSlash(i.description);
+                    return noTrailingSlashTarget.localeCompare(noTrailingSlash, "en", { sensitivity: "base" }) === 0;
+                }
+                return false;
+            });
             if (matches && matches.length > 0 && matches[0].detail) {
                 targetWebsocketUrl = matches[0].detail;
             } else {
