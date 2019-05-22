@@ -263,3 +263,11 @@ export async function openNewTab(hostname: string, port: number, tabUrl?: string
         return undefined;
     }
 }
+
+/**
+ * Remove a '/' from the end of the specified string if it exists
+ * @param uri The string from which to remove the trailing slash (if any)
+ */
+export function removeTrailingSlash(uri: string) {
+    return (uri.endsWith("/") ? uri.slice(0, -1) : uri);
+}

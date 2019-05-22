@@ -4,7 +4,7 @@
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson, SETTINGS_STORE_NAME, SETTINGS_VIEW_NAME } from "./utils";
+import { IRemoteTargetJson, removeTrailingSlash, SETTINGS_STORE_NAME, SETTINGS_VIEW_NAME } from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
@@ -28,6 +28,7 @@ describe("extension", () => {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
                 getListOfTargets: jest.fn(),
                 getRemoteEndpointSettings: jest.fn(),
+                removeTrailingSlash: jest.fn(removeTrailingSlash),
             };
             jest.doMock("./utils", () => mockUtils);
             jest.doMock("./launchDebugProvider");
@@ -170,6 +171,7 @@ describe("extension", () => {
                         port: "port",
                         useHttps: false,
                     }),
+                    removeTrailingSlash: jest.fn(removeTrailingSlash),
                 },
                 vscode: createFakeVSCode(),
             };
@@ -320,6 +322,7 @@ describe("extension", () => {
                 }),
                 launchBrowser: jest.fn(),
                 openNewTab: jest.fn().mockResolvedValue(null),
+                removeTrailingSlash: jest.fn(removeTrailingSlash),
             };
 
             mockPanel = {

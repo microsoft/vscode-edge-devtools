@@ -508,4 +508,18 @@ describe("utils", () => {
             expect(target).toBeUndefined();
         });
     });
+
+    describe("removeTrailingSlash", () => {
+        it("returns a string without a trailing slash", async () => {
+            expect(utils.removeTrailingSlash("hello/")).toEqual("hello");
+            expect(utils.removeTrailingSlash("hello//")).toEqual("hello/");
+            expect(utils.removeTrailingSlash("/")).toEqual("");
+        });
+
+        it("does nothing to strings without a trailing slash", async () => {
+            expect(utils.removeTrailingSlash("hello")).toEqual("hello");
+            expect(utils.removeTrailingSlash("hello\\")).toEqual("hello\\");
+            expect(utils.removeTrailingSlash("")).toEqual("");
+        });
+    });
 });
