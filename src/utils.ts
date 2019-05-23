@@ -170,17 +170,13 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
  * Get the remote endpoint settings from the vscode configuration
  * @param config The settings specified by a launch config, if any
  */
-export function getRemoteEndpointSettings(config?: Partial<IUserConfig>): IDevToolsSettings {
+export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): IDevToolsSettings {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const hostname: string = (config ? config.hostname : undefined) ||
-        settings.get("hostname") || SETTINGS_DEFAULT_HOSTNAME;
-    const port: number = (config ? config.port : undefined) ||
-        settings.get("port") || SETTINGS_DEFAULT_PORT;
-    const useHttps: boolean = (config ? config.useHttps : undefined) ||
-        settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
-    const defaultUrl: string = (config ? config.url : undefined) ||
-        settings.get("defaultUrl") || SETTINGS_DEFAULT_URL;
-    const userDataDir: string = (config ? config.userDataDirectory : undefined) ||
+    const hostname: string = config.hostname || settings.get("hostname") || SETTINGS_DEFAULT_HOSTNAME;
+    const port: number = config.port || settings.get("port") || SETTINGS_DEFAULT_PORT;
+    const useHttps: boolean = config.useHttps || settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
+    const defaultUrl: string = config.url || settings.get("defaultUrl") || SETTINGS_DEFAULT_URL;
+    const userDataDir: string = config.userDataDirectory ||
         settings.get("userDataDirectory") || SETTINGS_DEFAULT_USER_DATA_DIR;
 
     return { hostname, port, useHttps, defaultUrl, userDataDir };
@@ -217,9 +213,9 @@ export function getPlatform(): Platform {
  * For windows we will try: program files > local app data
  * @param config The settings specified by a launch config, if any
  */
-export async function getBrowserPath(config?: Partial<IUserConfig>) {
+export async function getBrowserPath(config: Partial<IUserConfig> = {}) {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const browserPath = (config ? config.browserPath : undefined) || settings.get("browserPath") || "";
+    const browserPath = config.browserPath || settings.get("browserPath") || "";
 
     if (!browserPath) {
         const platform = getPlatform();
