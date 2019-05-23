@@ -35,7 +35,7 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         folder: vscode.WorkspaceFolder | undefined,
         token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([{
-            name: "Launch Edge and open the devtools",
+            name: "Launch Microsoft Edge and open the Elements tool",
             request: "launch",
             type: `${SETTINGS_STORE_NAME}.debug`,
             url: "http://localhost:8080",
