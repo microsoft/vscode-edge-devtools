@@ -36,14 +36,14 @@ async function copyStaticFiles() {
     const toolsSrcDir =
         `${process.env.EDGE_CHROMIUM_PATH}/third_party/blink/renderer/devtools/front_end/`;
     if (!isDirectory(toolsSrcDir)) {
-        throw new Error(`Could not find Edge Chromium DevTools path at '${toolsSrcDir}'. ` +
+        throw new Error(`Could not find Microsoft Edge (Chromium) DevTools path at '${toolsSrcDir}'. ` +
             "Did you set the EDGE_CHROMIUM_PATH environment variable?");
     }
 
     const toolsGenDir =
         `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
     if (!isDirectory(toolsGenDir)) {
-        throw new Error(`Could not find Edge Chromium output path at '${toolsGenDir}'. ` +
+        throw new Error(`Could not find Microsoft Edge (Chromium) output path at '${toolsGenDir}'. ` +
             "Did you set the EDGE_CHROMIUM_OUT_DIR environment variable?");
     }
 

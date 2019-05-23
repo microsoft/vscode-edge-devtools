@@ -1,6 +1,6 @@
 {
     "name": "vscode-edge-devtools",
-    "displayName": "Elements for Edge",
+    "displayName": "Elements for Microsoft Edge",
     "description": "Inspect and edit elements and css styles elements in the Microsoft Edge browser",
     "version": "0.1.0",
     "license": "SEE LICENSE IN LICENSE",
@@ -45,16 +45,16 @@
             {
                 "command": "vscode-edge-devtools.attach",
                 "title": "Attach to a target",
-                "category": "Elements for Edge"
+                "category": "Elements for Microsoft Edge"
             },
             {
                 "command": "vscode-edge-devtools.launch",
                 "title": "Launch Edge and then attach to a target",
-                "category": "Elements for Edge"
+                "category": "Elements for Microsoft Edge"
             },
             {
                 "command": "vscode-edge-devtools-view.launch",
-                "category": "Elements for Edge",
+                "category": "Elements for Microsoft Edge",
                 "title": "Open a new tab",
                 "icon": {
                     "light": "resources/light/launch.svg",
@@ -63,7 +63,7 @@
             },
             {
                 "command": "vscode-edge-devtools-view.refresh",
-                "category": "Elements for Edge",
+                "category": "Elements for Microsoft Edge",
                 "title": "Refresh Targets",
                 "icon": {
                     "light": "resources/light/refresh.svg",
@@ -72,7 +72,7 @@
             },
             {
                 "command": "vscode-edge-devtools-view.attach",
-                "category": "Elements for Edge",
+                "category": "Elements for Microsoft Edge",
                 "title": "Attach and open Elements",
                 "icon": {
                     "light": "resources/light/attach.svg",
@@ -81,12 +81,12 @@
             },
             {
                 "command": "vscode-edge-devtools-view.copyItem",
-                "category": "Elements for Edge",
+                "category": "Elements for Microsoft Edge",
                 "title": "Copy Value"
             }
         ],
         "configuration": {
-            "title": "Elements for Edge",
+            "title": "Elements for Microsoft Edge",
             "type": "object",
             "properties": {
                 "vscode-edge-devtools.browserPath": {
@@ -124,25 +124,25 @@
         "debuggers": [
             {
                 "type": "vscode-edge-devtools.debug",
-                "label": "Elements for Edge",
+                "label": "Elements for Microsoft Edge",
                 "configurationSnippets": [
                     {
-                        "label": "Elements for Edge: Launch",
+                        "label": "Elements for Microsoft Edge: Launch",
                         "description": "Launch Microsoft Edge to a URL",
                         "body": {
                             "type": "vscode-edge-devtools.debug",
                             "request": "launch",
-                            "name": "Launch Edge and open the Elements tool",
+                            "name": "Launch Microsoft Edge and open the Elements tool",
                             "url": "http://localhost:8080"
                         }
                     },
                     {
-                        "label": "Elements for Edge: Attach",
+                        "label": "Elements for Microsoft Edge: Attach",
                         "description": "Attach to an instance of Microsoft Edge already in debug mode",
                         "body": {
                             "type": "vscode-edge-devtools.debug",
                             "request": "attach",
-                            "name": "Attach to Edge and open the Elements tool",
+                            "name": "Attach to Microsoft Edge and open the Elements tool",
                             "url": "http://localhost:8080"
                         }
                     }
@@ -237,7 +237,7 @@
             "activitybar": [
                 {
                     "id": "vscode-edge-devtools-view",
-                    "title": "Elements for Edge",
+                    "title": "Elements for Microsoft Edge",
                     "icon": "resources/viewIcon.svg"
                 }
             ]

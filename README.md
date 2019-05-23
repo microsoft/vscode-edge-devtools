@@ -11,7 +11,7 @@ A VS Code extension that allows you to use the browser's Elements tool from with
 
 **Note**: This extension only supports Microsoft Edge (Chromium)
 
-![Elements for Edge - Demo](demo.gif)
+![Elements for Microsoft Edge - Demo](demo.gif)
 
 **Supported Features**
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools
@@ -29,7 +29,7 @@ For use inside VS Code:
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the url parameter you simply tell VS Code which URL to either open or launch in the browser.
 
 ### Debug Configuration
-You can launch the Elements for Edge hosted in VS Code like you would a debugger, by using a launch.json config file. However, Elements for Edge isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the Elements for Edge tool once debugging has started.
+You can launch the Elements for Microsoft Edge extension like you would a debugger, by using a launch.json config file. However, Elements for Microsoft Edge isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the Elements for Microsoft Edge extension once debugging has started.
 
 To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
 
@@ -46,13 +46,13 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
         {
             "type": "vscode-edge-devtools.debug",
             "request": "launch",
-            "name": "Launch Edge and open the Elements tool",
+            "name": "Launch Microsoft Edge and open the Elements tool",
             "file": "${workspaceFolder}/index.html"
         },
         {
             "type": "vscode-edge-devtools.debug",
             "request": "attach",
-            "name": "Attach to Edge and open the Elements tool",
+            "name": "Attach to Microsoft Edge and open the Elements tool",
             "url": "http://localhost:8000/"
         }
     ]
@@ -61,7 +61,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 
 ### Launching the browser via the side bar view
 * Start Microsoft Edge via the side bar
-  * Click the `Elements for Edge` view in the side bar
+  * Click the `Elements for Microsoft Edge` view in the side bar
   * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab
 * Attach the Elements tool via the side bar view
   * Click the `Attach` icon next to the tab to open the Elements tool
@@ -71,7 +71,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
   * `msedge.exe --remote-debugging-port=9222`
   * Navigate the browser to the desired URL
 * Attach the Elements tool via a command:
-  * Run the command - Elements for Edge: Attach to a target
+  * Run the command - Elements for Microsoft Edge: Attach to a target
   * Select a target from the drop down
 
 # Contributing
