@@ -164,6 +164,26 @@
                                 "type": "string",
                                 "description": "Absolute path to the browser instance to launch",
                                 "default": ""
+                            },
+                            "hostname": {
+                                "type": "string",
+                                "default": "localhost",
+                                "description": "The hostname on which to search for remote debuggable instances"
+                            },
+                            "port": {
+                                "type": "number",
+                                "default": 9222,
+                                "description": "The port on which to search for remote debuggable instances"
+                            },
+                            "userDataDirectory": {
+                                "type": "string",
+                                "default": "",
+                                "description": "A custom user data directory to use when launching the browser"
+                            },
+                            "useHttps": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Should we request the remote target list using https rather than http"
                             }
                         }
                     },
@@ -183,6 +203,26 @@
                                 "type": "string",
                                 "description": "Absolute path to the browser instance to launch.",
                                 "default": ""
+                            },
+                            "hostname": {
+                                "type": "string",
+                                "default": "localhost",
+                                "description": "The hostname on which to search for remote debuggable instances"
+                            },
+                            "port": {
+                                "type": "number",
+                                "default": 9222,
+                                "description": "The port on which to search for remote debuggable instances"
+                            },
+                            "userDataDirectory": {
+                                "type": "string",
+                                "default": "",
+                                "description": "A custom user data directory to use when launching the browser"
+                            },
+                            "useHttps": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "Should we request the remote target list using https rather than http"
                             }
                         }
                     }

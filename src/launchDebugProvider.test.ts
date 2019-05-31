@@ -64,11 +64,11 @@ describe("launchDebugProvider", () => {
                 type: `${SETTINGS_STORE_NAME}.debug`,
             };
             await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
-            expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///index.html", undefined);
+            expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///index.html", mockConfig);
 
             mockConfig.file = "/index.html";
             await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
-            expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///index.html", undefined);
+            expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///index.html", mockConfig);
 
             const mockFolder = {
                 index: 0,
@@ -77,7 +77,7 @@ describe("launchDebugProvider", () => {
             };
             mockConfig.file = "${workspaceFolder}/index.html";
             await host.resolveDebugConfiguration(mockFolder as any, mockConfig, undefined);
-            expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///path/index.html", undefined);
+            expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///path/index.html", mockConfig);
         });
 
         it("applies the url value", async () => {
@@ -88,7 +88,7 @@ describe("launchDebugProvider", () => {
                 url: "http://localhost/index.html",
             };
             await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
-            expect(launch).toHaveBeenCalledWith(expect.any(Object), mockConfig.url, undefined);
+            expect(launch).toHaveBeenCalledWith(expect.any(Object), mockConfig.url, mockConfig);
         });
 
         it("reports error on no config", async () => {

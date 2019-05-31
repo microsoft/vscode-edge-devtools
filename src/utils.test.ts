@@ -301,6 +301,23 @@ describe("utils", () => {
             expect(vscodeMock.workspace.getConfiguration).toBeCalledWith(utils.SETTINGS_STORE_NAME);
         });
 
+        it("uses user config", async () => {
+            const config = {
+                hostname: "someHost",
+                port: 9999,
+                url: "url",
+                useHttps: true,
+                userDataDirectory: "default",
+            };
+
+            const { hostname, port, useHttps, defaultUrl, userDataDir } = utils.getRemoteEndpointSettings(config);
+            expect(hostname).toBe(config.hostname);
+            expect(port).toBe(config.port);
+            expect(useHttps).toBe(config.useHttps);
+            expect(defaultUrl).toBe(config.url);
+            expect(userDataDir).toBe(config.userDataDirectory);
+        });
+
         it("uses correct fallbacks on failure", async () => {
             const { hostname, port, useHttps, defaultUrl, userDataDir } = utils.getRemoteEndpointSettings();
             expect(hostname).toBe(utils.SETTINGS_DEFAULT_HOSTNAME);
@@ -399,15 +416,17 @@ describe("utils", () => {
         });
 
         it("returns the custom path or empty string", async () => {
-            const expectedPath = "someCustomPath.exe";
+            const config = {
+                browserPath: "someCustomPath.exe",
+            };
 
             // Ensure we get a valid path back
             fse.pathExists.mockImplementation(() => Promise.resolve(true));
-            expect(await utils.getBrowserPath(expectedPath)).toEqual(expectedPath);
+            expect(await utils.getBrowserPath(config)).toEqual(config.browserPath);
 
             // Ensure we get "" on bad path
             fse.pathExists.mockImplementation(() => Promise.resolve(false));
-            expect(await utils.getBrowserPath(expectedPath)).toEqual("");
+            expect(await utils.getBrowserPath(config)).toEqual("");
         });
 
         it("returns the settings path", async () => {

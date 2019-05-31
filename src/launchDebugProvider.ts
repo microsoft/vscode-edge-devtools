@@ -3,16 +3,16 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { SETTINGS_STORE_NAME } from "./utils";
+import { IUserConfig, SETTINGS_STORE_NAME } from "./utils";
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
-    viaConfig: boolean,
-    targetUrl?: string) => void;
+    targetUrl?: string,
+    config?: Partial<IUserConfig>) => void;
 type LaunchCallback = (
     context: vscode.ExtensionContext,
     launchUrl?: string,
-    browserPathFromLaunchConfig?: string) => void;
+    config?: Partial<IUserConfig>) => void;
 
 export default class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
     private readonly context: vscode.ExtensionContext;
@@ -46,14 +46,16 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         folder: vscode.WorkspaceFolder | undefined,
         config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration> {
+        const userConfig = config as Partial<IUserConfig>;
+
         if (config && config.type === `${SETTINGS_STORE_NAME}.debug`) {
             const targetUri: string = this.getUrlFromConfig(folder, config);
             if (config.request && config.request === "attach") {
                 this.telemetryReporter.sendTelemetryEvent("debug/attach");
-                this.attach(this.context, true, targetUri);
+                this.attach(this.context, targetUri, userConfig);
             } else if (config.request && config.request === "launch") {
                 this.telemetryReporter.sendTelemetryEvent("debug/launch");
-                this.launch(this.context, targetUri, config.chromePath);
+                this.launch(this.context, targetUri, userConfig);
             }
         } else {
             this.telemetryReporter.sendTelemetryEvent("debug/error/config_not_found");
