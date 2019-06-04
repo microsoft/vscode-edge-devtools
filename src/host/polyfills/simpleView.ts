@@ -10,7 +10,7 @@ export function applyCommonRevealerPatch(content: string) {
 export function applyInspectorViewPatch(content: string) {
     return content
         .replace(
-            /handleAction\(context, actionId\)\s*{/g,
+            /handleAction\(context,\s*actionId\)\s*{/g,
             "handleAction(context, actionId) { return false;")
         .replace(
             /_showDrawer\(focus\)\s*{/g,
@@ -47,7 +47,7 @@ export function applySelectTabPatch(content: string) {
     }).join(" && ");
 
     return content.replace(
-        /selectTab\(id, userGesture\)\s*{/g,
+        /selectTab\(id,\s*userGesture\)\s*{/g,
         `selectTab(id, userGesture) { if (${condition}) return false;`);
 }
 

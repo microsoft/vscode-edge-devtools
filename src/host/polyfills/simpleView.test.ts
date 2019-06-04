@@ -16,8 +16,12 @@ describe("simpleView", () => {
         expect(result).toEqual("handleAction(context, actionId) { return false; // code");
 
         const result2 = apply.applyInspectorViewPatch(
+            "handleAction(context,actionId) { // code");
+        expect(result2).toEqual("handleAction(context, actionId) { return false; // code");
+
+        const result3 = apply.applyInspectorViewPatch(
             "_showDrawer(focus) { // code");
-        expect(result2).toEqual("_showDrawer(focus) { return false; // code");
+        expect(result3).toEqual("_showDrawer(focus) { return false; // code");
     });
 
     it("applyMainViewPatch correctly changes text", async () => {
@@ -30,6 +34,9 @@ describe("simpleView", () => {
         const apply = await import("./simpleView");
         const result = apply.applySelectTabPatch("selectTab(id, userGesture) { // code");
         expect(result).toEqual(expect.stringContaining("selectTab(id, userGesture) { if ("));
+
+        const result2 = apply.applySelectTabPatch("selectTab(id,userGesture) { // code");
+        expect(result2).toEqual(expect.stringContaining("selectTab(id, userGesture) { if ("));
     });
 
     it("applyInspectorCommonCssPatch correctly changes text", async () => {
