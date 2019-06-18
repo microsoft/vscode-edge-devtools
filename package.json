@@ -31,7 +31,7 @@
     "categories": [
         "Other"
     ],
-    "aiKey": "c46f1587-0519-4b7c-b476-955ee2bed98a",
+    "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "main": "./out/extension",
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
