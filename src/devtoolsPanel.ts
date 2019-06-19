@@ -6,9 +6,9 @@ import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {
     encodeMessageForChannel,
-    ITelemetryData,
     ITelemetryMeasures,
     ITelemetryProps,
+    TelemetryData,
     WebSocketEvent,
 } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
@@ -106,11 +106,11 @@ export class DevToolsPanel {
     }
 
     private onSocketTelemetry(message: string) {
-        const telemetry: ITelemetryData = JSON.parse(message);
+        const telemetry: TelemetryData = JSON.parse(message);
 
         // Fire telemetry
         switch (telemetry.event) {
-            case "performance":
+            case "performance": {
                 const measures: ITelemetryMeasures = {};
                 measures[`${telemetry.name}.duration`] = telemetry.data;
                 this.telemetryReporter.sendTelemetryEvent(
@@ -118,14 +118,25 @@ export class DevToolsPanel {
                     undefined,
                     measures);
                 break;
+            }
 
-            case "enumerated":
+            case "enumerated": {
                 const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.actionCode`] = telemetry.data.toString();
                 this.telemetryReporter.sendTelemetryEvent(
                     `devtools/${telemetry.name}`,
                     properties);
                 break;
+            }
+
+            case "error": {
+                const properties: ITelemetryProps = {};
+                properties[`${telemetry.name}.info`] = JSON.stringify(telemetry.data);
+                this.telemetryReporter.sendTelemetryEvent(
+                    `devtools/${telemetry.name}`,
+                    properties);
+                break;
+            }
         }
     }
 
