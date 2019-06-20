@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import CDPTarget from "./cdpTarget";
@@ -153,6 +154,9 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
                 "Ensure you have installed Microsoft Edge, " +
                 "or try specifying a custom path via the 'browserPath' setting.");
             return;
+        } else {
+            const browserProps = { exe: `${path.basename(browserPath)}` };
+            telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
 
         launchBrowser(browserPath, port, url, userDataDir);
