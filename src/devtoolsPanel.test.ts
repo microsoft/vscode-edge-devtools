@@ -258,7 +258,14 @@ describe("devtoolsPanel", () => {
                 );
 
                 const expectedError: TelemetryData = {
-                    data: { message: "hi", lineno: 1, colno: 12 },
+                    data: {
+                        colno: 20,
+                        filename: "file.js",
+                        lineno: 11,
+                        message: "Unhandled Promise Rejection",
+                        sourceUrl: "vs-resource://source.js",
+                        stack: "Error: Unknown \n \t at file.js:1:2,",
+                    },
                     event: "error",
                     name: "UnknownError",
                 };

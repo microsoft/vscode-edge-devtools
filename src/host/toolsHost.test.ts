@@ -163,7 +163,7 @@ describe("toolsHost", () => {
                     lineno: 1,
                     message: "Unknown",
                     sourceUrl: "vs-resource://source.js",
-                    stack: "stack",
+                    stack: "Error: Unknown \n \t at file.js:1:2,",
                 },
                 event: "error",
                 name: "SomeError",
