@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import path from "path";
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import CDPTarget from "./cdpTarget";
@@ -155,7 +154,14 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
                 "or try specifying a custom path via the 'browserPath' setting.");
             return;
         } else {
-            const browserProps = { exe: `${path.basename(browserPath)}` };
+            // Here we grab the last part of the path (using either forward or back slashes to account for mac/win),
+            // Then we search that part for either chrome or edge to best guess identify the browser that is launching.
+            // If it is one of those names we use that, otherwise we default it to "other".
+            // Then we upload just one of those 3 names to telemetry.
+            const exeName = browserPath.split(/\\|\//).pop();
+            const match = exeName!.match(/(chrome|edge)/gi) || [];
+            const knownBrowser = match.length > 0 ? match[0] : "other";
+            const browserProps = { exe: `${knownBrowser.toLowerCase()}` };
             telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
 

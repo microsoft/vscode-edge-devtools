@@ -442,5 +442,33 @@ describe("extension", () => {
             await newExtension.launch(createFakeExtensionContext());
             expect(mockUtils.launchBrowser).toHaveBeenCalled();
         });
+
+        it("reports the browser type", async () => {
+            mockUtils.openNewTab!.mockResolvedValue(undefined);
+            const newExtension = await import("./extension");
+
+            const tests = [
+                { path: "some\\path\\to\\edge.exe -port", exe: "edge" },
+                { path: "some\\path\\to\\msedge.exe -pii", exe: "edge" },
+                { path: "some\\path\\to\\chrome.exe -hello", exe: "chrome" },
+                { path: "some\\path\\to\\brave.exe", exe: "other" },
+                { path: "a/mac/path/to/microsoft edge", exe: "edge" },
+                { path: "a/mac/path/to/google chrome", exe: "chrome" },
+                { path: "a/mac/path/to/some other browser", exe: "other" },
+                { path: "some\\mixed/path\\to/a script.sh -some param", exe: "other" },
+                { path: "some bad path that we will guess uses edge due to it containing that word", exe: "edge" },
+            ];
+
+            for (const t of tests) {
+                (mockReporter.sendTelemetryEvent as jest.Mock).mockClear();
+                mockUtils.getBrowserPath!.mockResolvedValueOnce(t.path);
+                await newExtension.launch(createFakeExtensionContext());
+                expect(mockReporter.sendTelemetryEvent).toHaveBeenNthCalledWith(
+                    2,
+                    "command/launch/browser",
+                    expect.objectContaining({ exe: t.exe }),
+                );
+            }
+        });
     });
 });
