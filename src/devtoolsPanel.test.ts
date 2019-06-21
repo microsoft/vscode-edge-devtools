@@ -6,7 +6,7 @@
 
 import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { ITelemetryData, webviewEventNames } from "./common/webviewEvents";
+import { TelemetryData, webviewEventNames } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
     createFakeExtensionContext,
@@ -234,7 +234,7 @@ describe("devtoolsPanel", () => {
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "");
 
-                const expectedPerf: ITelemetryData = {
+                const expectedPerf: TelemetryData = {
                     data: 100,
                     event: "performance",
                     name: "myHistogram",
@@ -246,7 +246,7 @@ describe("devtoolsPanel", () => {
                     expect.objectContaining({ "myHistogram.duration": 100 }),
                 );
 
-                const expectedEnum: ITelemetryData = {
+                const expectedEnum: TelemetryData = {
                     data: 2,
                     event: "enumerated",
                     name: "myHistogram2",
@@ -255,6 +255,24 @@ describe("devtoolsPanel", () => {
                 expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
                     `devtools/${expectedEnum.name}`,
                     expect.objectContaining({ "myHistogram2.actionCode": "2" }),
+                );
+
+                const expectedError: TelemetryData = {
+                    data: {
+                        colno: 20,
+                        filename: "file.js",
+                        lineno: 11,
+                        message: "Unhandled Promise Rejection",
+                        sourceUrl: "vs-resource://source.js",
+                        stack: "Error: Unknown \n \t at file.js:1:2,",
+                    },
+                    event: "error",
+                    name: "UnknownError",
+                };
+                hookedEvents.get("telemetry")!(JSON.stringify(expectedError));
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                    `devtools/${expectedError.name}`,
+                    expect.objectContaining({ "UnknownError.info": JSON.stringify(expectedError.data) }),
                 );
             });
 
