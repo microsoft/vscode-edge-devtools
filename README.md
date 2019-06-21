@@ -22,7 +22,7 @@ A VS Code extension that allows you to use the browser's Elements tool from with
 # Using the Extension
 ## Getting Started
 For use inside VS Code:
-1. Install the extension,
+1. Install the extension.
 1. Open the folder containing the project you want to work on.
 
 ## Using the tools
