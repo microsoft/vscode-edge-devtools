@@ -5,7 +5,7 @@
   <br>
 </h1>
 
-<h4 align="center">Show the browser's Elements tool inside the VSCode editor and use it to fix styling, layout, and css issues with your site.</h4>
+<h4 align="center">Show the browser's Elements tool inside the VSCode editor and use it to fix styling, layout, and CSS issues with your site.</h4>
 
 A VS Code extension that allows you to use the browser's Elements tool from within the editor. The Elements tool will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, and fix styling issues. All without leaving VS Code.
 
@@ -14,22 +14,22 @@ A VS Code extension that allows you to use the browser's Elements tool from with
 ![Elements for Microsoft Edge - Demo](demo.gif)
 
 **Supported Features**
-* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools
+* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools,
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
-* Fully featured Elements tool with views for HTML, CSS, Accessibility and more
-* Screen-casting feature to allow you to see your page without leaving VSCode
+* Fully featured Elements tool with views for HTML, CSS, accessibility and more.
+* Screen-casting feature to allow you to see your page without leaving VSCode.
 
 # Using the Extension
 ## Getting Started
 For use inside VS Code:
-1. Install the extension
+1. Install the extension,
 1. Open the folder containing the project you want to work on.
 
 ## Using the tools
-The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the url parameter you simply tell VS Code which URL to either open or launch in the browser.
+The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in the browser.
 
 ### Debug Configuration
-You can launch the Elements for Microsoft Edge extension like you would a debugger, by using a launch.json config file. However, Elements for Microsoft Edge isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the Elements for Microsoft Edge extension once debugging has started.
+You can launch the Elements for Microsoft Edge extension like you would a debugger, by using a `launch.json` config file. However, Elements for Microsoft Edge isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the Elements for Microsoft Edge extension once debugging has started.
 
 To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
 
@@ -61,18 +61,18 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 
 ### Launching the browser via the side bar view
 * Start Microsoft Edge via the side bar
-  * Click the `Elements for Microsoft Edge` view in the side bar
-  * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab
+  * Click the `Elements for Microsoft Edge` view in the side bar.
+  * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab.
 * Attach the Elements tool via the side bar view
-  * Click the `Attach` icon next to the tab to open the Elements tool
+  * Click the `Attach` icon next to the tab to open the Elements tool.
 
 ### Launching the browser manually
 * Start Microsoft Edge with remote-debugging enabled on port 9222:
   * `msedge.exe --remote-debugging-port=9222`
-  * Navigate the browser to the desired URL
+  * Navigate the browser to the desired URL.
 * Attach the Elements tool via a command:
-  * Run the command - Elements for Microsoft Edge: Attach to a target
-  * Select a target from the drop down
+  * Run the command `Elements for Microsoft Edge: Attach to a target`
+  * Select a target from the drop down.
 
 # Contributing
 
