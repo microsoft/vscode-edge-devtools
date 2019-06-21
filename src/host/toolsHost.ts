@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, ITelemetryData, WebSocketEvent, WebviewEvent } from "../common/webviewEvents";
+import { encodeMessageForChannel, TelemetryData, WebSocketEvent, WebviewEvent } from "../common/webviewEvents";
 import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
@@ -49,6 +49,25 @@ export default class ToolsHost {
         });
     }
 
+    public reportError(
+        type: string,
+        message: string,
+        stack: string,
+        filename: string,
+        sourceUrl: string,
+        lineno: number,
+        colno: number) {
+        // Package up the error info to send to the extension
+        const data = { message, stack, filename, sourceUrl, lineno, colno };
+
+        // Inform the extension of the DevTools telemetry event
+        this.sendTelemetry({
+            data,
+            event: "error",
+            name: type,
+        });
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {
@@ -72,7 +91,7 @@ export default class ToolsHost {
         return true;
     }
 
-    private sendTelemetry(telemetry: ITelemetryData) {
+    private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", telemetry);
     }
