@@ -151,6 +151,46 @@ describe("toolsHost", () => {
         });
     });
 
+    describe("reportError", () => {
+        it("calls across to extension", async () => {
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
+
+            const expectedTelemetry = {
+                data: {
+                    colno: 2,
+                    filename: "file.js",
+                    lineno: 1,
+                    message: "Unknown",
+                    sourceUrl: "vs-resource://source.js",
+                    stack: "Error: Unknown \n \t at file.js:1:2,",
+                },
+                event: "error",
+                name: "SomeError",
+            };
+            host.reportError(
+                expectedTelemetry.name,
+                expectedTelemetry.data.message,
+                expectedTelemetry.data.stack,
+                expectedTelemetry.data.filename,
+                expectedTelemetry.data.sourceUrl,
+                expectedTelemetry.data.lineno,
+                expectedTelemetry.data.colno);
+
+            expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                expect.any(Function),
+                "telemetry",
+                expect.objectContaining(expectedTelemetry),
+            );
+
+            // Ensure that the encoded message is actually passed over to the extension
+            const expectedPostedMessage = "encodedMessage";
+            const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
+            postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
+            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+        });
+    });
+
     describe("onMessageFromChannel", () => {
         it("calls onResolvedUrlFromChannel on getUrl message", async () => {
             const { default: toolsHost } = await import("./toolsHost");
