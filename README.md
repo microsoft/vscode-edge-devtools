@@ -61,6 +61,14 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 }
 ```
 
+#### Other optional launch config fields
+* `browserPath`: The full path to the browser executable that will be launched. If not specified the most stable channel of Microsoft Edge (Chromium) will be launched from the default install location instead.
+* `hostname`: By default the extension searches for debuggable instances using `localhost`. If you are hosting your web app on a remote machine you can specify the hostname using this setting.
+* `port`: By default the extension will set the remote-debugging-port to `9222`. Use this option to specify a different port on which to connect.
+* `userDataDir`: Normally, if Microsoft Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Microsoft Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile instead.
+* `useHttps`: By default the extension will search for attachable instances using the `http` protocol. Set this to true if you are hosting your web app over `https` instead.
+
+
 ### Launching the browser via the side bar view
 * Start Microsoft Edge via the side bar
   * Click the `Elements for Microsoft Edge` view in the side bar.

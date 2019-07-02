@@ -5,7 +5,7 @@
 // tslint:disable: variable-name
 
 import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson } from "./utils";
+import { IRemoteTargetJson, IUserConfig } from "./utils";
 
 jest.mock("vscode", () => null, { virtual: true });
 
@@ -281,7 +281,7 @@ describe("utils", () => {
                 hostname: "someHost",
                 port: 9999,
                 useHttps: true,
-                userDataDirectory: "default",
+                userDataDir: "default",
             };
 
             // Override the configuration mock to return our custom test values
@@ -297,7 +297,7 @@ describe("utils", () => {
             expect(port).toBe(expected.port);
             expect(useHttps).toBe(expected.useHttps);
             expect(defaultUrl).toBe(expected.defaultUrl);
-            expect(userDataDir).toBe(expected.userDataDirectory);
+            expect(userDataDir).toBe(expected.userDataDir);
             expect(vscodeMock.workspace.getConfiguration).toBeCalledWith(utils.SETTINGS_STORE_NAME);
         });
 
@@ -307,7 +307,7 @@ describe("utils", () => {
                 port: 9999,
                 url: "url",
                 useHttps: true,
-                userDataDirectory: "default",
+                userDataDir: "default",
             };
 
             const { hostname, port, useHttps, defaultUrl, userDataDir } = utils.getRemoteEndpointSettings(config);
@@ -315,16 +315,64 @@ describe("utils", () => {
             expect(port).toBe(config.port);
             expect(useHttps).toBe(config.useHttps);
             expect(defaultUrl).toBe(config.url);
-            expect(userDataDir).toBe(config.userDataDirectory);
+            expect(userDataDir).toBe(config.userDataDir);
         });
 
         it("uses correct fallbacks on failure", async () => {
+            // Override the configuration mock to return our custom test values
+            const configMock = {
+                get: (name: string) => undefined,
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
             const { hostname, port, useHttps, defaultUrl, userDataDir } = utils.getRemoteEndpointSettings();
             expect(hostname).toBe(utils.SETTINGS_DEFAULT_HOSTNAME);
             expect(port).toBe(utils.SETTINGS_DEFAULT_PORT);
             expect(useHttps).toBe(utils.SETTINGS_DEFAULT_USE_HTTPS);
             expect(defaultUrl).toBe(utils.SETTINGS_DEFAULT_URL);
-            expect(userDataDir).toBe(utils.SETTINGS_DEFAULT_USER_DATA_DIR);
+            expect(userDataDir).toEqual(expect.stringContaining(`vscode-edge-devtools-userdatadir_${port}`));
+        });
+
+        it("uses correct user data directory", async () => {
+            const config: Partial<IUserConfig> = {
+                userDataDir: false,
+            };
+
+            // True uses a temp directory
+            config.userDataDir = true;
+            const result = utils.getRemoteEndpointSettings(config);
+            expect(result.userDataDir).toEqual(expect.stringContaining("vscode-edge-devtools-userdatadir_"));
+
+            // False should not use a directory
+            config.userDataDir = false;
+            const result2 = utils.getRemoteEndpointSettings(config);
+            expect(result2.userDataDir).toBe("");
+
+            // A path should use that path
+            config.userDataDir = "this is a path";
+            const result3 = utils.getRemoteEndpointSettings(config);
+            expect(result3.userDataDir).toBe(config.userDataDir);
+
+            // Settings should be used if there is no config
+            const expectedSettingDir = "some/path";
+            const configMock = {
+                get: (name: string) => expectedSettingDir as string | undefined,
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+            const result4 = utils.getRemoteEndpointSettings();
+            expect(result4.userDataDir).toBe(expectedSettingDir);
+
+            // Default to true if no settings
+            configMock.get = (name: string) => undefined;
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+            const result5 = utils.getRemoteEndpointSettings();
+            expect(result5.userDataDir).toEqual(expect.stringContaining("vscode-edge-devtools-userdatadir_"));
+
+            // No folder if they use a browser path
+            const result6 = utils.getRemoteEndpointSettings({ browserPath: "someBrowser.exe"});
+            expect(result6.userDataDir).toEqual("");
         });
     });
 
@@ -470,6 +518,8 @@ describe("utils", () => {
     describe("launchBrowser", () => {
         it("spawns the process", async () => {
             jest.doMock("child_process");
+            jest.doMock("path");
+            jest.doMock("os");
             jest.resetModules();
             utils = await import("./utils");
 
@@ -477,6 +527,10 @@ describe("utils", () => {
             cp.spawn.mockReturnValue({
                 unref: jest.fn(),
             });
+
+            const expectedTempPath = "C:\\someTempPath";
+            const os = jest.requireMock("os");
+            os.tmpdir.mockReturnValue(expectedTempPath);
 
             const expectedPath = "somePath";
             const expectedPort = 9222;
