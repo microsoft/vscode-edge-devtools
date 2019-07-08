@@ -27,7 +27,7 @@ export interface IUserConfig {
     hostname: string;
     port: number;
     useHttps: boolean;
-    userDataDirectory: string;
+    userDataDir: string | boolean;
 }
 
 export type Platform = "Windows" | "OSX" | "Linux";
@@ -37,7 +37,6 @@ export const SETTINGS_DEFAULT_USE_HTTPS = false;
 export const SETTINGS_DEFAULT_HOSTNAME = "localhost";
 export const SETTINGS_DEFAULT_PORT = 9222;
 export const SETTINGS_DEFAULT_URL = "about:blank";
-export const SETTINGS_DEFAULT_USER_DATA_DIR = "";
 export const SETTINGS_WEBVIEW_NAME = "Elements";
 export const SETTINGS_PREF_NAME = "devtools-preferences";
 export const SETTINGS_PREF_DEFAULTS = {
@@ -176,8 +175,29 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     const port: number = config.port || settings.get("port") || SETTINGS_DEFAULT_PORT;
     const useHttps: boolean = config.useHttps || settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
     const defaultUrl: string = config.url || settings.get("defaultUrl") || SETTINGS_DEFAULT_URL;
-    const userDataDir: string = config.userDataDirectory ||
-        settings.get("userDataDirectory") || SETTINGS_DEFAULT_USER_DATA_DIR;
+
+    // Check to see if we need to use a user data directory, which will force Edge to launch with a new manager process.
+    // We generate a temp directory if the user opted in explicitly with 'true' (which is the default),
+    // Or if it is not defined and they are not using a custom browser path (such as electron).
+    // This matches the behavior of the chrome and edge debug extensions.
+    const browserPath = config.browserPath || settings.get("browserPath") || "";
+    let userDataDir: string | boolean | undefined;
+    if (typeof config.userDataDir !== "undefined") {
+        userDataDir = config.userDataDir;
+    } else {
+        const settingsUserDataDir: string | boolean | undefined = settings.get("userDataDir");
+        if (typeof settingsUserDataDir !== "undefined") {
+            userDataDir = settingsUserDataDir;
+        }
+    }
+
+    if (userDataDir === true || (typeof userDataDir === "undefined" && !browserPath)) {
+        // Generate a temp directory
+        userDataDir = path.join(os.tmpdir(), `vscode-edge-devtools-userdatadir_${port}`);
+    } else if (!userDataDir) {
+        // Explicit opt-out
+        userDataDir = "";
+    }
 
     return { hostname, port, useHttps, defaultUrl, userDataDir };
 }

@@ -1,12 +1,12 @@
 {
     "cSpell.words": [
-        "activitybar",
         "Backend",
-        "blackbox",
-        "edgedevtools",
         "LOCALAPPDATA",
         "MSEDGE",
+        "activitybar",
+        "blackbox",
         "devtool",
+        "edgedevtools",
         "finalhandler",
         "geolocations",
         "monospace",
@@ -17,6 +17,7 @@
         "screencast",
         "undocked",
         "unhandledrejection",
+        "userdatadir",
         "vsce",
         "vsix"
     ]
