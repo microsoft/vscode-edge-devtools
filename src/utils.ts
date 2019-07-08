@@ -264,6 +264,8 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}) {
  */
 export function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string) {
     const args = [
+        "--no-first-run",
+        "--no-default-browser-check",
         `--remote-debugging-port=${port}`,
         targetUrl,
     ];
