@@ -116,10 +116,13 @@
                     "default": "about:blank",
                     "description": "The default url to open when launching the browser without a target"
                 },
-                "vscode-edge-devtools.userDataDirectory": {
-                    "type": "string",
-                    "default": "",
-                    "description": "A custom user data directory to use when launching the browser"
+                "vscode-edge-devtools.userDataDir": {
+                    "type": [
+                        "string",
+                        "boolean"
+                    ],
+                    "default": true,
+                    "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead."
                 }
             }
         },
@@ -177,10 +180,13 @@
                                 "default": 9222,
                                 "description": "The port on which to search for remote debuggable instances"
                             },
-                            "userDataDirectory": {
-                                "type": "string",
-                                "default": "",
-                                "description": "A custom user data directory to use when launching the browser"
+                            "userDataDir": {
+                                "type": [
+                                  "string",
+                                  "boolean"
+                                ],
+                                "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead.",
+                                "default": true
                             },
                             "useHttps": {
                                 "type": "boolean",
@@ -216,10 +222,13 @@
                                 "default": 9222,
                                 "description": "The port on which to search for remote debuggable instances"
                             },
-                            "userDataDirectory": {
-                                "type": "string",
-                                "default": "",
-                                "description": "A custom user data directory to use when launching the browser"
+                            "userDataDir": {
+                                "type": [
+                                  "string",
+                                  "boolean"
+                                ],
+                                "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead.",
+                                "default": true
                             },
                             "useHttps": {
                                 "type": "boolean",
