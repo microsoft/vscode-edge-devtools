@@ -42,6 +42,7 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     dtWindow.addEventListener("DOMContentLoaded", () => {
         // Override the resource loading once the window has loaded so that we can control it
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Runtime);
+        (dtWindow as any).loadTimeData = {"data":{ "Styles":"AAAAAAAAAA"}}
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
     });
 }
