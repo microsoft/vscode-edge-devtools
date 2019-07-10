@@ -182,8 +182,8 @@
                             },
                             "userDataDir": {
                                 "type": [
-                                  "string",
-                                  "boolean"
+                                    "string",
+                                    "boolean"
                                 ],
                                 "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead.",
                                 "default": true
@@ -224,8 +224,8 @@
                             },
                             "userDataDir": {
                                 "type": [
-                                  "string",
-                                  "boolean"
+                                    "string",
+                                    "boolean"
                                 ],
                                 "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead.",
                                 "default": true
@@ -332,7 +332,8 @@
     },
     "dependencies": {
         "vscode-extension-telemetry": "0.1.1",
-        "ws": "6.2.0"
+        "ws": "6.2.0",
+        "vscode-nls": "4.1.1"
     },
     "devDependencies": {
         "@types/fs-extra": "5.0.5",
@@ -349,6 +350,7 @@
         "vsce": "1.64.0",
         "vscode": "1.1.34",
         "webpack": "4.29.6",
-        "webpack-cli": "3.2.3"
+        "webpack-cli": "3.2.3",
+        "vscode-nls-dev": "3.2.7"
     }
 }

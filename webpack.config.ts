@@ -10,6 +10,14 @@ const commonConfig = {
                 test: /\.tsx?$/,
                 use: "ts-loader",
             },
+            {
+                // vscode-nls-dev loader:
+                // * rewrite nls-calls
+                loader: 'vscode-nls-dev/lib/webpack-loader',
+                options: {
+                    base: path.join(__dirname, 'src')
+                }
+            }
         ],
     },
     resolve: {
@@ -29,6 +37,7 @@ module.exports = [
             filename: "[name].bundle.js",
             path: path.resolve(__dirname, "out/host"),
         },
+        target: "node"
     },
     {
         ...commonConfig,
