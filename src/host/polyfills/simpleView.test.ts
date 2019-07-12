@@ -2,11 +2,31 @@
 // Licensed under the MIT License.
 
 describe("simpleView", () => {
+    it("revealInVSCode calls openInEditor", async () => {
+        const apply = await import("./simpleView");
+        const expected = {
+            columnNumber: 0,
+            lineNumber: 0,
+            uiSourceCode: {
+                _url: "http://bing.com",
+            },
+        };
+        const mockOpen = jest.fn();
+        (global as any).InspectorFrontendHost = {
+            openInEditor: mockOpen,
+        };
+
+        await apply.revealInVSCode(expected, false);
+
+        expect(mockOpen).toHaveBeenCalled();
+    });
+
     it("applyCommonRevealerPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
         const result = apply.applyCommonRevealerPatch(
             "Common.Revealer.reveal = function(revealable, omitFocus) { // code");
-        expect(result).toEqual("Common.Revealer.reveal = function() { Promise.resolve(); return; // code");
+        expect(result).toEqual(
+            expect.stringContaining("Common.Revealer.reveal = function revealInVSCode(revealable, omitFocus) {"));
     });
 
     it("applyInspectorViewPatch correctly changes text", async () => {
