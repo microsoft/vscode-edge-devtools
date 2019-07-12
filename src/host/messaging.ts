@@ -4,12 +4,15 @@
 declare const acquireVsCodeApi: () => any;
 
 export function initializeMessaging() {
-    const vscode = acquireVsCodeApi();
+const vscode = acquireVsCodeApi();
 
     let toolsWindow: Window | null;
 
     window.addEventListener("DOMContentLoaded", () => {
         toolsWindow = (document.getElementById("host") as HTMLIFrameElement).contentWindow;
+
+         let message = "websocket:{\"message\":\"getStrings\"}"
+         vscode.postMessage(message);
     });
 
     window.addEventListener("message", (messageEvent) => {
