@@ -9,6 +9,7 @@ export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
+    private getStringsCallback: (message: any) => void = () => { };
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
@@ -18,6 +19,7 @@ export default class ToolsHost {
         // DevTools will always be inside a webview
         return true;
     }
+    
 
     public getPreferences(callback: (preferences: any) => void) {
         // Load the preference via the extension workspaceState
@@ -29,6 +31,10 @@ export default class ToolsHost {
     public setPreference(name: string, value: string) {
         // Save the preference via the extension workspaceState
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
+    }
+
+    public setGetStringsCallback(callback: (message: any) => void) {
+        this.getStringsCallback = callback;
     }
 
     public recordEnumeratedHistogram(actionName: string, actionCode: number, bucketSize: number) {
@@ -111,6 +117,8 @@ export default class ToolsHost {
     }
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
+        this.getStringsCallback(message);
+
         // Send response message to DevTools
         ToolsWebSocket.instance.onMessageFromChannel(e, message);
     }

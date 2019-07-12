@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { parseMessageFromChannel } from "../common/webviewEvents";
+import StringsProvider from "./stringsProvider";
 import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
@@ -29,6 +30,9 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     dtWindow.InspectorFrontendHost = new ToolsHost();
     dtWindow.WebSocket = ToolsWebSocket;
 
+    StringsProvider.dtWindow = dtWindow;
+    dtWindow.InspectorFrontendHost.setGetStringsCallback(StringsProvider.instance.getStringsCallback);
+
     // Listen for messages from the extension and forward to the tools
     const messageCallback =
         dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
@@ -42,7 +46,6 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     dtWindow.addEventListener("DOMContentLoaded", () => {
         // Override the resource loading once the window has loaded so that we can control it
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Runtime);
-        (dtWindow as any).loadTimeData = {"data":{ "Styles":"AAAAAAAAAA"}}
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
     });
 }

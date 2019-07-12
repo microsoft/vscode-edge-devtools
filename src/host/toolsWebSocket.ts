@@ -28,6 +28,7 @@ export default class ToolsWebSocket {
         ToolsWebSocket.devtoolsWebSocket = this;
         // Inform the extension that we are ready to receive messages
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "ready");
+//        this.send("getStrings");
     }
 
     public send(message: string) {
