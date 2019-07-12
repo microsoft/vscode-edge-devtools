@@ -9,7 +9,7 @@ export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
-    private getStringsCallback: (message: any) => void = () => { };
+    private getStringsCallback: (message: any) => boolean = () => { return false; };
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
@@ -33,7 +33,7 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
     }
 
-    public setGetStringsCallback(callback: (message: any) => void) {
+    public setGetStringsCallback(callback: (message: any) => boolean) {
         this.getStringsCallback = callback;
     }
 
@@ -117,9 +117,15 @@ export default class ToolsHost {
     }
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
-        this.getStringsCallback(message);
+        if (this.getStringsCallback(message)){
+            // String event is intercepted in here and handled already
+            // do not propagate.
+            return;
+        }
 
         // Send response message to DevTools
-        ToolsWebSocket.instance.onMessageFromChannel(e, message);
+        let instance = ToolsWebSocket.instance;
+        if (instance)
+            instance.onMessageFromChannel(e, message);
     }
 }

@@ -16,15 +16,23 @@ export default class StringsProvider {
         return StringsProvider._instance;
     }
 
-    public getStringsCallback(message: any): void {
-        if (this._initialized || !message)
-            return;
+    public getStringsCallback(message: any): boolean {
+        if (!message)
+            return false;
 
-        if (message.event === 'getStrings') {
-            let data  = JSON.parse(message.data);
-            StringsProvider.dtWindow.loadTimeData = { data };
-            this._initialized = true;
-        }
+        if (message.event === 'getStrings' ) 
+        {
+            if (!this._initialized) {
+               // initialize
+                let data  = JSON.parse(message.data);
+                StringsProvider.dtWindow.loadTimeData = { data };
+                this._initialized = true;
+            }
+
+            return true;
+        } 
+
+        return false;
     }
 
 }
