@@ -28,18 +28,21 @@ export class DevToolsPanel {
     private readonly panel: vscode.WebviewPanel;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
+    private stringMap: string;
     private panelSocket: PanelSocket;
 
     private constructor(
         panel: vscode.WebviewPanel,
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
-        targetUrl: string) {
+        targetUrl: string,
+        stringMap: string) {
         this.panel = panel;
         this.context = context;
         this.telemetryReporter = telemetryReporter;
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
+        this.stringMap = stringMap;
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
@@ -102,11 +105,15 @@ export class DevToolsPanel {
     }
 
     private onSocketMessage(msg: string) {
-        // TODO: Handle message
-        let message = {"event":"getStrings", "data": {"Styles":"1234"}};
-        let parsedObject  = JSON.parse(msg);
-        if(parsedObject && parsedObject.message === 'getStrings')
-            encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: "message", message });
+        // Handling the strings for the frontend
+        if(this.stringMap || this.stringMap !== "") {
+            let data = this.stringMap;
+            let message = {"event":"getStrings", "data": data };
+            let parsedObject  = JSON.parse(msg);
+            if(parsedObject && parsedObject.message === 'getStrings')
+                encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: "message", message });
+            this.stringMap = "";
+        }
 
     }
 
@@ -209,19 +216,26 @@ export class DevToolsPanel {
     public static createOrShow(
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
-        targetUrl: string) {
+        targetUrl: string,
+        stringMap: string = "") {
         const column = vscode.ViewColumn.Beside;
 
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);
         } else {
-            const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME, column, {
+            let name = SETTINGS_WEBVIEW_NAME;
+            if (stringMap) {
+                let stringMapJSON = JSON.parse(stringMap)
+                name = stringMapJSON[name]
+            }
+
+            const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, name, column, {
                 enableCommandUris: true,
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
 
-            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl);
+            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, stringMap);
         }
     }
 }

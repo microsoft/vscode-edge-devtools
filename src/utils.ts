@@ -304,3 +304,16 @@ export async function openNewTab(hostname: string, port: number, tabUrl?: string
 export function removeTrailingSlash(uri: string) {
     return (uri.endsWith("/") ? uri.slice(0, -1) : uri);
 }
+
+export async function getLocalizedStrings(extensionPath: string) {
+
+    try{
+        let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", "es.json"));
+        let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
+        if(frontendStringDocument)
+            return frontendStringDocument.getText();
+    }
+    catch(e){
+        return "" // Log error e.g File not found
+    }
+}

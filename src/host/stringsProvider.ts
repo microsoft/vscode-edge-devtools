@@ -21,7 +21,7 @@ export default class StringsProvider {
             return;
 
         if (message.event === 'getStrings') {
-            let data  = message.data;
+            let data  = JSON.parse(message.data);
             StringsProvider.dtWindow.loadTimeData = { data };
             this._initialized = true;
         }

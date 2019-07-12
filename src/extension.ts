@@ -13,6 +13,7 @@ import {
     getBrowserPath,
     getListOfTargets,
     getRemoteEndpointSettings,
+    getLocalizedStrings,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
@@ -114,7 +115,8 @@ export async function attach(context: vscode.ExtensionContext, attachUrl?: strin
         if (targetWebsocketUrl) {
             // Auto connect to found target
             telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
-            DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl);
+            let stringMap = await getLocalizedStrings(context.extensionPath);
+            DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, stringMap);
         } else {
             // Show the target list and allow the user to select one
             const selection = await vscode.window.showQuickPick(items);
@@ -135,14 +137,14 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
 
     const telemetryProps = { viaConfig: `${!!config}` };
     telemetryReporter.sendTelemetryEvent("command/launch", telemetryProps);
-
     const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);
     const url = launchUrl || defaultUrl;
     const target = await openNewTab(hostname, port, url);
     if (target && target.webSocketDebuggerUrl) {
         // Show the devtools
         telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
-        DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl);
+        let stringMap = await getLocalizedStrings(context.extensionPath);
+        DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl, stringMap);
     } else {
         // Launch a new instance
         const browserPath = await getBrowserPath(config);
