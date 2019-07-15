@@ -49,6 +49,7 @@ export class DevToolsPanel {
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
+        this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -166,6 +167,10 @@ export class DevToolsPanel {
         }
 
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", { id: request.id, content });
+    }
+
+    private async onSocketOpenInEditor(message: string) {
+        // TODO: Parse message and open the requested file
     }
 
     private update() {

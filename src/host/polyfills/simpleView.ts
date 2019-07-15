@@ -1,10 +1,34 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import ToolsHost from "../toolsHost";
+
+declare var InspectorFrontendHost: ToolsHost;
+
+interface IRevealable {
+    lineNumber: number;
+    columnNumber: number;
+    uiSourceCode: {
+        _url: string;
+    };
+}
+
+export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
+    if (revealable && revealable.uiSourceCode && revealable.uiSourceCode._url) {
+        InspectorFrontendHost.openInEditor(
+            revealable.uiSourceCode._url,
+            revealable.lineNumber,
+            revealable.columnNumber,
+        );
+    }
+
+    return Promise.resolve();
+}
+
 export function applyCommonRevealerPatch(content: string) {
     return content.replace(
         /Common\.Revealer\.reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g,
-        "Common.Revealer.reveal = function() { Promise.resolve(); return;");
+        `Common.Revealer.reveal = ${revealInVSCode.toString().slice(0, -1)}`);
 }
 
 export function applyInspectorViewPatch(content: string) {
