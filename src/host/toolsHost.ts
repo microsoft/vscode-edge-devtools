@@ -74,6 +74,12 @@ export default class ToolsHost {
         });
     }
 
+    public openInEditor(url: string, line: number, column: number) {
+        // Forward the data to the extension
+        const request = { column, line, url };
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {

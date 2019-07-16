@@ -47,13 +47,13 @@ export class DevToolsPanel {
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
         this.panelSocket.on("ready", () => this.onSocketReady());
-        this.panelSocket.on("websocket", (msg) => this.onSocketMessage(msg));
+        this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
-        this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
-
+        this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
+	this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
@@ -105,7 +105,8 @@ export class DevToolsPanel {
             this.panelSocket.isConnectedToTarget ? "websocket/reconnect" : "websocket/connect");
     }
 
-    private onSocketMessage(msg: string) {
+    private onSocketMessage() {
+        // TODO: Handle message
     }
 
     private onGetStrings(msg: string) {
@@ -179,6 +180,10 @@ export class DevToolsPanel {
         }
 
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", { id: request.id, content });
+    }
+
+    private async onSocketOpenInEditor(message: string) {
+        // TODO: Parse message and open the requested file
     }
 
     private update() {

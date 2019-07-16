@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export type WebviewEvent = "getState" | "getUrl" | "ready" | "setState" | "telemetry" | "websocket" | "getStrings";
+export type WebviewEvent = "getState" | "getUrl" | "openInEditor" |"ready" | "setState" | "telemetry" | "websocket" | "getStrings";
 export const webviewEventNames: WebviewEvent[] = [
     "getState",
     "getUrl",
+    "openInEditor",
     "ready",
     "setState",
     "telemetry",

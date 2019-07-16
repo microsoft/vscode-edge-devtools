@@ -191,6 +191,32 @@ describe("toolsHost", () => {
         });
     });
 
+    describe("openInEditor", () => {
+        it("calls across to extension", async () => {
+            const { default: toolsHost } = await import("./toolsHost");
+            const host = new toolsHost();
+
+            const expectedRequest = {
+                column: 500,
+                line: 23,
+                url: "webpack://file-to-open.css",
+            };
+            host.openInEditor(expectedRequest.url, expectedRequest.line, expectedRequest.column);
+
+            expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                expect.any(Function),
+                "openInEditor",
+                expect.objectContaining(expectedRequest),
+            );
+
+            // Ensure that the encoded message is actually passed over to the extension
+            const expectedPostedMessage = "encodedMessage";
+            const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
+            postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
+            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+        });
+    });
+
     describe("onMessageFromChannel", () => {
         it("calls onResolvedUrlFromChannel on getUrl message", async () => {
             const { default: toolsHost } = await import("./toolsHost");
