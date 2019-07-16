@@ -210,7 +210,7 @@ export class DevToolsPanel {
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string) {
-        const column = vscode.ViewColumn.Beside;
+        const column = vscode.ViewColumn.Active;
 
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);
