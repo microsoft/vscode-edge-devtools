@@ -71,7 +71,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `useHttps`: By default the extension will search for attachable instances using the `http` protocol. Set this to true if you are hosting your web app over `https` instead.
 * `sourceMaps`: By default, the extension will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
 * `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
-* `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemps](#sourcemaps) for more information
+* `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemaps](#sourcemaps) for more information
 
 #### Sourcemaps
 The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
