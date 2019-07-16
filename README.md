@@ -40,6 +40,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `name` - A friendly name to show in the VS Code UI. **Required.**
 * `url` - The url for the new tab or of the existing tab. **Optional.**
 * `file` - The local file path for the new tab or of the existing tab. **Optional.**
+* `webRoot` - The directory that files are served from. Used to resolve urls like `http://localhost:8000/app.js` to a file on disk like `/out/app.js`. **Optional.**
 
 ```
 {
@@ -55,7 +56,8 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
             "type": "vscode-edge-devtools.debug",
             "request": "attach",
             "name": "Attach to Microsoft Edge and open the Elements tool",
-            "url": "http://localhost:8000/"
+            "url": "http://localhost:8000/",
+            "webRoot": "${workspaceFolder}/out"
         }
     ]
 }
@@ -67,7 +69,36 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `port`: By default the extension will set the remote-debugging-port to `9222`. Use this option to specify a different port on which to connect.
 * `userDataDir`: Normally, if Microsoft Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Microsoft Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile instead.
 * `useHttps`: By default the extension will search for attachable instances using the `http` protocol. Set this to true if you are hosting your web app over `https` instead.
+* `sourceMaps`: By default, the extension will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
+* `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
+* `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemps](#sourcemaps) for more information
 
+#### Sourcemaps
+The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
+
+The left hand side of the mapping is a pattern that can contain a wildcard, and will be tested against the `sourceRoot` + `sources` entry in the source map. If it matches, the source file will be resolved to the path on the right hand side, which should be an absolute path to the source file on disk.
+
+A few mappings are applied by default, corresponding to some common default configs for Webpack and Meteor:
+```json
+// Note: These are the mappings that are included by default out of the box, with examples of how they could be resolved in different scenarios. These are not mappings that would make sense together in one project.
+// webRoot = /Users/me/project
+"sourceMapPathOverrides": {
+    "webpack:///./~/*": "${webRoot}/node_modules/*",       // Example: "webpack:///./~/querystring/index.js" -> "/Users/me/project/node_modules/querystring/index.js"
+    "webpack:///./*":   "${webRoot}/*",                    // Example: "webpack:///./src/app.js" -> "/Users/me/project/src/app.js",
+    "webpack:///*":     "*",                               // Example: "webpack:///project/app.ts" -> "/project/app.ts"
+    "webpack:///src/*": "${webRoot}/*",                    // Example: "webpack:///src/app.js" -> "/Users/me/project/app.js"
+    "meteor://💻app/*": "${webRoot}/*"                    // Example: "meteor://💻app/main.ts" -> "/Users/me/project/main.ts"
+}
+```
+If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceFolder}` and `${webRoot}` can be used here.
+
+### Ionic/gulp-sourcemaps note
+Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, try this setting:
+```json
+"sourceMapPathOverrides": {
+    "/source/*": "${workspaceFolder}/*"
+}
+```
 
 ### Launching the browser via the side bar view
 * Start Microsoft Edge via the side bar

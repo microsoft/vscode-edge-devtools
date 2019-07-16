@@ -595,4 +595,67 @@ describe("utils", () => {
             expect(utils.removeTrailingSlash("")).toEqual("");
         });
     });
+
+    describe("getRuntimeConfig", () => {
+        it("returns the stored settings", async () => {
+            const expected = {
+                pathMapping:  {
+                    "/app": "${workspaceFolder}/dist",
+                },
+                sourceMapPathOverrides: {
+                    "webpack:///./*": "${webRoot}/*",
+                },
+                sourceMaps: false,
+                webRoot: "/out",
+            };
+
+            // Override the configuration mock to return our custom test values
+            const configMock = {
+                get: (name: string) => (expected as any)[name],
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
+            // Ensure the new values are returned
+            const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig();
+            expect(pathMapping).toBe(expected.pathMapping);
+            expect(sourceMapPathOverrides).toBe(expected.sourceMapPathOverrides);
+            expect(sourceMaps).toBe(expected.sourceMaps);
+            expect(webRoot).toBe(expected.webRoot);
+        });
+
+        it("uses user config", async () => {
+            const config = {
+                pathMapping:  {
+                    "/app": "${workspaceFolder}/dist",
+                },
+                sourceMapPathOverrides: {
+                    "webpack:///./*": "${webRoot}/*",
+                },
+                sourceMaps: false,
+                webRoot: "/out",
+            };
+
+            const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig(config);
+            expect(pathMapping).toBe(config.pathMapping);
+            expect(sourceMapPathOverrides).toBe(config.sourceMapPathOverrides);
+            expect(sourceMaps).toBe(config.sourceMaps);
+            expect(webRoot).toBe(config.webRoot);
+        });
+
+        it("uses correct fallbacks on failure", async () => {
+            // Override the configuration mock to return our custom test values
+            const configMock = {
+                get: (name: string) => undefined,
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
+            const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig();
+            expect(pathMapping).toBe(utils.SETTINGS_DEFAULT_PATH_MAPPING);
+            expect(sourceMapPathOverrides).toBe(utils.SETTINGS_DEFAULT_PATH_OVERRIDES);
+            expect(sourceMaps).toBe(utils.SETTINGS_DEFAULT_SOURCE_MAPS);
+            expect(webRoot).toBe(utils.SETTINGS_DEFAULT_WEB_ROOT);
+        });
+    });
 });
