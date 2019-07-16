@@ -11,8 +11,8 @@ const vscode = acquireVsCodeApi();
     window.addEventListener("DOMContentLoaded", () => {
         toolsWindow = (document.getElementById("host") as HTMLIFrameElement).contentWindow;
 
-         let message = "websocket:{\"message\":\"getStrings\"}"
-         vscode.postMessage(message);
+        // when the frame is ready, load the strings.
+         vscode.postMessage("getStrings:{}");
     });
 
     window.addEventListener("message", (messageEvent) => {

@@ -93,6 +93,11 @@ export default class ToolsHost {
                 this.fireWebSocketCallback(event, message);
                 break;
             }
+            case "getStrings": {
+                const { event, message } = JSON.parse(args);
+                this.fireGetStringsCallback(event, message);
+                break;
+            }
         }
         return true;
     }
@@ -127,5 +132,11 @@ export default class ToolsHost {
         let instance = ToolsWebSocket.instance;
         if (instance)
             instance.onMessageFromChannel(e, message);
+    }
+
+    private fireGetStringsCallback(e: WebSocketEvent, message: string) {
+        this.getStringsCallback(message);
+
+        // do not propagate the event to the devtools window.
     }
 }

@@ -7,32 +7,26 @@ export default class StringsProvider {
 
     private constructor() {
         // private initialization for singleton.
-     }
+    }
 
     public static get instance() {
-        if(!StringsProvider._instance)
+        if (!StringsProvider._instance)
             StringsProvider._instance = new StringsProvider();
-        
+
         return StringsProvider._instance;
     }
 
-    public getStringsCallback(message: any): boolean {
+    public getStringsCallback(message: any): void {
         if (!message)
-            return false;
+            return;
 
-        if (message.event === 'getStrings' ) 
-        {
-            if (!this._initialized) {
-               // initialize
-                let data  = JSON.parse(message.data);
-                StringsProvider.dtWindow.loadTimeData = { data };
-                this._initialized = true;
-            }
+        if (!this._initialized) {
+            // initialize
+            let data = JSON.parse(message.data);
+            StringsProvider.dtWindow.loadTimeData = { data };
+            this._initialized = true;
+        }
 
-            return true;
-        } 
-
-        return false;
+        return;
     }
-
 }

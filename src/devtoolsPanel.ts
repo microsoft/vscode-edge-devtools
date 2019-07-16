@@ -52,6 +52,7 @@ export class DevToolsPanel {
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
+        this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -105,16 +106,16 @@ export class DevToolsPanel {
     }
 
     private onSocketMessage(msg: string) {
+    }
+
+    private onGetStrings(msg: string) {
         // Handling the strings for the frontend
         if(this.stringMap || this.stringMap !== "") {
             let data = this.stringMap;
-            let message = {"event":"getStrings", "data": data };
-            let parsedObject  = JSON.parse(msg);
-            if(parsedObject && parsedObject.message === 'getStrings')
-                encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: "message", message });
+            let message = {"data": data };
+            encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getStrings", { event: "initialRetrieve", message });
             this.stringMap = "";
         }
-
     }
 
     private onSocketTelemetry(message: string) {
