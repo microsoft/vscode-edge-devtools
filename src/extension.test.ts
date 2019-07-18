@@ -4,11 +4,19 @@
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson, removeTrailingSlash, SETTINGS_STORE_NAME, SETTINGS_VIEW_NAME } from "./utils";
+import {
+    IRemoteTargetJson,
+    IRuntimeConfig,
+    removeTrailingSlash,
+    SETTINGS_STORE_NAME,
+    SETTINGS_VIEW_NAME,
+} from "./utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("extension", () => {
+    const fakeRuntimeConfig: Partial<IRuntimeConfig> = {};
+
     describe("activate", () => {
         let context: ExtensionContext;
         let commandMock: jest.Mock;
@@ -28,6 +36,7 @@ describe("extension", () => {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
                 getListOfTargets: jest.fn(),
                 getRemoteEndpointSettings: jest.fn(),
+                getRuntimeConfig: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
             };
             jest.doMock("./utils", () => mockUtils);
@@ -171,6 +180,7 @@ describe("extension", () => {
                         port: "port",
                         useHttps: false,
                     }),
+                    getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),
                     removeTrailingSlash: jest.fn(removeTrailingSlash),
                 },
                 vscode: createFakeVSCode(),
@@ -235,6 +245,7 @@ describe("extension", () => {
                 expectedContext,
                 mockTelemetry,
                 expectedPick.detail,
+                fakeRuntimeConfig,
             );
         });
 
@@ -256,6 +267,7 @@ describe("extension", () => {
                 expectedContext,
                 mockTelemetry,
                 expectedWS,
+                fakeRuntimeConfig,
             );
         });
 
@@ -277,6 +289,7 @@ describe("extension", () => {
                 expectedContext,
                 mockTelemetry,
                 expectedWS,
+                fakeRuntimeConfig,
             );
 
             // Reverse the mismatched slashes
@@ -286,6 +299,7 @@ describe("extension", () => {
                 expectedContext,
                 mockTelemetry,
                 expectedWS,
+                fakeRuntimeConfig,
             );
         });
 
@@ -332,6 +346,7 @@ describe("extension", () => {
                     port: "port",
                     useHttps: false,
                 }),
+                getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),
                 launchBrowser: jest.fn(),
                 openNewTab: jest.fn().mockResolvedValue(null),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
@@ -417,6 +432,7 @@ describe("extension", () => {
                 expect.any(Object),
                 expect.any(Object),
                 target.webSocketDebuggerUrl,
+                fakeRuntimeConfig,
             );
         });
 
