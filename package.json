@@ -123,6 +123,34 @@
                     ],
                     "default": true,
                     "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead."
+                },
+                "vscode-edge-devtools.webRoot": {
+                    "type": "string",
+                    "description": "The absolute path to the webserver root. Used to resolve paths like `/app.js` to files on disk",
+                    "default": "${workspaceFolder}"
+                },
+                "vscode-edge-devtools.pathMapping": {
+                    "type": "object",
+                    "default": {
+                        "/": "${workspaceFolder}"
+                    },
+                    "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
+                },
+                "vscode-edge-devtools.sourceMapPathOverrides": {
+                    "type": "object",
+                    "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk",
+                    "default": {
+                        "webpack:///./*": "${webRoot}/*",
+                        "webpack:///src/*": "${webRoot}/*",
+                        "webpack:///*": "*",
+                        "webpack:///./~/*": "${webRoot}/node_modules/*",
+                        "meteor://💻app/*": "${webRoot}/*"
+                    }
+                },
+                "vscode-edge-devtools.sourceMaps": {
+                  "type": "boolean",
+                  "description": "Use JavaScript source maps (if they exist)",
+                  "default": true
                 }
             }
         },
@@ -138,7 +166,8 @@
                             "type": "vscode-edge-devtools.debug",
                             "request": "launch",
                             "name": "Launch Microsoft Edge and open the Elements tool",
-                            "url": "http://localhost:8080"
+                            "url": "http://localhost:8080",
+                            "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
                         }
                     },
                     {
@@ -148,7 +177,8 @@
                             "type": "vscode-edge-devtools.debug",
                             "request": "attach",
                             "name": "Attach to Microsoft Edge and open the Elements tool",
-                            "url": "http://localhost:8080"
+                            "url": "http://localhost:8080",
+                            "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
                         }
                     }
                 ],
@@ -192,6 +222,34 @@
                                 "type": "boolean",
                                 "default": false,
                                 "description": "Should we request the remote target list using https rather than http"
+                            },
+                            "webRoot": {
+                                "type": "string",
+                                "description": "The absolute path to the webserver root. Used to resolve paths like `/app.js` to files on disk",
+                                "default": "${workspaceFolder}"
+                            },
+                            "pathMapping": {
+                                "type": "object",
+                                "description": "A mapping of URLs/paths to local folders, to resolve scripts in Microsoft Edge to scripts on disk",
+                                "default": {
+                                    "/": "${workspaceFolder}"
+                                }
+                            },
+                            "sourceMapPathOverrides": {
+                                "type": "object",
+                                "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk",
+                                "default": {
+                                    "webpack:///./*": "${webRoot}/*",
+                                    "webpack:///src/*": "${webRoot}/*",
+                                    "webpack:///*": "*",
+                                    "webpack:///./~/*": "${webRoot}/node_modules/*",
+                                    "meteor://💻app/*": "${webRoot}/*"
+                                }
+                            },
+                            "sourceMaps": {
+                              "type": "boolean",
+                              "description": "Use JavaScript source maps (if they exist)",
+                              "default": true
                             }
                         }
                     },
@@ -234,6 +292,34 @@
                                 "type": "boolean",
                                 "default": false,
                                 "description": "Should we request the remote target list using https rather than http"
+                            },
+                            "webRoot": {
+                                "type": "string",
+                                "description": "The absolute path to the webserver root. Used to resolve paths like `/app.js` to files on disk",
+                                "default": "${workspaceFolder}"
+                            },
+                            "pathMapping": {
+                                "type": "object",
+                                "description": "A mapping of URLs/paths to local folders, to resolve scripts in Microsoft Edge to scripts on disk",
+                                "default": {
+                                    "/": "${workspaceFolder}"
+                                }
+                            },
+                            "sourceMapPathOverrides": {
+                                "type": "object",
+                                "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk",
+                                "default": {
+                                    "webpack:///./*": "${webRoot}/*",
+                                    "webpack:///src/*": "${webRoot}/*",
+                                    "webpack:///*": "*",
+                                    "webpack:///./~/*": "${webRoot}/node_modules/*",
+                                    "meteor://💻app/*": "${webRoot}/*"
+                                }
+                            },
+                            "sourceMaps": {
+                              "type": "boolean",
+                              "description": "Use JavaScript source maps (if they exist)",
+                              "default": true
                             }
                         }
                     }
