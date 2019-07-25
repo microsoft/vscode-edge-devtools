@@ -419,6 +419,7 @@ describe("devtoolsPanel", () => {
                 };
 
                 const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
                 };
                 jest.doMock("./utils", () => mockUtils);
@@ -431,6 +432,29 @@ describe("devtoolsPanel", () => {
                     `extension/openInEditor`,
                     expect.objectContaining({ sourceMaps: "true" }),
                 );
+            });
+
+            it("calls show document for open in editor", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    line: 1,
+                    url: "app.js",
+                };
+
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("./utils", () => mockUtils);
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
+
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
             });
         });
     });

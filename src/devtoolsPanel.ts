@@ -3,6 +3,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
+import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {
     encodeMessageForChannel,
@@ -13,6 +14,7 @@ import {
 } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
+    applyPathMapping,
     fetchUri,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
@@ -179,7 +181,42 @@ export class DevToolsPanel {
             sourceMaps: `${this.config.sourceMaps}`,
         });
 
-        // TODO: Parse message and open the requested file
+        // Parse message and open the requested file
+        const { column, line, url } = JSON.parse(message) as { column: number, line: number, url: string };
+
+        // Convert the devtools url into a local one
+        let sourcePath = url;
+        if (this.config.sourceMaps) {
+            sourcePath = applyPathMapping(sourcePath, this.config.sourceMapPathOverrides);
+        }
+
+        // Convert the local url to a workspace path
+        const transformer = new debugCore.UrlPathTransformer();
+        transformer.launch({ pathMapping: this.config.pathMapping });
+        const localSource = { path: sourcePath };
+        await transformer.fixSource(localSource);
+
+        sourcePath = localSource.path || sourcePath;
+
+        // Convert the workspace path into a VS Code url
+        let uri: vscode.Uri;
+        try {
+            uri = vscode.Uri.file(sourcePath);
+        } catch {
+            uri = vscode.Uri.parse(sourcePath, true);
+        }
+
+        // Finally open the document if it exists
+        if (uri) {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            vscode.window.showTextDocument(
+                doc,
+                {
+                    preserveFocus: true,
+                    selection: new vscode.Range(line, column, line, column),
+                    viewColumn: vscode.ViewColumn.One,
+                });
+        }
     }
 
     private update() {

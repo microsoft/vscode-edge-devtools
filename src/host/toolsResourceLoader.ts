@@ -32,7 +32,7 @@ export default class ToolsResourceLoader {
             const id = this.urlLoadNextId++;
             return new Promise((resolve: (url: string) => void) => {
                 this.urlLoadResolvers.set(id, resolve);
-                encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getUrl", [{ id, url }]);
+                encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getUrl", { id, url });
             });
         }
 
