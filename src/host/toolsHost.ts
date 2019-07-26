@@ -68,9 +68,9 @@ export default class ToolsHost {
         });
     }
 
-    public openInEditor(url: string, line: number, column: number) {
+    public openInEditor(url: string, line: number, column: number, omitFocus: boolean) {
         // Forward the data to the extension
-        const request = { column, line, url };
+        const request = { column, line, url, omitFocus };
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
     }
 

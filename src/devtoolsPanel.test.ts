@@ -46,6 +46,7 @@ describe("devtoolsPanel", () => {
             onDidChangeViewState: jest.fn(),
             onDidDispose: jest.fn(),
             reveal: jest.fn(),
+            viewColumn: 1,
             webview: {
                 onDidReceiveMessage: jest.fn(),
                 postMessage: jest.fn(),
@@ -415,14 +416,9 @@ describe("devtoolsPanel", () => {
                 const expectedRequest = {
                     column: 2,
                     line: 4,
+                    omitFocus: true,
                     url: "http://fake.com/app.js",
                 };
-
-                const mockUtils = {
-                    applyPathMapping: jest.fn().mockImplementation((x) => x),
-                    fetchUri: jest.fn().mockRejectedValue(null),
-                };
-                jest.doMock("./utils", () => mockUtils);
 
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
@@ -438,17 +434,18 @@ describe("devtoolsPanel", () => {
                 const expectedRequest = {
                     column: 5,
                     line: 1,
+                    omitFocus: false,
                     url: "app.js",
                 };
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
 
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
                 };
                 jest.doMock("./utils", () => mockUtils);
-
-                const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
 
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);

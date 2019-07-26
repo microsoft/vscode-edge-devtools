@@ -199,9 +199,14 @@ describe("toolsHost", () => {
             const expectedRequest = {
                 column: 500,
                 line: 23,
+                omitFocus: true,
                 url: "webpack://file-to-open.css",
             };
-            host.openInEditor(expectedRequest.url, expectedRequest.line, expectedRequest.column);
+            host.openInEditor(
+                expectedRequest.url,
+                expectedRequest.line,
+                expectedRequest.column,
+                expectedRequest.omitFocus);
 
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),

@@ -37,7 +37,7 @@ export function createFakeVSCode() {
             file: jest.fn().mockReturnValue({ with: jest.fn() }),
             parse: jest.fn().mockReturnValue({ with: jest.fn() }),
         },
-        ViewColumn: { Two: 2 },
+        ViewColumn: { One: 1, Two: 2 },
         commands: {
             registerCommand: jest.fn(),
         },

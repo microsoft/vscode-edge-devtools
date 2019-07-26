@@ -182,7 +182,15 @@ export class DevToolsPanel {
         });
 
         // Parse message and open the requested file
-        const { column, line, url } = JSON.parse(message) as { column: number, line: number, url: string };
+        const { column, line, url, omitFocus } =
+            JSON.parse(message) as { column: number, line: number, url: string, omitFocus: boolean };
+
+        // If we don't want to focus on the doc and doing so would cause a tab switch ignore it.
+        // This is because just starting to edit a style in the Elements tool with call openInEditor
+        // but if we switch vs code tab the edit will be cancelled.
+        if (omitFocus && this.panel.viewColumn === vscode.ViewColumn.One) {
+            return;
+        }
 
         // Convert the devtools url into a local one
         let sourcePath = url;
