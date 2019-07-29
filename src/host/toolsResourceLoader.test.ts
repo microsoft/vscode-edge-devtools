@@ -44,7 +44,7 @@ describe("toolsResourceLoader", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "getUrl",
-                expect.objectContaining([{ id: 0, url: expectedUrl }]),
+                expect.objectContaining({ id: 0, url: expectedUrl }),
             );
 
             // Ensure that the encoded message is actually passed over to the extension
@@ -70,7 +70,7 @@ describe("toolsResourceLoader", () => {
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),
                 "getUrl",
-                expect.objectContaining([{ id: 0, url: expectedUrl }]),
+                expect.objectContaining({ id: 0, url: expectedUrl }),
             );
 
             // Ensure that the encoded message is actually passed over to the extension

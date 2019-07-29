@@ -198,10 +198,15 @@ describe("toolsHost", () => {
 
             const expectedRequest = {
                 column: 500,
+                ignoreTabChanges: true,
                 line: 23,
                 url: "webpack://file-to-open.css",
             };
-            host.openInEditor(expectedRequest.url, expectedRequest.line, expectedRequest.column);
+            host.openInEditor(
+                expectedRequest.url,
+                expectedRequest.line,
+                expectedRequest.column,
+                expectedRequest.ignoreTabChanges);
 
             expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                 expect.any(Function),

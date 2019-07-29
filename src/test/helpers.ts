@@ -29,13 +29,15 @@ export type Writable<T> = {
 export function createFakeVSCode() {
     return {
         EventEmitter: jest.fn(),
+        Range: function Range() { /* constructor */ },
         TreeDataProvider: jest.fn(),
         TreeItem: jest.fn(),
         TreeItemCollapsibleState: { None: 0, Collapsed: 1 },
         Uri: {
             file: jest.fn().mockReturnValue({ with: jest.fn() }),
+            parse: jest.fn().mockReturnValue({ with: jest.fn() }),
         },
-        ViewColumn: { Two: 2 },
+        ViewColumn: { One: 1, Two: 2 },
         commands: {
             registerCommand: jest.fn(),
         },
@@ -51,12 +53,14 @@ export function createFakeVSCode() {
             registerTreeDataProvider: jest.fn(),
             showErrorMessage: jest.fn(),
             showQuickPick: jest.fn().mockResolvedValue(null),
+            showTextDocument: jest.fn(),
         },
         workspace: {
             getConfiguration: jest.fn(() => {
                 return { get: (name: string) => "" };
             }),
             onDidChangeConfiguration: jest.fn(),
+            openTextDocument: jest.fn().mockResolvedValue(null),
         },
     };
 }

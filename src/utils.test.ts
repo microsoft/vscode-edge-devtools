@@ -4,6 +4,7 @@
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
 
+import * as path from "path";
 import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./test/helpers";
 import { IRemoteTargetJson, IUserConfig } from "./utils";
 
@@ -17,6 +18,7 @@ describe("utils", () => {
     beforeEach(async () => {
         jest.doMock("http");
         jest.doMock("https");
+        jest.doMock("vscode-nls", () => ({ loadMessageBundle: jest.fn().mockReturnValue(jest.fn()) }));
         jest.doMock("vscode", () => createFakeVSCode(), { virtual: true });
         jest.resetModules();
 
@@ -371,7 +373,7 @@ describe("utils", () => {
             expect(result5.userDataDir).toEqual(expect.stringContaining("vscode-edge-devtools-userdatadir_"));
 
             // No folder if they use a browser path
-            const result6 = utils.getRemoteEndpointSettings({ browserPath: "someBrowser.exe"});
+            const result6 = utils.getRemoteEndpointSettings({ browserPath: "someBrowser.exe" });
             expect(result6.userDataDir).toEqual("");
         });
     });
@@ -599,7 +601,7 @@ describe("utils", () => {
     describe("getRuntimeConfig", () => {
         it("returns the stored settings", async () => {
             const expected = {
-                pathMapping:  {
+                pathMapping: {
                     "/app": "${workspaceFolder}/dist",
                 },
                 sourceMapPathOverrides: {
@@ -607,6 +609,10 @@ describe("utils", () => {
                 },
                 sourceMaps: false,
                 webRoot: "/out",
+            };
+
+            const expectedResolvedOverride = {
+                "webpack:///./*": "/out/*",
             };
 
             // Override the configuration mock to return our custom test values
@@ -619,14 +625,14 @@ describe("utils", () => {
             // Ensure the new values are returned
             const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig();
             expect(pathMapping).toBe(expected.pathMapping);
-            expect(sourceMapPathOverrides).toBe(expected.sourceMapPathOverrides);
+            expect(sourceMapPathOverrides).toEqual(expectedResolvedOverride);
             expect(sourceMaps).toBe(expected.sourceMaps);
             expect(webRoot).toBe(expected.webRoot);
         });
 
         it("uses user config", async () => {
             const config = {
-                pathMapping:  {
+                pathMapping: {
                     "/app": "${workspaceFolder}/dist",
                 },
                 sourceMapPathOverrides: {
@@ -636,9 +642,13 @@ describe("utils", () => {
                 webRoot: "/out",
             };
 
+            const expectedResolvedOverride = {
+                "webpack:///./*": "/out/*",
+            };
+
             const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig(config);
             expect(pathMapping).toBe(config.pathMapping);
-            expect(sourceMapPathOverrides).toBe(config.sourceMapPathOverrides);
+            expect(sourceMapPathOverrides).toEqual(expectedResolvedOverride);
             expect(sourceMaps).toBe(config.sourceMaps);
             expect(webRoot).toBe(config.webRoot);
         });
@@ -651,11 +661,137 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
+            const expectedResolvedOverrides = utils.SETTINGS_DEFAULT_PATH_OVERRIDES;
+            for (const i in expectedResolvedOverrides) {
+                if (expectedResolvedOverrides.hasOwnProperty(i)) {
+                    expectedResolvedOverrides[i] =
+                        expectedResolvedOverrides[i].replace("${webRoot}", utils.SETTINGS_DEFAULT_WEB_ROOT);
+                }
+            }
+
             const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig();
             expect(pathMapping).toBe(utils.SETTINGS_DEFAULT_PATH_MAPPING);
-            expect(sourceMapPathOverrides).toBe(utils.SETTINGS_DEFAULT_PATH_OVERRIDES);
+            expect(sourceMapPathOverrides).toEqual(expectedResolvedOverrides);
             expect(sourceMaps).toBe(utils.SETTINGS_DEFAULT_SOURCE_MAPS);
             expect(webRoot).toBe(utils.SETTINGS_DEFAULT_WEB_ROOT);
+        });
+    });
+
+    describe("replaceWebRootInSourceMapPathOverridesEntry", () => {
+        it("replaces webRoot correctly", () => {
+            const replaceWith = "new/path";
+            expect(utils.replaceWebRootInSourceMapPathOverridesEntry(replaceWith, "${webRoot}")).toBe(replaceWith);
+            expect(utils.replaceWebRootInSourceMapPathOverridesEntry(replaceWith, "/${webRoot}")).toBe("/${webRoot}");
+            expect(utils.replaceWebRootInSourceMapPathOverridesEntry(replaceWith, "${webRoot}/path"))
+                .toBe(`${replaceWith}/path`);
+        });
+    });
+
+    describe("applyPathMapping", () => {
+        function pathResolve(...segments: string[]): string {
+            let aPath = path.resolve.apply(null, segments);
+            if (aPath.match(/^[A-Za-z]:/)) {
+                aPath = aPath[0].toLowerCase() + aPath.substr(1);
+            }
+            return aPath;
+        }
+
+        beforeEach(async () => {
+            jest.unmock("path");
+            jest.resetModules();
+            utils = await import("./utils");
+        });
+
+        it("removes a matching webpack prefix", () => {
+            expect(utils.applyPathMapping("webpack:///src/app.js", {
+                "webpack:///*": pathResolve("/project/*"),
+            })).toEqual(pathResolve("/project/src/app.js"));
+        });
+
+        it("works using the laptop emoji", () => {
+            expect(utils.applyPathMapping("meteor:///💻app/src/main.js", {
+                "meteor:///💻app/*": pathResolve("/project/*"),
+            })).toEqual(
+                pathResolve("/project/src/main.js"));
+        });
+
+        it("does nothing when no overrides match", () => {
+            expect(utils.applyPathMapping("file:///c:/project/app.js", {
+                "webpack:///*": pathResolve("/project/*"),
+            })).toEqual("file:///c:/project/app.js");
+        });
+
+        it("resolves ..", () => {
+            expect(utils.applyPathMapping("/project/source/app.js", {
+                "/project/source/*": pathResolve("/") + "project/../*",
+            })).toEqual(pathResolve("/app.js"));
+        });
+
+        it("does nothing when match but asterisks don't match", () => {
+            expect(utils.applyPathMapping("webpack:///src/app.js", {
+                "webpack:///src/app.js": pathResolve("/project/*"),
+            })).toEqual("webpack:///src/app.js");
+        });
+
+        it("does nothing when match but too many asterisks", () => {
+            expect(utils.applyPathMapping("webpack:///src/code/app.js", {
+                "webpack:///*/code/app.js": pathResolve("/project/*/*"),
+            })).toEqual("webpack:///src/code/app.js");
+        });
+
+        it("does nothing when too many asterisks on left", () => {
+            expect(utils.applyPathMapping("webpack:///src/code/app.js", {
+                "webpack:///*/code/*/app.js": pathResolve("/project/*"),
+            })).toEqual("webpack:///src/code/app.js");
+        });
+
+        it("replaces an asterisk in the middle", () => {
+            expect(utils.applyPathMapping("webpack:///src/app.js", {
+                "webpack:///*/app.js": pathResolve("/project/*/app.js"),
+            })).toEqual(pathResolve("/project/src/app.js"));
+        });
+
+        it("replaces an asterisk at the beginning", () => {
+            expect(utils.applyPathMapping("/src/app.js", {
+                "*/app.js": pathResolve("/project/*/app.js"),
+            })).toEqual(pathResolve("/project/src/app.js"));
+        });
+
+        it("allows some regex characters in the pattern", () => {
+            expect(utils.applyPathMapping("webpack+(foo):///src/app.js", {
+                "webpack+(foo):///*/app.js": pathResolve("/project/*/app.js"),
+            })).toEqual(pathResolve("/project/src/app.js"));
+        });
+
+        it("replaces correctly when asterisk on left but not right", () => {
+            expect(utils.applyPathMapping("/src/app.js", {
+                "*/app.js": pathResolve("/project/app.js"),
+            })).toEqual(pathResolve("/project/app.js"));
+        });
+
+        it("the pattern is case-insensitive", () => {
+            expect(utils.applyPathMapping("/src/app.js", {
+                "*/APP.js": pathResolve("/project/*/app.js"),
+            })).toEqual(pathResolve("/project/src/app.js"));
+        });
+
+        it("works when multiple overrides provided", () => {
+            expect(utils.applyPathMapping("/src/app.js", {
+                "foo": "bar",
+                // tslint:disable-next-line: object-literal-sort-keys
+                "/file.js": pathResolve("/main.js"),
+                "*/app.js": pathResolve("/project/*/app.js"),
+                "/something/*/else.js": "main.js",
+            })).toEqual(pathResolve("/project/src/app.js"));
+        });
+
+        it("applies overrides in order by longest key first", () => {
+            expect(utils.applyPathMapping("/src/app.js", {
+                "*": pathResolve("/main.js"),
+                "*/app.js": pathResolve("/project/*/app.js"),
+                // tslint:disable-next-line: object-literal-sort-keys
+                "*.js": "main.js",
+            })).toEqual(pathResolve("/project/src/app.js"));
         });
     });
 });
