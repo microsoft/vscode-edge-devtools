@@ -1,7 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, TelemetryData, WebSocketEvent, WebviewEvent } from "../common/webviewEvents";
+import {
+    encodeMessageForChannel,
+    IOpenEditorData,
+    TelemetryData,
+    WebSocketEvent,
+    WebviewEvent,
+} from "../common/webviewEvents";
 import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
@@ -68,9 +74,9 @@ export default class ToolsHost {
         });
     }
 
-    public openInEditor(url: string, line: number, column: number, omitFocus: boolean) {
+    public openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean) {
         // Forward the data to the extension
-        const request = { column, line, url, omitFocus };
+        const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
     }
 

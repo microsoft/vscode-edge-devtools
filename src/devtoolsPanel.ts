@@ -7,6 +7,7 @@ import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {
     encodeMessageForChannel,
+    IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
     TelemetryData,
@@ -182,13 +183,12 @@ export class DevToolsPanel {
         });
 
         // Parse message and open the requested file
-        const { column, line, url, omitFocus } =
-            JSON.parse(message) as { column: number, line: number, url: string, omitFocus: boolean };
+        const { column, line, url, ignoreTabChanges } = JSON.parse(message) as IOpenEditorData;
 
-        // If we don't want to focus on the doc and doing so would cause a tab switch ignore it.
+        // If we don't want to force focus to the doc and doing so would cause a tab switch ignore it.
         // This is because just starting to edit a style in the Elements tool with call openInEditor
         // but if we switch vs code tab the edit will be cancelled.
-        if (omitFocus && this.panel.viewColumn === vscode.ViewColumn.One) {
+        if (ignoreTabChanges && this.panel.viewColumn === vscode.ViewColumn.One) {
             return;
         }
 
@@ -207,11 +207,15 @@ export class DevToolsPanel {
         sourcePath = localSource.path || sourcePath;
 
         // Convert the workspace path into a VS Code url
-        let uri: vscode.Uri;
+        let uri: vscode.Uri | undefined;
         try {
             uri = vscode.Uri.file(sourcePath);
         } catch {
-            uri = vscode.Uri.parse(sourcePath, true);
+            try {
+                uri = vscode.Uri.parse(sourcePath, true);
+            } catch {
+                uri = undefined;
+            }
         }
 
         // Finally open the document if it exists
@@ -224,6 +228,8 @@ export class DevToolsPanel {
                     selection: new vscode.Range(line, column, line, column),
                     viewColumn: vscode.ViewColumn.One,
                 });
+        } else {
+            vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
         }
     }
 

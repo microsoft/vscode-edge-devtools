@@ -415,8 +415,8 @@ describe("devtoolsPanel", () => {
             it("sends telemetry event for open in editor", async () => {
                 const expectedRequest = {
                     column: 2,
+                    ignoreTabChanges: true,
                     line: 4,
-                    omitFocus: true,
                     url: "http://fake.com/app.js",
                 };
 
@@ -433,8 +433,8 @@ describe("devtoolsPanel", () => {
             it("calls show document for open in editor", async () => {
                 const expectedRequest = {
                     column: 5,
+                    ignoreTabChanges: false,
                     line: 1,
-                    omitFocus: false,
                     url: "app.js",
                 };
 
@@ -452,6 +452,32 @@ describe("devtoolsPanel", () => {
 
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
                 expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
+            });
+
+            it("shows an error for unmapped urls", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    ignoreTabChanges: false,
+                    line: 1,
+                    url: "app.js",
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
+                mockVsCode.Uri.parse = jest.fn(() => { throw new Error(); });
+
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("./utils", () => mockUtils);
+
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showErrorMessage).toHaveBeenCalledWith(
+                    expect.stringContaining(expectedRequest.url));
             });
         });
     });
