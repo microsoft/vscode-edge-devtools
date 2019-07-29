@@ -14,6 +14,7 @@ import {
 import { PanelSocket } from "./panelSocket";
 import {
     fetchUri,
+    IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
     SETTINGS_PREF_NAME,
     SETTINGS_STORE_NAME,
@@ -22,6 +23,7 @@ import {
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
+    private readonly config: IRuntimeConfig;
     private readonly context: vscode.ExtensionContext;
     private readonly disposables: vscode.Disposable[] = [];
     private readonly extensionPath: string;
@@ -34,12 +36,14 @@ export class DevToolsPanel {
         panel: vscode.WebviewPanel,
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
-        targetUrl: string) {
+        targetUrl: string,
+        config: IRuntimeConfig) {
         this.panel = panel;
         this.context = context;
         this.telemetryReporter = telemetryReporter;
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
+        this.config = config;
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
@@ -170,6 +174,11 @@ export class DevToolsPanel {
     }
 
     private async onSocketOpenInEditor(message: string) {
+        // Report usage telemetry
+        this.telemetryReporter.sendTelemetryEvent("extension/openInEditor", {
+            sourceMaps: `${this.config.sourceMaps}`,
+        });
+
         // TODO: Parse message and open the requested file
     }
 
@@ -209,7 +218,8 @@ export class DevToolsPanel {
     public static createOrShow(
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
-        targetUrl: string) {
+        targetUrl: string,
+        config: IRuntimeConfig) {
         const column = vscode.ViewColumn.Active;
 
         if (DevToolsPanel.instance) {
@@ -221,7 +231,7 @@ export class DevToolsPanel {
                 retainContextWhenHidden: true,
             });
 
-            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl);
+            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
         }
     }
 }
