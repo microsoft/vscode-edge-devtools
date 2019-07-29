@@ -361,19 +361,25 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
     };
 }
 
-export async function getLocalizedStrings(extensionPath: string) {
-    try{
+/**
+ * Gets the localized resources that will be displayed in the frontend
+ * @param extensionPath The root folder for the extension path.
+ */
+export async function getLocalizedStrings(extensionPath: string): Promise<string> {
+    try {
         let locale = "en-us";
-        if(process.env.VSCODE_NLS_CONFIG) {
+        if (process.env.VSCODE_NLS_CONFIG) {
             locale = JSON.parse(process.env.VSCODE_NLS_CONFIG).locale;
         }
 
         let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", `${locale}.json`));
         let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
-        if(frontendStringDocument)
+        if (frontendStringDocument)
             return frontendStringDocument.getText();
+
+        return "";
     }
-    catch(e){
+    catch (e) {
         return "" // Log error e.g File not found
     }
 }

@@ -1,19 +1,14 @@
-export default class StringsProvider {
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
-    private static _instance: StringsProvider;
+export default class StringsProvider {
     private _initialized: boolean = false;
 
     public static dtWindow: any;
+    private static _instance: StringsProvider;
 
     private constructor() {
         // private initialization for singleton.
-    }
-
-    public static get instance() {
-        if (!StringsProvider._instance)
-            StringsProvider._instance = new StringsProvider();
-
-        return StringsProvider._instance;
     }
 
     public getStringsCallback(message: any): void {
@@ -29,4 +24,13 @@ export default class StringsProvider {
 
         return;
     }
+
+    public static get instance() {
+        if (!StringsProvider._instance)
+            StringsProvider._instance = new StringsProvider();
+
+        return StringsProvider._instance;
+    }
+
+
 }
