@@ -30,6 +30,39 @@ For use inside VS Code:
 ## Using the tools
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in the browser.
 
+### Opening source files from the Elements tool
+One of the features of the Elements extension is that it can show you what file applied the styles and event handlers for a given node.
+
+![Elements for Microsoft Edge - Links](links.png)
+
+The source files for these applied styles and attached event handlers appear in the form of links to a url specified by the browser. Clicking on one will attempt to open that file inside the VS Code editor window. Correctly mapping these runtime locations to actual files on disk that are part of your current workspace, may require you to enable source maps as part of your build environment.
+
+An example webpack configuration for sass and typescript is given below:
+```javascript
+module.exports = {
+  devtool: "source-map",
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        loader: "ts-loader"
+      },
+      {
+        test: /\.(s*)css$/,
+        use: [
+          { loader: MiniCssExtractPlugin.loader },
+          { loader: "css-loader", options: { sourceMap: true } },
+          { loader: "sass-loader", options: { sourceMap: true } }
+        ]
+      },
+    ]
+  }
+}
+```
+
+With source maps enabled, you may also need to configure the extension settings/launch.json config to add customized paths between your runtime urls and your workspace paths, see [Sourcemaps](#sourcemaps) for more information.
+
+
 ### Debug Configuration
 You can launch the Elements for Microsoft Edge extension like you would a debugger, by using a `launch.json` config file. However, Elements for Microsoft Edge isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the Elements for Microsoft Edge extension once debugging has started.
 
