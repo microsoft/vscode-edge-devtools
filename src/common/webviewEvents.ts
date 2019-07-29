@@ -37,6 +37,13 @@ export interface ITelemetryDataObject {
 }
 export type TelemetryData = ITelemetryDataNumber | ITelemetryDataObject;
 
+export interface IOpenEditorData {
+    url: string;
+    line: number;
+    column: number;
+    ignoreTabChanges: boolean;
+}
+
 /**
  * Parse out the WebviewEvents type from a message and call the appropriate emit event
  * @param message The message to parse

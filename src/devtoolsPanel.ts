@@ -3,9 +3,11 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
+import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {
     encodeMessageForChannel,
+    IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
     TelemetryData,
@@ -13,6 +15,7 @@ import {
 } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {
+    applyPathMapping,
     fetchUri,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
@@ -179,7 +182,55 @@ export class DevToolsPanel {
             sourceMaps: `${this.config.sourceMaps}`,
         });
 
-        // TODO: Parse message and open the requested file
+        // Parse message and open the requested file
+        const { column, line, url, ignoreTabChanges } = JSON.parse(message) as IOpenEditorData;
+
+        // If we don't want to force focus to the doc and doing so would cause a tab switch ignore it.
+        // This is because just starting to edit a style in the Elements tool with call openInEditor
+        // but if we switch vs code tab the edit will be cancelled.
+        if (ignoreTabChanges && this.panel.viewColumn === vscode.ViewColumn.One) {
+            return;
+        }
+
+        // Convert the devtools url into a local one
+        let sourcePath = url;
+        if (this.config.sourceMaps) {
+            sourcePath = applyPathMapping(sourcePath, this.config.sourceMapPathOverrides);
+        }
+
+        // Convert the local url to a workspace path
+        const transformer = new debugCore.UrlPathTransformer();
+        transformer.launch({ pathMapping: this.config.pathMapping });
+        const localSource = { path: sourcePath };
+        await transformer.fixSource(localSource);
+
+        sourcePath = localSource.path || sourcePath;
+
+        // Convert the workspace path into a VS Code url
+        let uri: vscode.Uri | undefined;
+        try {
+            uri = vscode.Uri.file(sourcePath);
+        } catch {
+            try {
+                uri = vscode.Uri.parse(sourcePath, true);
+            } catch {
+                uri = undefined;
+            }
+        }
+
+        // Finally open the document if it exists
+        if (uri) {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            vscode.window.showTextDocument(
+                doc,
+                {
+                    preserveFocus: true,
+                    selection: new vscode.Range(line, column, line, column),
+                    viewColumn: vscode.ViewColumn.One,
+                });
+        } else {
+            vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
+        }
     }
 
     private update() {
