@@ -28,6 +28,20 @@ export interface IUserConfig {
     port: number;
     useHttps: boolean;
     userDataDir: string | boolean;
+    webRoot: string;
+    pathMapping: IStringDictionary<string>;
+    sourceMapPathOverrides: IStringDictionary<string>;
+    sourceMaps: boolean;
+}
+
+export interface IRuntimeConfig {
+    pathMapping: IStringDictionary<string>;
+    sourceMapPathOverrides: IStringDictionary<string>;
+    sourceMaps: boolean;
+    webRoot: string;
+}
+export interface IStringDictionary<T> {
+    [name: string]: T;
 }
 
 export type Platform = "Windows" | "OSX" | "Linux";
@@ -44,6 +58,18 @@ export const SETTINGS_PREF_DEFAULTS = {
     uiTheme: '"dark"',
 };
 export const SETTINGS_VIEW_NAME = "vscode-edge-devtools-view";
+export const SETTINGS_DEFAULT_PATH_MAPPING: IStringDictionary<string> = {
+    "/": "${workspaceFolder}",
+};
+export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
+    "meteor://💻app/*": "${webRoot}/*",
+    "webpack:///*": "*",
+    "webpack:///./*": "${webRoot}/*",
+    "webpack:///./~/*": "${webRoot}/node_modules/*",
+    "webpack:///src/*": "${webRoot}/*",
+};
+export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
+export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || "/";
 const WIN_MSEDGE_PATHS = [
@@ -305,8 +331,37 @@ export function removeTrailingSlash(uri: string) {
     return (uri.endsWith("/") ? uri.slice(0, -1) : uri);
 }
 
-export async function getLocalizedStrings(extensionPath: string) {
+/**
+ * Get the configuration settings that should be used at runtime.
+ * The order of precedence is launch.json > extension settings > default values.
+ * @param config A user specified config from launch.json
+ */
+export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeConfig {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const pathMapping = config.pathMapping || settings.get("pathMapping") || SETTINGS_DEFAULT_PATH_MAPPING;
+    const sourceMapPathOverrides =
+        config.sourceMapPathOverrides || settings.get("sourceMapPathOverrides") || SETTINGS_DEFAULT_PATH_OVERRIDES;
+    const webRoot = config.webRoot || settings.get("webRoot") || SETTINGS_DEFAULT_WEB_ROOT;
 
+    let sourceMaps = SETTINGS_DEFAULT_SOURCE_MAPS;
+    if (typeof config.sourceMaps !== "undefined") {
+        sourceMaps = config.sourceMaps;
+    } else {
+        const settingsSourceMaps: boolean | undefined = settings.get("sourceMaps");
+        if (typeof settingsSourceMaps !== "undefined") {
+            sourceMaps = settingsSourceMaps;
+        }
+    }
+
+    return {
+        pathMapping,
+        sourceMapPathOverrides,
+        sourceMaps,
+        webRoot,
+    };
+}
+
+export async function getLocalizedStrings(extensionPath: string) {
     try{
         let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", "es.json"));
         let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
