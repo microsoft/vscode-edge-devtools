@@ -437,7 +437,6 @@
         "vsce": "1.65.0",
         "vscode": "1.1.35",
         "webpack": "4.36.1",
-        "webpack-cli": "3.3.6",
-        "vscode-nls-dev": "3.2.7"
+        "webpack-cli": "3.3.6"
     }
 }

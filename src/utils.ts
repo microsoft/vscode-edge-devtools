@@ -363,7 +363,12 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
 
 export async function getLocalizedStrings(extensionPath: string) {
     try{
-        let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", "es.json"));
+        let locale = "en-us";
+        if(process.env.VSCODE_NLS_CONFIG) {
+            locale = JSON.parse(process.env.VSCODE_NLS_CONFIG).locale;
+        }
+
+        let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", `${locale}.json`));
         let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
         if(frontendStringDocument)
             return frontendStringDocument.getText();
