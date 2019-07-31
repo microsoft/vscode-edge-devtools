@@ -59,7 +59,7 @@ export default class StringsProvider {
         // implement custom fallback logic here as follows:
         // this._fallBackMap.set('en-us', []): if a language is available (json provided)
         // this._fallBackMap.set('test', ['es-mx']): fallback list for test language
-        this._fallBackMap.set('en-us', ['qps-ploc'])
+        this._fallBackMap.set('en-us', [])
         this._fallBackMap.set('qps-ploc', [])
     }
 }
