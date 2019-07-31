@@ -29,7 +29,7 @@ module.exports = [
             filename: "[name].bundle.js",
             path: path.resolve(__dirname, "out/host"),
         },
-        target: "node"
+        target: "node",
     },
     {
         ...commonConfig,

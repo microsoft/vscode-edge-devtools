@@ -11,7 +11,7 @@ export function initializeMessaging() {
         toolsWindow = (document.getElementById("host") as HTMLIFrameElement).contentWindow;
 
         // when the frame is ready, load the strings.
-         vscode.postMessage("getStrings:{}");
+        vscode.postMessage("getStrings:{}");
     });
 
     window.addEventListener("message", (messageEvent) => {

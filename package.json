@@ -154,7 +154,11 @@
                 },
                 "vscode-edge-devtools.Localization": {
                     "type": "string",
-                    "enum": ["Enabled", "Disabled", "qps-ploc"],
+                    "enum": [
+                        "Enabled",
+                        "Disabled",
+                        "qps-ploc"
+                    ],
                     "default": "Disabled",
                     "description": "If enabled Elements for Edge will match Visual Studio Code locale"
                 }

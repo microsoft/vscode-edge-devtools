@@ -70,16 +70,16 @@ export function applySelectTabPatch(content: string) {
     const condition = allowedTabs.map((v) => {
         return `id !== '${v}'`;
     }).join(" && ");
-    
+
     const conditionTranslated = allowedTabs.map((v) => {
         return `id !== window.loadTimeData.data['${v}']`;
     }).join(" && ");
 
-    let replaceText = `if (window.loadTimeData && window.loadTimeData.data) {
+    const replaceText = `if (window.loadTimeData && window.loadTimeData.data) {
         if (${conditionTranslated} && ${condition}) return false;
     } else {
         if (${condition}) return false;
-    }`
+    }`;
     return content.replace(
         /selectTab\(id,\s*userGesture\)\s*{/g,
         `selectTab(id, userGesture) { ${replaceText}`);

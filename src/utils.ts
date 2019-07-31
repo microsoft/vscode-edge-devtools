@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 import * as cp from "child_process";
 import * as fse from "fs-extra";
 import * as http from "http";
@@ -10,9 +9,10 @@ import * as path from "path";
 import * as url from "url";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
-import StringsProvider from "./common/stringsProvider"
 import TelemetryReporter from "vscode-extension-telemetry";
+
 import packageJson from "../package.json";
+import StringsProvider from "./common/stringsProvider";
 import DebugTelemetryReporter from "./debugTelemetryReporter";
 
 export interface IDevToolsSettings {
@@ -70,7 +70,7 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
     "webpack:///./~/*": "${webRoot}/node_modules/*",
     "webpack:///src/*": "${webRoot}/*",
 };
-export const SETTINGS_LOCALIZATION: string = "Disabled"
+export const SETTINGS_LOCALIZATION: string = "Disabled";
 export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
 export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
 
@@ -454,7 +454,7 @@ export function applyPathMapping(
 export async function getLocalizedStrings(extensionPath: string): Promise<string> {
     try {
         const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-        let localizationEnabled: string = settings.get("Localization") || SETTINGS_LOCALIZATION;
+        const localizationEnabled: string = settings.get("Localization") || SETTINGS_LOCALIZATION;
         if (localizationEnabled === "Enabled" || localizationEnabled === "qps-ploc") {
             let locale = "en-us";
             if (process.env.VSCODE_NLS_CONFIG) {
@@ -462,20 +462,22 @@ export async function getLocalizedStrings(extensionPath: string): Promise<string
             }
 
             // override for pseudo
-            if (localizationEnabled === "qps-ploc")
+            if (localizationEnabled === "qps-ploc") {
                 locale = "qps-ploc";
+            }
 
             if (locale !== "en-us") {
-                let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", `${locale}.json`));
-                let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
-                if (frontendStringDocument)
+                const resourcePath = vscode.Uri.file(
+                    path.join(extensionPath, "resources", "locales", `${locale}.json`));
+                const frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
+                if (frontendStringDocument) {
                     return frontendStringDocument.getText();
+                }
             }
         }
 
         return "";
-    }
-    catch (e) {
-        return "" // Log error e.g File not found
+    } catch (e) {
+        return ""; // Log error e.g File not found
     }
 }

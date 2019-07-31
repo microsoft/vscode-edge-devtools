@@ -118,7 +118,7 @@ export async function attach(context: vscode.ExtensionContext, attachUrl?: strin
             // Auto connect to found target
             telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
             const runtimeConfig = getRuntimeConfig(config);
-	    let stringMap = await getLocalizedStrings(context.extensionPath);
+            const stringMap = await getLocalizedStrings(context.extensionPath);
             DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig, stringMap);
         } else {
             // Show the target list and allow the user to select one
@@ -148,7 +148,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         // Show the devtools
         telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
         const runtimeConfig = getRuntimeConfig(config);
-	let stringMap = await getLocalizedStrings(context.extensionPath);
+        const stringMap = await getLocalizedStrings(context.extensionPath);
         DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl, runtimeConfig, stringMap);
     } else {
         // Launch a new instance

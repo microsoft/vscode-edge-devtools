@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
-import { parseMessageFromChannel } from "../common/webviewEvents";
 import StringsProvider from "../common/stringsProvider";
+import { parseMessageFromChannel } from "../common/webviewEvents";
 import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";

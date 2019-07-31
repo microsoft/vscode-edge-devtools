@@ -120,9 +120,10 @@ export class DevToolsPanel {
     private onGetStrings(msg: string) {
         // Handling the strings for the frontend
         if (this.stringMap) {
-            let data = this.stringMap;
-            let message = {"data": data };
-            encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getStrings", { event: "initialRetrieve", message });
+            const data = this.stringMap;
+            const message = { data };
+            encodeMessageForChannel((receivedMsg) => this.panel.webview.postMessage(receivedMsg),
+                "getStrings", { event: "initialRetrieve", message });
             this.stringMap = "";
         }
     }
@@ -293,8 +294,8 @@ export class DevToolsPanel {
         } else {
             let name = SETTINGS_WEBVIEW_NAME;
             if (stringMap) {
-                let stringMapJSON = JSON.parse(stringMap)
-                name = stringMapJSON[name]
+                const stringMapJSON = JSON.parse(stringMap);
+                name = stringMapJSON[name];
             }
 
             const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, name, column, {
