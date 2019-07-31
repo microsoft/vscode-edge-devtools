@@ -4,8 +4,7 @@
 declare const acquireVsCodeApi: () => any;
 
 export function initializeMessaging() {
-const vscode = acquireVsCodeApi();
-
+    const vscode = acquireVsCodeApi();
     let toolsWindow: Window | null;
 
     window.addEventListener("DOMContentLoaded", () => {
