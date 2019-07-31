@@ -69,6 +69,7 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
     "webpack:///./~/*": "${webRoot}/node_modules/*",
     "webpack:///src/*": "${webRoot}/*",
 };
+export const SETTINGS_LOCALIZATION: string = "Disabled"
 export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
 export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
 
@@ -368,16 +369,24 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
  */
 export async function getLocalizedStrings(extensionPath: string): Promise<string> {
     try {
-        let locale = "en-us";
-        if (process.env.VSCODE_NLS_CONFIG) {
-            locale = StringsProvider.getFallback(JSON.parse(process.env.VSCODE_NLS_CONFIG).locale);
-        }
+        const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+        let localizationEnabled: string = settings.get("Localization") || SETTINGS_LOCALIZATION;
+        if (localizationEnabled === "Enabled" || localizationEnabled === "qps-ploc") {
+            let locale = "en-us";
+            if (process.env.VSCODE_NLS_CONFIG) {
+                locale = StringsProvider.getFallback(JSON.parse(process.env.VSCODE_NLS_CONFIG).locale);
+            }
 
-        if (locale !== "en-us") {
-            let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", `${locale}.json`));
-            let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
-            if (frontendStringDocument)
-                return frontendStringDocument.getText();
+            // override for pseudo
+            if (localizationEnabled === "qps-ploc")
+                locale = "qps-ploc";
+
+            if (locale !== "en-us") {
+                let resourcePath = vscode.Uri.file(path.join(extensionPath, "resources", "locales", `${locale}.json`));
+                let frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
+                if (frontendStringDocument)
+                    return frontendStringDocument.getText();
+            }
         }
 
         return "";

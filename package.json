@@ -151,6 +151,12 @@
                     "type": "boolean",
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
+                },
+                "vscode-edge-devtools.Localization": {
+                    "type": "string",
+                    "enum": ["Enabled", "Disabled", "qps-ploc"],
+                    "default": "Disabled",
+                    "description": "If enabled Elements for Edge will match Visual Studio Code locale"
                 }
             }
         },
