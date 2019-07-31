@@ -9,6 +9,7 @@ import * as os from "os";
 import * as path from "path";
 import * as url from "url";
 import * as vscode from "vscode";
+import * as debugCore from "vscode-chrome-debug-core";
 import StringsProvider from "./common/stringsProvider"
 import TelemetryReporter from "vscode-extension-telemetry";
 import packageJson from "../package.json";
@@ -355,15 +356,98 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         }
     }
 
+    // Resolve the paths with the webRoot set by the user
+    const resolvedOverrides: IStringDictionary<string> = {};
+    for (const pattern in sourceMapPathOverrides) {
+        if (sourceMapPathOverrides.hasOwnProperty(pattern)) {
+            const replacePattern = replaceWebRootInSourceMapPathOverridesEntry(webRoot, pattern);
+            const replacePatternValue = replaceWebRootInSourceMapPathOverridesEntry(
+                webRoot, sourceMapPathOverrides[pattern]);
+
+            resolvedOverrides[replacePattern] = replacePatternValue;
+        }
+    }
+
     return {
         pathMapping,
-        sourceMapPathOverrides,
+        sourceMapPathOverrides: resolvedOverrides,
         sourceMaps,
         webRoot,
     };
 }
 
- /**
+/**
+ * Find '${webRoot}' in a string and replace it with the specified value only if it is at the start.
+ * @param webRoot The value to use for replacement.
+ * @param entry The path containing the '${webRoot}' string that we will replace.
+ */
+export function replaceWebRootInSourceMapPathOverridesEntry(webRoot: string, entry: string) {
+    if (webRoot) {
+        const webRootIndex = entry.indexOf("${webRoot}");
+        if (webRootIndex === 0) {
+            return entry.replace("${webRoot}", webRoot);
+        }
+    }
+    return entry;
+}
+
+/**
+ * Walk through the list of mappings and find one that matches the sourcePath.
+ * Once a match is found, replace the pattern in the value side of the mapping with
+ * the rest of the path.
+ * @param sourcePath The source path to convert
+ * @param pathMapping The list of mappings from source map to authored file path
+ */
+export function applyPathMapping(
+    sourcePath: string,
+    pathMapping: IStringDictionary<string>): string {
+    const forwardSlashSourcePath = sourcePath.replace(/\\/g, "/");
+
+    // Sort the overrides by length, large to small
+    const sortedOverrideKeys = Object.keys(pathMapping)
+        .sort((a, b) => b.length - a.length);
+
+    // Iterate the key/values, only apply the first one that matches.
+    for (const leftPattern of sortedOverrideKeys) {
+        const rightPattern = pathMapping[leftPattern];
+
+        const asterisks = leftPattern.match(/\*/g) || [];
+        if (asterisks.length > 1) {
+            continue;
+        }
+
+        const replacePatternAsterisks = rightPattern.match(/\*/g) || [];
+        if (replacePatternAsterisks.length > asterisks.length) {
+            continue;
+        }
+
+        // Does it match?
+        const escapedLeftPattern = debugCore.utils.escapeRegexSpecialChars(leftPattern, "/*");
+        const leftRegexSegment = escapedLeftPattern
+            .replace(/\*/g, "(.*)")
+            .replace(/\\\\/g, "/");
+        const leftRegex = new RegExp(`^${leftRegexSegment}$`, "i");
+        const overridePatternMatches = forwardSlashSourcePath.match(leftRegex);
+        if (!overridePatternMatches) {
+            continue;
+        }
+
+        // Grab the value of the wildcard from the match above, replace the wildcard in the
+        // replacement pattern, and return the result.
+        const wildcardValue = overridePatternMatches[1];
+        let mappedPath = rightPattern.replace(/\*/g, wildcardValue);
+        mappedPath = debugCore.utils.properJoin(mappedPath); // Fix any ..'s
+        mappedPath = mappedPath.replace(
+            "${workspaceFolder}",
+            vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.toString() : "" || "");
+
+        return mappedPath;
+    }
+
+    return sourcePath;
+}
+
+/**
  * Gets the localized resources that will be displayed in the frontend
  * @param extensionPath The root folder for the extension path.
  */

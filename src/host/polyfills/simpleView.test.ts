@@ -7,6 +7,7 @@ describe("simpleView", () => {
         const expected = {
             columnNumber: 0,
             lineNumber: 0,
+            omitFocus: false,
             uiSourceCode: {
                 _url: "http://bing.com",
             },
@@ -16,7 +17,7 @@ describe("simpleView", () => {
             openInEditor: mockOpen,
         };
 
-        await apply.revealInVSCode(expected, false);
+        await apply.revealInVSCode(expected, expected.omitFocus);
 
         expect(mockOpen).toHaveBeenCalled();
     });

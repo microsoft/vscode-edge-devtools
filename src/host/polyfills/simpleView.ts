@@ -19,6 +19,7 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
             revealable.uiSourceCode._url,
             revealable.lineNumber,
             revealable.columnNumber,
+            omitFocus,
         );
     }
 
