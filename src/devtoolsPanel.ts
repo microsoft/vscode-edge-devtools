@@ -38,7 +38,7 @@ export class DevToolsPanel {
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
-	config: IRuntimeConfig,
+        config: IRuntimeConfig,
         stringMap: string) {
         this.panel = panel;
         this.context = context;
@@ -46,7 +46,7 @@ export class DevToolsPanel {
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
         this.stringMap = stringMap;
-	this.config = config;
+        this.config = config;
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
@@ -57,7 +57,8 @@ export class DevToolsPanel {
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
-	this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
+        this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
+
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
@@ -115,7 +116,7 @@ export class DevToolsPanel {
 
     private onGetStrings(msg: string) {
         // Handling the strings for the frontend
-        if(this.stringMap || this.stringMap !== "") {
+        if (this.stringMap) {
             let data = this.stringMap;
             let message = {"data": data };
             encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getStrings", { event: "initialRetrieve", message });
@@ -232,8 +233,8 @@ export class DevToolsPanel {
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
-	config: IRuntimeConfig,
-	stringMap: string = "") {
+        config: IRuntimeConfig,
+        stringMap: string = "") {
         const column = vscode.ViewColumn.Beside;
 
         if (DevToolsPanel.instance) {

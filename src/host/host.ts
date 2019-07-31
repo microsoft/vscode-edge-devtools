@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { parseMessageFromChannel } from "../common/webviewEvents";
-import StringsProvider from "./stringsProvider";
+import StringsProvider from "../common/stringsProvider";
 import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
