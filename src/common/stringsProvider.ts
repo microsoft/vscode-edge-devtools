@@ -20,8 +20,8 @@ export default class StringsProvider {
 
         if (!this.initialized) {
             // initialize
-            const data = JSON.parse(message.data);
-            StringsProvider.dtWindow.loadTimeData = { data };
+            const localizedStringsMap = JSON.parse(message.data);
+            StringsProvider.dtWindow.Localization = { localizedStringsMap };
             this.initialized = true;
         }
 
