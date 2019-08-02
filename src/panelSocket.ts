@@ -71,7 +71,7 @@ export class PanelSocket extends EventEmitter {
         this.socket.onopen = () => this.onOpen();
         this.socket.onmessage = (ev) => this.onMessage(ev);
         this.socket.onerror = () => this.onError();
-        this.socket.onclose = () => this.onClose();
+        this.socket.onclose = (ev) => this.onClose(ev);
     }
 
     private onOpen() {
@@ -102,11 +102,13 @@ export class PanelSocket extends EventEmitter {
         }
     }
 
-    private onClose() {
+    private onClose(message: { wasClean: boolean; code: number; reason: string; target: WebSocket }) {
         if (this.isConnected) {
             // Tell the devtools that the real websocket was closed
             this.postMessageToDevTools("close");
+            this.emit("websocket", message)
         }
+
         this.isConnected = false;
     }
 }
