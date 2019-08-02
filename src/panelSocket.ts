@@ -106,7 +106,7 @@ export class PanelSocket extends EventEmitter {
         if (this.isConnected) {
             // Tell the devtools that the real websocket was closed
             this.postMessageToDevTools("close");
-            this.emit("websocket", message)
+            this.emit("websocket", message);
         }
 
         this.isConnected = false;

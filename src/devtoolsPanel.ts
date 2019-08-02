@@ -110,7 +110,7 @@ export class DevToolsPanel {
     }
 
     private onSocketMessage(msg: any) {
-        if(msg && msg.type === "close") {
+        if (msg && msg.type === "close") {
             // close extension on disconnect
             this.dispose();
         }
