@@ -51,12 +51,13 @@ export class DevToolsPanel {
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
         this.panelSocket.on("ready", () => this.onSocketReady());
-        this.panelSocket.on("websocket", (msg) => this.onSocketMessage(msg));
+        this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
+        this.panelSocket.on("close", () => this.onSocketClose());
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -109,11 +110,12 @@ export class DevToolsPanel {
             this.panelSocket.isConnectedToTarget ? "websocket/reconnect" : "websocket/connect");
     }
 
-    private onSocketMessage(msg: any) {
-        if (msg && msg.type === "close") {
-            // close extension on disconnect
-            this.dispose();
-        }
+    private onSocketMessage() {
+         // TODO: Handle message
+    }
+
+    private onSocketClose() {
+        this.dispose();
     }
 
     private onSocketTelemetry(message: string) {
