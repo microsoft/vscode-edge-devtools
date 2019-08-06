@@ -161,10 +161,14 @@ describe("devtoolsPanel", () => {
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
-            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length);
+            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1);
             for (const e of webviewEventNames) {
                 expect(hookedEvents).toContain(e);
             }
+
+            // Close is raised from the extension side in response to websocket close.
+            // so it does not require a Webview event, we verify manually for this case.
+            expect(hookedEvents).toContain("close");
         });
 
         it("forwards webview messages to the panel socket", async () => {
