@@ -307,6 +307,13 @@ describe("devtoolsPanel", () => {
                 expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
             });
 
+            it("dispose devtools panel on socket close", async () => {
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+                hookedEvents.get("close")!();
+                expect(mockPanelSocket.dispose).toBeCalled();
+            });
+
             it("posts defaults for get state", async () => {
                 (context.workspaceState.get as jest.Mock).mockReturnValue(null);
 
