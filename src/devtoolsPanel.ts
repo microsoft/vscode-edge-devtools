@@ -111,7 +111,7 @@ export class DevToolsPanel {
     }
 
     private onSocketMessage() {
-         // TODO: Handle message
+        // TODO: Handle message
     }
 
     private onSocketClose() {
