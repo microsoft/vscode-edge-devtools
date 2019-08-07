@@ -57,6 +57,7 @@ export class DevToolsPanel {
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
+        this.panelSocket.on("close", () => this.onSocketClose());
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -111,6 +112,10 @@ export class DevToolsPanel {
 
     private onSocketMessage() {
         // TODO: Handle message
+    }
+
+    private onSocketClose() {
+        this.dispose();
     }
 
     private onSocketTelemetry(message: string) {

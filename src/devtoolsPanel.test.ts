@@ -161,10 +161,15 @@ describe("devtoolsPanel", () => {
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
-            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length);
+            // The +1 in here is due to the 'close' event. This is an extension event not raised from the Webview.
+            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1);
             for (const e of webviewEventNames) {
                 expect(hookedEvents).toContain(e);
             }
+
+            // Close is raised from the extension side in response to websocket close.
+            // so it does not require a Webview event, we verify manually for this case.
+            expect(hookedEvents).toContain("close");
         });
 
         it("forwards webview messages to the panel socket", async () => {
@@ -305,6 +310,13 @@ describe("devtoolsPanel", () => {
                 const { callback, thisObj } = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
                 callback.call(thisObj, expectedPostedMessage);
                 expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
+            });
+
+            it("dispose devtools panel on socket close", async () => {
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+                hookedEvents.get("close")!();
+                expect(mockPanelSocket.dispose).toBeCalled();
             });
 
             it("posts defaults for get state", async () => {
