@@ -161,6 +161,7 @@ describe("devtoolsPanel", () => {
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
+            // The +1 in here is due to the 'close' event. This is an extension event not raised from the Webview.
             expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1);
             for (const e of webviewEventNames) {
                 expect(hookedEvents).toContain(e);
