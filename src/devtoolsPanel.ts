@@ -60,7 +60,8 @@ export class DevToolsPanel {
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
-        this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
+        this.panelSocket.on("close", () => this.onSocketClose());
+	this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -126,6 +127,10 @@ export class DevToolsPanel {
                 "getStrings", { event: "initialRetrieve", message });
             this.stringMap = "";
         }
+    }
+
+    private onSocketClose() {
+        this.dispose();
     }
 
     private onSocketTelemetry(message: string) {
