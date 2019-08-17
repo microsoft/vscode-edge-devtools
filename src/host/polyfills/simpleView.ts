@@ -72,10 +72,10 @@ export function applySelectTabPatch(content: string) {
     }).join(" && ");
 
     const conditionTranslated = allowedTabs.map((v) => {
-        return `id !== window.loadTimeData.data['${v}']`;
+        return `id !== window.DevToolsLocalization._localizedStringsMap['${v}']`;
     }).join(" && ");
 
-    const replaceText = `if (window.loadTimeData && window.loadTimeData.data) {
+    const replaceText = `if (window.DevToolsLocalization && window.DevToolsLocalization._localizedStringsMap) {
         if (${conditionTranslated} && ${condition}) return false;
     } else {
         if (${condition}) return false;
