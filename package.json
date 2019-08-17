@@ -152,12 +152,17 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
-                "vscode-edge-devtools.Localization": {
+                "vscode-edge-devtools.localization": {
                     "type": "string",
                     "enum": [
                         "Enabled",
                         "Disabled",
                         "qps-ploc"
+                    ],
+                    "enumDescriptions": [
+                        "Elements for Edge will match the selected locale for VS Code",
+                        "Elements for Edge will be displayed in English (en-US)",
+                        "Elements for Edge will displayed unicode characters instead of en-US characters. Used for testing"
                     ],
                     "default": "Disabled",
                     "description": "If enabled Elements for Edge will match Visual Studio Code locale"
@@ -428,8 +433,7 @@
     "dependencies": {
         "vscode-chrome-debug-core": "6.7.51",
         "vscode-extension-telemetry": "0.1.1",
-        "ws": "7.1.0",
-        "vscode-nls": "4.1.1"
+        "ws": "7.1.0"
     },
     "devDependencies": {
         "@types/fs-extra": "8.0.0",

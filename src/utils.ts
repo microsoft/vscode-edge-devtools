@@ -454,7 +454,7 @@ export function applyPathMapping(
 export async function getLocalizedStrings(extensionPath: string): Promise<string> {
     try {
         const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-        const localizationEnabled: string = settings.get("Localization") || SETTINGS_LOCALIZATION;
+        const localizationEnabled: string = settings.get("localization") || SETTINGS_LOCALIZATION;
         if (localizationEnabled === "Enabled" || localizationEnabled === "qps-ploc") {
             let locale = "en-us";
             if (process.env.VSCODE_NLS_CONFIG) {

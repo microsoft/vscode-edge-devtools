@@ -19,10 +19,15 @@ export default class StringsProvider {
         }
 
         if (!this.initialized) {
+
+            let injectedFunction = (stringId: string) => {
+                return StringsProvider.dtWindow.DevToolsLocalization._localizedStringsMap[stringId] || stringId;
+            }
+            
             // initialize
             const localizedStringsMap = JSON.parse(message.data);
-            StringsProvider.dtWindow.Localization = { localizedStringsMap };
-            this.initialized = true;
+            StringsProvider.dtWindow.DevToolsLocalization = { _localizedStringsMap: localizedStringsMap };
+            StringsProvider.dtWindow.Common.localizedStrings._getString = injectedFunction;
         }
 
         return;
