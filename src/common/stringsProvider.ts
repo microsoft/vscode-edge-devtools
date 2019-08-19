@@ -6,7 +6,7 @@ export default class StringsProvider {
 
     private static singletonInstance: StringsProvider;
     private initialized: boolean = false;
-    private fallbackMap: Map<string, []> = new Map<string, []>();
+    private fallbackMap: Map<string, string[]> = new Map<string, string[]>();
 
     private constructor() {
         // private initialization for singleton.
@@ -20,7 +20,7 @@ export default class StringsProvider {
 
         if (!this.initialized) {
 
-            let injectedFunction = (stringId: string) => {
+            let injectedFunction = function(stringId: string) {
                 return StringsProvider.dtWindow.DevToolsLocalization._localizedStringsMap[stringId] || stringId;
             }
             
