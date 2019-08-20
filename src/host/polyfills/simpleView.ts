@@ -72,7 +72,7 @@ export function applySelectTabPatch(content: string) {
     }).join(" && ");
 
     const conditionTranslated = allowedTabs.map((v) => {
-        return `id !== window.DevToolsLocalization._localizedStringsMap['${v}']`;
+        return `id !== window.DevToolsLocalization._localizedStringsMap.get('${v}')`;
     }).join(" && ");
 
     const replaceText = `if (window.DevToolsLocalization && window.DevToolsLocalization._localizedStringsMap) {

@@ -5,11 +5,14 @@ import { parseMessageFromChannel } from "../common/webviewEvents";
 import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
+import { IDevToolsLocalization, IDevToolsCommon } from "../common/stringsProviderInterface";
 
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
     Runtime: IRuntimeResourceLoader;
+    DevToolsLocalization: IDevToolsLocalization;
+    Common: IDevToolsCommon;
 }
 
 export function initialize(devToolsFrame: HTMLIFrameElement) {
@@ -28,9 +31,7 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     // Setup the global objects that must exist at load time
     dtWindow.InspectorFrontendHost = new ToolsHost();
     dtWindow.WebSocket = ToolsWebSocket;
-
-    StringsProvider.dtWindow = dtWindow;
-    dtWindow.InspectorFrontendHost.setGetStringsCallback(StringsProvider.instance.getStringsCallback);
+    StringsProvider.instance.overrideFrontendStrings(dtWindow);
 
     // Listen for messages from the extension and forward to the tools
     const messageCallback =

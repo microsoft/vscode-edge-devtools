@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+//  import { IDevToolsLocalization, IDevToolsCommon } from "./stringsProviderInterface"
+import { IDevToolsWindow } from "../host/host";
 
 export default class StringsProvider {
-    public static dtWindow: any;
-
     private static singletonInstance: StringsProvider;
     private initialized: boolean = false;
     private fallbackMap: Map<string, string[]> = new Map<string, string[]>();
+    private dtWindow: IDevToolsWindow | undefined;
 
     private constructor() {
         // private initialization for singleton.
@@ -18,19 +19,30 @@ export default class StringsProvider {
             return;
         }
 
-        if (!this.initialized) {
-
-            let injectedFunction = function(stringId: string) {
-                return StringsProvider.dtWindow.DevToolsLocalization._localizedStringsMap[stringId] || stringId;
+        if (!this.initialized && this.dtWindow) {
+            let injectedFunction = function (stringId: string) {
+                if (StringsProvider.instance.dtWindow)
+                    return  StringsProvider.instance.dtWindow.DevToolsLocalization._localizedStringsMap.get(stringId)
+                    || stringId
+                return  stringId;
             }
-            
+
             // initialize
-            const localizedStringsMap = JSON.parse(message.data);
-            StringsProvider.dtWindow.DevToolsLocalization = { _localizedStringsMap: localizedStringsMap };
-            StringsProvider.dtWindow.Common.localizedStrings._getString = injectedFunction;
+            const localizedStringsMap = new Map();
+            JSON.parse(message.data, (key, value) => {
+                localizedStringsMap.set(key, value);
+            });
+
+            this.dtWindow.DevToolsLocalization._localizedStringsMap = localizedStringsMap;
+            this.dtWindow.Common.localizedStrings._getString = injectedFunction;
         }
 
         return;
+    }
+
+    public overrideFrontendStrings(dtWindow: IDevToolsWindow) {
+        StringsProvider.instance.dtWindow = dtWindow;
+        dtWindow.InspectorFrontendHost.setGetStringsCallback(this.getStringsCallback.bind(StringsProvider.instance))
     }
 
     private fallBackInitialization() {
