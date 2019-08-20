@@ -121,8 +121,7 @@ export class DevToolsPanel {
     private onGetStrings(msg: string) {
         // Handling the strings for the frontend
         if (this.stringMap) {
-            const data = this.stringMap;
-            const message = { data };
+            const message = this.stringMap;
             encodeMessageForChannel((receivedMsg) => this.panel.webview.postMessage(receivedMsg),
                 "getStrings", { event: "initialRetrieve", message });
             this.stringMap = "";

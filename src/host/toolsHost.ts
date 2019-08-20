@@ -37,7 +37,7 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
     }
 
-    public setGetStringsCallback(callback: (message: any) => void) {
+    public setGetStringsCallback(callback: (message: string) => void) {
         this.getStringsCallback = callback;
     }
 
@@ -112,7 +112,7 @@ export default class ToolsHost {
         return true;
     }
 
-    private getStringsCallback: (message: any) => void = () => { return; };
+    private getStringsCallback: (message: string) => void = () => { };
 
     private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension

@@ -7,5 +7,5 @@ export interface IDevToolsCommon {
 }
 
 export interface IDevToolsCommonLocalizedStrings {
-    _getString: (string) => string
+    _getString: (string) => string;
 }

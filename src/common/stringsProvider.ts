@@ -14,30 +14,24 @@ export default class StringsProvider {
         this.fallBackInitialization();
     }
 
-    public getStringsCallback(message: any): void {
-        if (!message) {
-            return;
-        }
-
+    public getStringsCallback(message: string) {
         if (!this.initialized && this.dtWindow) {
             let injectedFunction = function (stringId: string) {
                 if (StringsProvider.instance.dtWindow)
                     return  StringsProvider.instance.dtWindow.DevToolsLocalization._localizedStringsMap.get(stringId)
-                    || stringId
+                    || stringId;
                 return  stringId;
             }
 
             // initialize
             const localizedStringsMap = new Map();
-            JSON.parse(message.data, (key, value) => {
+            JSON.parse((<any>message), (key, value) => {
                 localizedStringsMap.set(key, value);
             });
 
             this.dtWindow.DevToolsLocalization._localizedStringsMap = localizedStringsMap;
             this.dtWindow.Common.localizedStrings._getString = injectedFunction;
         }
-
-        return;
     }
 
     public overrideFrontendStrings(dtWindow: IDevToolsWindow) {
