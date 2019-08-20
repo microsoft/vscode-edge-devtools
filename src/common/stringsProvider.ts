@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-//  import { IDevToolsLocalization, IDevToolsCommon } from "./stringsProviderInterface"
+
+import { englishLocale, pseudoLocale } from "./stringProviderConstants";
 import { IDevToolsWindow } from "../host/host";
 
 export default class StringsProvider {
@@ -43,8 +44,8 @@ export default class StringsProvider {
         // implement custom fallback logic here as follows:
         // this._fallBackMap.set('en-us', []): if a language is available (json provided)
         // this._fallBackMap.set('test', ['es-mx']): fallback list for test language
-        this.fallbackMap.set("en-us", []);
-        this.fallbackMap.set("qps-ploc", []);
+        this.fallbackMap.set(englishLocale, []);
+        this.fallbackMap.set(pseudoLocale, []);
     }
 
     public static get instance() {
@@ -61,7 +62,7 @@ export default class StringsProvider {
 
             // the provided locale is not supported
             if (!fallbackLocale) {
-                return "en-us";
+                return englishLocale;
             }
 
             if (fallbackLocale.length === 0) {
@@ -74,6 +75,6 @@ export default class StringsProvider {
         }
 
         // not even the last locale worked so we default to en-us
-        return locale ? locale : "en-us";
+        return locale ? locale : englishLocale;
     }
 }
