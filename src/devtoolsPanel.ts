@@ -296,13 +296,13 @@ export class DevToolsPanel {
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);
         } else {
-            let name = SETTINGS_WEBVIEW_NAME;
+            let localizedTabTitle = SETTINGS_WEBVIEW_NAME;
             if (serializedFrontendStrings) {
                 const frontendStrings = JSON.parse(serializedFrontendStrings);
-                name = frontendStrings[name];
+                localizedTabTitle  = frontendStrings[localizedTabTitle];
             }
 
-            const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, name, column, {
+            const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, localizedTabTitle , column, {
                 enableCommandUris: true,
                 enableScripts: true,
                 retainContextWhenHidden: true,
