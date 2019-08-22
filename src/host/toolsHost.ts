@@ -10,11 +10,13 @@ import {
 } from "../common/webviewEvents";
 import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
+import StringsProvider from "../common/stringsProvider";
 
 export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
+    private stringsProvider: StringsProvider | undefined;
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
@@ -37,8 +39,8 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
     }
 
-    public setGetStringsCallback(callback: (message: string) => void) {
-        this.getStringsCallback = callback;
+    public setStringsProvider(stringsProvider: StringsProvider) {
+        this.stringsProvider = stringsProvider;
     }
 
     public recordEnumeratedHistogram(actionName: string, actionCode: number, bucketSize: number) {
@@ -113,8 +115,6 @@ export default class ToolsHost {
         return true;
     }
 
-    private getStringsCallback: (message: string) => void = () => { };
-
     private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", telemetry);
@@ -143,7 +143,8 @@ export default class ToolsHost {
     }
 
     private fireGetStringsCallback(e: WebSocketEvent, message: string) {
-        this.getStringsCallback(message);
+        if (this.stringsProvider)
+            this.stringsProvider.overrideFrontendStrings(message);
 
         // do not propagate the event to the devtools window.
     }

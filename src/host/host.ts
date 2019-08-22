@@ -31,7 +31,7 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     // Setup the global objects that must exist at load time
     dtWindow.InspectorFrontendHost = new ToolsHost();
     dtWindow.WebSocket = ToolsWebSocket;
-    StringsProvider.instance.overrideFrontendStrings(dtWindow);
+    StringsProvider.instance.initializeStringsProvider(dtWindow);
 
     // Listen for messages from the extension and forward to the tools
     const messageCallback =

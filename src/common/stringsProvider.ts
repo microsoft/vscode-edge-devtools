@@ -15,13 +15,13 @@ export default class StringsProvider {
         this.fallBackInitialization();
     }
 
-    public getStringsCallback(message: string) {
+    public overrideFrontendStrings(message: string) {
         if (!this.initialized && this.dtWindow) {
             let injectedFunction = function (stringId: string) {
                 if (StringsProvider.instance.dtWindow)
-                    return  StringsProvider.instance.dtWindow.DevToolsLocalization._localizedStringsMap.get(stringId)
-                    || stringId;
-                return  stringId;
+                    return StringsProvider.instance.dtWindow.DevToolsLocalization._localizedStringsMap.get(stringId)
+                        || stringId;
+                return stringId;
             }
 
             // initialize
@@ -35,9 +35,9 @@ export default class StringsProvider {
         }
     }
 
-    public overrideFrontendStrings(dtWindow: IDevToolsWindow) {
+    public initializeStringsProvider(dtWindow: IDevToolsWindow) {
         StringsProvider.instance.dtWindow = dtWindow;
-        dtWindow.InspectorFrontendHost.setGetStringsCallback(this.getStringsCallback.bind(StringsProvider.instance))
+        dtWindow.InspectorFrontendHost.setStringsProvider(StringsProvider.instance);
     }
 
     private fallBackInitialization() {
