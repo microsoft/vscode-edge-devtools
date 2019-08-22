@@ -92,6 +92,12 @@ export default class ToolsHost {
                 break;
             }
 
+            case "getStrings": {
+                const { event, message } = JSON.parse(args);
+                this.fireGetStringsCallback(event, message);
+                break;
+            }
+
             case "getUrl": {
                 const { id, content } = JSON.parse(args);
                 this.fireGetUrlCallback(id, content);
@@ -101,11 +107,6 @@ export default class ToolsHost {
             case "websocket": {
                 const { event, message } = JSON.parse(args);
                 this.fireWebSocketCallback(event, message);
-                break;
-            }
-            case "getStrings": {
-                const { event, message } = JSON.parse(args);
-                this.fireGetStringsCallback(event, message);
                 break;
             }
         }
