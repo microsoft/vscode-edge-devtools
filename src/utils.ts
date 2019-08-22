@@ -12,7 +12,7 @@ import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 
 import packageJson from "../package.json";
-import { englishLocale, pseudoLocale } from "./common/stringProviderConstants";
+import { enabledLocalizationSetting, englishLocale, pseudoLocale } from "./common/stringProviderConstants";
 import StringsProvider from "./common/stringsProvider";
 import DebugTelemetryReporter from "./debugTelemetryReporter";
 
@@ -456,8 +456,8 @@ export async function getLocalizedStrings(extensionPath: string): Promise<string
     try {
         const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
         const localizationEnabled: string = settings.get("localization") || SETTINGS_DEFAULT_LOCALIZATION;
-        if (localizationEnabled === "Enabled" || localizationEnabled === pseudoLocale) {
-            let locale = englishLocale;
+        if (localizationEnabled === enabledLocalizationSetting || localizationEnabled === pseudoLocale) {
+            let locale: string = englishLocale;
             if (process.env.VSCODE_NLS_CONFIG) {
                 locale = StringsProvider.getFallback(JSON.parse(process.env.VSCODE_NLS_CONFIG).locale);
             }
