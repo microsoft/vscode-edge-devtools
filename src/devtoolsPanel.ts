@@ -33,7 +33,7 @@ export class DevToolsPanel {
     private readonly panel: vscode.WebviewPanel;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
-    private stringMap: string;
+    private serializedFrontendStrings: string;
     private panelSocket: PanelSocket;
 
     private constructor(
@@ -42,13 +42,13 @@ export class DevToolsPanel {
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
         config: IRuntimeConfig,
-        stringMap: string) {
+        serializedFrontendStrings: string) {
         this.panel = panel;
         this.context = context;
         this.telemetryReporter = telemetryReporter;
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
-        this.stringMap = stringMap;
+        this.serializedFrontendStrings = serializedFrontendStrings;
         this.config = config;
 
         // Hook up the socket events
@@ -120,11 +120,11 @@ export class DevToolsPanel {
 
     private onSocketGetStrings() {
         // Handling the strings for the frontend
-        if (this.stringMap) {
-            const message = this.stringMap;
+        if (this.serializedFrontendStrings) {
+            const message = this.serializedFrontendStrings;
             encodeMessageForChannel((receivedMsg) => this.panel.webview.postMessage(receivedMsg),
                 "getStrings", { event: "initialRetrieve", message });
-            this.stringMap = "";
+            this.serializedFrontendStrings = "";
         }
     }
 
@@ -290,16 +290,16 @@ export class DevToolsPanel {
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
         config: IRuntimeConfig,
-        stringMap: string = "") {
+        serializedFrontendStrings: string = "") {
         const column = vscode.ViewColumn.Beside;
 
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);
         } else {
             let name = SETTINGS_WEBVIEW_NAME;
-            if (stringMap) {
-                const stringMapJSON = JSON.parse(stringMap);
-                name = stringMapJSON[name];
+            if (serializedFrontendStrings) {
+                const frontendStrings = JSON.parse(serializedFrontendStrings);
+                name = frontendStrings[name];
             }
 
             const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, name, column, {
@@ -308,7 +308,8 @@ export class DevToolsPanel {
                 retainContextWhenHidden: true,
             });
 
-            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config, stringMap);
+            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config,
+                serializedFrontendStrings);
         }
     }
 }
