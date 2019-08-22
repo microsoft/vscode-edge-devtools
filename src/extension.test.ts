@@ -176,11 +176,7 @@ describe("extension", () => {
                     createTelemetryReporter: jest.fn((_: ExtensionContext) => mockTelemetry),
                     fixRemoteWebSocket: jest.fn().mockReturnValue(target),
                     getListOfTargets: jest.fn().mockResolvedValue([target]),
-                    getLocalizedStrings: jest.fn((value) => {
-                        return new Promise((resolveFunction) => {
-                            resolveFunction(fakeResourceStrings);
-                        });
-                    }),
+                    getLocalizedStrings: jest.fn().mockResolvedValue(fakeResourceStrings),
                     getRemoteEndpointSettings: jest.fn().mockReturnValue({
                         hostname: "hostname",
                         port: "port",
@@ -350,11 +346,7 @@ describe("extension", () => {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => mockReporter),
                 getBrowserPath: jest.fn().mockResolvedValue("path"),
                 getListOfTargets: jest.fn().mockResolvedValue(null),
-                getLocalizedStrings: jest.fn((value) => {
-                    return new Promise((resolveFunction) => {
-                        resolveFunction(fakeResourceStrings);
-                    });
-                }),
+                getLocalizedStrings: jest.fn().mockResolvedValue(fakeResourceStrings),
                 getRemoteEndpointSettings: jest.fn().mockReturnValue({
                     hostname: "hostname",
                     port: "port",

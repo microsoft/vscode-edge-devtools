@@ -88,7 +88,7 @@ describe("host", () => {
             jest.doMock("./toolsHost", () => (function toolsHost() {
                 return {
                     onMessageFromChannel: jest.fn(),
-                    setGetStringsCallback: jest.fn(),
+                    setStringsProvider: jest.fn(),
                 };
             }));
             jest.resetModules();
