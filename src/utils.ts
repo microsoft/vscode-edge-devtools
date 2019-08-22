@@ -71,7 +71,7 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
     "webpack:///./~/*": "${webRoot}/node_modules/*",
     "webpack:///src/*": "${webRoot}/*",
 };
-export const SETTINGS_LOCALIZATION: string = "Disabled";
+export const SETTINGS_DEFAULT_LOCALIZATION: string = "Disabled";
 export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
 export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
 
@@ -455,7 +455,7 @@ export function applyPathMapping(
 export async function getLocalizedStrings(extensionPath: string): Promise<string> {
     try {
         const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-        const localizationEnabled: string = settings.get("localization") || SETTINGS_LOCALIZATION;
+        const localizationEnabled: string = settings.get("localization") || SETTINGS_DEFAULT_LOCALIZATION;
         if (localizationEnabled === "Enabled" || localizationEnabled === pseudoLocale) {
             let locale = englishLocale;
             if (process.env.VSCODE_NLS_CONFIG) {
