@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
+import StringsProvider from "../common/stringsProvider";
 import {
     encodeMessageForChannel,
     IOpenEditorData,
@@ -10,7 +10,6 @@ import {
 } from "../common/webviewEvents";
 import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
-import StringsProvider from "../common/stringsProvider";
 
 export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
@@ -143,9 +142,9 @@ export default class ToolsHost {
     }
 
     private fireGetStringsCallback(e: WebSocketEvent, message: string) {
-        if (this.stringsProvider)
+        if (this.stringsProvider) {
             this.stringsProvider.overrideFrontendStrings(message);
-
+        }
         // do not propagate the event to the devtools window.
     }
 }

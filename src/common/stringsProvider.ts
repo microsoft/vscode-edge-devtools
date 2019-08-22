@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
-import { englishLocale, pseudoLocale } from "./stringProviderConstants";
 import { IDevToolsWindow } from "../host/host";
+import { englishLocale, pseudoLocale } from "./stringProviderConstants";
 
 export default class StringsProvider {
     private static singletonInstance: StringsProvider;
@@ -17,16 +16,19 @@ export default class StringsProvider {
 
     public overrideFrontendStrings(message: string) {
         if (!this.initialized && this.dtWindow) {
-            let injectedFunction = function (stringId: string) {
-                if (StringsProvider.instance.dtWindow)
+            const injectedFunction = (stringId: string) => {
+                if (StringsProvider.instance.dtWindow) {
+
                     return StringsProvider.instance.dtWindow.DevToolsLocalization._localizedStringsMap.get(stringId)
                         || stringId;
+                }
+
                 return stringId;
-            }
+            };
 
             // initialize
             const localizedStringsMap = new Map();
-            JSON.parse((<any>message), (key, value) => {
+            JSON.parse(message, (key, value) => {
                 localizedStringsMap.set(key, value);
             });
 

@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import StringsProvider from "../common/stringsProvider";
+import { IDevToolsCommon, IDevToolsLocalization } from "../common/stringsProviderInterface";
 import { parseMessageFromChannel } from "../common/webviewEvents";
 import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
-import { IDevToolsLocalization, IDevToolsCommon } from "../common/stringsProviderInterface";
 
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
