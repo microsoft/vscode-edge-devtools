@@ -453,21 +453,22 @@ export function applyPathMapping(
  * @param extensionPath The root folder for the extension path.
  */
 export async function getLocalizedStrings(extensionPath: string): Promise<string> {
-    try {
-        const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-        const localizationEnabled: string = settings.get("localization") || SETTINGS_DEFAULT_LOCALIZATION;
-        if (localizationEnabled === enabledLocalizationSetting || localizationEnabled === pseudoLocale) {
-            let locale: string = englishLocale;
-            if (process.env.VSCODE_NLS_CONFIG) {
-                locale = StringsProvider.getFallback(JSON.parse(process.env.VSCODE_NLS_CONFIG).locale);
-            }
 
-            // override for pseudo
-            if (localizationEnabled === pseudoLocale) {
-                locale = pseudoLocale;
-            }
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const localizationEnabled: string = settings.get("localization") || SETTINGS_DEFAULT_LOCALIZATION;
+    if (localizationEnabled === enabledLocalizationSetting || localizationEnabled === pseudoLocale) {
+        let locale: string = englishLocale;
+        if (process.env.VSCODE_NLS_CONFIG) {
+            locale = StringsProvider.getFallback(JSON.parse(process.env.VSCODE_NLS_CONFIG).locale);
+        }
 
-            if (locale !== englishLocale) {
+        // override for pseudo
+        if (localizationEnabled === pseudoLocale) {
+            locale = pseudoLocale;
+        }
+
+        if (locale !== englishLocale) {
+            try {
                 const resourcePath = vscode.Uri.file(
                     path.join(extensionPath, "resources", "locales", `${locale}.json`));
                 const frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
@@ -475,10 +476,11 @@ export async function getLocalizedStrings(extensionPath: string): Promise<string
                     return frontendStringDocument.getText();
                 }
             }
+            catch (e) {
+                return ""; // Log error e.g File not found
+            }
         }
-
-        return "";
-    } catch (e) {
-        return ""; // Log error e.g File not found
     }
+
+    return "";
 }
