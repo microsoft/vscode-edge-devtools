@@ -57,11 +57,11 @@ export class DevToolsPanel {
         this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
+        this.panelSocket.on("getStrings", (msg) => this.onSocketGetStrings(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
-	this.panelSocket.on("getStrings", (msg) => this.onGetStrings(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -118,7 +118,7 @@ export class DevToolsPanel {
         // TODO: Handle message
     }
 
-    private onGetStrings(msg: string) {
+    private onSocketGetStrings(msg: string) {
         // Handling the strings for the frontend
         if (this.stringMap) {
             const message = this.stringMap;
