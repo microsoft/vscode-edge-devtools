@@ -16,7 +16,6 @@ jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
 describe("extension", () => {
     const fakeRuntimeConfig: Partial<IRuntimeConfig> = {};
-    const fakeResourceStrings = "{\"data\":{\"Elements\":\"Elementos\"}}";
 
     describe("activate", () => {
         let context: ExtensionContext;
@@ -176,7 +175,6 @@ describe("extension", () => {
                     createTelemetryReporter: jest.fn((_: ExtensionContext) => mockTelemetry),
                     fixRemoteWebSocket: jest.fn().mockReturnValue(target),
                     getListOfTargets: jest.fn().mockResolvedValue([target]),
-                    getLocalizedStrings: jest.fn().mockResolvedValue(fakeResourceStrings),
                     getRemoteEndpointSettings: jest.fn().mockReturnValue({
                         hostname: "hostname",
                         port: "port",
@@ -270,7 +268,6 @@ describe("extension", () => {
                 mockTelemetry,
                 expectedWS,
                 fakeRuntimeConfig,
-                fakeResourceStrings,
             );
         });
 
@@ -293,7 +290,6 @@ describe("extension", () => {
                 mockTelemetry,
                 expectedWS,
                 fakeRuntimeConfig,
-                fakeResourceStrings,
             );
 
             // Reverse the mismatched slashes
@@ -304,7 +300,6 @@ describe("extension", () => {
                 mockTelemetry,
                 expectedWS,
                 fakeRuntimeConfig,
-                fakeResourceStrings,
             );
         });
 
@@ -346,7 +341,6 @@ describe("extension", () => {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => mockReporter),
                 getBrowserPath: jest.fn().mockResolvedValue("path"),
                 getListOfTargets: jest.fn().mockResolvedValue(null),
-                getLocalizedStrings: jest.fn().mockResolvedValue(fakeResourceStrings),
                 getRemoteEndpointSettings: jest.fn().mockReturnValue({
                     hostname: "hostname",
                     port: "port",
@@ -439,7 +433,6 @@ describe("extension", () => {
                 expect.any(Object),
                 target.webSocketDebuggerUrl,
                 fakeRuntimeConfig,
-                fakeResourceStrings,
             );
         });
 
