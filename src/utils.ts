@@ -475,8 +475,7 @@ export async function getLocalizedStrings(extensionPath: string): Promise<string
                 if (frontendStringDocument) {
                     return frontendStringDocument.getText();
                 }
-            }
-            catch (e) {
+            } catch (e) {
                 return ""; // Log error e.g File not found
             }
         }

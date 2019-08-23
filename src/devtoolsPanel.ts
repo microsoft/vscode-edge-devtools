@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 import * as path from "path";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
+
 import {
     encodeMessageForChannel,
     IOpenEditorData,
@@ -17,6 +17,7 @@ import { PanelSocket } from "./panelSocket";
 import {
     applyPathMapping,
     fetchUri,
+    getLocalizedStrings,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
     SETTINGS_PREF_NAME,
@@ -285,13 +286,14 @@ export class DevToolsPanel {
             `;
     }
 
-    public static createOrShow(
+    public static async createOrShow(
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
-        config: IRuntimeConfig,
-        serializedFrontendStrings: string = "") {
+        config: IRuntimeConfig) {
         const column = vscode.ViewColumn.Beside;
+
+        const serializedFrontendStrings: string = await getLocalizedStrings(context.extensionPath);
 
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);
