@@ -42,6 +42,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
+    vscode.debug.registerDebugConfigurationProvider("edge",
+        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
+
     // Register the side-panel view and its commands
     const cdpTargetsProvider = new CDPTargetsProvider(context, telemetryReporter);
     context.subscriptions.push(vscode.window.registerTreeDataProvider(

@@ -151,6 +151,11 @@
                     "type": "boolean",
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
+                },
+                "vscode-edge-devtools.debugAttachTimeoutMs": {
+                    "type": "number",
+                    "description": "How many milliseconds to wait before attaching after launching a debugger",
+                    "default": 3000
                 }
             }
         },
