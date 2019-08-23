@@ -261,11 +261,13 @@ export class DevToolsPanel {
                     content="default-src 'none';
                     frame-src vscode-resource:;
                     script-src vscode-resource:;
-                    style-src vscode-resource:;">
+                    style-src vscode-resource: 'unsafe-inline';">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${scriptUri}"></script>
             </head>
-            <iframe id="host" style="width: 100%; height: 100%" frameBorder="0" src="${htmlUri}"></iframe>
+            <body>
+                <iframe id="host" style="width: 100%; height: 100%" frameBorder="0" src="${htmlUri}"></iframe>
+            </body>
             </html>
             `;
     }
