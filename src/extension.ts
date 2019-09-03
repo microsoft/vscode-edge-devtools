@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
+import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 import CDPTarget from "./cdpTarget";
 import CDPTargetsProvider from "./cdpTargetsProvider";
@@ -18,7 +19,6 @@ import {
     IUserConfig,
     launchBrowser,
     openNewTab,
-    removeTrailingSlash,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
 } from "./utils";
@@ -101,16 +101,16 @@ export async function attach(context: vscode.ExtensionContext, attachUrl?: strin
         // Try to match the given target with the list of targets we received from the endpoint
         let targetWebsocketUrl = "";
         if (attachUrl) {
-            const noTrailingSlashTarget = removeTrailingSlash(attachUrl);
-            const matches = items.filter((i) => {
-                if (i.description) {
-                    const noTrailingSlash = removeTrailingSlash(i.description);
-                    return noTrailingSlashTarget.localeCompare(noTrailingSlash, "en", { sensitivity: "base" }) === 0;
-                }
-                return false;
-            });
-            if (matches && matches.length > 0 && matches[0].detail) {
-                targetWebsocketUrl = matches[0].detail;
+            // Match the targets using the edge debug adapter logic
+            let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
+            try {
+                matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray, attachUrl);
+            } catch {
+                matchedTargets = undefined;
+            }
+
+            if (matchedTargets && matchedTargets.length > 0 && matchedTargets[0].webSocketDebuggerUrl) {
+                targetWebsocketUrl = matchedTargets[0].webSocketDebuggerUrl;
             } else {
                 vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
             }

@@ -3,7 +3,7 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { IUserConfig, SETTINGS_STORE_NAME } from "./utils";
+import { IUserConfig, SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT, SETTINGS_STORE_NAME } from "./utils";
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
@@ -59,13 +59,18 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
             }
         } else if (config && config.type === "edge") {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-            const time = (settings.get("debugAttachTimeoutMs") || 3000) as number;
-            setTimeout(() => {
-                if (!userConfig.port) {
-                    userConfig.port = 2015;
-                }
-                this.attach(this.context, userConfig.url, userConfig);
-            }, time);
+            if (settings.get("autoAttachViaDebuggerForEdge")) {
+                const time = (settings.get("debugAttachTimeoutMs") || 3000) as number;
+                setTimeout(() => {
+                    if (!userConfig.port) {
+                        userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
+                    }
+                    if (userConfig.urlFilter) {
+                        userConfig.url = userConfig.urlFilter;
+                    }
+                    this.attach(this.context, userConfig.url, userConfig);
+                }, time);
+            }
             return Promise.resolve(config);
         } else {
             this.telemetryReporter.sendTelemetryEvent("debug/error/config_not_found");
@@ -86,6 +91,8 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
             outUrlString = (outUrlString.startsWith("/") ? "file://" : "file:///") + outUrlString;
         } else if (config.url) {
             outUrlString = config.url;
+        } else if (config.urlFilter) {
+            outUrlString = config.urlFilter;
         }
 
         return outUrlString;

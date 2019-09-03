@@ -258,6 +258,7 @@ describe("extension", () => {
                 webSocketDebuggerUrl: expectedWS,
             } as IRemoteTargetJson;
 
+            mocks.utils.getListOfTargets!.mockResolvedValue([target]),
             mocks.utils.fixRemoteWebSocket!.mockReturnValueOnce(target);
 
             const expectedContext = createFakeExtensionContext();
@@ -280,6 +281,7 @@ describe("extension", () => {
                 webSocketDebuggerUrl: expectedWS,
             } as IRemoteTargetJson;
 
+            mocks.utils.getListOfTargets!.mockResolvedValue([target]),
             mocks.utils.fixRemoteWebSocket!.mockReturnValueOnce(target);
 
             const expectedContext = createFakeExtensionContext();
@@ -295,6 +297,29 @@ describe("extension", () => {
             // Reverse the mismatched slashes
             target.url = expectedUrl;
             await newExtension.attach(expectedContext, `${expectedUrl}/`);
+            expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
+                expectedContext,
+                mockTelemetry,
+                expectedWS,
+                fakeRuntimeConfig,
+            );
+        });
+
+        it("opens devtools against given filter", async () => {
+            const expectedUrl = "http://target:9222";
+            const expectedWS = "ws://target:9222";
+            target = {
+                title: "title",
+                url: expectedUrl,
+                webSocketDebuggerUrl: expectedWS,
+            } as IRemoteTargetJson;
+
+            mocks.utils.getListOfTargets!.mockResolvedValue([target]),
+            mocks.utils.fixRemoteWebSocket!.mockReturnValueOnce(target);
+
+            const expectedContext = createFakeExtensionContext();
+            const newExtension = await import("./extension");
+            await newExtension.attach(expectedContext, "http://*");
             expect(mocks.panel.DevToolsPanel.createOrShow).toHaveBeenCalledWith(
                 expectedContext,
                 mockTelemetry,

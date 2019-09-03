@@ -152,6 +152,11 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
+                "vscode-edge-devtools.autoAttachViaDebuggerForEdge": {
+                    "type": "boolean",
+                    "description": "Auto attach the Elements for Microsoft Edge extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",
+                    "default": true
+                },
                 "vscode-edge-devtools.debugAttachTimeoutMs": {
                     "type": "number",
                     "description": "How many milliseconds to wait before attaching after launching a debugger",

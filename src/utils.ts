@@ -24,6 +24,7 @@ export interface IDevToolsSettings {
 
 export interface IUserConfig {
     url: string;
+    urlFilter: string;
     browserPath: string;
     hostname: string;
     port: number;
@@ -71,6 +72,7 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
 };
 export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
 export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
+export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT: number = 2015;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || "/";
 const WIN_MSEDGE_PATHS = [
