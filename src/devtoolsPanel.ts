@@ -264,24 +264,25 @@ export class DevToolsPanel {
         const scriptPath = vscode.Uri.file(path.join(this.extensionPath, "out", "host", "messaging.bundle.js"));
         const scriptUri = scriptPath.with({ scheme: "vscode-resource" });
 
+        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, "out", "common", "styles.css"));
+        const stylesUri = stylesPath.with({ scheme: "vscode-resource" });
+
         return `
             <!doctype html>
             <html>
             <head>
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-                <style>
-                    html, body, iframe {
-                        height: 100%;
-                        width: 100%;
-                        position: absolute;
-                        padding: 0;
-                        margin: 0;
-                        overflow: hidden;
-                    }
-                </style>
+                <meta http-equiv="Content-Security-Policy"
+                    content="default-src 'none';
+                    frame-src vscode-resource:;
+                    script-src vscode-resource:;
+                    style-src vscode-resource:;">
+                <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${scriptUri}"></script>
             </head>
-            <iframe id="host" style="width: 100%; height: 100%" frameBorder="0" src="${htmlUri}"></iframe>
+            <body>
+                <iframe id="host" frameBorder="0" src="${htmlUri}"></iframe>
+            </body>
             </html>
             `;
     }
