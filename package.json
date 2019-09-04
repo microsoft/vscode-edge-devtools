@@ -159,7 +159,7 @@
                 },
                 "vscode-edge-devtools.debugAttachTimeoutMs": {
                     "type": "number",
-                    "description": "How many milliseconds to wait before attaching after launching a debugger",
+                    "description": "How many milliseconds to wait before attaching the Elements tool after launching a debugger",
                     "default": 3000
                 }
             }

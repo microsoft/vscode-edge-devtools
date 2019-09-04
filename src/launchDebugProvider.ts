@@ -3,7 +3,12 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { IUserConfig, SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT, SETTINGS_STORE_NAME } from "./utils";
+import {
+    IUserConfig,
+    SETTINGS_DEFAULT_DEBUGGER_ATTACH_TIMEOUT,
+    SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
+    SETTINGS_STORE_NAME,
+} from "./utils";
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
@@ -60,7 +65,7 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         } else if (config && config.type === "edge") {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
             if (settings.get("autoAttachViaDebuggerForEdge")) {
-                const time = (settings.get("debugAttachTimeoutMs") || 3000) as number;
+                const time: number = (settings.get("debugAttachTimeoutMs") || SETTINGS_DEFAULT_DEBUGGER_ATTACH_TIMEOUT);
                 setTimeout(() => {
                     if (!userConfig.port) {
                         userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
