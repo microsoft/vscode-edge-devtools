@@ -172,6 +172,14 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
   * Run the command `Elements for Microsoft Edge: Attach to a target`
   * Select a target from the drop down.
 
+### Attaching automatically when launching the browser for debugging
+* Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension
+* Setup your `launch.json` configuration to launch and debug Microsoft Edge (Chromium).
+  * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
+* Start Microsoft Edge for debugging.
+  * The Elements tool should auto attach once debugging has started.
+  * You can also adjust the time for which the Elements extension will wait after debugging has started before attaching to the browser via the `vscode-edge-devtools.debugAttachTimeoutMs` VS Code setting (default 3000ms).
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
