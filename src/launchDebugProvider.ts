@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import {
     IUserConfig,
-    SETTINGS_DEFAULT_DEBUGGER_ATTACH_TIMEOUT,
+    SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
     SETTINGS_STORE_NAME,
 } from "./utils";
@@ -13,7 +13,8 @@ import {
 type AttachCallback = (
     context: vscode.ExtensionContext,
     targetUrl?: string,
-    config?: Partial<IUserConfig>) => void;
+    config?: Partial<IUserConfig>,
+    useRetry?: boolean) => void;
 type LaunchCallback = (
     context: vscode.ExtensionContext,
     launchUrl?: string,
@@ -62,19 +63,20 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
                 this.telemetryReporter.sendTelemetryEvent("debug/launch");
                 this.launch(this.context, targetUri, userConfig);
             }
-        } else if (config && config.type === "edge") {
+        } else if (config && (config.type === "edge" || config.type === "msedge")) {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
             if (settings.get("autoAttachViaDebuggerForEdge")) {
-                const time: number = (settings.get("debugAttachTimeoutMs") || SETTINGS_DEFAULT_DEBUGGER_ATTACH_TIMEOUT);
+                if (!userConfig.port) {
+                    userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
+                }
+                if (userConfig.urlFilter) {
+                    userConfig.url = userConfig.urlFilter;
+                }
+
+                // Allow the debugger to actually launch the browser before attaching
                 setTimeout(() => {
-                    if (!userConfig.port) {
-                        userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
-                    }
-                    if (userConfig.urlFilter) {
-                        userConfig.url = userConfig.urlFilter;
-                    }
-                    this.attach(this.context, userConfig.url, userConfig);
-                }, time);
+                    this.attach(this.context, userConfig.url, userConfig, /*useRetry=*/ true);
+                }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
             }
             return Promise.resolve(config);
         } else {

@@ -109,6 +109,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
 * `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemaps](#sourcemaps) for more information
 * `urlFilter`: A string that can contain wildcards that will be used for finding a browser target, for example, "localhost:*/app" will match either "http://localhost:123/app" or "http://localhost:456/app", but not "https://stackoverflow.com". This property will only be used if `url` and `file` are not specified.
+* `timeout`: The number of milliseconds that the Elements tool will keep trying to attach to the browser before timing out. Defaults to 10000ms.
 
 #### Sourcemaps
 The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
@@ -177,8 +178,8 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
 * Setup your `launch.json` configuration to launch and debug Microsoft Edge (Chromium).
   * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
 * Start Microsoft Edge for debugging.
-  * The Elements tool should auto attach once debugging has started.
-  * You can also adjust the time for which the Elements extension will wait after debugging has started before attaching to the browser via the `vscode-edge-devtools.debugAttachTimeoutMs` VS Code setting (default 3000ms).
+  * Once debugging has started, the Elements tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
+  * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` VS Code setting.
 
 # Contributing
 

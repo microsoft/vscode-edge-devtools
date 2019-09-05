@@ -157,10 +157,10 @@
                     "description": "Auto attach the Elements for Microsoft Edge extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",
                     "default": true
                 },
-                "vscode-edge-devtools.debugAttachTimeoutMs": {
+                "vscode-edge-devtools.timeout": {
                     "type": "number",
-                    "description": "How many milliseconds to wait before attaching the Elements tool after launching a debugger",
-                    "default": 3000
+                    "description": "The number of milliseconds that the Elements tool will keep trying to attach the browser before timing out",
+                    "default": 10000
                 }
             }
         },

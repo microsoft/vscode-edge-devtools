@@ -109,6 +109,7 @@ describe("extension", () => {
                 defaultUrl: "url",
                 hostname: "localhost",
                 port: 9222,
+                timeout: 10000,
                 useHttps: false,
                 userDataDir: "profile",
             });
@@ -178,6 +179,7 @@ describe("extension", () => {
                     getRemoteEndpointSettings: jest.fn().mockReturnValue({
                         hostname: "hostname",
                         port: "port",
+                        timeout: 10000,
                         useHttps: false,
                     }),
                     getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),
@@ -369,6 +371,7 @@ describe("extension", () => {
                 getRemoteEndpointSettings: jest.fn().mockReturnValue({
                     hostname: "hostname",
                     port: "port",
+                    timeout: 10000,
                     useHttps: false,
                 }),
                 getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),

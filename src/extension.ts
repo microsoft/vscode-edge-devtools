@@ -19,6 +19,7 @@ import {
     IUserConfig,
     launchBrowser,
     openNewTab,
+    SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
 } from "./utils";
@@ -42,7 +43,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
+    // Register the Microsoft Edge (Chromium) debugger types
     vscode.debug.registerDebugConfigurationProvider("edge",
+        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
+    vscode.debug.registerDebugConfigurationProvider("msedge",
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
     // Register the side-panel view and its commands
@@ -71,7 +75,8 @@ export function activate(context: vscode.ExtensionContext) {
         (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
 }
 
-export async function attach(context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>) {
+export async function attach(
+    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean) {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
@@ -79,60 +84,87 @@ export async function attach(context: vscode.ExtensionContext, attachUrl?: strin
     const telemetryProps = { viaConfig: `${!!config}`, withTargetUrl: `${!!attachUrl}` };
     telemetryReporter.sendTelemetryEvent("command/attach", telemetryProps);
 
-    const { hostname, port, useHttps } = getRemoteEndpointSettings(config);
-    const responseArray = await getListOfTargets(hostname, port, useHttps);
-    if (Array.isArray(responseArray)) {
-        telemetryReporter.sendTelemetryEvent(
-            "command/attach/list",
-            telemetryProps,
-            { targetCount: responseArray.length },
-        );
+    const { hostname, port, useHttps, timeout } = getRemoteEndpointSettings(config);
 
-        // Fix up the response targets with the correct web socket
-        const items = responseArray.map((i: IRemoteTargetJson) => {
-            i = fixRemoteWebSocket(hostname, port, i);
-            return {
-                description: i.url,
-                detail: i.webSocketDebuggerUrl,
-                label: i.title,
-            } as vscode.QuickPickItem;
-        });
-
-        // Try to match the given target with the list of targets we received from the endpoint
-        let targetWebsocketUrl = "";
-        if (attachUrl) {
-            // Match the targets using the edge debug adapter logic
-            let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
-            try {
-                matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray, attachUrl);
-            } catch {
-                matchedTargets = undefined;
-            }
-
-            if (matchedTargets && matchedTargets.length > 0 && matchedTargets[0].webSocketDebuggerUrl) {
-                targetWebsocketUrl = matchedTargets[0].webSocketDebuggerUrl;
-            } else {
-                vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
-            }
+    // Get the attach target and keep trying until reaching timeout
+    const startTime = Date.now();
+    do {
+        let responseArray: any[] | undefined;
+        try {
+            // Keep trying to attach to the list endpoint until timeout
+            responseArray = await debugCore.utils.retryAsync(
+                () => getListOfTargets(hostname, port, useHttps),
+                timeout,
+                /*intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
+        } catch {
+            // Timeout so make sure we error out with no json result
+            responseArray = undefined;
         }
 
-        if (targetWebsocketUrl) {
-            // Auto connect to found target
-            telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
-            const runtimeConfig = getRuntimeConfig(config);
-            DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
-        } else {
-            // Show the target list and allow the user to select one
-            const selection = await vscode.window.showQuickPick(items);
-            if (selection && selection.detail) {
+        if (Array.isArray(responseArray)) {
+            telemetryReporter.sendTelemetryEvent(
+                "command/attach/list",
+                telemetryProps,
+                { targetCount: responseArray.length },
+            );
+
+            // Try to match the given target with the list of targets we received from the endpoint
+            let targetWebsocketUrl = "";
+            if (attachUrl) {
+                // Match the targets using the edge debug adapter logic
+                let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
+                try {
+                    matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray, attachUrl);
+                } catch {
+                    matchedTargets = undefined;
+                }
+
+                if (matchedTargets && matchedTargets.length > 0 && matchedTargets[0].webSocketDebuggerUrl) {
+                    const actualTarget = fixRemoteWebSocket(hostname, port, matchedTargets[0] as any);
+                    targetWebsocketUrl = actualTarget.webSocketDebuggerUrl;
+                }
+
+                if (!useRetry) {
+                    vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
+                }
+            }
+
+            if (targetWebsocketUrl) {
+                // Auto connect to found target
+                useRetry = false;
                 telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
                 const runtimeConfig = getRuntimeConfig(config);
-                DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
+                DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+            } else if (useRetry) {
+                // Wait for a little bit until we retry
+                await new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
+                });
+            } else {
+                // Create the list of items to show with fixed websocket addresses
+                const items = responseArray.map((i: IRemoteTargetJson) => {
+                    i = fixRemoteWebSocket(hostname, port, i);
+                    return {
+                        description: i.url,
+                        detail: i.webSocketDebuggerUrl,
+                        label: i.title,
+                    } as vscode.QuickPickItem;
+                });
+
+                // Show the target list and allow the user to select one
+                const selection = await vscode.window.showQuickPick(items);
+                if (selection && selection.detail) {
+                    telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
+                    const runtimeConfig = getRuntimeConfig(config);
+                    DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
+                }
             }
+        } else {
+            telemetryReporter.sendTelemetryEvent("command/attach/error/no_json_array", telemetryProps);
         }
-    } else {
-        telemetryReporter.sendTelemetryEvent("command/attach/error/no_json_array", telemetryProps);
-    }
+    } while (useRetry && Date.now() - startTime < timeout);
 }
 
 export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>) {

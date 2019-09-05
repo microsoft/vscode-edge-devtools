@@ -79,7 +79,7 @@ describe("launchDebugProvider", () => {
             const { callback, thisObj } = getFirstCallback(mockSetTimeout);
             callback.call(thisObj);
 
-            expect(attach).toHaveBeenCalledWith(expect.any(Object), mockConfig.urlFilter, mockConfig);
+            expect(attach).toHaveBeenCalledWith(expect.any(Object), mockConfig.urlFilter, mockConfig, true);
         });
 
         it("calls launch", async () => {
