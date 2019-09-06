@@ -18,7 +18,7 @@ A VS Code extension that allows you to use the browser's Elements tool from with
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving VSCode.
-* Go directly to the line/column for source files in your workspace when clicking on a link inside the Elements tool.
+* Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
 * Auto attach the Elements tool when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 
 # Using the Extension
