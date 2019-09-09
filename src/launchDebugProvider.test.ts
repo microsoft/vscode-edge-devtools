@@ -3,7 +3,13 @@
 
 import TelemetryReporter from "vscode-extension-telemetry";
 import LaunchDebugProvider from "./launchDebugProvider";
-import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
+import {
+    createFakeExtensionContext,
+    createFakeTelemetryReporter,
+    createFakeVSCode,
+    getFirstCallback,
+    Mocked,
+} from "./test/helpers";
 import { SETTINGS_STORE_NAME } from "./utils";
 
 jest.mock("vscode", () => null, { virtual: true });
@@ -44,6 +50,36 @@ describe("launchDebugProvider", () => {
             };
             await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
             expect(attach).toHaveBeenCalled();
+        });
+
+        it("calls attach on edge debugger", async () => {
+            const mockSetTimeout = jest.fn();
+            global.setTimeout = mockSetTimeout;
+
+            // Mock out the settings
+            const expectedSettings = {
+                autoAttachViaDebuggerForEdge: true,
+                debugAttachTimeoutMs: 3000,
+            };
+            const configMock = {
+                get: (name: string) => (expectedSettings as any)[name],
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
+            // Use an edge debugger config
+            const mockConfig = {
+                name: "config",
+                request: "launch",
+                type: "edge",
+                urlFilter: "http://localhost/index.html",
+            };
+            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
+
+            const { callback, thisObj } = getFirstCallback(mockSetTimeout);
+            callback.call(thisObj);
+
+            expect(attach).toHaveBeenCalledWith(expect.any(Object), mockConfig.urlFilter, mockConfig, true);
         });
 
         it("calls launch", async () => {

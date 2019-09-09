@@ -20,10 +20,12 @@ export interface IDevToolsSettings {
     useHttps: boolean;
     defaultUrl: string;
     userDataDir: string;
+    timeout: number;
 }
 
 export interface IUserConfig {
     url: string;
+    urlFilter: string;
     browserPath: string;
     hostname: string;
     port: number;
@@ -33,6 +35,7 @@ export interface IUserConfig {
     pathMapping: IStringDictionary<string>;
     sourceMapPathOverrides: IStringDictionary<string>;
     sourceMaps: boolean;
+    timeout: number;
 }
 
 export interface IRuntimeConfig {
@@ -71,6 +74,9 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
 };
 export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
 export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
+export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT: number = 2015;
+export const SETTINGS_DEFAULT_ATTACH_TIMEOUT: number = 10000;
+export const SETTINGS_DEFAULT_ATTACH_INTERVAL: number = 200;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || "/";
 const WIN_MSEDGE_PATHS = [
@@ -202,6 +208,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     const port: number = config.port || settings.get("port") || SETTINGS_DEFAULT_PORT;
     const useHttps: boolean = config.useHttps || settings.get("useHttps") || SETTINGS_DEFAULT_USE_HTTPS;
     const defaultUrl: string = config.url || settings.get("defaultUrl") || SETTINGS_DEFAULT_URL;
+    const timeout: number = config.timeout || settings.get("timeout") || SETTINGS_DEFAULT_ATTACH_TIMEOUT;
 
     // Check to see if we need to use a user data directory, which will force Edge to launch with a new manager process.
     // We generate a temp directory if the user opted in explicitly with 'true' (which is the default),
@@ -226,7 +233,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
         userDataDir = "";
     }
 
-    return { hostname, port, useHttps, defaultUrl, userDataDir };
+    return { hostname, port, useHttps, defaultUrl, userDataDir, timeout };
 }
 
 /**

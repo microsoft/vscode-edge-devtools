@@ -18,6 +18,8 @@ A VS Code extension that allows you to use the browser's Elements tool from with
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving VSCode.
+* Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
+* Auto attach the Elements tool when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 
 # Using the Extension
 ## Getting Started
@@ -26,6 +28,7 @@ For use inside VS Code:
 1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge (Chromium)](https://aka.ms/edgeinsider).
 1. Install the extension [Elements for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
 1. Open the folder containing the project you want to work on.
+1. (Optional) Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 
 ## Using the tools
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in the browser.
@@ -105,6 +108,8 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `sourceMaps`: By default, the extension will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
 * `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
 * `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemaps](#sourcemaps) for more information
+* `urlFilter`: A string that can contain wildcards that will be used for finding a browser target, for example, "localhost:*/app" will match either "http://localhost:123/app" or "http://localhost:456/app", but not "https://stackoverflow.com". This property will only be used if `url` and `file` are not specified.
+* `timeout`: The number of milliseconds that the Elements tool will keep trying to attach to the browser before timing out. Defaults to 10000ms.
 
 #### Sourcemaps
 The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
@@ -167,6 +172,14 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
 * Attach the Elements tool via a command:
   * Run the command `Elements for Microsoft Edge: Attach to a target`
   * Select a target from the drop down.
+
+### Attaching automatically when launching the browser for debugging
+* Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension
+* Setup your `launch.json` configuration to launch and debug Microsoft Edge (Chromium).
+  * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
+* Start Microsoft Edge for debugging.
+  * Once debugging has started, the Elements tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
+  * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` VS Code setting.
 
 # Contributing
 
