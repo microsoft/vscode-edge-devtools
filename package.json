@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Elements for Microsoft Edge (Chromium)",
     "description": "Use the Microsoft Edge (Chromium) Elements tool from within VS Code to see your site's runtime HTML structure, alter its layout, and fix styling issues.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": true,
@@ -152,8 +152,6 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
-                "vscode-edge-devtools.localization": {
-                    "type": "string",
                     "enum": [
                         "Enabled",
                         "Disabled",
@@ -162,10 +160,9 @@
                     "enumDescriptions": [
                         "Elements for Edge will match the selected locale for VS Code",
                         "Elements for Edge will be displayed in English (en-US)",
-                        "Elements for Edge will displayed unicode characters instead of en-US characters. Used for testing"
-                    ],
-                    "default": "Disabled",
-                    "description": "If enabled Elements for Edge will match Visual Studio Code locale"
+                    "default": true
+                "vscode-edge-devtools.timeout": {
+                    "default": 10000
                 }
             }
         },
