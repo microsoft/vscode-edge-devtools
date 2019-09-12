@@ -33,7 +33,7 @@ export default class StringsProvider {
             });
 
             this.dtWindow.DevToolsLocalization._localizedStringsMap = localizedStringsMap;
-            this.dtWindow.Common.localizedStrings._getString = injectedFunction;
+            this.dtWindow.DevToolsLocalization.getString = injectedFunction;
         }
     }
 
