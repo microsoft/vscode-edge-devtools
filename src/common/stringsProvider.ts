@@ -17,8 +17,7 @@ export default class StringsProvider {
     public overrideFrontendStrings(message: string) {
         if (!this.initialized && this.dtWindow) {
             const injectedFunction = (stringId: string) => {
-                if (StringsProvider.instance.dtWindow) {
-
+                if (StringsProvider.instance.dtWindow && stringId) {
                     return StringsProvider.instance.dtWindow.DevToolsLocalization._localizedStringsMap.get(stringId)
                         || stringId;
                 }
