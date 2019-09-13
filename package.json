@@ -160,8 +160,8 @@
                         "qps-ploc"
                     ],
                     "enumDescriptions": [
-                        "Elements for Edge will match the selected locale for VS Code",
-                        "Elements for Edge will be displayed in English (en-US)"
+                        "Elements for Microsoft Edge will match the selected locale for VS Code",
+                        "Elements for Microsoft Edge will be displayed in English (en-US)"
                     ]
                 },
                 "vscode-edge-devtools.autoAttachViaDebuggerForEdge": {
