@@ -1,4 +1,4 @@
-## 1.0.3.1
+## 1.0.4
 * Minor change to icon
 
 ## 1.0.3
