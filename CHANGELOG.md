@@ -1,3 +1,6 @@
+## 1.0.3.1
+* Minor change to icon
+
 ## 1.0.3
 * Added Debugger for Microsoft Edge integration - [PR #96](https://github.com/microsoft/vscode-edge-devtools/pull/96)
 * Fixed content-security-policy - [PR #95](https://github.com/microsoft/vscode-edge-devtools/pull/95)
