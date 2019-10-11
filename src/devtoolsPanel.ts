@@ -4,7 +4,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
-
 import {
     encodeMessageForChannel,
     IOpenEditorData,

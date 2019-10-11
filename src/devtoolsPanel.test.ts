@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-
 import { TelemetryData, webviewEventNames } from "./common/webviewEvents";
 import { PanelSocket } from "./panelSocket";
 import {

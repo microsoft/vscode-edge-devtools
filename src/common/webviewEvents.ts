@@ -5,13 +5,13 @@ export type WebviewEvent = "getState" | "getStrings" | "getUrl" | "openInEditor"
                             "websocket";
 export const webviewEventNames: WebviewEvent[] = [
     "getState",
+    "getStrings",
     "getUrl",
     "openInEditor",
     "ready",
     "setState",
     "telemetry",
     "websocket",
-    "getStrings",
 ];
 
 export type WebSocketEvent = "open" | "close" | "error" | "message";
