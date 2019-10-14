@@ -107,7 +107,7 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
 }
 
 export function applyInspectorDarkCssPatch(content: string, isRelease?: boolean) {
-    const separator = (isRelease ? "\\n" : "\n"); // Release css is embedded in js
+    const separator = (isRelease ? "\\n" : "\n");
     const cssHeaderContents =
         `.main-tabbed-pane .tabbed-pane-header-contents {
             display: none !important;
@@ -121,6 +121,8 @@ export function applyInspectorDarkCssPatch(content: string, isRelease?: boolean)
             display: none !important;
         }`.replace(/\n/g, separator);
 
+    // we need to do this by parts as the code is split between base.css
+    // and dark.css
     let result = content.replace(
         /(\.main-tabbed-pane\s*\.tabbed-pane-header-contents\s*\{([^\}]*)?\})/g,
         cssHeaderContents);

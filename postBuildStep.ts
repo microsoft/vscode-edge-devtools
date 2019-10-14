@@ -102,7 +102,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
     await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
     await patchFileForWebView("ui/inspectorCommon.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
-    await patchFileForWebView("themes/dark.css", toolsOutDir, false, [applyInspectorDarkCssPatch])
+    await patchFileForWebView("themes/dark.css", toolsOutDir, false, [applyInspectorDarkCssPatch]);
     await patchFileForWebView("common/ModuleExtensionInterfaces.js", toolsOutDir, false, [applyCommonRevealerPatch]);
     await patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
     await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
@@ -159,13 +159,12 @@ async function patchFileForWebViewWithLegacySupport(
     dir: string,
     isRelease: boolean,
     patches: Array<(content: string, isRelease?: boolean) => string>) {
-        
         if (!await fse.pathExists(filename)) {
             await patchFileForWebView(filename,
                                         dir,
                                         false,
                                         [applyPaddingInlineCssPatch]);
-        } else { 
+        } else {
             await patchFileForWebView(legacyFilename,
                                         dir,
                                         false,
