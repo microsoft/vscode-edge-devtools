@@ -71,9 +71,20 @@ export function applySelectTabPatch(content: string) {
         return `id !== '${v}'`;
     }).join(" && ");
 
+    // v1Pattern represent legacy version of the API, v2 represents the latest
+    //method signature.
+    let v1Pattern = /selectTab\(id,\s*userGesture\)\s*{/g;
+    let v2Pattern = /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g;
+
+    if(v1Pattern.exec(content)){
+        return content.replace(
+            v1Pattern,
+            `selectTab(id, userGesture) { if (${condition}) return false;`);
+    }
+
     return content.replace(
-        /selectTab\(id,\s*userGesture\)\s*{/g,
-        `selectTab(id, userGesture) { if (${condition}) return false;`);
+        v2Pattern,
+        `selectTab(id, userGesture, forceFocus) { if (${condition}) return false;`);
 }
 
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
