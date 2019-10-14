@@ -105,3 +105,30 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
         `${css}${separator} $1`,
     );
 }
+
+export function applyInspectorDarkCssPatch(content: string, isRelease?: boolean) {
+    const separator = (isRelease ? "\\n" : "\n"); // Release css is embedded in js
+    const cssHeaderContents =
+        `.main-tabbed-pane .tabbed-pane-header-contents {
+            display: none !important;
+        }`.replace(/\n/g, separator);
+    const cssRightToolbar = 
+        `.main-tabbed-pane .tabbed-pane-right-toolbar {
+            display: none !important;
+        }`.replace(/\n/g, separator);
+    const cssTabSlider =
+        `.tabbed-pane-tab-slider {
+            display: none !important;
+        }`.replace(/\n/g, separator);
+
+    let result = content.replace(
+        /(\.main-tabbed-pane\s*\.tabbed-pane-header-contents\s*\{([^\}]*)?\})/g,
+        cssHeaderContents);
+    result = result.replace(
+        /(\.main-tabbed-pane\s*.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g,
+        cssRightToolbar);
+    result = result.replace(
+        /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g,
+        cssTabSlider);
+    return result;
+}

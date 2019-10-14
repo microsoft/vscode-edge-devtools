@@ -8,6 +8,7 @@ import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills
 import {
     applyCommonRevealerPatch,
     applyInspectorCommonCssPatch,
+    applyInspectorDarkCssPatch,
     applyInspectorViewPatch,
     applyMainViewPatch,
     applySelectTabPatch,
@@ -85,6 +86,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyUIUtilsPatch,
         applyCreateElementPatch,
         applyInspectorCommonCssPatch,
+        applyInspectorDarkCssPatch,
         applyCommonRevealerPatch,
         applyMainViewPatch,
         applyInspectorViewPatch,
@@ -100,12 +102,23 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
     await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
     await patchFileForWebView("ui/inspectorCommon.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
+    await patchFileForWebView("themes/dark.css", toolsOutDir, false, [applyInspectorDarkCssPatch])
     await patchFileForWebView("common/ModuleExtensionInterfaces.js", toolsOutDir, false, [applyCommonRevealerPatch]);
     await patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
     await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
     await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
-    await patchFileForWebView("elements/elementsTreeOutline.js", toolsOutDir, false, [applyPaddingInlineCssPatch]);
-    await patchFileForWebView("elements/stylesSectionTree.js", toolsOutDir, false, [applyPaddingInlineCssPatch]);
+    await patchFileForWebViewWithLegacySupport(
+                              "elements/elementsTreeOutline.js",
+                              "elements/elementsTreeOutline.css",
+                              toolsOutDir,
+                              false,
+                              [applyPaddingInlineCssPatch]);
+    await patchFileForWebViewWithLegacySupport(
+                              "elements/stylesSectionTree.js",
+                              "elements/stylesSectionTree.css",
+                              toolsOutDir,
+                              false,
+                              [applyPaddingInlineCssPatch]);
 }
 
 async function patchFileForWebView(
@@ -139,5 +152,25 @@ function isDirectory(fullPath: string) {
         return false;
     }
 }
+
+async function patchFileForWebViewWithLegacySupport(
+    filename: string,
+    legacyFilename: string,
+    dir: string,
+    isRelease: boolean,
+    patches: Array<(content: string, isRelease?: boolean) => string>) {
+        
+        if (!await fse.pathExists(filename)) {
+            await patchFileForWebView(filename,
+                                        dir,
+                                        false,
+                                        [applyPaddingInlineCssPatch]);
+        } else { 
+            await patchFileForWebView(legacyFilename,
+                                        dir,
+                                        false,
+                                        [applyPaddingInlineCssPatch]);
+        }
+    }
 
 copyStaticFiles();
