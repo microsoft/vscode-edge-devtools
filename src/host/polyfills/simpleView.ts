@@ -72,11 +72,11 @@ export function applySelectTabPatch(content: string) {
     }).join(" && ");
 
     // v1Pattern represent legacy version of the API, v2 represents the latest
-    //method signature.
+    // method signature.
     let v1Pattern = /selectTab\(id,\s*userGesture\)\s*{/g;
     let v2Pattern = /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g;
 
-    if(v1Pattern.exec(content)){
+    if (v1Pattern.exec(content)) {
         return content.replace(
             v1Pattern,
             `selectTab(id, userGesture) { if (${condition}) return false;`);
