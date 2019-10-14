@@ -108,14 +108,14 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
     await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
     await patchFileForWebViewWithLegacySupport(
-                              "elements/elementsTreeOutline.js",
                               "elements/elementsTreeOutline.css",
+                              "elements/elementsTreeOutline.js",
                               toolsOutDir,
                               false,
                               [applyPaddingInlineCssPatch]);
     await patchFileForWebViewWithLegacySupport(
-                              "elements/stylesSectionTree.js",
                               "elements/stylesSectionTree.css",
+                              "elements/stylesSectionTree.js",
                               toolsOutDir,
                               false,
                               [applyPaddingInlineCssPatch]);
