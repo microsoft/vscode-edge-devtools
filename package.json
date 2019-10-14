@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Elements for Microsoft Edge (Chromium)",
     "description": "Use the Microsoft Edge (Chromium) Elements tool from within VS Code to see your site's runtime HTML structure, alter its layout, and fix styling issues.",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": true,
@@ -28,7 +28,7 @@
         "dom"
     ],
     "engines": {
-        "vscode": "^1.33.1"
+        "vscode": "^1.36.0"
     },
     "categories": [
         "Debuggers"
@@ -151,6 +151,16 @@
                     "type": "boolean",
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
+                },
+                "vscode-edge-devtools.autoAttachViaDebuggerForEdge": {
+                    "type": "boolean",
+                    "description": "Auto attach the Elements for Microsoft Edge extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",
+                    "default": true
+                },
+                "vscode-edge-devtools.timeout": {
+                    "type": "number",
+                    "description": "The number of milliseconds that the Elements tool will keep trying to attach the browser before timing out",
+                    "default": 10000
                 }
             }
         },
@@ -413,10 +423,10 @@
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
         "lint": "tslint -c tslint.json -p tsconfig.json",
-        "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run lint && jest --coverage"
     },
     "dependencies": {
+        "vscode-chrome-debug-core": "6.7.51",
         "vscode-extension-telemetry": "0.1.1",
         "ws": "7.1.0"
     },
@@ -425,7 +435,7 @@
         "@types/jest": "24.0.15",
         "@types/node": "12.6.8",
         "@types/ws": "6.0.1",
-        "diff": "3.5.0",
+        "@types/vscode": "1.36.0",
         "fs-extra": "8.1.0",
         "jest": "24.8.0",
         "ts-jest": "24.0.2",
@@ -434,7 +444,7 @@
         "tslint": "5.18.0",
         "typescript": "3.5.3",
         "vsce": "1.65.0",
-        "vscode": "1.1.35",
+        "vscode-test": "1.0.2",
         "webpack": "4.36.1",
         "webpack-cli": "3.3.6"
     }

@@ -3,12 +3,18 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { IUserConfig, SETTINGS_STORE_NAME } from "./utils";
+import {
+    IUserConfig,
+    SETTINGS_DEFAULT_ATTACH_INTERVAL,
+    SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
+    SETTINGS_STORE_NAME,
+} from "./utils";
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
     targetUrl?: string,
-    config?: Partial<IUserConfig>) => void;
+    config?: Partial<IUserConfig>,
+    useRetry?: boolean) => void;
 type LaunchCallback = (
     context: vscode.ExtensionContext,
     launchUrl?: string,
@@ -57,6 +63,22 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
                 this.telemetryReporter.sendTelemetryEvent("debug/launch");
                 this.launch(this.context, targetUri, userConfig);
             }
+        } else if (config && (config.type === "edge" || config.type === "msedge")) {
+            const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+            if (settings.get("autoAttachViaDebuggerForEdge")) {
+                if (!userConfig.port) {
+                    userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
+                }
+                if (userConfig.urlFilter) {
+                    userConfig.url = userConfig.urlFilter;
+                }
+
+                // Allow the debugger to actually launch the browser before attaching
+                setTimeout(() => {
+                    this.attach(this.context, userConfig.url, userConfig, /*useRetry=*/ true);
+                }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
+            }
+            return Promise.resolve(config);
         } else {
             this.telemetryReporter.sendTelemetryEvent("debug/error/config_not_found");
             vscode.window.showErrorMessage("No supported launch config was found.");
@@ -76,6 +98,8 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
             outUrlString = (outUrlString.startsWith("/") ? "file://" : "file:///") + outUrlString;
         } else if (config.url) {
             outUrlString = config.url;
+        } else if (config.urlFilter) {
+            outUrlString = config.urlFilter;
         }
 
         return outUrlString;

@@ -46,6 +46,7 @@ describe("devtoolsPanel", () => {
             onDidChangeViewState: jest.fn(),
             onDidDispose: jest.fn(),
             reveal: jest.fn(),
+            viewColumn: 1,
             webview: {
                 onDidReceiveMessage: jest.fn(),
                 postMessage: jest.fn(),
@@ -160,10 +161,15 @@ describe("devtoolsPanel", () => {
             const dtp = await import("./devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
-            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length);
+            // The +1 in here is due to the 'close' event. This is an extension event not raised from the Webview.
+            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1);
             for (const e of webviewEventNames) {
                 expect(hookedEvents).toContain(e);
             }
+
+            // Close is raised from the extension side in response to websocket close.
+            // so it does not require a Webview event, we verify manually for this case.
+            expect(hookedEvents).toContain("close");
         });
 
         it("forwards webview messages to the panel socket", async () => {
@@ -306,6 +312,13 @@ describe("devtoolsPanel", () => {
                 expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
             });
 
+            it("dispose devtools panel on socket close", async () => {
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+                hookedEvents.get("close")!();
+                expect(mockPanelSocket.dispose).toBeCalled();
+            });
+
             it("posts defaults for get state", async () => {
                 (context.workspaceState.get as jest.Mock).mockReturnValue(null);
 
@@ -414,14 +427,10 @@ describe("devtoolsPanel", () => {
             it("sends telemetry event for open in editor", async () => {
                 const expectedRequest = {
                     column: 2,
+                    ignoreTabChanges: true,
                     line: 4,
                     url: "http://fake.com/app.js",
                 };
-
-                const mockUtils = {
-                    fetchUri: jest.fn().mockRejectedValue(null),
-                };
-                jest.doMock("./utils", () => mockUtils);
 
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
@@ -431,6 +440,56 @@ describe("devtoolsPanel", () => {
                     `extension/openInEditor`,
                     expect.objectContaining({ sourceMaps: "true" }),
                 );
+            });
+
+            it("calls show document for open in editor", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    ignoreTabChanges: false,
+                    line: 1,
+                    url: "app.js",
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
+
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("./utils", () => mockUtils);
+
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
+            });
+
+            it("shows an error for unmapped urls", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    ignoreTabChanges: false,
+                    line: 1,
+                    url: "app.js",
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
+                mockVsCode.Uri.parse = jest.fn(() => { throw new Error(); });
+
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("./utils", () => mockUtils);
+
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showErrorMessage).toHaveBeenCalledWith(
+                    expect.stringContaining(expectedRequest.url));
             });
         });
     });

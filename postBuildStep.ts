@@ -28,6 +28,12 @@ async function copyStaticFiles() {
     await fse.ensureDir(hostOutDir);
     await copyFile(hostSrcDir, hostOutDir, "devtools.html");
 
+    // Copy the static css file to the out directory
+    const commonSrcDir = "./src/common/";
+    const commonOutDir = "./out/common/";
+    await fse.ensureDir(commonOutDir);
+    await copyFile(commonSrcDir, commonOutDir, "styles.css");
+
     // Must set environment variables EDGE_CHROMIUM_PATH and EDGE_CHROMIUM_OUT_DIR
     // E.g. set EDGE_CHROMIUM_PATH=F:/git/Edge/src
     //      set EDGE_CHROMIUM_OUT_DIR=debug_x64
