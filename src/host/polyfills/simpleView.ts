@@ -112,7 +112,7 @@ export function applyInspectorDarkCssPatch(content: string, isRelease?: boolean)
         `.main-tabbed-pane .tabbed-pane-header-contents {
             display: none !important;
         }`.replace(/\n/g, separator);
-    const cssRightToolbar = 
+    const cssRightToolbar =
         `.main-tabbed-pane .tabbed-pane-right-toolbar {
             display: none !important;
         }`.replace(/\n/g, separator);
