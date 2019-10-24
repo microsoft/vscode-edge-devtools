@@ -53,27 +53,103 @@ describe("simpleView", () => {
 
     it("applySelectTabPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
-        const result = apply.applySelectTabPatch("selectTab(id, userGesture) { // code");
-        expect(result).toEqual(expect.stringContaining("selectTab(id, userGesture) { if ("));
+        const result = apply.applySelectTabPatch("selectTab(id, userGesture, forceFocus) { // code");
+        expect(result).toEqual(expect.stringContaining("selectTab(id, userGesture, forceFocus) { if ("));
 
-        const result2 = apply.applySelectTabPatch("selectTab(id,userGesture) { // code");
-        expect(result2).toEqual(expect.stringContaining("selectTab(id, userGesture) { if ("));
+        const result2 = apply.applySelectTabPatch("selectTab(id, userGesture, forceFocus) { // code");
+        expect(result2).toEqual(expect.stringContaining("selectTab(id, userGesture, forceFocus) { if ("));
     });
 
-    it("applyInspectorCommonCssPatch correctly changes text", async () => {
-        const expectedCss = ":host-context(.platform-mac) .monospace,";
+    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-header-contents", async () => {
+        const expectedCss = `.main-tabbed-pane .tabbed-pane-header-contents {
+            flex: auto;
+            pointer-events: none;
+            margin-left: 0;
+            position: relative;
+        }`;
+        const expectedResult = `.main-tabbed-pane .tabbed-pane-header-contents {
+            display: none !important;
+        }`;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssPatch(expectedCss);
-        expect(result.startsWith(".main")).toEqual(true);
-        expect(result.endsWith(".monospace,")).toEqual(true);
+        expect(result === expectedResult).toEqual(true);
     });
 
-    it("applyInspectorCommonCssPatch correctly changes text in release mode", async () => {
-        const expectedCss = ":host-context(.platform-mac) .monospace,";
+    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-tab-slider", async () => {
+        const expectedCss = `.tabbed-pane-tab-slider {
+            height: 2px;
+            position: absolute;
+            bottom: -1px;
+            background-color: var(--accent-color);
+            left: 0;
+            z-index: 50;
+            transform-origin: 0 100%;
+            transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
+            visibility: hidden;
+        }`;
+        const expectedResult = `.tabbed-pane-tab-slider {
+            display: none !important;
+        }`;
+        const apply = await import("./simpleView");
+        const result = apply.applyInspectorCommonCssPatch(expectedCss);
+        expect(result === expectedResult).toEqual(true);
+    });
+
+    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-right-toolbar", async () => {
+        const expectedCss = `.tabbed-pane-right-toolbar {
+            margin-left: -4px;
+            flex: none;
+        }`;
+        const expectedResult = `.tabbed-pane-right-toolbar {
+            display: none !important;
+        }`;
+        const apply = await import("./simpleView");
+        const result = apply.applyInspectorCommonCssPatch(expectedCss);
+        expect(result === expectedResult).toEqual(true);
+    });
+
+    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-header-contents in release mode", async () => {
+        const expectedCss = `.main-tabbed-pane .tabbed-pane-header-contents {
+            flex: auto;
+            pointer-events: none;
+            margin-left: 0;
+            position: relative;
+        }`;
+        const expectedResult =
+            ".main-tabbed-pane .tabbed-pane-header-contents {\\n            display: none !important;\\n        }";
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssPatch(expectedCss, true);
-        expect(result.startsWith(".main")).toEqual(true);
-        expect(result.endsWith(".monospace,")).toEqual(true);
-        expect(result.indexOf("\\n") > -1).toEqual(true);
+        expect(result === expectedResult).toEqual(true);
+    });
+
+    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-tab-slider in release mode", async () => {
+        const expectedCss = `.tabbed-pane-tab-slider {
+            height: 2px;
+            position: absolute;
+            bottom: -1px;
+            background-color: var(--accent-color);
+            left: 0;
+            z-index: 50;
+            transform-origin: 0 100%;
+            transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
+            visibility: hidden;
+        }`;
+        const expectedResult =
+            ".tabbed-pane-tab-slider {\\n            display: none !important;\\n        }";
+        const apply = await import("./simpleView");
+        const result = apply.applyInspectorCommonCssPatch(expectedCss, true);
+        expect(result === expectedResult).toEqual(true);
+    });
+
+    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-right-toolbar in release mode", async () => {
+        const expectedCss = `.tabbed-pane-right-toolbar {
+            margin-left: -4px;
+            flex: none;
+        }`;
+        const expectedResult =
+            ".tabbed-pane-right-toolbar {\\n            display: none !important;\\n        }";
+        const apply = await import("./simpleView");
+        const result = apply.applyInspectorCommonCssPatch(expectedCss, true);
+        expect(result === expectedResult).toEqual(true);
     });
 });
