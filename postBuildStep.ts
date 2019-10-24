@@ -99,13 +99,13 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
     await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
     await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
-    await patchFileForWebView("ui/inspectorCommon.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
+    await patchFileForWebView("themes/base.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
     await patchFileForWebView("common/ModuleExtensionInterfaces.js", toolsOutDir, false, [applyCommonRevealerPatch]);
     await patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
     await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
     await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
-    await patchFileForWebView("elements/elementsTreeOutline.js", toolsOutDir, false, [applyPaddingInlineCssPatch]);
-    await patchFileForWebView("elements/stylesSectionTree.js", toolsOutDir, false, [applyPaddingInlineCssPatch]);
+    await patchFileForWebView("elements/elementsTreeOutline.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
+    await patchFileForWebView("elements/stylesSectionTree.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
 }
 
 async function patchFileForWebView(

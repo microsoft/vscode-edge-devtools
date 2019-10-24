@@ -71,26 +71,38 @@ export function applySelectTabPatch(content: string) {
         return `id !== '${v}'`;
     }).join(" && ");
 
+    const pattern = /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g;
+
     return content.replace(
-        /selectTab\(id,\s*userGesture\)\s*{/g,
-        `selectTab(id, userGesture) { if (${condition}) return false;`);
+        pattern,
+        `selectTab(id, userGesture, forceFocus) { if (${condition}) return false;`);
 }
 
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
-    const separator = (isRelease ? "\\n" : "\n"); // Release css is embedded in js
-    const css =
+    const separator = (isRelease ? "\\n" : "\n");
+    const cssHeaderContents =
         `.main-tabbed-pane .tabbed-pane-header-contents {
             display: none !important;
-        }
-        .main-tabbed-pane .tabbed-pane-right-toolbar {
+        }`.replace(/\n/g, separator);
+    const cssRightToolbar =
+        `.tabbed-pane-right-toolbar {
             display: none !important;
-        }
-        .tabbed-pane-tab-slider {
+        }`.replace(/\n/g, separator);
+    const cssTabSlider =
+        `.tabbed-pane-tab-slider {
             display: none !important;
         }`.replace(/\n/g, separator);
 
-    return content.replace(
-        /(:host-context\(\.platform-mac\)\s*\.monospace,)/g,
-        `${css}${separator} $1`,
-    );
+    // we need to do this by parts as the code is split between base.css
+    // and dark.css
+    let result = content.replace(
+        /(\.main-tabbed-pane\s*\.tabbed-pane-header-contents\s*\{([^\}]*)?\})/g,
+        cssHeaderContents);
+    result = result.replace(
+            /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g,
+            cssRightToolbar);
+    result = result.replace(
+        /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g,
+        cssTabSlider);
+    return result;
 }
