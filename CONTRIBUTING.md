@@ -17,11 +17,20 @@ Contributions are always welcome! We only ask that you open an issue first so we
 ## Development setup
 * Clone this repo
 * Run `npm install` in '/vscode-edge-devtools'
+* On an administrator prompt execute the following commands (assuming your drive is located at C:\)
+  * `mkdir c:\edgeoss\code`
+  * `mkdir c:\edgeoss\src\out\Release\gen\devtools`
+  * `mkdir c:\edgeoss\src\third_party\blink\renderer\devtools\front_end`
 * Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com)
-* Extract the zip and follow the instructions located at `src/docs/edge_build_instructions.md`
-* Set the `EDGE_CHROMIUM_PATH` environment variable to the same value you used for `EDGE_ROOT`
-* Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to your output folder (which is `Release` by default)
-* Run `npm run build` or `npm run watch`
+* **Open** the zip file and (inside the zip file) navigate to:
+  * `[ZIP_FILE]:\src\third_party\blink\renderer\devtools\front_end`
+  * copy the contents of the "front_end" folder and paste them into `c:\edgeoss\src\third_party\blink\renderer\devtools\front_end`
+* **Open** the zip file and (inside the zip file) navigate to:
+  * `[ZIP_FILE]:\src\out\Release\gen\devtools`
+  * copy the contents of the "devtools" folder and paste them into `c:\edgeoss\src\out\Release\gen\devtools`
+* Set the `EDGE_CHROMIUM_PATH` environment variable to `c:\edgeoss\src` (assuming your drive is located at C:\)
+* Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
+* Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VSCode
 * Select `Launch Extension` debug configuration
 * Press `F5` to launch the VSCode extension host environment and debug the extension
