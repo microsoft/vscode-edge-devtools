@@ -3,6 +3,9 @@
 
 import { encodeMessageForChannel } from "../common/webviewEvents";
 
+export interface IRoot {
+    Runtime: IRuntimeResourceLoader;
+}
 export interface IRuntimeResourceLoader {
     loadResourcePromise: (url: string) => Promise<string>;
 }

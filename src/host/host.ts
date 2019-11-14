@@ -3,13 +3,13 @@
 
 import { parseMessageFromChannel } from "../common/webviewEvents";
 import ToolsHost from "./toolsHost";
-import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
+import ToolsResourceLoader, { IRoot } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
-    Runtime: IRuntimeResourceLoader;
+    Root: IRoot;
 }
 
 export function initialize(devToolsFrame: HTMLIFrameElement) {
@@ -41,7 +41,7 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
 
     dtWindow.addEventListener("DOMContentLoaded", () => {
         // Override the resource loading once the window has loaded so that we can control it
-        const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Runtime);
+        const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
     });
 }
