@@ -15,9 +15,9 @@ describe("host", () => {
 
         mockIframe = {
             contentWindow: {
+                Root: {},
                 addEventListener: jest.fn(),
                 localStorage: jest.fn(),
-                Root: {}
             } as object,
         } as Mocked<HTMLIFrameElement>;
 
