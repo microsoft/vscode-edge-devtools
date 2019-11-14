@@ -25,6 +25,13 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
         set() { /* NO-OP */ },
     });
 
+    // Create a mock sessionStorage since it doesn't exist in data url but the devtools use it
+    const sessionStorage = {};
+    Object.defineProperty(dtWindow, "sessionStorage", {
+        get() { return sessionStorage; },
+        set() { /* NO-OP */ },
+    });
+
     // Setup the global objects that must exist at load time
     dtWindow.InspectorFrontendHost = new ToolsHost();
     dtWindow.WebSocket = ToolsWebSocket;
