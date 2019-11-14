@@ -17,6 +17,7 @@ describe("host", () => {
             contentWindow: {
                 addEventListener: jest.fn(),
                 localStorage: jest.fn(),
+                Root: {}
             } as object,
         } as Mocked<HTMLIFrameElement>;
 
@@ -58,6 +59,18 @@ describe("host", () => {
             expect(setter).toBeDefined();
             setter!.set!("some new value");
             expect(mockDevToolsWindow.localStorage).toBeUndefined();
+        });
+
+        it("verifies that session storage cannot be modified", async () => {
+            const host = await import("./host");
+            host.initialize(mockIframe);
+
+            expect(mockDevToolsWindow.sessionStorage).toBeDefined();
+            const previousSessionStorage = mockDevToolsWindow.sessionStorage;
+            const setter = Object.getOwnPropertyDescriptor(mockDevToolsWindow, "sessionStorage");
+            expect(setter).toBeDefined();
+            setter!.set!("some new value");
+            expect(mockDevToolsWindow.sessionStorage).toMatchObject(previousSessionStorage);
         });
     });
 
