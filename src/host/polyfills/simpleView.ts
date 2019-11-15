@@ -82,7 +82,7 @@ export function applySelectTabPatch(content: string) {
     }`;
     return content.replace(
         /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g,
-        `selectTab(id, userGesture) { ${replaceText}`);
+        `selectTab(id, userGesture, forceFocus) { ${replaceText}`);
 }
 
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
