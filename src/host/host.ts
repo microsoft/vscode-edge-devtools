@@ -11,7 +11,6 @@ export interface IDevToolsWindow extends Window {
     WebSocket: typeof ToolsWebSocket;
     Root: IRoot;
     _importScriptPathPrefix: string;
-    _isHostedInWebView: boolean;
 }
 
 export interface IRoot {
@@ -22,9 +21,6 @@ export function initialize(dtWindow: IDevToolsWindow) {
     if (!dtWindow) {
         return;
     }
-
-    // Add a flag we can use to check our hosting mode
-    dtWindow._isHostedInWebView = true;
 
     // Create a mock sessionStorage since it doesn't exist in data url but the devtools use it
     const sessionStorage = {};
