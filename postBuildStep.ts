@@ -40,7 +40,7 @@ async function copyStaticFiles() {
     // See CONTRIBUTING.md for more details
 
     const toolsSrcDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/third_party/blink/renderer/devtools/front_end/`;
+        `${process.env.EDGE_CHROMIUM_PATH}/third_party/devtools-frontend/src/front_end/`;
     if (!isDirectory(toolsSrcDir)) {
         throw new Error(`Could not find Microsoft Edge (Chromium) DevTools path at '${toolsSrcDir}'. ` +
             "Did you set the EDGE_CHROMIUM_PATH environment variable?");

@@ -9,6 +9,10 @@ import ToolsWebSocket from "./toolsWebSocket";
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
+    Root: IRoot;
+}
+
+export interface IRoot {
     Runtime: IRuntimeResourceLoader;
 }
 
@@ -22,6 +26,13 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     // Prevent the devtools from using localStorage since it doesn't exist in data uris
     Object.defineProperty(dtWindow, "localStorage", {
         get() { return undefined; },
+        set() { /* NO-OP */ },
+    });
+
+    // Create a mock sessionStorage since it doesn't exist in data url but the devtools use it
+    const sessionStorage = {};
+    Object.defineProperty(dtWindow, "sessionStorage", {
+        get() { return sessionStorage; },
         set() { /* NO-OP */ },
     });
 
@@ -41,7 +52,7 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
 
     dtWindow.addEventListener("DOMContentLoaded", () => {
         // Override the resource loading once the window has loaded so that we can control it
-        const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Runtime);
+        const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
     });
 }
