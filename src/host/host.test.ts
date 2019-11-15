@@ -61,16 +61,16 @@ describe("host", () => {
             expect(mockDevToolsWindow.localStorage).toBeUndefined();
         });
 
-        it("verifies that session storage cannot be modified", async () => {
+        it("emulates session storage", async () => {
             const host = await import("./host");
             host.initialize(mockIframe);
 
             expect(mockDevToolsWindow.sessionStorage).toBeDefined();
-            const previousSessionStorage = mockDevToolsWindow.sessionStorage;
-            const setter = Object.getOwnPropertyDescriptor(mockDevToolsWindow, "sessionStorage");
-            expect(setter).toBeDefined();
-            setter!.set!("some new value");
-            expect(mockDevToolsWindow.sessionStorage).toMatchObject(previousSessionStorage);
+
+            const expectedKey = "key";
+            const expectedVal = "value";
+            (mockDevToolsWindow as any).sessionStorage[expectedKey] = expectedVal;
+            expect(mockDevToolsWindow.sessionStorage[expectedKey]).toEqual(expectedVal);
         });
     });
 

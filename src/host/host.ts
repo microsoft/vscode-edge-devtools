@@ -3,13 +3,17 @@
 
 import { parseMessageFromChannel } from "../common/webviewEvents";
 import ToolsHost from "./toolsHost";
-import ToolsResourceLoader, { IRoot } from "./toolsResourceLoader";
+import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
     Root: IRoot;
+}
+
+export interface IRoot {
+    Runtime: IRuntimeResourceLoader;
 }
 
 export function initialize(devToolsFrame: HTMLIFrameElement) {
