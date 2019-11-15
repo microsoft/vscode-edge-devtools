@@ -1,3 +1,7 @@
+## 1.0.5
+* Fixed issue with extension and VSCode 1.40 - [PR #109](https://github.com/microsoft/vscode-edge-devtools/pull/109)
+* Bumped elements tool version to `80.0.331.0`
+
 ## 1.0.4
 * Minor change to icon
 
