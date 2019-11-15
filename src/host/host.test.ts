@@ -1,76 +1,64 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { getFirstCallback, Mocked, Writable } from "../test/helpers";
+import { getFirstCallback, Mocked } from "../test/helpers";
 import { IDevToolsWindow } from "./host";
 
 describe("host", () => {
-    let mockGlobal: Mocked<Window>;
-    let mockIframe: Mocked<HTMLIFrameElement>;
-    let mockDevToolsWindow: IDevToolsWindow;
+    let mockGlobal: Mocked<IDevToolsWindow>;
 
     beforeEach(() => {
-        mockGlobal = global as object as Mocked<Window>;
-        mockGlobal.addEventListener = jest.fn();
-
-        mockIframe = {
-            contentWindow: {
-                Root: {},
-                addEventListener: jest.fn(),
-                localStorage: jest.fn(),
-            } as object,
-        } as Mocked<HTMLIFrameElement>;
-
-        mockDevToolsWindow = mockIframe.contentWindow as IDevToolsWindow;
+        mockGlobal = {
+            Root: {},
+            _importScriptPathPrefix: "",
+            addEventListener: jest.fn(),
+            localStorage: jest.fn(),
+        } as object as Mocked<IDevToolsWindow>;
     });
 
     describe("initialize", () => {
         it("hooks events correctly", async () => {
             const host = await import("./host");
-            host.initialize(mockIframe);
+            host.initialize(mockGlobal);
 
-            expect(mockGlobal.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
-            expect(mockDevToolsWindow.addEventListener).toHaveBeenCalledWith("DOMContentLoaded", expect.any(Function));
+            expect(mockGlobal.addEventListener).toHaveBeenNthCalledWith(1, "message", expect.any(Function), true);
+            expect(mockGlobal.addEventListener).toHaveBeenNthCalledWith(2, "DOMContentLoaded", expect.any(Function));
 
-            expect(mockDevToolsWindow.InspectorFrontendHost).toBeDefined();
-            expect(mockDevToolsWindow.WebSocket).toBeDefined();
+            expect(mockGlobal.InspectorFrontendHost).toBeDefined();
+            expect(mockGlobal.WebSocket).toBeDefined();
         });
 
         it("skips events if there is no contentWindow", async () => {
-            const overwrite: Writable<Mocked<HTMLIFrameElement>> = mockIframe;
-            overwrite.contentWindow = null;
-
             const host = await import("./host");
-            host.initialize(mockIframe);
+            host.initialize(null as any as IDevToolsWindow);
 
             expect(mockGlobal.addEventListener).not.toHaveBeenCalled();
-            expect(mockDevToolsWindow.addEventListener).not.toHaveBeenCalled();
-            expect(mockDevToolsWindow.InspectorFrontendHost).toBeUndefined();
-            expect(mockDevToolsWindow.WebSocket).toBeUndefined();
+            expect(mockGlobal.InspectorFrontendHost).toBeUndefined();
+            expect(mockGlobal.WebSocket).toBeUndefined();
         });
 
         it("hides local storage", async () => {
             const host = await import("./host");
-            host.initialize(mockIframe);
+            host.initialize(mockGlobal);
 
-            expect(mockDevToolsWindow.localStorage).toBeUndefined();
+            expect(mockGlobal.localStorage).toBeUndefined();
 
-            const setter = Object.getOwnPropertyDescriptor(mockDevToolsWindow, "localStorage");
+            const setter = Object.getOwnPropertyDescriptor(mockGlobal, "localStorage");
             expect(setter).toBeDefined();
             setter!.set!("some new value");
-            expect(mockDevToolsWindow.localStorage).toBeUndefined();
+            expect(mockGlobal.localStorage).toBeUndefined();
         });
 
         it("emulates session storage", async () => {
             const host = await import("./host");
-            host.initialize(mockIframe);
+            host.initialize(mockGlobal);
 
-            expect(mockDevToolsWindow.sessionStorage).toBeDefined();
+            expect(mockGlobal.sessionStorage).toBeDefined();
 
             const expectedKey = "key";
             const expectedVal = "value";
-            (mockDevToolsWindow as any).sessionStorage[expectedKey] = expectedVal;
-            expect(mockDevToolsWindow.sessionStorage[expectedKey]).toEqual(expectedVal);
+            (mockGlobal as any).sessionStorage[expectedKey] = expectedVal;
+            expect(mockGlobal.sessionStorage[expectedKey]).toEqual(expectedVal);
         });
     });
 
@@ -83,12 +71,22 @@ describe("host", () => {
             jest.resetModules();
 
             const host = await import("./host");
-            host.initialize(mockIframe);
+            host.initialize(mockGlobal);
 
-            const { callback, thisObj } = getFirstCallback(mockDevToolsWindow.addEventListener as jest.Mock, 1);
+            mockGlobal._importScriptPathPrefix = "null/somepath";
+
+            function getDOMLoadedCallback(mock: jest.Mock, callbackArgIndex: number = 0):
+                // Allow us to type the callback as a general 'Function' so that we get enough typing to use .call();
+                // tslint:disable-next-line: ban-types
+                { callback: Function, thisObj: object } {
+                return { callback: mock.mock.calls[1][callbackArgIndex], thisObj: mock.mock.instances[0] };
+            }
+
+            const { callback, thisObj } = getDOMLoadedCallback(mockGlobal.addEventListener as jest.Mock, 1);
             callback.call(thisObj);
 
             expect(mockOverride).toHaveBeenCalled();
+            expect(mockGlobal._importScriptPathPrefix).toBe("vscode-resource:/somepath");
         });
     });
 
@@ -106,18 +104,21 @@ describe("host", () => {
             jest.resetModules();
 
             const host = await import("./host");
-            host.initialize(mockIframe);
+            host.initialize(mockGlobal);
 
             const onMessage = getFirstCallback(mockGlobal.addEventListener, 1);
             expect(onMessage).toBeDefined();
 
             // Ensure that the message gets parsed correctly
-            const expected = { data: "hello" };
-            onMessage.callback.call(onMessage.thisObj, expected);
+            const expected = { data: "hello", preventDefault: jest.fn(), stopImmediatePropagation: jest.fn() };
+            const returnValue = onMessage.callback.call(onMessage.thisObj, expected);
+            expect(returnValue).toBe(false);
             expect(mockWebviewEvents.parseMessageFromChannel).toHaveBeenCalledWith(
                 expected.data,
                 expect.any(Function),
             );
+            expect(expected.preventDefault).toHaveBeenCalled();
+            expect(expected.stopImmediatePropagation).toHaveBeenCalled();
 
             const onParsed = getFirstCallback(mockWebviewEvents.parseMessageFromChannel, 1);
             expect(onParsed).toBeDefined();
@@ -126,7 +127,7 @@ describe("host", () => {
             const expectedEvent = "websocket";
             const expectedData = JSON.stringify({ event: "event", message: "some message" });
             onParsed.callback.call(onParsed.thisObj, expectedEvent, expectedData);
-            expect(mockDevToolsWindow.InspectorFrontendHost.onMessageFromChannel).toHaveBeenCalledWith(
+            expect(mockGlobal.InspectorFrontendHost.onMessageFromChannel).toHaveBeenCalledWith(
                 expectedEvent,
                 expectedData,
             );

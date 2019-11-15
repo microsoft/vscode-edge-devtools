@@ -49,7 +49,7 @@ describe("messaging", () => {
         expect(document.getElementById).toBeCalledTimes(1);
     });
 
-    it("posts message based on origin", async () => {
+    it("posts message based on protocol", async () => {
         const messaging = await import("./messaging");
         messaging.initializeMessaging();
 
@@ -65,12 +65,12 @@ describe("messaging", () => {
 
         const expectedToolsWindowMessage = "to tools window";
         messageCallback.call(messageThis,
-            { origin: "", data: expectedToolsWindowMessage } as MessageEvent);
+            { source: { location: { protocol: "data:" } }, data: expectedToolsWindowMessage } as MessageEvent);
         expect(mockToolsWindow.contentWindow.postMessage).toBeCalledWith(expectedToolsWindowMessage, "*");
 
         const expectedVSCodeMessage = "to vscode";
         messageCallback.call(messageThis,
-            { origin: "vscode-resource://", data: expectedVSCodeMessage } as MessageEvent);
+            { source: { location: { protocol: "null" } }, data: expectedVSCodeMessage } as MessageEvent);
         expect(mockVSCode.postMessage).toBeCalledWith(expectedVSCodeMessage);
     });
 });

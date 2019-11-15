@@ -6,11 +6,8 @@ describe("mainHost", () => {
         const mockInitialize = jest.fn();
         jest.doMock("./host", () => ({ initialize: mockInitialize }));
 
-        const expectedFrame = {};
-        (global as object as Window).document.getElementById = jest.fn().mockReturnValue(expectedFrame);
-
         const mainHost = await import("./mainHost");
         expect(mainHost).toBeDefined();
-        expect(mockInitialize).toBeCalledWith(expectedFrame);
+        expect(mockInitialize).toBeCalledWith(global);
     });
 });
