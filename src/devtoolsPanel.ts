@@ -243,7 +243,7 @@ export class DevToolsPanel {
     }
 
     private getHtmlForWebview() {
-        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, "out", "host", "devtools.html"));
+        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, "out/tools/front_end", "inspector.html"));
         const htmlUri = htmlPath.with({ scheme: "vscode-resource" });
 
         const scriptPath = vscode.Uri.file(path.join(this.extensionPath, "out", "host", "messaging.bundle.js"));
@@ -266,7 +266,7 @@ export class DevToolsPanel {
                 <script src="${scriptUri}"></script>
             </head>
             <body>
-                <iframe id="host" frameBorder="0" src="${htmlUri}"></iframe>
+                <iframe id="host" frameBorder="0" src="${htmlUri}?ws=trueD&experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;

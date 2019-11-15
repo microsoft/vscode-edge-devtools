@@ -5,6 +5,7 @@ import * as fse from "fs-extra";
 import path from "path";
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
+import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import {
     applyCommonRevealerPatch,
     applyInspectorCommonCssPatch,
@@ -22,12 +23,6 @@ async function copyFile(srcDir: string, outDir: string, name: string) {
 }
 
 async function copyStaticFiles() {
-    // Copy the static html file to the out directory
-    const hostSrcDir = "./src/host/";
-    const hostOutDir = "./out/host/";
-    await fse.ensureDir(hostOutDir);
-    await copyFile(hostSrcDir, hostOutDir, "devtools.html");
-
     // Copy the static css file to the out directory
     const commonSrcDir = "./src/common/";
     const commonOutDir = "./out/common/";
@@ -93,6 +88,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [
         applySetupTextSelectionPatch,
         applyPaddingInlineCssPatch,
+    ]);
+    await patchFileForWebView("inspector.html", toolsOutDir, true, [
+        applyContentSecurityPolicyPatch,
     ]);
 
     // Debug file versions

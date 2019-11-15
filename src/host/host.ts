@@ -10,29 +10,32 @@ export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
     Root: IRoot;
+    _importScriptPathPrefix: string;
+    _isHostedInWebView: boolean;
 }
 
 export interface IRoot {
     Runtime: IRuntimeResourceLoader;
 }
 
-export function initialize(devToolsFrame: HTMLIFrameElement) {
-    if (!devToolsFrame.contentWindow) {
+export function initialize(dtWindow: IDevToolsWindow) {
+    if (!dtWindow) {
         return;
     }
 
-    const dtWindow = devToolsFrame.contentWindow as IDevToolsWindow;
-
-    // Prevent the devtools from using localStorage since it doesn't exist in data uris
-    Object.defineProperty(dtWindow, "localStorage", {
-        get() { return undefined; },
-        set() { /* NO-OP */ },
-    });
+    // Add a flag we can use to check our hosting mode
+    dtWindow._isHostedInWebView = true;
 
     // Create a mock sessionStorage since it doesn't exist in data url but the devtools use it
     const sessionStorage = {};
     Object.defineProperty(dtWindow, "sessionStorage", {
         get() { return sessionStorage; },
+        set() { /* NO-OP */ },
+    });
+
+    // Prevent the devtools from using localStorage since it doesn't exist in data uris
+    Object.defineProperty(dtWindow, "localStorage", {
+        get() { return undefined; },
         set() { /* NO-OP */ },
     });
 
@@ -43,16 +46,21 @@ export function initialize(devToolsFrame: HTMLIFrameElement) {
     // Listen for messages from the extension and forward to the tools
     const messageCallback =
         dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
-    window.addEventListener("message", (e) => {
+    dtWindow.addEventListener("message", (e) => {
         parseMessageFromChannel(
             e.data,
             messageCallback,
         );
-    });
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return false;
+    }, true);
 
     dtWindow.addEventListener("DOMContentLoaded", () => {
         // Override the resource loading once the window has loaded so that we can control it
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
+
+        dtWindow._importScriptPathPrefix = dtWindow._importScriptPathPrefix.replace("null", "vscode-resource:");
     });
 }
