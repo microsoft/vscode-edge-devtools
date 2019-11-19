@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Elements for Microsoft Edge (Chromium)",
     "description": "Use the Microsoft Edge (Chromium) Elements tool from within VS Code to see your site's runtime HTML structure, alter its layout, and fix styling issues.",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": true,
