@@ -16,10 +16,6 @@
         "type": "git",
         "url": "https://github.com/Microsoft/vscode-edge-devtools"
     },
-    "galleryBanner": {
-        "color": "#5c2d91",
-        "theme": "dark"
-    },
     "keywords": [
         "browser",
         "elements",
