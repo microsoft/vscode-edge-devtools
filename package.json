@@ -7,7 +7,7 @@
     "publisher": "ms-edgedevtools",
     "preview": true,
     "icon": "icon.png",
-    "extensionKind": "ui",
+    "extensionKind": ["ui"],
     "author": {
         "name": "Microsoft Corporation"
     },
