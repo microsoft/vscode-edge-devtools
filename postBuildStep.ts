@@ -98,7 +98,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
     await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
     await patchFileForWebView("themes/base.css", toolsOutDir, false, [applyInspectorCommonCssPatch]);
-    await patchFileForWebView("common/ModuleExtensionInterfaces.js", toolsOutDir, false, [applyCommonRevealerPatch]);
+    await patchFileForWebView("common/Revealer.js", toolsOutDir, false, [applyCommonRevealerPatch]);
     await patchFileForWebView("main/Main.js", toolsOutDir, false, [applyMainViewPatch]);
     await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyInspectorViewPatch]);
     await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
