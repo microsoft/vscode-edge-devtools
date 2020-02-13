@@ -28,8 +28,8 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
 
 export function applyCommonRevealerPatch(content: string) {
     return content.replace(
-        /const reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g,
-        `const reveal = ${revealInVSCode.toString().slice(0, -1)}`);
+        /let reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g,
+        `let reveal = ${revealInVSCode.toString().slice(0, -1)}`);
 }
 
 export function applyInspectorViewPatch(content: string) {

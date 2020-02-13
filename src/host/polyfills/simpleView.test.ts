@@ -25,9 +25,9 @@ describe("simpleView", () => {
     it("applyCommonRevealerPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
         const result = apply.applyCommonRevealerPatch(
-            "const reveal = function(revealable, omitFocus) { // code");
+            "let reveal = function(revealable, omitFocus) { // code");
         expect(result).toEqual(
-            expect.stringContaining("const reveal = function revealInVSCode(revealable, omitFocus) {"));
+            expect.stringContaining("let reveal = function revealInVSCode(revealable, omitFocus) {"));
     });
 
     it("applyInspectorViewPatch correctly changes text", async () => {
