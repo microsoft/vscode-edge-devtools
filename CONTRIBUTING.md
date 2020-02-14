@@ -18,13 +18,12 @@ Contributions are always welcome! We only ask that you open an issue first so we
 * Clone this repo
 * Run `npm install` in '/vscode-edge-devtools'
 * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
-  * `mkdir c:\edgeoss\code`
   * `mkdir c:\edgeoss\src\out\Release\gen\devtools`
-  * `mkdir c:\edgeoss\src\third_party\blink\renderer\devtools\front_end`
+  * `mkdir c:\edgeoss\src\third_party\devtools-frontend\src\front_end`
 * Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com)
 * **Open** the zip file and (inside the zip file) navigate to:
-  * `[ZIP_FILE]:\src\third_party\blink\renderer\devtools\front_end`
-  * copy the contents of the "front_end" folder and paste them into `c:\edgeoss\src\third_party\blink\renderer\devtools\front_end`
+  * `[ZIP_FILE]:\src\third_party\devtools-frontend\src\front_end`
+  * copy the contents of the "front_end" folder and paste them into `c:\edgeoss\src\third_party\devtools-frontend\src\front_end`
 * **Open** the zip file and (inside the zip file) navigate to:
   * `[ZIP_FILE]:\src\out\Release\gen\devtools`
   * copy the contents of the "devtools" folder and paste them into `c:\edgeoss\src\out\Release\gen\devtools`
