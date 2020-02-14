@@ -17,6 +17,24 @@
             "preLaunchTask": "npm: build"
         },
         {
+            "name": "Debug postbuild step",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceRoot}", 
+            "env": { 
+                "NODE_ENV": "test" 
+            }, 
+            "args": [ 
+                "${workspaceFolder}/postBuildStep.ts", "debug"
+            ], 
+            "runtimeArgs": [ 
+                "--nolazy", "-r", "ts-node/register" ,
+            ], 
+            "sourceMaps": true, 
+            "protocol": "inspector" ,
+            "preLaunchTask": "npm: build-wp"
+        },
+        {
             "name": "Launch Tests",
             "type": "node",
             "request": "launch",
