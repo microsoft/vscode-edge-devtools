@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+import fs from "fs";
+import { ExtensionContext } from "vscode";
+import TelemetryReporter from "vscode-extension-telemetry";
 
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
-
-import { ExtensionContext } from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
 
 export type Mocked<T> = {
     -readonly [P in keyof T]:
@@ -127,4 +127,19 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
     // tslint:disable-next-line: ban-types
     { callback: Function, thisObj: object } {
     return { callback: mock.mock.calls[0][callbackArgIndex], thisObj: mock.mock.instances[0] };
+}
+
+/**
+ * Returns the contents of the specified file, if the file is not found returns null
+ * @param uri The uri relative to the 'gen' folder specified in EDGE_CHROMIUM_PATH environment variable.
+ */
+export function getTextFromFile(uri: string) {
+    const toolsGenDir =
+        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
+    const filePath = `${toolsGenDir}${uri}`;
+    if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath, "utf8");
+    }
+
+    return null;
 }
