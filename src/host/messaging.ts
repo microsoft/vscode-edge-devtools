@@ -5,11 +5,13 @@ declare const acquireVsCodeApi: () => any;
 
 export function initializeMessaging() {
     const vscode = acquireVsCodeApi();
-
     let toolsWindow: Window | null;
 
     window.addEventListener("DOMContentLoaded", () => {
         toolsWindow = (document.getElementById("host") as HTMLIFrameElement).contentWindow;
+
+        // when the frame is ready, load the strings.
+        vscode.postMessage("getStrings:{}");
     });
 
     window.addEventListener("message", (messageEvent) => {

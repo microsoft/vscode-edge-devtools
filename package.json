@@ -148,6 +148,18 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
+                "vscode-edge-devtools.localization": {
+                    "type": "string",
+                    "enum": [
+                        "Enabled",
+                        "Disabled",
+                        "qps-ploc"
+                    ],
+                    "enumDescriptions": [
+                        "Elements for Microsoft Edge will match the selected locale for VS Code",
+                        "Elements for Microsoft Edge will be displayed in English (en-US)"
+                    ]
+                },
                 "vscode-edge-devtools.autoAttachViaDebuggerForEdge": {
                     "type": "boolean",
                     "description": "Auto attach the Elements for Microsoft Edge extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",

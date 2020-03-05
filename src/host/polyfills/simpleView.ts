@@ -71,11 +71,18 @@ export function applySelectTabPatch(content: string) {
         return `id !== '${v}'`;
     }).join(" && ");
 
-    const pattern = /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g;
+    const conditionTranslated = allowedTabs.map((v) => {
+        return `id !== window.DevToolsLocalization._localizedStringsMap.get('${v}')`;
+    }).join(" && ");
 
+    const replaceText = `if (window.DevToolsLocalization && window.DevToolsLocalization._localizedStringsMap) {
+        if (${conditionTranslated} && ${condition}) return false;
+    } else {
+        if (${condition}) return false;
+    }`;
     return content.replace(
-        pattern,
-        `selectTab(id, userGesture, forceFocus) { if (${condition}) return false;`);
+        /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g,
+        `selectTab(id, userGesture, forceFocus) { ${replaceText}`);
 }
 
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {

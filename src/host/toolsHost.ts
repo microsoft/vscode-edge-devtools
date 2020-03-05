@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
+import StringsProvider from "../common/stringsProvider";
 import {
     encodeMessageForChannel,
     IOpenEditorData,
@@ -15,6 +15,7 @@ export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getStateNextId: number = 0;
     private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
+    private stringsProvider: StringsProvider | undefined;
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
@@ -35,6 +36,10 @@ export default class ToolsHost {
     public setPreference(name: string, value: string) {
         // Save the preference via the extension workspaceState
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
+    }
+
+    public setStringsProvider(stringsProvider: StringsProvider) {
+        this.stringsProvider = stringsProvider;
     }
 
     public recordEnumeratedHistogram(actionName: string, actionCode: number, bucketSize: number) {
@@ -88,6 +93,12 @@ export default class ToolsHost {
                 break;
             }
 
+            case "getStrings": {
+                const { event, message } = JSON.parse(args);
+                this.fireGetStringsCallback(event, message);
+                break;
+            }
+
             case "getUrl": {
                 const { id, content } = JSON.parse(args);
                 this.fireGetUrlCallback(id, content);
@@ -124,6 +135,16 @@ export default class ToolsHost {
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
         // Send response message to DevTools
-        ToolsWebSocket.instance.onMessageFromChannel(e, message);
+        const instance = ToolsWebSocket.instance;
+        if (instance) {
+            instance.onMessageFromChannel(e, message);
+        }
+    }
+
+    private fireGetStringsCallback(e: WebSocketEvent, message: string) {
+        if (this.stringsProvider) {
+            this.stringsProvider.overrideFrontendStrings(message);
+        }
+        // do not propagate the event to the devtools window.
     }
 }

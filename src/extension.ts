@@ -65,10 +65,10 @@ export function activate(context: vscode.ExtensionContext) {
         () => cdpTargetsProvider.refresh()));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
-        (target: CDPTarget) => {
+        async (target: CDPTarget) => {
             telemetryReporter.sendTelemetryEvent("view/devtools");
             const runtimeConfig = getRuntimeConfig();
-            DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
+            await DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.copyItem`,
@@ -134,7 +134,7 @@ export async function attach(
                 useRetry = false;
                 telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
                 const runtimeConfig = getRuntimeConfig(config);
-                DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+                await DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
             } else if (useRetry) {
                 // Wait for a little bit until we retry
                 await new Promise((resolve, reject) => {
@@ -158,7 +158,7 @@ export async function attach(
                 if (selection && selection.detail) {
                     telemetryReporter.sendTelemetryEvent("command/attach/devtools", telemetryProps);
                     const runtimeConfig = getRuntimeConfig(config);
-                    DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
+                    await DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
                 }
             }
         } else {
@@ -182,7 +182,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         // Show the devtools
         telemetryReporter.sendTelemetryEvent("command/launch/devtools", telemetryProps);
         const runtimeConfig = getRuntimeConfig(config);
-        DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl, runtimeConfig);
+        await DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl, runtimeConfig);
     } else {
         // Launch a new instance
         const browserPath = await getBrowserPath(config);

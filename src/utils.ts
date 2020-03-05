@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 import * as cp from "child_process";
 import * as fse from "fs-extra";
 import * as http from "http";
@@ -11,7 +10,10 @@ import * as url from "url";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
+
 import packageJson from "../package.json";
+import { enabledLocalizationSetting, englishLocale, pseudoLocale } from "./common/stringProviderConstants";
+import StringsProvider from "./common/stringsProvider";
 import DebugTelemetryReporter from "./debugTelemetryReporter";
 
 export interface IDevToolsSettings {
@@ -72,6 +74,7 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
     "webpack:///./~/*": "${webRoot}/node_modules/*",
     "webpack:///src/*": "${webRoot}/*",
 };
+export const SETTINGS_DEFAULT_LOCALIZATION: string = "Disabled";
 export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
 export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
 export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT: number = 2015;
@@ -450,4 +453,40 @@ export function applyPathMapping(
     }
 
     return sourcePath;
+}
+
+/**
+ * Gets the localized resources that will be displayed in the frontend
+ * @param extensionPath The root folder for the extension path.
+ */
+export async function getLocalizedStrings(extensionPath: string): Promise<string> {
+
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const localizationEnabled: string = settings.get("localization") || SETTINGS_DEFAULT_LOCALIZATION;
+    if (localizationEnabled === enabledLocalizationSetting || localizationEnabled === pseudoLocale) {
+        let locale: string = englishLocale;
+        if (process.env.VSCODE_NLS_CONFIG) {
+            locale = StringsProvider.getFallback(JSON.parse(process.env.VSCODE_NLS_CONFIG).locale);
+        }
+
+        // override for pseudo
+        if (localizationEnabled === pseudoLocale) {
+            locale = pseudoLocale;
+        }
+
+        if (locale !== englishLocale) {
+            try {
+                const resourcePath = vscode.Uri.file(
+                    path.join(extensionPath, "resources", "locales", `${locale}.json`));
+                const frontendStringDocument = await vscode.workspace.openTextDocument(resourcePath);
+                if (frontendStringDocument) {
+                    return frontendStringDocument.getText();
+                }
+            } catch (e) {
+                return ""; // Log error e.g File not found
+            }
+        }
+    }
+
+    return "";
 }

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
+import StringsProvider from "../common/stringsProvider";
+import { IDevToolsLocalization } from "../common/stringsProviderInterface";
 import { parseMessageFromChannel } from "../common/webviewEvents";
 import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
@@ -15,6 +16,7 @@ export interface IDevToolsWindow extends Window {
 
 export interface IRoot {
     Runtime: IRuntimeResourceLoader;
+    DevToolsLocalization: IDevToolsLocalization;
 }
 
 export function initialize(dtWindow: IDevToolsWindow) {
@@ -38,6 +40,7 @@ export function initialize(dtWindow: IDevToolsWindow) {
     // Setup the global objects that must exist at load time
     dtWindow.InspectorFrontendHost = new ToolsHost();
     dtWindow.WebSocket = ToolsWebSocket;
+    StringsProvider.instance.initializeStringsProvider(dtWindow);
 
     // Listen for messages from the extension and forward to the tools
     const messageCallback =

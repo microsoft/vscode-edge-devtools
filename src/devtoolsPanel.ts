@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 import * as path from "path";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
@@ -17,6 +16,7 @@ import { PanelSocket } from "./panelSocket";
 import {
     applyPathMapping,
     fetchUri,
+    getLocalizedStrings,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
     SETTINGS_PREF_NAME,
@@ -33,6 +33,7 @@ export class DevToolsPanel {
     private readonly panel: vscode.WebviewPanel;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
+    private serializedFrontendStrings: string;
     private panelSocket: PanelSocket;
 
     private constructor(
@@ -40,12 +41,14 @@ export class DevToolsPanel {
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
-        config: IRuntimeConfig) {
+        config: IRuntimeConfig,
+        serializedFrontendStrings: string) {
         this.panel = panel;
         this.context = context;
         this.telemetryReporter = telemetryReporter;
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
+        this.serializedFrontendStrings = serializedFrontendStrings;
         this.config = config;
 
         // Hook up the socket events
@@ -54,6 +57,7 @@ export class DevToolsPanel {
         this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
+        this.panelSocket.on("getStrings", () => this.onSocketGetStrings());
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
@@ -112,6 +116,16 @@ export class DevToolsPanel {
 
     private onSocketMessage() {
         // TODO: Handle message
+    }
+
+    private onSocketGetStrings() {
+        // Handling the strings for the frontend
+        if (this.serializedFrontendStrings) {
+            const message = this.serializedFrontendStrings;
+            encodeMessageForChannel((receivedMsg) => this.panel.webview.postMessage(receivedMsg),
+                "getStrings", { event: "initialRetrieve", message });
+            this.serializedFrontendStrings = "";
+        }
     }
 
     private onSocketClose() {
@@ -272,23 +286,32 @@ export class DevToolsPanel {
             `;
     }
 
-    public static createOrShow(
+    public static async createOrShow(
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
         config: IRuntimeConfig) {
         const column = vscode.ViewColumn.Beside;
 
+        const serializedFrontendStrings: string = await getLocalizedStrings(context.extensionPath);
+
         if (DevToolsPanel.instance) {
             DevToolsPanel.instance.panel.reveal(column);
         } else {
-            const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME, column, {
+            let localizedTabTitle = SETTINGS_WEBVIEW_NAME;
+            if (serializedFrontendStrings) {
+                const frontendStrings = JSON.parse(serializedFrontendStrings);
+                localizedTabTitle  = frontendStrings[localizedTabTitle];
+            }
+
+            const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, localizedTabTitle , column, {
                 enableCommandUris: true,
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
 
-            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
+            DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config,
+                serializedFrontendStrings);
         }
     }
 }
