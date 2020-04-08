@@ -94,40 +94,40 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyInspectorCommonCssTabSliderPatch,
         ]);
 
-        await patchFileForWebView("main/MainImpl.js", toolsOutDir, true, [applyMainViewPatch]);
-        await patchFileForWebView("common/Revealer.js", toolsOutDir, true, [applyCommonRevealerPatch]);
+        await patchFileForWebView("main/main.js", toolsOutDir, true, [applyMainViewPatch]);
+        await patchFileForWebView("common/common.js", toolsOutDir, true, [applyCommonRevealerPatch]);
         await patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [
             applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, true, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [
+        await patchFileForWebView("ui/ui.js", toolsOutDir, true, [
             applyInspectorViewHandleActionPatch,
             applyInspectorViewShowDrawerPatch,
 	        applyDrawerTabLocationPatch,
             applyMainTabTabLocationPatch,
 	    ]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [applySelectTabPatch, applyShowTabElement]);
+        await patchFileForWebView("ui/ui.js", toolsOutDir, true, [applySelectTabPatch, applyShowTabElement]);
     } else {
         // tslint:disable-next-line:no-console
         console.log("Patching files for debug version");
-        await patchFileForWebView("main/MainImpl.js", toolsOutDir, false, [applyMainViewPatch]);
-        await patchFileForWebView("common/Revealer.js", toolsOutDir, false, [applyCommonRevealerPatch]);
+        await patchFileForWebView("main/main.js", toolsOutDir, false, [applyMainViewPatch]);
+        await patchFileForWebView("common/common.js", toolsOutDir, false, [applyCommonRevealerPatch]);
         await patchFileForWebView("elements/elements_module.js", toolsOutDir, false, [
             applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, false, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch, applyShowTabElement]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [
+        await patchFileForWebView("ui/ui.js", toolsOutDir, false, [applySelectTabPatch, applyShowTabElement]);
+        await patchFileForWebView("ui/ui.js", toolsOutDir, false, [
             applyInspectorViewHandleActionPatch,
             applyInspectorViewShowDrawerPatch,
             applyDrawerTabLocationPatch,
             applyMainTabTabLocationPatch
 	]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
+        await patchFileForWebView("ui/ui.js", toolsOutDir, false, [applySelectTabPatch]);
         // Debug file versions
-        await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
+        await patchFileForWebView("ui/ui.js", toolsOutDir, false, [applyUIUtilsPatch]);
         await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
         await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
         await patchFileForWebView("themes/base.css", toolsOutDir, false, [
