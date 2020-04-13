@@ -1,3 +1,7 @@
+## 1.0.7
+* Updated to version 82.0.423
+* Fixing issue with Styles panel links
+
 ## 1.0.6
 * Updating icon
 
