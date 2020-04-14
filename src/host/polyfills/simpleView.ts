@@ -27,25 +27,44 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
 }
 
 export function applyCommonRevealerPatch(content: string) {
-    return content.replace(
-        /let reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g,
-        `let reveal = ${revealInVSCode.toString().slice(0, -1)}`);
+    const pattern = /let reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g;
+    if (content.match(pattern)) {
+        return content.replace(pattern,
+            `let reveal = ${revealInVSCode.toString().slice(0, -1)}`);
+    } else {
+        return null;
+    }
 }
 
-export function applyInspectorViewPatch(content: string) {
-    return content
-        .replace(
-            /handleAction\(context,\s*actionId\)\s*{/g,
-            "handleAction(context, actionId) { return false;")
-        .replace(
-            /_showDrawer\(focus\)\s*{/g,
-            "_showDrawer(focus) { return false;");
+export function applyInspectorViewHandleActionPatch(content: string) {
+    const pattern = /handleAction\(context,\s*actionId\)\s*{/g;
+
+    if (content.match(pattern)) {
+        return content
+        .replace(pattern, "handleAction(context, actionId) { return false;");
+    } else {
+        return null;
+    }
+}
+
+export function applyInspectorViewShowDrawerPatch(content: string) {
+    const pattern = /_showDrawer\(focus\)\s*{/g;
+
+    if (content.match(pattern)) {
+        return content.replace(pattern, "_showDrawer(focus) { return false;");
+    } else {
+        return null;
+    }
 }
 
 export function applyMainViewPatch(content: string) {
-    return content.replace(
-        /const moreTools\s*=\s*[^;]+;/g,
-        "const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };");
+    const pattern = /const moreTools\s*=\s*[^;]+;/g;
+
+    if (content.match(pattern)) {
+        return content.replace(pattern, "const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };");
+    } else {
+        return null;
+    }
 }
 
 export function applySelectTabPatch(content: string) {
@@ -73,36 +92,65 @@ export function applySelectTabPatch(content: string) {
 
     const pattern = /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g;
 
-    return content.replace(
-        pattern,
-        `selectTab(id, userGesture, forceFocus) { if (${condition}) return false;`);
+    if (content.match(pattern)) {
+        return content.replace(
+            pattern,
+            `selectTab(id, userGesture, forceFocus) { if (${condition}) return false;`);
+    } else {
+        return null;
+    }
 }
 
-export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
+export function applyInspectorCommonCssHeaderContentsPatch(content: string, isRelease?: boolean) {
     const separator = (isRelease ? "\\n" : "\n");
     const cssHeaderContents =
         `.main-tabbed-pane .tabbed-pane-header-contents {
             display: none !important;
         }`.replace(/\n/g, separator);
+
+    const mainPattern = /(\.main-tabbed-pane\s*\.tabbed-pane-header-contents\s*\{([^\}]*)?\})/g;
+
+    if (content.match(mainPattern)) {
+        return content.replace(
+            mainPattern,
+            cssHeaderContents);
+    } else {
+        return null;
+    }
+}
+
+export function applyInspectorCommonCssRightToolbarPatch(content: string, isRelease?: boolean) {
+    const separator = (isRelease ? "\\n" : "\n");
     const cssRightToolbar =
         `.tabbed-pane-right-toolbar {
             display: none !important;
         }`.replace(/\n/g, separator);
+
+    const tabbedPanePattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
+
+    if (content.match(tabbedPanePattern)) {
+        return content.replace(
+                tabbedPanePattern,
+                cssRightToolbar);
+    } else {
+        return null;
+    }
+}
+
+export function applyInspectorCommonCssTabSliderPatch(content: string, isRelease?: boolean) {
+    const separator = (isRelease ? "\\n" : "\n");
     const cssTabSlider =
         `.tabbed-pane-tab-slider {
             display: none !important;
         }`.replace(/\n/g, separator);
 
-    // we need to do this by parts as the code is split between base.css
-    // and dark.css
-    let result = content.replace(
-        /(\.main-tabbed-pane\s*\.tabbed-pane-header-contents\s*\{([^\}]*)?\})/g,
-        cssHeaderContents);
-    result = result.replace(
-            /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g,
-            cssRightToolbar);
-    result = result.replace(
-        /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g,
-        cssTabSlider);
-    return result;
+    const tabbedPaneSlider = /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g;
+
+    if (content.match(tabbedPaneSlider)) {
+        return content.replace(
+            tabbedPaneSlider,
+            cssTabSlider);
+    } else {
+        return null;
+    }
 }

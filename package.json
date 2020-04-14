@@ -414,6 +414,7 @@
         "package": "vsce package --out vscode-edge-devtools.vsix",
         "vscode:prepublish": "npm run build-and-lint",
         "build": "npm run build-wp && npm run build-post",
+        "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
         "build-wp": "webpack",
         "build-post": "ts-node postBuildStep.ts",
         "build-watch": "npm run build && npm run watch",
