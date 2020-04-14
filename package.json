@@ -7,7 +7,9 @@
     "publisher": "ms-edgedevtools",
     "preview": true,
     "icon": "icon.png",
-    "extensionKind": ["ui"],
+    "extensionKind": [
+        "ui"
+    ],
     "author": {
         "name": "Microsoft Corporation"
     },
@@ -431,8 +433,8 @@
         "@types/fs-extra": "8.0.0",
         "@types/jest": "24.0.15",
         "@types/node": "12.6.8",
-        "@types/ws": "6.0.1",
         "@types/vscode": "1.36.0",
+        "@types/ws": "6.0.1",
         "fs-extra": "8.1.0",
         "jest": "24.8.0",
         "ts-jest": "24.0.2",
@@ -440,7 +442,7 @@
         "ts-node": "8.3.0",
         "tslint": "5.18.0",
         "typescript": "3.5.3",
-        "vsce": "1.65.0",
+        "vsce": "1.75.0",
         "vscode-test": "1.0.2",
         "webpack": "4.36.1",
         "webpack-cli": "3.3.6"
