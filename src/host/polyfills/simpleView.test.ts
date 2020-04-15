@@ -37,7 +37,7 @@ describe("simpleView", () => {
             expect.stringContaining("let reveal = function revealInVSCode(revealable, omitFocus) {"));
     });
 
-    it("applyInspectorViewPatch correctly changes handleAction text", async () => {
+    it("applyInspectorViewPatch correctly changes handleAction text", async () => { 
         const comparableText = "handleAction(context, actionId) {\n";
         let fileContents = getTextFromFile("ui/InspectorView.js");
         // The file was not found, so test that at least the text is being replaced.
@@ -76,7 +76,7 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssPatch correctly changes tabbed-pane-tab-slider", async () => {
-        const expectedCss = `.tabbed-pane-tab-slider {
+        const comparableText = `.tabbed-pane-tab-slider {
             height: 2px;
             position: absolute;
             bottom: -1px;
@@ -93,15 +93,15 @@ describe("simpleView", () => {
         let fileContents = getTextFromFile("shell.js");
 
         // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : expectedCss;
+        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
 
-    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-right-toolbar", async () => {
-        const expectedCss = `.tabbed-pane-right-toolbar {
+    it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar", async () => {
+        const comparableText = `.tabbed-pane-right-toolbar {
             margin-left: -4px;
             flex: none;
         }`;
@@ -111,15 +111,15 @@ describe("simpleView", () => {
         let fileContents = getTextFromFile("shell.js");
 
         // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : expectedCss;
+        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
 
-    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-tab-slider in release mode", async () => {
-        const expectedCss = `.tabbed-pane-tab-slider {
+    it("applyInspectorCommonCssTabSliderPatch correctly changes tabbed-pane-tab-slider in release mode", async () => {
+        const comparableText = `.tabbed-pane-tab-slider {
             height: 2px;
             position: absolute;
             bottom: -1px;
@@ -135,15 +135,15 @@ describe("simpleView", () => {
         let fileContents = getTextFromFile("shell.js");
 
         // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : expectedCss;
+        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents, true);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
 
-    it("applyInspectorCommonCssPatch correctly changes tabbed-pane-right-toolbar in release mode", async () => {
-        const expectedCss = `.tabbed-pane-right-toolbar {
+    it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar in release mode", async () => {
+        const comparableText = `.tabbed-pane-right-toolbar {
             margin-left: -4px;
             flex: none;
         }`;
@@ -152,37 +152,41 @@ describe("simpleView", () => {
         let fileContents = getTextFromFile("shell.js");
 
         // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : expectedCss;
+        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents, true);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
 
-    it("applyInspectorViewPatch correctly changes text", async () => {
+    it("applyDrawerTabLocationPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
 
-        const comparableText3 = "this._showDrawer.bind(this, false), 'drawer-view', true, true // code";
-        let fileContents3 = getTextFromFile("ui/ui.js");
+        const comparableText = "this._showDrawer.bind(this, false), 'drawer-view', true, true";
+        let fileContents = getTextFromFile("ui/InspectorView.js");
         // The file was not found, so test that at least the text is being replaced.
-        fileContents3 = fileContents3 ? fileContents3 : comparableText3;
-        const result3 = apply.applyDrawerTabLocationPatch(fileContents3);
-        expect(result3).not.toEqual(null);
-        expect(result3).toEqual(
-            "this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls' // code");
+        fileContents = fileContents ? fileContents : comparableText;
+        const result = apply.applyDrawerTabLocationPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(
+            "this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls'"));
+    });
 
-        const comparableText4 = "InspectorFrontendHostInstance), 'panel', true, true, Root.Runtime.queryParam('panel') // code";
-        let fileContents4 = getTextFromFile("ui/ui.js");
+    it("applyMainTabTabLocationPatch correctly changes text", async () => {
+        const apply = await import("./simpleView");
+
+        const comparableText = "InspectorFrontendHostInstance), 'panel', true, true, Root.Runtime.queryParam('panel')";
+        let fileContents = getTextFromFile("ui/InspectorView.js");
         // The file was not found, so test that at least the text is being replaced.
-        fileContents4 = fileContents4 ? fileContents4 : comparableText4;
-        const result4 = apply.applyMainTabTabLocationPatch(fileContents4);
-        expect(result4).not.toEqual(null);
-        expect(result4).toEqual("InspectorFrontendHostInstance), 'panel', true, true, 'network' // code");
+        fileContents = fileContents ? fileContents : comparableText;
+        const result = apply.applyMainTabTabLocationPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining("InspectorFrontendHostInstance), 'panel', true, true, 'network'"));
     });
 
     it("applySelectTabPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
-        const comparableText = "selectTab(id, userGesture, forceFocus) { // code"
+        const comparableText = "selectTab(id, userGesture, forceFocus) {"
 
         let fileContents = getTextFromFile("ui/TabbedPane.js");
         fileContents = fileContents ? fileContents : comparableText;
@@ -194,7 +198,7 @@ describe("simpleView", () => {
     it("applyShowTabElementPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
 
-        const comparableText = "_showTabElement(index, tab) { // code";
+        const comparableText = "_showTabElement(index, tab) {";
         let fileContents = getTextFromFile("ui/TabbedPane.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyShowTabElement(fileContents);
@@ -208,10 +212,13 @@ describe("simpleView", () => {
         let fileContents = getTextFromFile("shell.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonCssPatch(fileContents);
+
+        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
+        const expectedString = ".tabbed-pane-header-tabs-drop-down-container {\n        display: none";
+
         expect(result).not.toEqual(null);
         if (result) {
-          expect(result.startsWith(".main-tabbed-pane")).toEqual(true);
-          expect(result.endsWith(".monospace,")).toEqual(true);
+          expect(result).toEqual(expect.stringContaining(expectedString));
         }
     });
 
@@ -221,11 +228,24 @@ describe("simpleView", () => {
         let fileContents = getTextFromFile("shell.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonCssPatch(fileContents, true);
+
+        const expectedString = ".tabbed-pane-header-tabs-drop-down-container {\\n        display: none";
+
         expect(result).not.toEqual(null);
         if (result) {
-          expect(result.startsWith(".main-tabbed-pane")).toEqual(true);
-          expect(result.endsWith(".monospace,")).toEqual(true);
-          expect(result.indexOf("\\n") > -1).toEqual(true);
+          expect(result).toEqual(expect.stringContaining(expectedString));
         }
     });
+
+    it("applyShowElementsTab correctly changes text", async () => {
+      const apply = await import("./simpleView");
+      const comparableText = "this._defaultTab = defaultTab;";
+      let fileContents = getTextFromFile("ui/ViewManager.js");
+      fileContents = fileContents ? fileContents : comparableText;
+      const result = apply.applyShowElementsTab(fileContents);
+      expect(result).not.toEqual(null);
+      if (result) {
+        expect(result).toEqual(expect.stringContaining("this._defaultTab = 'elements';"));
+      }
+  });
 });

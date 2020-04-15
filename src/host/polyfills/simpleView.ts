@@ -67,6 +67,16 @@ export function applyMainViewPatch(content: string) {
     }
 }
 
+export function applyShowElementsTab(content: string) {
+  const pattern = /this\._defaultTab\s*=\s*defaultTab;/;
+
+  if (content.match(pattern)) {
+    return content.replace(pattern, "this._defaultTab = 'elements';")
+  } else {
+    return null;
+  }
+}
+
 export function applySelectTabPatch(content: string) {
     const allowedTabs = [
         "elements",
