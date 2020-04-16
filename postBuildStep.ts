@@ -7,6 +7,7 @@ import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import {
+    applyAppendTabPatch,
     applyCommonRevealerPatch,
     applyDrawerTabLocationPatch,
     applyInspectorCommonCssPatch,
@@ -15,7 +16,6 @@ import {
     applyInspectorViewHandleActionPatch,
     applyInspectorViewShowDrawerPatch,
     applyMainTabTabLocationPatch,
-    applyAppendTabPatch,
     applyMainViewPatch,
     applyShowElementsTab,
 } from "./src/host/polyfills/simpleView";
