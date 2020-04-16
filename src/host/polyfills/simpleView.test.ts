@@ -106,7 +106,7 @@ describe("simpleView", () => {
             flex: none;
         }`;
         const expectedResult = `.tabbed-pane-right-toolbar {
-            display: none !important;
+            visibility: hidden !important;
         }`;
         let fileContents = getTextFromFile("shell.js");
 
@@ -148,7 +148,7 @@ describe("simpleView", () => {
             flex: none;
         }`;
         const expectedResult =
-            ".tabbed-pane-right-toolbar {\\n            display: none !important;\\n        }";
+            ".tabbed-pane-right-toolbar {\\n            visibility: hidden !important;\\n        }";
         let fileContents = getTextFromFile("shell.js");
 
         // The file was not found, so test that at least the text is being replaced.
