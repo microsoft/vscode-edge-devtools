@@ -210,24 +210,6 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
     }
 }
 
-export function applyInspectorCommonCssHeaderContentsPatch(content: string, isRelease?: boolean) {
-    const separator = (isRelease ? "\\n" : "\n");
-    const cssHeaderContents =
-        `.main-tabbed-pane .tabbed-pane-header-contents {
-            display: none !important;
-        }`.replace(/\n/g, separator);
-
-    const mainPattern = /(\.main-tabbed-pane\s*\.tabbed-pane-header-contents\s*\{([^\}]*)?\})/g;
-
-    if (content.match(mainPattern)) {
-        return content.replace(
-            mainPattern,
-            cssHeaderContents);
-    } else {
-        return null;
-    }
-}
-
 export function applyInspectorCommonCssRightToolbarPatch(content: string, isRelease?: boolean) {
     const separator = (isRelease ? "\\n" : "\n");
     const cssRightToolbar =
