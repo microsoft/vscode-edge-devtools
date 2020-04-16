@@ -16,8 +16,7 @@ import {
     applyInspectorViewShowDrawerPatch,
     applyMainTabTabLocationPatch,
     applyMainViewPatch,
-    applySelectTabPatch,
-    applyShowTabElement,
+    applyAppendTabPatch,
     applyShowElementsTab
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
@@ -107,7 +106,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
 	          applyDrawerTabLocationPatch,
             applyMainTabTabLocationPatch,
 	    ]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [applySelectTabPatch, applyShowTabElement]);
+        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [applyAppendTabPatch]);
         await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [applyShowElementsTab]);
     } else {
         // tslint:disable-next-line:no-console
@@ -119,14 +118,14 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, false, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch, applyShowTabElement]);
+        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applyAppendTabPatch]);
         await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [
             applyInspectorViewHandleActionPatch,
             applyInspectorViewShowDrawerPatch,
             applyDrawerTabLocationPatch,
             applyMainTabTabLocationPatch
 	      ]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
+        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applyAppendTabPatch]);
         await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [applyShowElementsTab]);
         // Debug file versions
         await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);

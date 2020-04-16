@@ -184,26 +184,15 @@ describe("simpleView", () => {
         expect(result).toEqual(expect.stringContaining("InspectorFrontendHostInstance), 'panel', true, true, 'network'"));
     });
 
-    it("applySelectTabPatch correctly changes text", async () => {
+    it("applyAppendTabPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
-        const comparableText = "selectTab(id, userGesture, forceFocus) {"
+        const comparableText = "appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"
 
         let fileContents = getTextFromFile("ui/TabbedPane.js");
         fileContents = fileContents ? fileContents : comparableText;
-        const result = apply.applySelectTabPatch(fileContents);
+        const result = apply.applyAppendTabPatch(fileContents);
         expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining("selectTab(id, userGesture, forceFocus) { if ("));
-    });
-
-    it("applyShowTabElementPatch correctly changes text", async () => {
-        const apply = await import("./simpleView");
-
-        const comparableText = "_showTabElement(index, tab) {";
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
-        fileContents = fileContents ? fileContents : comparableText;
-        const result = apply.applyShowTabElement(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining("_showTabElement(index, tab) { if ("));
+        expect(result).toEqual(expect.stringContaining("appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) { if (id"));
     });
 
     it("applyInspectorCommonCssPatch correctly changes text", async () => {
@@ -214,7 +203,7 @@ describe("simpleView", () => {
         const result = apply.applyInspectorCommonCssPatch(fileContents);
 
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString = ".tabbed-pane-header-tabs-drop-down-container {\n        display: none";
+        const expectedString = ".toolbar-button[aria-label='Toggle screencast'] {\n            visibility: visible !important;"
 
         expect(result).not.toEqual(null);
         if (result) {
@@ -229,7 +218,7 @@ describe("simpleView", () => {
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonCssPatch(fileContents, true);
 
-        const expectedString = ".tabbed-pane-header-tabs-drop-down-container {\\n        display: none";
+        const expectedString = ".toolbar-button[aria-label='Toggle screencast'] {\\n            visibility: visible !important;";
 
         expect(result).not.toEqual(null);
         if (result) {

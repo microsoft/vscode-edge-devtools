@@ -77,7 +77,7 @@ export function applyShowElementsTab(content: string) {
   }
 }
 
-export function applySelectTabPatch(content: string) {
+export function applyAppendTabPatch(content: string) {
     const allowedTabs = [
         "elements",
         "Styles",
@@ -111,54 +111,12 @@ export function applySelectTabPatch(content: string) {
         return `id !== '${tab}'`;
     }).join(" && ");
 
-    const pattern = /selectTab\(id,\s*userGesture,\s*forceFocus\)\s*{/g;
+    const pattern = /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
 
     if (content.match(pattern)) {
         return content.replace(
             pattern,
-            `selectTab(id, userGesture, forceFocus) { if (${condition}) return false;`);
-    } else {
-        return null;
-    }
-}
-
-export function applyShowTabElement(content: string) {
-    const networkTabs = [
-        "elements",
-        "Styles",
-        "Computed",
-        "accessibility.view",
-        "elements.domProperties",
-        "elements.domBreakpoints",
-        "elements.eventListeners",
-        "network",
-        "network.blocked-urls",
-        "network.search-network-tab",
-        "headers",
-        "preview",
-        "response",
-        "timing",
-        "initiator",
-        "cookies",
-        "eventSource",
-        "webSocketFrames",
-        "preferences",
-        "workspace",
-        "experiments",
-        "blackbox",
-        "devices",
-        "throttling-conditions",
-        "emulation-geolocations",
-        "Shortcuts",
-    ];
-
-    const condition = networkTabs.map((tab) => {
-        return `tab._id !== '${tab}'`;
-    }).join(" && ");
-
-    const pattern = /_showTabElement\(index,\s*tab\)\s*{/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, `_showTabElement\(index, tab\) { if (${condition}) return false;`);
+            `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) { if (${condition}) return;`);
     } else {
         return null;
     }
@@ -185,11 +143,6 @@ export function applyMainTabTabLocationPatch(content: string) {
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
     const separator = (isRelease ? "\\n" : "\n");
 
-    const hideToolsDropdown =
-    `.tabbed-pane-header-tabs-drop-down-container {
-        display: none !important;
-    }`.replace(/\n/g, separator);
-
     const hideInspectBtn =
         `.toolbar-button[aria-label='Select an element in the page to inspect it'] {
             display: none !important;
@@ -207,7 +160,6 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
 
     const topHeaderCSS =
         hideInspectBtn +
-        hideToolsDropdown +
         unHideScreenCastBtn +
         unHideSearchCloseButton;
 
@@ -279,7 +231,7 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string, isRele
     const separator = (isRelease ? "\\n" : "\n");
     const cssRightToolbar =
         `.tabbed-pane-right-toolbar {
-            display: none !important;
+            visibility: hidden !important;
         }`.replace(/\n/g, separator);
 
     const tabbedPanePattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
