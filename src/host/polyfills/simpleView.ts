@@ -71,7 +71,7 @@ export function applyShowElementsTab(content: string) {
   const pattern = /this\._defaultTab\s*=\s*defaultTab;/;
 
   if (content.match(pattern)) {
-    return content.replace(pattern, "this._defaultTab = 'elements';")
+    return content.replace(pattern, "this._defaultTab = 'elements';");
   } else {
     return null;
   }
@@ -86,7 +86,7 @@ export function applyAppendTabPatch(content: string) {
         "elements.domProperties",
         "elements.domBreakpoints",
         "elements.eventListeners",
-    	  "network",
+        "network",
         "network.blocked-urls",
         "network.search-network-tab",
         "headers",
@@ -125,7 +125,8 @@ export function applyAppendTabPatch(content: string) {
 export function applyDrawerTabLocationPatch(content: string) {
     const pattern = /this._showDrawer.bind\s*\(this,\s*false\),\s*'drawer-view',\s*true,\s*true/g;
     if (content.match(pattern)) {
-        return content.replace(pattern, `this._showDrawer.bind\(this, false\), 'drawer-view', true, true, 'network.blocked-urls'`);
+        return content.replace(pattern,
+            `this._showDrawer.bind\(this, false\), 'drawer-view', true, true, 'network.blocked-urls'`);
     } else {
         return null;
     }
@@ -201,7 +202,7 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
         drawerCSS +
         networkCSS;
 
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g
+    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     if (content.match(pattern)) {
         return content.replace(pattern, `${addCSS}${separator} $1`);
     } else {

@@ -15,9 +15,9 @@ import {
     applyInspectorViewHandleActionPatch,
     applyInspectorViewShowDrawerPatch,
     applyMainTabTabLocationPatch,
-    applyMainViewPatch,
     applyAppendTabPatch,
-    applyShowElementsTab
+    applyMainViewPatch,
+    applyShowElementsTab,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
 
@@ -89,7 +89,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyUIUtilsPatch,
             applyCreateElementPatch,
             applyInspectorCommonCssRightToolbarPatch,
-	          applyInspectorCommonCssPatch,
+            applyInspectorCommonCssPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
 
@@ -103,9 +103,9 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [
             applyInspectorViewHandleActionPatch,
             applyInspectorViewShowDrawerPatch,
-	          applyDrawerTabLocationPatch,
+            applyDrawerTabLocationPatch,
             applyMainTabTabLocationPatch,
-	    ]);
+        ]);
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [applyAppendTabPatch]);
         await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [applyShowElementsTab]);
     } else {
@@ -123,8 +123,8 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyInspectorViewHandleActionPatch,
             applyInspectorViewShowDrawerPatch,
             applyDrawerTabLocationPatch,
-            applyMainTabTabLocationPatch
-	      ]);
+            applyMainTabTabLocationPatch,
+        ]);
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applyAppendTabPatch]);
         await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [applyShowElementsTab]);
         // Debug file versions
@@ -132,7 +132,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
         await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
         await patchFileForWebView("themes/base.css", toolsOutDir, false, [
-           applyInspectorCommonCssRightToolbarPatch, applyInspectorCommonCssTabSliderPatch]);
+            applyInspectorCommonCssRightToolbarPatch, applyInspectorCommonCssTabSliderPatch]);
         await patchFileForWebView("elements/elementsTreeOutline.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
         await patchFileForWebView("elements/stylesSectionTree.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
     }
