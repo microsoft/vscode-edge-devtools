@@ -372,6 +372,10 @@
                     "group": "inline"
                 },
                 {
+                    "command": "vscode-edge-devtools-view.attach",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget"
+                },
+                {
                     "command": "vscode-edge-devtools-view.copyItem",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTargetProperty",
                     "group": "2_contextMenu"
