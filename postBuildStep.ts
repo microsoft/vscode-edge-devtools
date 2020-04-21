@@ -10,9 +10,11 @@ import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
     applyDrawerTabLocationPatch,
+    applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
+    applyInspectorCommonNetworkPatch,
     applyInspectorViewHandleActionPatch,
     applyInspectorViewShowDrawerPatch,
     applyMainTabTabLocationPatch,
@@ -88,8 +90,10 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("shell.js", toolsOutDir, true, [
             applyUIUtilsPatch,
             applyCreateElementPatch,
+            applyInspectorCommonContextMenuPatch,
             applyInspectorCommonCssRightToolbarPatch,
             applyInspectorCommonCssPatch,
+            applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
 
@@ -132,6 +136,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
         await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
         await patchFileForWebView("themes/base.css", toolsOutDir, false, [
+            applyInspectorCommonContextMenuPatch, applyInspectorCommonCssPatch, applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssRightToolbarPatch, applyInspectorCommonCssTabSliderPatch]);
         await patchFileForWebView("elements/elementsTreeOutline.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
         await patchFileForWebView("elements/stylesSectionTree.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);

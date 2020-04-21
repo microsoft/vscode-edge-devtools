@@ -164,12 +164,16 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
         unHideScreenCastBtn +
         unHideSearchCloseButton;
 
-    const hideMoreToolsBtn =
-        `.toolbar-button[aria-label='More Tools'] {
-            display: none !important;
-        }`.replace(/\n/g, separator);
+    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
+    if (content.match(pattern)) {
+        return content.replace(pattern, `${topHeaderCSS}${separator} $1`);
+    } else {
+        return null;
+    }
+}
 
-    const drawerCSS = hideMoreToolsBtn;
+export function applyInspectorCommonNetworkPatch(content: string, isRelease?: boolean) {
+    const separator = (isRelease ? "\\n" : "\n");
 
     const hideExportHarBtn =
         `.toolbar-button[aria-label='Export HAR...'] {
@@ -181,7 +185,22 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
             display: none !important;
         }`.replace(/\n/g, separator);
 
-    const hideSomeContextMenuItems =
+    const networkCSS =
+        hideExportHarBtn +
+        hidePrettyPrintBtn;
+
+    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
+    if (content.match(pattern)) {
+        return content.replace(pattern, `${networkCSS}${separator} $1`);
+    } else {
+        return null;
+    }
+}
+
+export function applyInspectorCommonContextMenuPatch(content: string, isRelease?: boolean) {
+    const separator = (isRelease ? "\\n" : "\n");
+
+    const hideContextMenuItems =
         `.soft-context-menu-separator,
         .soft-context-menu-item[aria-label='Open in new tab'],
         .soft-context-menu-item[aria-label='Open in Sources panel'],
@@ -192,19 +211,9 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
             display: none !important;
         }`.replace(/\n/g, separator);
 
-    const networkCSS =
-        hideExportHarBtn +
-        hidePrettyPrintBtn +
-        hideSomeContextMenuItems;
-
-    const addCSS =
-        topHeaderCSS +
-        drawerCSS +
-        networkCSS;
-
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     if (content.match(pattern)) {
-        return content.replace(pattern, `${addCSS}${separator} $1`);
+        return content.replace(pattern, `${hideContextMenuItems}${separator} $1`);
     } else {
         return null;
     }
