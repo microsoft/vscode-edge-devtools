@@ -87,18 +87,6 @@ describe("simpleView", () => {
             "this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls'"));
     });
 
-    it("applyMainTabTabLocationPatch correctly changes text", async () => {
-        const apply = await import("./simpleView");
-        const comparableText = "InspectorFrontendHostInstance), 'panel', true, true, Root.Runtime.queryParam('panel')";
-        let fileContents = getTextFromFile("ui/InspectorView.js");
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
-        const result = apply.applyMainTabTabLocationPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(
-            "InspectorFrontendHostInstance), 'panel', true, true, 'network'"));
-    });
-
     it("applyAppendTabPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
         const comparableText = "appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {";
@@ -119,6 +107,32 @@ describe("simpleView", () => {
         expect(result).not.toEqual(null);
         if (result) {
             expect(result).toEqual(expect.stringContaining("this._defaultTab = 'elements';"));
+        }
+    });
+
+    it("applyShowRequestBlockingTab correctly changes text", async () => {
+        const apply = await import("./simpleView");
+        const comparableText = "if(!view.isCloseable())";
+        let fileContents = getTextFromFile("ui/ViewManager.js");
+        fileContents = fileContents ? fileContents : comparableText;
+        const result = apply.applyShowRequestBlockingTab(fileContents);
+        expect(result).not.toEqual(null);
+        if (result) {
+            expect(result).toEqual(expect.stringContaining(
+                "if(!view.isCloseable()||id==='network.blocked-urls')"));
+        }
+    });
+
+    it("applyPersistRequestBlockingTab correctly changes text", async () => {
+        const apply = await import("./simpleView");
+        const comparableText = "this._closeable = closeable;";
+        let fileContents = getTextFromFile("ui/TabbedPane.js");
+        fileContents = fileContents ? fileContents : comparableText;
+        const result = apply.applyPersistRequestBlockingTab(fileContents);
+        expect(result).not.toEqual(null);
+        if (result) {
+            expect(result).toEqual(expect.stringContaining(
+                "this._closeable=id==='network.blocked-urls'?false:closeable;"));
         }
     });
 

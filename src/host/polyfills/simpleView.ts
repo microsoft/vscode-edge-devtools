@@ -36,7 +36,11 @@ export function applyCommonRevealerPatch(content: string) {
     }
 }
 
+// This function is needed for Elements-only version, but we need the drawer
+// for the Request Blocking tool when enabling the Network Panel.
 export function applyInspectorViewHandleActionPatch(content: string) {
+    // This patch removes the ability to open/close the drawer using 'ESC'
+    // and using CTRL + [ or CTRL + ] to navigate between tabs.
     const pattern = /handleAction\(context,\s*actionId\)\s*{/g;
 
     if (content.match(pattern)) {
@@ -47,7 +51,10 @@ export function applyInspectorViewHandleActionPatch(content: string) {
     }
 }
 
+// This function is needed for Elements-only version, but we need the drawer
+// for the Request Blocking tool when enabling the Network Panel.
 export function applyInspectorViewShowDrawerPatch(content: string) {
+    // This patch hides the drawer.
     const pattern = /_showDrawer\(focus\)\s*{/g;
 
     if (content.match(pattern)) {
@@ -68,16 +75,42 @@ export function applyMainViewPatch(content: string) {
 }
 
 export function applyShowElementsTab(content: string) {
-  const pattern = /this\._defaultTab\s*=\s*defaultTab;/;
+    // This tab sets the Elements tool as the default tab,
+    // so the extension will always show the Elements tool first.
+    const pattern = /this\._defaultTab\s*=\s*defaultTab;/;
 
-  if (content.match(pattern)) {
-    return content.replace(pattern, "this._defaultTab = 'elements';");
-  } else {
+    if (content.match(pattern)) {
+        return content.replace(pattern, "this._defaultTab = 'elements';");
+    } else {
     return null;
-  }
+    }
+}
+
+export function applyShowRequestBlockingTab(content: string) {
+    // Appends the Request Blocking tab in the drawer even if it is not open.
+    const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
+
+    if (content.match(pattern)) {
+        return content.replace(pattern, "if(!view.isCloseable()||id==='network.blocked-urls')");
+    } else {
+        return null;
+    }
+}
+
+export function applyPersistRequestBlockingTab(content: string) {
+    // Removes the close button from the Request blocking tab by making the tab non-closeable.
+    const pattern = /this\._closeable\s*=\s*closeable;/;
+
+    if (content.match(pattern)) {
+        return content.replace(pattern, "this._closeable=id==='network.blocked-urls'?false:closeable;");
+    } else {
+        return null;
+    }
 }
 
 export function applyAppendTabPatch(content: string) {
+    // The appendTab function chooses which tabs to put in the tabbed pane header section
+    // showTabElement and selectTab are only called by tabs that have already been appended via appendTab.
     const allowedTabs = [
         "elements",
         "Styles",
@@ -123,6 +156,7 @@ export function applyAppendTabPatch(content: string) {
 }
 
 export function applyDrawerTabLocationPatch(content: string) {
+    // This shows the drawer with the network.blocked-urls tab open.
     const pattern = /this._showDrawer.bind\s*\(this,\s*false\),\s*'drawer-view',\s*true,\s*true/g;
     if (content.match(pattern)) {
         return content.replace(pattern,
@@ -132,20 +166,17 @@ export function applyDrawerTabLocationPatch(content: string) {
     }
 }
 
-export function applyMainTabTabLocationPatch(content: string) {
-    const pattern = /InspectorFrontendHostInstance\),\s*'panel',\s*true,\s*true,\s*Root.Runtime.queryParam\('panel'\)/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, `InspectorFrontendHostInstance\), 'panel', true, true, 'network'`);
-    } else {
-        return null;
-    }
-}
-
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
+    // Hides the inspect button, the more tools button in the drawer and reveals the screen cast button.
     const separator = (isRelease ? "\\n" : "\n");
 
     const hideInspectBtn =
         `.toolbar-button[aria-label='Select an element in the page to inspect it'] {
+            display: none !important;
+        }`.replace(/\n/g, separator);
+
+    const hideMoreToolsBtn =
+        `.toolbar-button[aria-label='More Tools'] {
             display: none !important;
         }`.replace(/\n/g, separator);
 
@@ -154,15 +185,10 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
             visibility: visible !important;
         }`.replace(/\n/g, separator);
 
-    const unHideSearchCloseButton =
-        `.toolbar-button[aria-label='Close'] {
-            visibility: visible !important;
-        }`.replace(/\n/g, separator);
-
     const topHeaderCSS =
         hideInspectBtn +
-        unHideScreenCastBtn +
-        unHideSearchCloseButton;
+        hideMoreToolsBtn +
+        unHideScreenCastBtn;
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     if (content.match(pattern)) {
@@ -173,6 +199,7 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
 }
 
 export function applyInspectorCommonNetworkPatch(content: string, isRelease?: boolean) {
+    // Hides export HAR button and pretty print button and reveals the Network search close button in the Network Panel.
     const separator = (isRelease ? "\\n" : "\n");
 
     const hideExportHarBtn =
@@ -185,9 +212,16 @@ export function applyInspectorCommonNetworkPatch(content: string, isRelease?: bo
             display: none !important;
         }`.replace(/\n/g, separator);
 
+    // Search close button initially hidden by applyInspectorCommonCssRightToolbarPatch
+    const unHideSearchCloseButton =
+        `.toolbar-button[aria-label='Close'] {
+            visibility: visible !important;
+        }`.replace(/\n/g, separator);
+
     const networkCSS =
         hideExportHarBtn +
-        hidePrettyPrintBtn;
+        hidePrettyPrintBtn +
+        unHideSearchCloseButton;
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     if (content.match(pattern)) {
@@ -198,6 +232,7 @@ export function applyInspectorCommonNetworkPatch(content: string, isRelease?: bo
 }
 
 export function applyInspectorCommonContextMenuPatch(content: string, isRelease?: boolean) {
+    // Hides certain context menu items from elements in the Network Panel.
     const separator = (isRelease ? "\\n" : "\n");
 
     const hideContextMenuItems =
