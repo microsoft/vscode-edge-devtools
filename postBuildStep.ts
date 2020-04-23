@@ -17,6 +17,7 @@ import {
     applyInspectorCommonNetworkPatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
+    applySetTabIconPatch,
     applyShowElementsTab,
     applyShowRequestBlockingTab,
 } from "./src/host/polyfills/simpleView";
@@ -107,6 +108,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
+            applySetTabIconPatch,
         ]);
         await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
@@ -126,6 +128,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
+            applySetTabIconPatch,
         ]);
         await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,

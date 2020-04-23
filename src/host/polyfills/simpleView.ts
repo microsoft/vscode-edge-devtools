@@ -108,6 +108,18 @@ export function applyPersistRequestBlockingTab(content: string) {
     }
 }
 
+export function applySetTabIconPatch(content: string) {
+    // Patching setTabIcon so it does not throw an unhandled promise rejection when hard coded tab names are not in the tablist.
+    // This is needed due to applyAppendTabPatch which removes unused tabs from the tablist.
+    const pattern = /setTabIcon\(id,\s*icon\)\s*{\s*const tab\s*=\s*this\._tabsById\.get\(id\);/;
+
+    if (content.match(pattern)) {
+        return content.replace(pattern, "setTabIcon(id,icon){const tab=this._tabsById.get(id); if(!tab){return;}");
+    } else {
+        return null;
+    }
+}
+
 export function applyAppendTabPatch(content: string) {
     // The appendTab function chooses which tabs to put in the tabbed pane header section
     // showTabElement and selectTab are only called by tabs that have already been appended via appendTab.

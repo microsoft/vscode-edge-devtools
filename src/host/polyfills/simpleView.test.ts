@@ -87,6 +87,16 @@ describe("simpleView", () => {
             "this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls'"));
     });
 
+    it("applySetTabIconPatch correctly changes text", async () => {
+        const apply = await import("./simpleView");
+        const comparableText = " setTabIcon(id, icon) {const tab = this._tabsById.get(id); tab._setIcon(icon);this._updateTabElements();}";
+        let fileContents = getTextFromFile("ui/TabbedPane.js");
+        fileContents = fileContents ? fileContents : comparableText;
+        const result = apply.applySetTabIconPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining("if(!tab){return;}"));
+    });
+
     it("applyAppendTabPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
         const comparableText = "appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {";
