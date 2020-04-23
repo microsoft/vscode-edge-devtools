@@ -109,7 +109,7 @@ export function applyPersistRequestBlockingTab(content: string) {
 }
 
 export function applySetTabIconPatch(content: string) {
-    // Patching setTabIcon so it does not throw an unhandled promise rejection when hard coded tab names are not in the tablist.
+    // Adding undefined check in SetTabIcon so it doesn't throw an error trying to access disabled tabs.
     // This is needed due to applyAppendTabPatch which removes unused tabs from the tablist.
     const pattern = /setTabIcon\(id,\s*icon\)\s*{\s*const tab\s*=\s*this\._tabsById\.get\(id\);/;
 

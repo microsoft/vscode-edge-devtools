@@ -89,7 +89,8 @@ describe("simpleView", () => {
 
     it("applySetTabIconPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
-        const comparableText = " setTabIcon(id, icon) {const tab = this._tabsById.get(id); tab._setIcon(icon);this._updateTabElements();}";
+        const comparableText =
+            " setTabIcon(id, icon) {const tab = this._tabsById.get(id); tab._setIcon(icon);this._updateTabElements();}";
         let fileContents = getTextFromFile("ui/TabbedPane.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applySetTabIconPatch(fileContents);
