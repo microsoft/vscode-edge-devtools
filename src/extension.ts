@@ -122,9 +122,7 @@ export async function attach(
                 if (matchedTargets && matchedTargets.length > 0 && matchedTargets[0].webSocketDebuggerUrl) {
                     const actualTarget = fixRemoteWebSocket(hostname, port, matchedTargets[0] as any);
                     targetWebsocketUrl = actualTarget.webSocketDebuggerUrl;
-                }
-
-                if (!useRetry) {
+                } else if (!useRetry) {
                     vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
                 }
             }
