@@ -85,8 +85,8 @@ export function createFakeExtensionContext() {
 export function createFakeTelemetryReporter(): Mocked<Readonly<TelemetryReporter>> {
     return {
         dispose: jest.fn(),
-        sendTelemetryEvent: jest.fn(),
         sendTelemetryErrorEvent: jest.fn(),
+        sendTelemetryEvent: jest.fn(),
         sendTelemetryException: jest.fn(),
     };
 }
