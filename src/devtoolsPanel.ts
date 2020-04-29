@@ -145,7 +145,7 @@ export class DevToolsPanel {
             case "error": {
                 const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.info`] = JSON.stringify(telemetry.data);
-                this.telemetryReporter.sendTelemetryEvent(
+                this.telemetryReporter.sendTelemetryErrorEvent(
                     `devtools/${telemetry.name}`,
                     properties);
                 break;
