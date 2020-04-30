@@ -7,14 +7,19 @@ import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import {
+    applyAppendTabPatch,
     applyCommonRevealerPatch,
-    applyInspectorCommonCssHeaderContentsPatch,
+    applyDrawerTabLocationPatch,
+    applyInspectorCommonContextMenuPatch,
+    applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
-    applyInspectorViewHandleActionPatch,
-    applyInspectorViewShowDrawerPatch,
+    applyInspectorCommonNetworkPatch,
     applyMainViewPatch,
-    applySelectTabPatch,
+    applyPersistRequestBlockingTab,
+    applySetTabIconPatch,
+    applyShowElementsTab,
+    applyShowRequestBlockingTab,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
 
@@ -78,7 +83,6 @@ async function copyStaticFiles(debugMode: boolean) {
 }
 
 async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
-
     // Release file versions
     if (!debugMode) {
         // tslint:disable-next-line:no-console
@@ -86,8 +90,10 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebView("shell.js", toolsOutDir, true, [
             applyUIUtilsPatch,
             applyCreateElementPatch,
-            applyInspectorCommonCssHeaderContentsPatch,
+            applyInspectorCommonContextMenuPatch,
             applyInspectorCommonCssRightToolbarPatch,
+            applyInspectorCommonCssPatch,
+            applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
 
@@ -98,11 +104,16 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, true, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [
-            applyInspectorViewHandleActionPatch,
-            applyInspectorViewShowDrawerPatch]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [applySelectTabPatch]);
-
+        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [applyDrawerTabLocationPatch]);
+        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [
+            applyAppendTabPatch,
+            applyPersistRequestBlockingTab,
+            applySetTabIconPatch,
+        ]);
+        await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [
+            applyShowElementsTab,
+            applyShowRequestBlockingTab,
+        ]);
     } else {
         // tslint:disable-next-line:no-console
         console.log("Patching files for debug version");
@@ -113,16 +124,23 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, false, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [
-            applyInspectorViewHandleActionPatch,
-            applyInspectorViewShowDrawerPatch]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [applySelectTabPatch]);
+        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyDrawerTabLocationPatch]);
+        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [
+            applyAppendTabPatch,
+            applyPersistRequestBlockingTab,
+            applySetTabIconPatch,
+        ]);
+        await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [
+            applyShowElementsTab,
+            applyShowRequestBlockingTab,
+        ]);
         // Debug file versions
         await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
         await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
         await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
-        await patchFileForWebView("themes/base.css", toolsOutDir, false, [applyInspectorCommonCssHeaderContentsPatch,
-           applyInspectorCommonCssRightToolbarPatch, applyInspectorCommonCssTabSliderPatch]);
+        await patchFileForWebView("themes/base.css", toolsOutDir, false, [
+            applyInspectorCommonContextMenuPatch, applyInspectorCommonCssPatch, applyInspectorCommonNetworkPatch,
+            applyInspectorCommonCssRightToolbarPatch, applyInspectorCommonCssTabSliderPatch]);
         await patchFileForWebView("elements/elementsTreeOutline.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
         await patchFileForWebView("elements/stylesSectionTree.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
     }
