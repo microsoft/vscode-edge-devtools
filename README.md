@@ -1,7 +1,7 @@
 
 <h1 align="center">
   <br>
-  VS Code - DevTools for Microsoft Edge (Chromium)
+  VS Code - Microsoft Edge (Chromium) Tools
   <br>
 </h1>
 
@@ -11,7 +11,7 @@ A VS Code extension that allows you to use the browser's Elements and Network to
 
 **Note**: This extension only supports Microsoft Edge (Chromium)
 
-![DevTools for Microsoft Edge - Demo](demo.gif)
+![Microsoft Edge (Chromium) Tools - Demo](demo.gif)
 
 **Supported Features**
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools,
@@ -19,14 +19,14 @@ A VS Code extension that allows you to use the browser's Elements and Network to
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving VSCode.
 * Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
-* Auto attach the DevTools when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
+* Auto attach the Microsoft Edge Tools when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 
 # Using the Extension
 ## Getting Started
 For use inside VS Code:
 
 1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge (Chromium)](https://aka.ms/edgeinsider).
-1. Install the extension [DevTools for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
+1. Install the extension [Microsoft Edge Tools](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
 1. Open the folder containing the project you want to work on.
 1. (Optional) Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 
@@ -36,7 +36,7 @@ The extension operates in two modes - it can launch an instance of Microsoft Edg
 ### Opening source files from the Elements tool
 One of the features of the Elements extension is that it can show you what file applied the styles and event handlers for a given node.
 
-![DevTools for Microsoft Edge - Links](links.png)
+![Microsoft Edge Tools - Links](links.png)
 
 The source files for these applied styles and attached event handlers appear in the form of links to a url specified by the browser. Clicking on one will attempt to open that file inside the VS Code editor window. Correctly mapping these runtime locations to actual files on disk that are part of your current workspace, may require you to enable source maps as part of your build environment.
 
@@ -67,7 +67,7 @@ With source maps enabled, you may also need to configure the extension settings/
 
 
 ### Debug Configuration
-You can launch the DevTools for Microsoft Edge extension like you would a debugger, by using a `launch.json` config file. However, DevTools for Microsoft Edge isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the DevTools for Microsoft Edge extension once debugging has started.
+You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. However, Microsoft Edge Tools isn't a debugger and so any breakpoints set in VS Code won't be hit, you can of course use a different debug extension instead and attach the Microsoft Edge Tools extension once debugging has started.
 
 To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
 
@@ -85,13 +85,13 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
         {
             "type": "vscode-edge-devtools.debug",
             "request": "launch",
-            "name": "Launch Microsoft Edge and open the DevTools",
+            "name": "Launch Microsoft Edge and open the Edge DevTools",
             "file": "${workspaceFolder}/index.html"
         },
         {
             "type": "vscode-edge-devtools.debug",
             "request": "attach",
-            "name": "Attach to Microsoft Edge and open the DevTools",
+            "name": "Attach to Microsoft Edge and open the Edge DevTools",
             "url": "http://localhost:8000/",
             "webRoot": "${workspaceFolder}/out"
         }
@@ -109,7 +109,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
 * `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemaps](#sourcemaps) for more information
 * `urlFilter`: A string that can contain wildcards that will be used for finding a browser target, for example, "localhost:*/app" will match either "http://localhost:123/app" or "http://localhost:456/app", but not "https://stackoverflow.com". This property will only be used if `url` and `file` are not specified.
-* `timeout`: The number of milliseconds that the DevTools will keep trying to attach to the browser before timing out. Defaults to 10000ms.
+* `timeout`: The number of milliseconds that the Microsoft Edge Tools will keep trying to attach to the browser before timing out. Defaults to 10000ms.
 
 #### Sourcemaps
 The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
@@ -160,17 +160,17 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
 
 ### Launching the browser via the side bar view
 * Start Microsoft Edge via the side bar
-  * Click the `DevTools for Microsoft Edge` view in the side bar.
+  * Click the `Microsoft Edge Tools` view in the side bar.
   * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab.
-* Attach the DevTools via the side bar view
-  * Click the `Attach` icon next to the tab to open the DevTools.
+* Attach the Microsoft Edge Tools via the side bar view
+  * Click the `Attach` icon next to the tab to open the Microsoft Edge Tools.
 
 ### Launching the browser manually
 * Start Microsoft Edge with remote-debugging enabled on port 9222:
   * `msedge.exe --remote-debugging-port=9222`
   * Navigate the browser to the desired URL.
-* Attach the DevTools via a command:
-  * Run the command `DevTools for Microsoft Edge: Attach to a target`
+* Attach the Microsoft Edge Tools via a command:
+  * Run the command `Microsoft Edge (Chromium) Tools: Attach to a target`
   * Select a target from the drop down.
 
 ### Attaching automatically when launching the browser for debugging
@@ -178,7 +178,7 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
 * Setup your `launch.json` configuration to launch and debug Microsoft Edge (Chromium).
   * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
 * Start Microsoft Edge for debugging.
-  * Once debugging has started, the DevTools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
+  * Once debugging has started, the Microsoft Edge Tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
   * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` VS Code setting.
 
 # Contributing
