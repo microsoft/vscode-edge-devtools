@@ -34,7 +34,7 @@ For use inside VS Code:
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in the browser.
 
 ### Opening source files from the Elements tool
-One of the features of the Elements extension is that it can show you what file applied the styles and event handlers for a given node.
+One of the features of the Elements tool is that it can show you what file applied the styles and event handlers for a given node.
 
 ![Microsoft Edge Tools - Links](links.png)
 
