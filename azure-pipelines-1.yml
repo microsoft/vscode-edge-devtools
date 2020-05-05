@@ -9,9 +9,12 @@ trigger:
 stages:
 - stage: testStage
   jobs:
-  - deployment: testDeploy
-    displayName: test environment
+  - deployment: VMDeploy
+    displayName: web
     environment: 'devtools-environment'
+      name: MIKELIAO
+      resourceType: VirtualMachine
+      tags: dev
     strategy:
       runOnce:
         deploy:
