@@ -28,7 +28,7 @@ stages:
               npm install
             displayName: 'npm install'
           - script: |
-              npm build
+              npm run build
             displayName: 'npm build'
           - script: |
               npm run test
