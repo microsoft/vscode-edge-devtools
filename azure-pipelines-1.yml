@@ -11,8 +11,8 @@ stages:
   jobs:
   - deployment: VMDeploy
     displayName: web
-    environment: 'devtools-environment'
-      name: MIKELIAO
+    environment:
+      name: 'devtools-environment'
       resourceType: VirtualMachine
       tags: dev
     strategy:
