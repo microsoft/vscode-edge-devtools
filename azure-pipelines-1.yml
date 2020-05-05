@@ -19,6 +19,7 @@ stages:
       runOnce:
         deploy:
           steps:
+          - checkout: self
           - task: NodeTool@0
             inputs:
               versionSpec: '10.x'
