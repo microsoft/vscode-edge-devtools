@@ -24,6 +24,9 @@ stages:
             inputs:
               versionSpec: '10.x'
             displayName: 'Install Node.js'
+          - task: CmdLine@2
+            inputs:
+              script: 'set EDGE_CHROMIUM_PATH=C:\edge\src && set EDGE_CHROMIUM_OUT_DIR=Release'
           - script: |
               npm install
             displayName: 'npm install'
