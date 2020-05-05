@@ -26,8 +26,10 @@ stages:
             displayName: 'Install Node.js'
           - script: |
               npm install
-              npm run build
-            displayName: 'npm install and build'
+            displayName: 'npm install'
+          - script: |
+              npm build
+            displayName: 'npm build'
           - script: |
               npm run test
             displayName: 'test'
