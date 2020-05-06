@@ -100,11 +100,11 @@ describe("simpleView", () => {
 
     it("applyAppendTabPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
-        const comparableText = "appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {";
+        const comparableText = `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {}
+        export const Events={}`;
         let fileContents = getTextFromFile("ui/TabbedPane.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyAppendTabPatch(fileContents);
-        expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(
             "appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"));
     });
