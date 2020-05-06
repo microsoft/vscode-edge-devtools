@@ -35,3 +35,16 @@ stages:
               set EDGE_CHROMIUM_PATH=C:/azagent/A1/edge/src&&set EDGE_CHROMIUM_OUT_DIR=Release&&set EDGE
               npm run test
             displayName: 'test'
+          - task: Npm@1
+            displayName: 'npm run package'
+            inputs:
+              command: custom
+              verbose: false
+              customCommand: 'run package'
+          - task: CopyFiles@2
+            displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+            inputs:
+              Contents: '*.vsix'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Artifact: drop'
