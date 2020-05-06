@@ -106,7 +106,7 @@ describe("simpleView", () => {
         const result = apply.applyAppendTabPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(
-            "appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) { if (id"));
+            "appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"));
     });
 
     it("applyShowElementsTab correctly changes text", async () => {

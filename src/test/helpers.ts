@@ -57,7 +57,13 @@ export function createFakeVSCode() {
         },
         workspace: {
             getConfiguration: jest.fn(() => {
-                return { get: (name: string) => "" };
+                return { get: (name: string) => {
+                    if ("enableNetwork" === name) {
+                        return true;
+                    } else {
+                        return "";
+                    }
+                } };
             }),
             onDidChangeConfiguration: jest.fn(),
             openTextDocument: jest.fn().mockResolvedValue(null),

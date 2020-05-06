@@ -155,6 +155,11 @@
                     "description": "Auto attach the Elements for Microsoft Edge extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",
                     "default": true
                 },
+                "vscode-edge-devtools.enableNetwork": {
+                    "type": "boolean",
+                    "description": "Enable network panel (requires relaunching extension)",
+                    "default": true
+                },
                 "vscode-edge-devtools.timeout": {
                     "type": "number",
                     "description": "The number of milliseconds that the Elements tool will keep trying to attach the browser before timing out",

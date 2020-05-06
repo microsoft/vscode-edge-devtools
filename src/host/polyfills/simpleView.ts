@@ -26,6 +26,10 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
     return Promise.resolve();
 }
 
+export function getApprovedTabs(callback: () => void) {
+    InspectorFrontendHost.getApprovedTabs(callback);
+}
+
 export function applyCommonRevealerPatch(content: string) {
     const pattern = /let reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g;
     if (content.match(pattern)) {
@@ -123,7 +127,7 @@ export function applySetTabIconPatch(content: string) {
 export function applyAppendTabPatch(content: string) {
     // The appendTab function chooses which tabs to put in the tabbed pane header section
     // showTabElement and selectTab are only called by tabs that have already been appended via appendTab.
-    const allowedTabs = [
+    const elementsTabs = [
         "elements",
         "Styles",
         "Computed",
@@ -131,7 +135,50 @@ export function applyAppendTabPatch(content: string) {
         "elements.domProperties",
         "elements.domBreakpoints",
         "elements.eventListeners",
-        "network",
+    ];
+
+    const condition = elementsTabs.map((tab) => {
+        return `id !== '${tab}'`;
+    }).join(" && ");
+
+    const appendTabWrapper =
+        /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
+    const injectionPoint = /}(\s|\n)*export\s*const\s*Events={/;
+
+    // Injecting our verifications by redirecting appendTab to appendTabOverride
+    if (content.match(appendTabWrapper)) {
+        content = content.replace(
+            appendTabWrapper,
+            `appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {`);
+    } else {
+        return null;
+    }
+
+    // We then replace with the verifications itself.
+    if (content.match(injectionPoint)) {
+        content = content.replace(
+            injectionPoint,
+            `${getApprovedTabs.toString().slice(9)};
+            appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
+                let patchedCondition = ${condition};
+                this.getApprovedTabs((approvedTabs)=>{
+                    ${applyEnableNetworkPatch()}
+                    if (!patchedCondition) {
+                        this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
+                    }
+                });
+            }}
+            export const Events={`);
+    } else {
+        return null;
+    }
+
+    return content;
+}
+
+export function applyEnableNetworkPatch(): string {
+    // Creates the condition to display or hide the network panel.
+    const networkTabs = ["network",
         "network.blocked-urls",
         "network.search-network-tab",
         "headers",
@@ -149,22 +196,15 @@ export function applyAppendTabPatch(content: string) {
         "devices",
         "throttling-conditions",
         "emulation-geolocations",
-        "Shortcuts",
-    ];
+        "Shortcuts"];
 
-    const condition = allowedTabs.map((tab) => {
+    const networkCondition = networkTabs.map((tab) => {
         return `id !== '${tab}'`;
     }).join(" && ");
 
-    const pattern = /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
-
-    if (content.match(pattern)) {
-        return content.replace(
-            pattern,
-            `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) { if (${condition}) return;`);
-    } else {
-        return null;
-    }
+    return `if(approvedTabs.enableNetwork) {
+        patchedCondition = patchedCondition && (${networkCondition});
+    }`;
 }
 
 export function applyDrawerTabLocationPatch(content: string) {

@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 import * as path from "path";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
+
+import { TabSettingsProvider } from "./common/tabSettingsProvider";
 import {
     encodeMessageForChannel,
     IOpenEditorData,
@@ -54,6 +55,7 @@ export class DevToolsPanel {
         this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
+        this.panelSocket.on("getApprovedTabs", (msg) => this.onSocketGetApprovedTabs(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
@@ -157,6 +159,13 @@ export class DevToolsPanel {
         const { id } = JSON.parse(message) as { id: number };
         const preferences: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getState", { id, preferences });
+    }
+
+    private onSocketGetApprovedTabs(message: string) {
+        const { id } = JSON.parse(message) as { id: number };
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getApprovedTabs", {
+            enableNetwork: TabSettingsProvider.instance.isNetworkEnabled(),
+            id });
     }
 
     private onSocketSetState(message: string) {
