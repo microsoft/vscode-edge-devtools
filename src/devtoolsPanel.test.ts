@@ -284,7 +284,7 @@ describe("devtoolsPanel", () => {
                     name: "UnknownError",
                 };
                 hookedEvents.get("telemetry")!(JSON.stringify(expectedError));
-                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                expect(mockTelemetry.sendTelemetryErrorEvent).toHaveBeenCalledWith(
                     `devtools/${expectedError.name}`,
                     expect.objectContaining({ "UnknownError.info": JSON.stringify(expectedError.data) }),
                 );

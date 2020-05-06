@@ -435,7 +435,7 @@
     },
     "dependencies": {
         "vscode-chrome-debug-core": "6.7.51",
-        "vscode-extension-telemetry": "0.1.1",
+        "vscode-extension-telemetry": "0.1.4",
         "ws": "7.1.0"
     },
     "devDependencies": {
