@@ -38,7 +38,7 @@ export function applyCommonRevealerPatch(content: string) {
 
 // This function is needed for Elements-only version, but we need the drawer
 // for the Request Blocking tool when enabling the Network Panel.
-export function applyInspectorViewHandleActionPatch(content: string) {
+export function applyHandleActionPatch(content: string) {
     // This patch removes the ability to open/close the drawer using 'ESC'
     // and using CTRL + [ or CTRL + ] to navigate between tabs.
     const pattern = /handleAction\(context,\s*actionId\)\s*{/g;

@@ -9,6 +9,7 @@ import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorC
 import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
+    applyHandleActionPatch,
     applyDrawerTabLocationPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
@@ -104,7 +105,9 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, true, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [applyDrawerTabLocationPatch]);
+        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [
+            applyHandleActionPatch,
+            applyDrawerTabLocationPatch]);
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
@@ -114,6 +117,8 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyShowElementsTab,
             applyShowRequestBlockingTab,
         ]);
+        await patchFileForWebView("quick_open/QuickOpen.js", toolsOutDir, true, [applyHandleActionPatch]);
+        await patchFileForWebView("quick_open/CommandMenu.js", toolsOutDir, true, [applyHandleActionPatch]);
     } else {
         // tslint:disable-next-line:no-console
         console.log("Patching files for debug version");
@@ -124,7 +129,9 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, false, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyDrawerTabLocationPatch]);
+        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [
+            applyHandleActionPatch,
+            applyDrawerTabLocationPatch]);
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
@@ -134,6 +141,8 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyShowElementsTab,
             applyShowRequestBlockingTab,
         ]);
+        await patchFileForWebView("quick_open/QuickOpen.js", toolsOutDir, true, [applyHandleActionPatch]);
+        await patchFileForWebView("quick_open/CommandMenu.js", toolsOutDir, true, [applyHandleActionPatch]);
         // Debug file versions
         await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
         await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);

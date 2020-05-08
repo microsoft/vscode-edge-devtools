@@ -37,16 +37,34 @@ describe("simpleView", () => {
             expect.stringContaining("let reveal = function revealInVSCode(revealable, omitFocus) {"));
     });
 
-    it("applyInspectorViewPatch correctly changes handleAction text", async () => {
+    it("applyHandleActionPatch correctly changes handleAction text", async () => {
         const comparableText = "handleAction(context, actionId) {\n";
         let fileContents = getTextFromFile("ui/InspectorView.js");
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
 
         const apply = await import("./simpleView");
-        const result = apply.applyInspectorViewHandleActionPatch(fileContents);
+        const result = apply.applyHandleActionPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(
+            expect.stringContaining("handleAction(context, actionId) { return false;"));
+
+        fileContents = getTextFromFile("quick_open/QuickOpen.js");
+        // The file was not found, so test that at least the text is being replaced.
+        fileContents = fileContents ? fileContents : comparableText;
+
+        const quickOpenResult = apply.applyHandleActionPatch(fileContents);
+        expect(quickOpenResult).not.toEqual(null);
+        expect(quickOpenResult).toEqual(
+            expect.stringContaining("handleAction(context, actionId) { return false;"));
+
+        fileContents = getTextFromFile("quick_open/CommandMenu.js");
+        // The file was not found, so test that at least the text is being replaced.
+        fileContents = fileContents ? fileContents : comparableText;
+
+        const commandMenuResult = apply.applyHandleActionPatch(fileContents);
+        expect(commandMenuResult).not.toEqual(null);
+        expect(commandMenuResult).toEqual(
             expect.stringContaining("handleAction(context, actionId) { return false;"));
     });
 
