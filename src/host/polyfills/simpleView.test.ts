@@ -39,17 +39,9 @@ describe("simpleView", () => {
 
     it("applyHandleActionPatch correctly changes handleAction text", async () => {
         const comparableText = "handleAction(context, actionId) {\n";
-        let fileContents = getTextFromFile("ui/InspectorView.js");
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
-
         const apply = await import("./simpleView");
-        const result = apply.applyHandleActionPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(
-            expect.stringContaining("handleAction(context, actionId) { return false;"));
 
-        fileContents = getTextFromFile("quick_open/QuickOpen.js");
+        let fileContents = getTextFromFile("quick_open/QuickOpen.js");
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
 

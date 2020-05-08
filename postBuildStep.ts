@@ -105,9 +105,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, true, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [
-            applyHandleActionPatch,
-            applyDrawerTabLocationPatch]);
+        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [applyDrawerTabLocationPatch]);
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
@@ -129,9 +127,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebView("inspector.html", toolsOutDir, false, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [
-            applyHandleActionPatch,
-            applyDrawerTabLocationPatch]);
+        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyDrawerTabLocationPatch]);
         await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
