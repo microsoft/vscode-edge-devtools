@@ -37,7 +37,7 @@ export function applyCommonRevealerPatch(content: string) {
 }
 
 export function applyHandleActionPatch(content: string) {
-    // This patch removes the ability to use the 
+    // This patch removes the ability to use the
     // quick open menu (CTRL + P) and command menu (CTRL + SHIFT + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{/g;
 
