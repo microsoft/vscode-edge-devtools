@@ -55,7 +55,7 @@ export const SETTINGS_DEFAULT_USE_HTTPS = false;
 export const SETTINGS_DEFAULT_HOSTNAME = "localhost";
 export const SETTINGS_DEFAULT_PORT = 9222;
 export const SETTINGS_DEFAULT_URL = "about:blank";
-export const SETTINGS_WEBVIEW_NAME = "Elements";
+export const SETTINGS_WEBVIEW_NAME = "Edge DevTools";
 export const SETTINGS_PREF_NAME = "devtools-preferences";
 export const SETTINGS_PREF_DEFAULTS = {
     screencastEnabled: false,

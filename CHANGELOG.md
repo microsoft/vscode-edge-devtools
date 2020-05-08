@@ -1,3 +1,8 @@
+## 1.0.8
+* Downgraded Edge DevTools version to 81.0.416 (Microsoft Edge Stable)
+* Merged Network Tool into the extension - [PR #128](https://github.com/microsoft/vscode-edge-devtools/pull/128)
+* Renaming tool to "Microsoft Edge (Chromium) Tools for VSCode"
+
 ## 1.0.7
 * Updated to version 82.0.423
 * Fixing issue with Styles panel links
