@@ -9,8 +9,8 @@ import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorC
 import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
-    applyHandleActionPatch,
     applyDrawerTabLocationPatch,
+    applyHandleActionPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
