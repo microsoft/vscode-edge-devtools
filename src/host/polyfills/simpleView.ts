@@ -177,13 +177,8 @@ export function applyDrawerTabLocationPatch(content: string) {
 }
 
 export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
-    // Hides the inspect button, the more tools button in the drawer and reveals the screen cast button.
+    // Hides the more tools button in the drawer and reveals the screen cast button.
     const separator = (isRelease ? "\\n" : "\n");
-
-    const hideInspectBtn =
-        `.toolbar-button[aria-label='Select an element in the page to inspect it'] {
-            display: none !important;
-        }`.replace(/\n/g, separator);
 
     const hideMoreToolsBtn =
         `.toolbar-button[aria-label='More Tools'] {
@@ -196,7 +191,6 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
         }`.replace(/\n/g, separator);
 
     const topHeaderCSS =
-        hideInspectBtn +
         hideMoreToolsBtn +
         unHideScreenCastBtn;
 
