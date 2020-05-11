@@ -200,7 +200,7 @@ export class DevToolsPanel {
         const { column, line, url, ignoreTabChanges } = JSON.parse(message) as IOpenEditorData;
 
         // If we don't want to force focus to the doc and doing so would cause a tab switch ignore it.
-        // This is because just starting to edit a style in the Elements tool with call openInEditor
+        // This is because just starting to edit a style in the Microsoft Edge Tools with call openInEditor
         // but if we switch vs code tab the edit will be cancelled.
         if (ignoreTabChanges && this.panel.viewColumn === vscode.ViewColumn.One) {
             return;
