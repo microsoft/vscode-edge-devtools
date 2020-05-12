@@ -156,6 +156,7 @@ export function applyAppendTabPatch(content: string) {
     if (content.match(injectionPoint)) {
         content = content.replace(
             injectionPoint,
+            // points to the getApprovedTabs, then take the out the "function" from the string (slice(9))
             `${getApprovedTabs.toString().slice(9)};
             appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
                 let patchedCondition = ${condition};
