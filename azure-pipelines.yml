@@ -10,16 +10,41 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- checkout: self
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
   displayName: 'Install Node.js'
-
 - script: |
     npm install
-    npm run build
-  displayName: 'npm install and build'
-
+  displayName: 'npm install'
 - script: |
+    output=$(node src/scripts/retrieveDownloadLink.js)
+    curl "$output" --output $(Agent.TempDirectory)/edge.zip
+  displayName: Downloading Edge Zip
+- script: |
+    unzip $(Agent.TempDirectory)/edge.zip src/out/Release/gen/devtools/* -d $(Agent.TempDirectory)/edge
+    unzip $(Agent.TempDirectory)/edge.zip src/third_party/devtools-frontend/src/front_end/* -d $(Agent.TempDirectory)/edge
+  displayName: Extracting Relevant Files
+- script: |
+    export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
+    export EDGE_CHROMIUM_OUT_DIR=Release
+    npm run build
+  displayName: 'npm build'
+- script: |
+    export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
+    export EDGE_CHROMIUM_OUT_DIR=Release
     npm run test
   displayName: 'test'
+- script: |
+    export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
+    export EDGE_CHROMIUM_OUT_DIR=Release
+    npm run package
+  displayName: 'npm run package'
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  inputs:
+    Contents: '*.vsix'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
