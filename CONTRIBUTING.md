@@ -20,7 +20,7 @@ Contributions are always welcome! We only ask that you open an issue first so we
 * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
   * `mkdir c:\edge\src\out\Release\gen\devtools`
   * `mkdir c:\edge\src\third_party\devtools-frontend\src\front_end`
-* Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com)
+* Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 81.0.416.
 * **Open** the zip file and (inside the zip file) navigate to:
   * `[ZIP_FILE]:\src\third_party\devtools-frontend\src\front_end`
   * copy the contents of the "front_end" folder and paste them into `c:\edge\src\third_party\devtools-frontend\src\front_end`
