@@ -13,8 +13,8 @@ import ToolsWebSocket from "./toolsWebSocket";
 
 export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
-    private getStateNextId: number = 0;
-    private getStateCallbacks: Map<number, (preferences: object) => void> = new Map();
+    private getHostCallbacksNextId: number = 0;
+    private getHostCallbacks: Map<number, (preferences: object) => void> = new Map();
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
@@ -27,8 +27,8 @@ export default class ToolsHost {
 
     public getPreferences(callback: (preferences: any) => void) {
         // Load the preference via the extension workspaceState
-        const id = this.getStateNextId++;
-        this.getStateCallbacks.set(id, callback);
+        const id = this.getHostCallbacksNextId++;
+        this.getHostCallbacks.set(id, callback);
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getState", { id });
     }
 
@@ -80,11 +80,17 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
     }
 
+    public getApprovedTabs(callback: () => void) {
+        const id = this.getHostCallbacksNextId++;
+        this.getHostCallbacks.set(id, callback);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getApprovedTabs", {id});
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {
                 const { id, preferences } = JSON.parse(args);
-                this.fireGetStateCallback(id, preferences);
+                this.fireGetHostCallback(id, preferences);
                 break;
             }
 
@@ -99,6 +105,14 @@ export default class ToolsHost {
                 this.fireWebSocketCallback(event, message);
                 break;
             }
+
+            case "getApprovedTabs": {
+                const { id, enableNetwork } = JSON.parse(args);
+                this.fireGetHostCallback(id, {
+                        enableNetwork,
+                });
+                break;
+            }
         }
         return true;
     }
@@ -108,10 +122,10 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", telemetry);
     }
 
-    private fireGetStateCallback(id: number, preferences: object) {
-        if (this.getStateCallbacks.has(id)) {
-            this.getStateCallbacks.get(id)!(preferences);
-            this.getStateCallbacks.delete(id);
+    private fireGetHostCallback(id: number, args: object) {
+        if (this.getHostCallbacks.has(id)) {
+            this.getHostCallbacks.get(id)!(args);
+            this.getHostCallbacks.delete(id);
         }
     }
 
