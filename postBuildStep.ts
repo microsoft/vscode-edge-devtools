@@ -158,7 +158,7 @@ async function patchFileForWebViewWrapper(
   dir: string,
   isRelease: boolean,
   patches: Array<(content: string, isRelease?: boolean) => string | null>) {
-  await patchFileForWebView(filename, dir, isRelease, patches).catch(errorMessage=>{console.error(errorMessage);});
+  await patchFileForWebView(filename, dir, isRelease, patches).catch(errorMessage=>{console.error(errorMessage); process.exit(1);});
 }
 
 async function patchFileForWebView(
@@ -205,7 +205,7 @@ function main() {
         debugMode = true;
     }
 
-    copyStaticFiles(debugMode).catch(errorMessage=>{console.error(errorMessage);});
+    copyStaticFiles(debugMode).catch(errorMessage=>{console.error(errorMessage); process.exit(1);});
 }
 
 main();
