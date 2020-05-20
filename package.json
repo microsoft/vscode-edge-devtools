@@ -93,7 +93,7 @@
             "properties": {
                 "vscode-edge-devtools.browserPath": {
                     "type": "string",
-                    "default": null,
+                    "default": "",
                     "description": "The path to the browser to use, rather than searching for the default"
                 },
                 "vscode-edge-devtools.hostname": {
