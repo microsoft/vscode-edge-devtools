@@ -91,11 +91,6 @@
             "title": "Microsoft Edge (Chromium) Tools",
             "type": "object",
             "properties": {
-                "vscode-edge-devtools.browserPath": {
-                    "type": "string",
-                    "default": "",
-                    "description": "The path to the browser to use, rather than searching for the default"
-                },
                 "vscode-edge-devtools.hostname": {
                     "type": "string",
                     "default": "localhost",
@@ -166,6 +161,23 @@
                     "type": "number",
                     "description": "The number of milliseconds that the Microsoft Edge Tools will keep trying to attach the browser before timing out",
                     "default": 10000
+                },
+                "vscode-edge-devtools.browserFlavor": {
+                    "type": "string",
+                    "enum": [
+                        "default",
+                        "stable",
+                        "beta",
+                        "dev",
+                        "canary"
+                    ],
+                    "enumDescriptions": [
+                        "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
+                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Stable version",
+                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Beta version",
+                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Dev version",
+                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Canary version"
+                    ]
                 }
             }
         },
@@ -210,11 +222,6 @@
                                 "description": "File path to launch",
                                 "default": "${workspaceFolder}/index.html"
                             },
-                            "browserPath": {
-                                "type": "string",
-                                "description": "Absolute path to the browser instance to launch",
-                                "default": ""
-                            },
                             "hostname": {
                                 "type": "string",
                                 "default": "localhost",
@@ -265,6 +272,23 @@
                                 "type": "boolean",
                                 "description": "Use JavaScript source maps (if they exist)",
                                 "default": true
+                            },
+                            "vscode-edge-devtools.browserFlavor": {
+                                "type": "string",
+                                "enum": [
+                                    "default",
+                                    "stable",
+                                    "beta",
+                                    "dev",
+                                    "canary"
+                                ],
+                                "enumDescriptions": [
+                                    "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Stable version",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Beta version",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Dev version",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Canary version"
+                                ]
                             }
                         }
                     },
@@ -280,11 +304,6 @@
                                 "description": "File path to launch.",
                                 "default": "${workspaceFolder}/index.html"
                             },
-                            "browserPath": {
-                                "type": "string",
-                                "description": "Absolute path to the browser instance to launch.",
-                                "default": ""
-                            },
                             "hostname": {
                                 "type": "string",
                                 "default": "localhost",
@@ -335,6 +354,23 @@
                                 "type": "boolean",
                                 "description": "Use JavaScript source maps (if they exist)",
                                 "default": true
+                            },
+                            "vscode-edge-devtools.browserFlavor": {
+                                "type": "string",
+                                "enum": [
+                                    "default",
+                                    "stable",
+                                    "beta",
+                                    "dev",
+                                    "canary"
+                                ],
+                                "enumDescriptions": [
+                                    "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Stable version",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Beta version",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Dev version",
+                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Canary version"
+                                ]
                             }
                         }
                     }

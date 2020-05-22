@@ -5,8 +5,9 @@
 // tslint:disable: variable-name
 
 import * as path from "path";
+
 import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson, IUserConfig } from "./utils";
+import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "./utils";
 
 jest.mock("vscode", () => null, { virtual: true });
 
@@ -305,6 +306,7 @@ describe("utils", () => {
 
         it("uses user config", async () => {
             const config = {
+                browserPath: "default",
                 hostname: "someHost",
                 port: 9999,
                 url: "url",
@@ -373,7 +375,7 @@ describe("utils", () => {
             expect(result5.userDataDir).toEqual(expect.stringContaining("vscode-edge-devtools-userdatadir_"));
 
             // No folder if they use a browser path
-            const result6 = utils.getRemoteEndpointSettings({ browserPath: "someBrowser.exe" });
+            const result6 = utils.getRemoteEndpointSettings({ browserFlavor: "stable" });
             expect(result6.userDataDir).toEqual("");
         });
     });
@@ -467,12 +469,13 @@ describe("utils", () => {
 
         it("returns the custom path or empty string", async () => {
             const config = {
-                browserPath: "someCustomPath.exe",
+                browserFlavor: "default" as BrowserFlavor,
             };
+            os.platform.mockReturnValue("win32");
 
             // Ensure we get a valid path back
             fse.pathExists.mockImplementation(() => Promise.resolve(true));
-            expect(await utils.getBrowserPath(config)).toEqual(config.browserPath);
+            expect(await utils.getBrowserPath(config)).not.toEqual("");
 
             // Ensure we get "" on bad path
             fse.pathExists.mockImplementation(() => Promise.resolve(false));
@@ -480,12 +483,17 @@ describe("utils", () => {
         });
 
         it("returns the settings path", async () => {
-            const expectedPath = "someCustomPath.exe";
+            const expectedFlavor = "default";
+            const expectedPath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
             const configMock = {
-                get: (name: string) => expectedPath,
+                get: (name: string) => expectedFlavor,
             };
             const vscodeMock = await jest.requireMock("vscode");
+            os.platform.mockReturnValue("win32");
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+            fse.pathExists.mockImplementation(() => {
+                return Promise.resolve(true);
+            });
 
             expect(await utils.getBrowserPath()).toEqual(expectedPath);
         });
@@ -493,25 +501,47 @@ describe("utils", () => {
         it("searches for path", async () => {
             // Check Windows
             global.process.env.LOCALAPPDATA = "";
+            const vscodeMock = await jest.requireMock("vscode");
+            let matchingRegex = /.+Microsoft\\Edge\\Application\\msedge.exe/g;
             os.platform.mockReturnValue("win32");
-            fse.pathExists.mockImplementation(() => {
-                return Promise.resolve(fse.pathExists.mock.calls.length === 8);
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => {
+                return {
+                    get: (name: string) => "default",
+                };
             });
-            expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(/.+msedge.exe/g));
-
-            fse.pathExists.mockClear();
+            fse.pathExists.mockImplementation((customPath) => {
+                if (customPath && customPath.match(matchingRegex)) {
+                    return Promise.resolve(true);
+                }
+                return Promise.resolve(false);
+            });
+            expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(matchingRegex));
 
             // Check OSX
+            matchingRegex = /.+Microsoft Edge Canary\.app.+/g;
             os.platform.mockReturnValue("darwin");
-            fse.pathExists.mockImplementation(() => {
-                return Promise.resolve(fse.pathExists.mock.calls.length === 4);
-            });
-            expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(/.+Microsoft Edge Canary/g));
-
             fse.pathExists.mockClear();
+            fse.pathExists.mockImplementation((customPath) => {
+                if (customPath && customPath.match(matchingRegex)) {
+                    return Promise.resolve(true);
+                }
+                return Promise.resolve(false);
+            });
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => {
+                return {
+                    get: (name: string) => "canary",
+                };
+            });
+            expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(matchingRegex));
 
             // Check Linux
             os.platform.mockReturnValue("linux");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => {
+                return {
+                    get: (name: string) => "dev",
+                };
+            });
+            fse.pathExists.mockClear();
             fse.pathExists.mockImplementation(() => Promise.resolve(false));
             expect(await utils.getBrowserPath()).toEqual("");
         });
