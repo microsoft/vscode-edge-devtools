@@ -88,7 +88,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
     if (!debugMode) {
         // tslint:disable-next-line:no-console
         console.log("Patching files for release version");
-        await patchFileForWebView("shell.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("shell.js", toolsOutDir, true, [
             applyUIUtilsPatch,
             applyCreateElementPatch,
             applyInspectorCommonContextMenuPatch,
@@ -98,57 +98,111 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyInspectorCommonCssTabSliderPatch,
         ]);
 
-        await patchFileForWebView("main/MainImpl.js", toolsOutDir, true, [applyMainViewPatch]);
-        await patchFileForWebView("common/Revealer.js", toolsOutDir, true, [applyCommonRevealerPatch]);
-        await patchFileForWebView("elements/elements_module.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, true, [
+            applyMainViewPatch,
+        ]);
+        await patchFileForWebViewWrapper("common/Revealer.js", toolsOutDir, true, [
+            applyCommonRevealerPatch,
+        ]);
+        await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, true, [
             applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
-        await patchFileForWebView("inspector.html", toolsOutDir, true, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, true, [applyDrawerTabLocationPatch]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("inspector.html", toolsOutDir, true, [
+            applyContentSecurityPolicyPatch,
+        ]);
+        await patchFileForWebViewWrapper("ui/InspectorView.js", toolsOutDir, true, [
+            applyDrawerTabLocationPatch,
+        ]);
+        await patchFileForWebViewWrapper("ui/TabbedPane.js", toolsOutDir, true, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
             applySetTabIconPatch,
         ]);
-        await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
             applyShowRequestBlockingTab,
         ]);
-        await patchFileForWebView("quick_open/QuickOpen.js", toolsOutDir, true, [applyHandleActionPatch]);
-        await patchFileForWebView("quick_open/CommandMenu.js", toolsOutDir, true, [applyHandleActionPatch]);
+        await patchFileForWebViewWrapper("quick_open/QuickOpen.js", toolsOutDir, true, [
+            applyHandleActionPatch,
+        ]);
+        await patchFileForWebViewWrapper("quick_open/CommandMenu.js", toolsOutDir, true, [
+            applyHandleActionPatch,
+        ]);
     } else {
         // tslint:disable-next-line:no-console
         console.log("Patching files for debug version");
-        await patchFileForWebView("main/MainImpl.js", toolsOutDir, false, [applyMainViewPatch]);
-        await patchFileForWebView("common/Revealer.js", toolsOutDir, false, [applyCommonRevealerPatch]);
-        await patchFileForWebView("elements/elements_module.js", toolsOutDir, false, [
+        await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, false, [
+            applyMainViewPatch,
+        ]);
+        await patchFileForWebViewWrapper("common/Revealer.js", toolsOutDir, false, [
+            applyCommonRevealerPatch,
+        ]);
+        await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, false, [
             applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
-        await patchFileForWebView("inspector.html", toolsOutDir, false, [applyContentSecurityPolicyPatch]);
-        await patchFileForWebView("ui/InspectorView.js", toolsOutDir, false, [applyDrawerTabLocationPatch]);
-        await patchFileForWebView("ui/TabbedPane.js", toolsOutDir, false, [
+        await patchFileForWebViewWrapper("inspector.html", toolsOutDir, false, [
+            applyContentSecurityPolicyPatch,
+        ]);
+        await patchFileForWebViewWrapper("ui/InspectorView.js", toolsOutDir, false, [
+            applyDrawerTabLocationPatch,
+        ]);
+        await patchFileForWebViewWrapper("ui/TabbedPane.js", toolsOutDir, false, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
             applySetTabIconPatch,
         ]);
-        await patchFileForWebView("ui/ViewManager.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
             applyShowRequestBlockingTab,
         ]);
-        await patchFileForWebView("quick_open/QuickOpen.js", toolsOutDir, true, [applyHandleActionPatch]);
-        await patchFileForWebView("quick_open/CommandMenu.js", toolsOutDir, true, [applyHandleActionPatch]);
+        await patchFileForWebViewWrapper("quick_open/QuickOpen.js", toolsOutDir, true, [
+            applyHandleActionPatch,
+        ]);
+        await patchFileForWebViewWrapper("quick_open/CommandMenu.js", toolsOutDir, true, [
+            applyHandleActionPatch,
+        ]);
         // Debug file versions
-        await patchFileForWebView("ui/UIUtils.js", toolsOutDir, false, [applyUIUtilsPatch]);
-        await patchFileForWebView("dom_extension/DOMExtension.js", toolsOutDir, false, [applyCreateElementPatch]);
-        await patchFileForWebView("elements/ElementsPanel.js", toolsOutDir, false, [applySetupTextSelectionPatch]);
-        await patchFileForWebView("themes/base.css", toolsOutDir, false, [
-            applyInspectorCommonContextMenuPatch, applyInspectorCommonCssPatch, applyInspectorCommonNetworkPatch,
-            applyInspectorCommonCssRightToolbarPatch, applyInspectorCommonCssTabSliderPatch]);
-        await patchFileForWebView("elements/elementsTreeOutline.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
-        await patchFileForWebView("elements/stylesSectionTree.css", toolsOutDir, false, [applyPaddingInlineCssPatch]);
+        await patchFileForWebViewWrapper("ui/UIUtils.js", toolsOutDir, false, [
+            applyUIUtilsPatch,
+        ]);
+        await patchFileForWebViewWrapper("dom_extension/DOMExtension.js", toolsOutDir, false, [
+            applyCreateElementPatch,
+        ]);
+        await patchFileForWebViewWrapper("elements/ElementsPanel.js", toolsOutDir, false, [
+            applySetupTextSelectionPatch,
+        ]);
+        await patchFileForWebViewWrapper("themes/base.css", toolsOutDir, false, [
+            applyInspectorCommonContextMenuPatch,
+            applyInspectorCommonCssPatch,
+            applyInspectorCommonNetworkPatch,
+            applyInspectorCommonCssRightToolbarPatch,
+            applyInspectorCommonCssTabSliderPatch,
+        ]);
+        await patchFileForWebViewWrapper("elements/elementsTreeOutline.css", toolsOutDir, false, [
+            applyPaddingInlineCssPatch,
+        ]);
+        await patchFileForWebViewWrapper("elements/stylesSectionTree.css", toolsOutDir, false, [
+            applyPaddingInlineCssPatch,
+        ]);
     }
+}
+
+// This function wraps the patchFileForWebView function to catch any errors thrown, log them
+// and return with an exit code of 1.
+// Returning the exit code of 1 will ensure that the Azure Pipeline will fail when patching fails.
+async function patchFileForWebViewWrapper(
+  filename: string,
+  dir: string,
+  isRelease: boolean,
+  patches: Array<(content: string, isRelease?: boolean) => string | null>) {
+  await patchFileForWebView(filename, dir, isRelease, patches)
+      .catch((errorMessage) => {
+        // tslint:disable-next-line:no-console
+        console.error(errorMessage);
+        process.exit(1);
+      });
 }
 
 async function patchFileForWebView(
@@ -195,7 +249,12 @@ function main() {
         debugMode = true;
     }
 
-    copyStaticFiles(debugMode);
+    copyStaticFiles(debugMode)
+        .catch((errorMessage) => {
+          // tslint:disable-next-line:no-console
+          console.error(errorMessage);
+          process.exit(1);
+        });
 }
 
 main();
