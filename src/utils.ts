@@ -14,7 +14,7 @@ import TelemetryReporter from "vscode-extension-telemetry";
 import packageJson from "../package.json";
 import DebugTelemetryReporter from "./debugTelemetryReporter";
 
-export type BrowserFlavor = "default" | "stable" | "beta" | "dev" | "canary";
+export type BrowserFlavor = "Default" | "Stable" | "Beta" | "Dev" | "Canary";
 
 interface IBrowserPath {
     windows: {
@@ -209,7 +209,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     // We generate a temp directory if the user opted in explicitly with 'true' (which is the default),
     // Or if it is not defined and they are not using a custom browser path (such as electron).
     // This matches the behavior of the chrome and edge debug extensions.
-    const browserPathSet = config.browserFlavor !== "default";
+    const browserPathSet = config.browserFlavor !== "Default";
     let userDataDir: string | boolean | undefined;
     if (typeof config.userDataDir !== "undefined") {
         userDataDir = config.userDataDir;
@@ -451,7 +451,7 @@ export function applyPathMapping(
  * @returns a promise with the path to the browser or an empty string if not found.
  */
 async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Platform): Promise<string> {
-    let item = msEdgeBrowserMapping.get(flavor || "default");
+    let item = msEdgeBrowserMapping.get(flavor || "Default");
     if (!item) {
         // if no flavor is specified search for any path present.
         for (item of msEdgeBrowserMapping.values()) {
@@ -471,13 +471,13 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
         }
 
         if (await fse.pathExists(browserPath.windows.primary) &&
-            (platform === "Windows" || flavor === "default")) {
+            (platform === "Windows" || flavor === "Default")) {
             return browserPath.windows.primary;
         } else if (await fse.pathExists(browserPath.windows.secondary) &&
-            (platform === "Windows" || flavor === "default")) {
+            (platform === "Windows" || flavor === "Default")) {
             return browserPath.windows.secondary;
         } else if (await fse.pathExists(browserPath.osx) &&
-            (platform === "OSX" || flavor === "default")) {
+            (platform === "OSX" || flavor === "Default")) {
             return browserPath.osx;
         }
 
@@ -487,28 +487,28 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
 
 (function initialize() {
     // insertion order matters.
-    msEdgeBrowserMapping.set("stable", {
+    msEdgeBrowserMapping.set("Stable", {
         osx: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
             secondary: path.join(WIN_APP_DATA, "Microsoft\\Edge\\Application\\msedge.exe"),
         },
     });
-    msEdgeBrowserMapping.set("beta", {
+    msEdgeBrowserMapping.set("Beta", {
         osx: "/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe",
             secondary: path.join(WIN_APP_DATA, "Microsoft\\Edge Beta\\Application\\msedge.exe"),
         },
     });
-    msEdgeBrowserMapping.set("dev", {
+    msEdgeBrowserMapping.set("Dev", {
         osx: "/Applications/Microsoft Edge Dev.app/Contents/MacOS/Microsoft Edge Dev",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe",
             secondary: path.join(WIN_APP_DATA, "Microsoft\\Edge Dev\\Application\\msedge.exe"),
         },
     });
-    msEdgeBrowserMapping.set("canary", {
+    msEdgeBrowserMapping.set("Canary", {
         osx: "/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge SxS\\Application\\msedge.exe",

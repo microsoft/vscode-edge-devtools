@@ -165,11 +165,11 @@
                 "vscode-edge-devtools.browserFlavor": {
                     "type": "string",
                     "enum": [
-                        "default",
-                        "stable",
-                        "beta",
-                        "dev",
-                        "canary"
+                        "Default",
+                        "Stable",
+                        "Beta",
+                        "Dev",
+                        "Canary"
                     ],
                     "enumDescriptions": [
                         "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",

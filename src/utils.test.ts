@@ -375,7 +375,7 @@ describe("utils", () => {
             expect(result5.userDataDir).toEqual(expect.stringContaining("vscode-edge-devtools-userdatadir_"));
 
             // No folder if they use a browser path
-            const result6 = utils.getRemoteEndpointSettings({ browserFlavor: "stable" });
+            const result6 = utils.getRemoteEndpointSettings({ browserFlavor: "Stable" });
             expect(result6.userDataDir).toEqual("");
         });
     });
@@ -529,7 +529,7 @@ describe("utils", () => {
             });
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => {
                 return {
-                    get: (name: string) => "canary",
+                    get: (name: string) => "Canary",
                 };
             });
             expect(await utils.getBrowserPath()).toEqual(expect.stringMatching(matchingRegex));
@@ -538,7 +538,7 @@ describe("utils", () => {
             os.platform.mockReturnValue("linux");
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => {
                 return {
-                    get: (name: string) => "dev",
+                    get: (name: string) => "Dev",
                 };
             });
             fse.pathExists.mockClear();
