@@ -19,7 +19,7 @@ steps:
     npm install
   displayName: 'npm install'
 - script: |
-    output=$(node src/scripts/retrieveDownloadLink.js)
+    output=$(node scripts/retrieveDownloadLink.js)
     curl "$output" --output $(Agent.TempDirectory)/edge.zip
   displayName: Downloading Edge Zip
 - script: |
