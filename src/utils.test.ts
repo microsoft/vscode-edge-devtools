@@ -469,7 +469,7 @@ describe("utils", () => {
 
         it("returns the custom path or empty string", async () => {
             const config = {
-                browserFlavor: "default" as BrowserFlavor,
+                browserFlavor: "Default" as BrowserFlavor,
             };
             os.platform.mockReturnValue("win32");
 
@@ -483,7 +483,7 @@ describe("utils", () => {
         });
 
         it("returns the settings path", async () => {
-            const expectedFlavor = "default";
+            const expectedFlavor = "Default";
             const expectedPath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
             const configMock = {
                 get: (name: string) => expectedFlavor,
@@ -506,7 +506,7 @@ describe("utils", () => {
             os.platform.mockReturnValue("win32");
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => {
                 return {
-                    get: (name: string) => "default",
+                    get: (name: string) => "Default",
                 };
             });
             fse.pathExists.mockImplementation((customPath) => {
