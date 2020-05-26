@@ -306,7 +306,7 @@ describe("utils", () => {
 
         it("uses user config", async () => {
             const config = {
-                browserPath: "default",
+                browserPath: "Default",
                 hostname: "someHost",
                 port: 9999,
                 url: "url",

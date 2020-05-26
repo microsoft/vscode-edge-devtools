@@ -209,7 +209,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     // We generate a temp directory if the user opted in explicitly with 'true' (which is the default),
     // Or if it is not defined and they are not using a custom browser path (such as electron).
     // This matches the behavior of the chrome and edge debug extensions.
-    const browserPathSet = config.browserFlavor !== "Default";
+    const browserPathSet = config.browserFlavor || "Default";
     let userDataDir: string | boolean | undefined;
     if (typeof config.userDataDir !== "undefined") {
         userDataDir = config.userDataDir;
@@ -220,7 +220,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
         }
     }
 
-    if (userDataDir === true || (typeof userDataDir === "undefined" && browserPathSet)) {
+    if (userDataDir === true || (typeof userDataDir === "undefined" && browserPathSet === "Default")) {
         // Generate a temp directory
         userDataDir = path.join(os.tmpdir(), `vscode-edge-devtools-userdatadir_${port}`);
     } else if (!userDataDir) {
@@ -266,11 +266,9 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
     switch (getPlatform()) {
         case "Windows": {
            return await verifyFlavorPath(flavor, "Windows");
-           break;
         }
         case "OSX": {
             return await verifyFlavorPath(flavor, "OSX");
-            break;
         }
     }
 
