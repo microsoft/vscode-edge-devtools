@@ -188,8 +188,9 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             telemetryReporter.sendTelemetryEvent("command/launch/error/browser_not_found", telemetryProps);
             vscode.window.showErrorMessage(
                 "Microsoft Edge could not be found. " +
-                "Ensure you have installed Microsoft Edge, " +
-                "or try specifying a custom path via the 'browserPath' setting.");
+                "Ensure you have installed Microsoft Edge " +
+                "and that you have selected 'default' or the appropriate version of Microsoft Edge " +
+                "in the extension settings panel.");
             return;
         } else {
             // Here we grab the last part of the path (using either forward or back slashes to account for mac/win),
