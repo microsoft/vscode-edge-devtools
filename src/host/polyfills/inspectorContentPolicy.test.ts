@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+// TODO: Replace vscode-resource with Webview.cspSource
 describe("inspectorContentPolicy", () => {
     it("applyContentSecurityPolicyPatch correctly changes text", async () => {
         const apply = await import("./inspectorContentPolicy");

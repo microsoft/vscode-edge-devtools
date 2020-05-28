@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+// TODO: Replace vscode-resource with Webview.cspSource
 export function applyContentSecurityPolicyPatch(content: string) {
     return content
         .replace(

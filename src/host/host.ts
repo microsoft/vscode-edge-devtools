@@ -52,6 +52,7 @@ export function initialize(dtWindow: IDevToolsWindow) {
         return false;
     }, true);
 
+    // TODO: Replace vscode-resource with Webview.cspSource
     dtWindow.addEventListener("DOMContentLoaded", () => {
         // Override the resource loading once the window has loaded so that we can control it
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
