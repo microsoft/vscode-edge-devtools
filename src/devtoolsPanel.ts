@@ -60,6 +60,7 @@ export class DevToolsPanel {
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
+
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
