@@ -89,15 +89,15 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         // tslint:disable-next-line:no-console
         console.log("Patching files for release version");
         await patchFileForWebViewWrapper("shell.js", toolsOutDir, true, [
-            applyUIUtilsPatch,
-            applyCreateElementPatch,
             applyInspectorCommonContextMenuPatch,
             applyInspectorCommonCssRightToolbarPatch,
             applyInspectorCommonCssPatch,
             applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
-
+        await patchFileForWebViewWrapper("dom_extension/DOMExtension.js", toolsOutDir, true, [
+            applyCreateElementPatch,
+        ]);
         await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, true, [
             applyMainViewPatch,
         ]);
@@ -122,6 +122,9 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebViewWrapper("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
             applyShowRequestBlockingTab,
+        ]);
+        await patchFileForWebViewWrapper("ui/utils/register-custom-element.js", toolsOutDir, true, [
+            applyUIUtilsPatch,
         ]);
         await patchFileForWebViewWrapper("quick_open/QuickOpen.js", toolsOutDir, true, [
             applyHandleActionPatch,
@@ -164,7 +167,7 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyHandleActionPatch,
         ]);
         // Debug file versions
-        await patchFileForWebViewWrapper("ui/UIUtils.js", toolsOutDir, false, [
+        await patchFileForWebViewWrapper("ui/utils/register-custom-element.js", toolsOutDir, false, [
             applyUIUtilsPatch,
         ]);
         await patchFileForWebViewWrapper("dom_extension/DOMExtension.js", toolsOutDir, false, [

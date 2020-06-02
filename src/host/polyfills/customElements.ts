@@ -3,7 +3,7 @@
 
 declare var document: HTMLDocument & { registerElement: (...args: any[]) => any };
 
-export function registerCustomElementOverride(
+export function registerCustomElement(
     localName: string,
     typeExtension: string,
     definition: new (...a: any[]) => any) {
@@ -26,16 +26,21 @@ export function registerCustomElementOverride(
 }
 
 export function applyUIUtilsPatch(content: string) {
-    const newContent = content.replace(
-        /UI.registerCustomElement\s*=\s*function/g,
-        `UI.registerCustomElement = ${registerCustomElementOverride.toString()};
-        UI.deprecatedRegisterCustomElement = function`,
-    );
-    return newContent;
+    const pattern = /export\s*function\s*registerCustomElement\s*\(localName,\s*typeExtension/g;
+    if (content.match(pattern)) {
+        return content.replace(pattern,
+            `export ${registerCustomElement.toString()} 
+            export function deprecatedRegisterCustomElement(localName, typeExtension`);
+    } else {
+        return null;
+    }
 }
 
 export function applyCreateElementPatch(content: string) {
-    return content.replace(
-        /\.createElement\((.+){is:\s*customElementType}/g,
-        ".createElement($1 customElementType || ''");
+    const pattern = /\.createElement\(([a-zA-Z]+)\s*,\s*{is:\s*customElementType}/g;
+    if (content.match(pattern)) {
+        return content.replace(pattern, ".createElement($1, customElementType || ''");
+    } else {
+        return null;
+    }
 }
