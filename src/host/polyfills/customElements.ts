@@ -29,7 +29,7 @@ export function applyUIUtilsPatch(content: string) {
     const pattern = /export\s*function\s*registerCustomElement\s*\(localName,\s*typeExtension/g;
     if (content.match(pattern)) {
         return content.replace(pattern,
-            `export ${registerCustomElement.toString()} 
+            `export ${registerCustomElement.toString()}
             export function deprecatedRegisterCustomElement(localName, typeExtension`);
     } else {
         return null;
