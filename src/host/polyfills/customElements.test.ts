@@ -23,8 +23,7 @@ describe("customElements", () => {
     });
 
     it("applyUIUtilsPatch correctly changes text", async () => {
-        //const comparableText = "UI.registerCustomElement = function() { code }";
-        const comparableText = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+        const comparableText = "UI.registerCustomElement = function() { code }";
         let fileContents = getTextFromFile("ui/utils/register-custom-element.js");
 
         // The file was not found, so test that at least the text is being replaced.
