@@ -14,10 +14,10 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
-  displayName: 'Install Node.js'
+  displayName: Install Node.js
 - script: |
     npm install
-  displayName: 'npm install'
+  displayName: Install Dependencies
 - script: |
     output=$(node scripts/retrieveDownloadLink.js win)
     curl "$output" --output $(Agent.TempDirectory)/edge.zip
@@ -30,17 +30,17 @@ steps:
     export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
     npm run build
-  displayName: 'npm build'
+  displayName: Building
 - script: |
     export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
     npm run test
-  displayName: 'test'
+  displayName: Linting and Testing
 - script: |
     export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
     npm run package
-  displayName: 'npm run package'
+  displayName: Creating .vsix
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
   inputs:
