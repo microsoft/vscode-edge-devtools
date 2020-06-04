@@ -4,11 +4,11 @@ import { getTextFromFile } from "../../test/helpers";
 
 describe("inspectorContentPolicy", () => {
     it("applyContentSecurityPolicyPatch correctly changes text", async () => {
-        //const comparableText = "script-src 'self' 'unsafe-eval' <meta name=\"referrer\" content=\"no-referrer\">";
+        const comparableText = "script-src 'self' 'unsafe-eval' <meta name=\"referrer\" content=\"no-referrer\">";
         let fileContents = getTextFromFile("inspector.html");
 
         // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : "aaa";
+        fileContents = fileContents ? fileContents : comparableText;
 
         const apply = await import("./inspectorContentPolicy");
         const result = apply.applyContentSecurityPolicyPatch(fileContents);
