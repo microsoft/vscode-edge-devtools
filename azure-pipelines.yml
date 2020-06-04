@@ -25,7 +25,7 @@ steps:
 - script: |
     chmod +rwx scripts/pipelineUnzipEdge.sh
     ./scripts/pipelineUnzipEdge.sh $(Agent.TempDirectory)/edge.zip $(Agent.TempDirectory)/edge
-  displayName: Extracting Relevant Files
+  displayName: Extracting DevTools Files
 - script: |
     export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
