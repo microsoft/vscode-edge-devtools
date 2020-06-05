@@ -7,10 +7,6 @@ function fetchJsonFromUrl(url){
 }
 
 function fetchDownloadUrl(platform) {
-  if (!platform) {
-    console.log('Invalid platform');
-    return;
-  }
   const jsonString = fetchJsonFromUrl("https://thirdpartysource.microsoft.com/downloads");
   const jsonObjects = JSON.parse(jsonString);
   for (let object of jsonObjects) {
@@ -22,11 +18,11 @@ function fetchDownloadUrl(platform) {
 
 function retrievePlatform() {
   const arg = process.argv.slice(2)[0];
-  switch (arg) {
-    case 'win':
-      return 'Windows x64';
+  switch (arg.toLowerCase()) {
     case 'mac':
       return 'Mac OS x64';
+    default:
+      return 'Windows x64';
   }
 }
 
