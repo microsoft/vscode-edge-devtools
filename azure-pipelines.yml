@@ -19,12 +19,12 @@ steps:
     npm install
   displayName: 'npm install'
 - script: |
-    output=$(node scripts/retrieveDownloadLink.js)
+    output=$(node scripts/retrieveDownloadLink.js win)
     curl "$output" --output $(Agent.TempDirectory)/edge.zip
-  displayName: Downloading Edge Zip
+  displayName: Downloading Edge Zip (Windows x64)
 - script: |
-    unzip $(Agent.TempDirectory)/edge.zip src/out/Release/gen/devtools/* -d $(Agent.TempDirectory)/edge
-    unzip $(Agent.TempDirectory)/edge.zip src/third_party/devtools-frontend/src/front_end/* -d $(Agent.TempDirectory)/edge
+    chmod +rwx scripts/pipelineUnzipEdge.sh
+    ./scripts/pipelineUnzipEdge.sh $(Agent.TempDirectory)/edge.zip $(Agent.TempDirectory)/edge
   displayName: Extracting Relevant Files
 - script: |
     export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
