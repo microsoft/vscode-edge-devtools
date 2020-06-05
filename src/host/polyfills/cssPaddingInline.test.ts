@@ -4,11 +4,11 @@ import { getTextFromFile } from "../../test/helpers";
 
 describe("cssPaddingInline", () => {
     it("applyPaddingInlineCssPatch correctly changes elements-disclosure text", async () => {
-        const comparableText = ".elements-disclosure .gutter-container {\n    position: absolute;}";
-        let fileContents = getTextFromFile("elements/elements_module.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
+        const filePath = "elements/elements_module.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
         const apply = await import("./cssPaddingInline");
         const result = apply.default(fileContents);
@@ -17,11 +17,11 @@ describe("cssPaddingInline", () => {
     });
 
     it("applyPaddingInlineCssPatch correctly changes padding-inline-start text", async () => {
-        const comparableText = "padding-inline-start: 6px;\n    border-width: 1px;\n";
-        let fileContents = getTextFromFile("elements/elements_module.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
+        const filePath = "elements/elements_module.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
         const apply = await import("./cssPaddingInline");
         const result = apply.default(fileContents);
