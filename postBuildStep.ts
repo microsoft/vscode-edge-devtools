@@ -105,8 +105,10 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyCommonRevealerPatch,
         ]);
         await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, true, [
-            applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
+        ]);
+        await patchFileForWebViewWrapper("elements/ElementsPanel.js", toolsOutDir, true, [
+            applySetupTextSelectionPatch,
         ]);
         await patchFileForWebViewWrapper("inspector.html", toolsOutDir, true, [
             applyContentSecurityPolicyPatch,
