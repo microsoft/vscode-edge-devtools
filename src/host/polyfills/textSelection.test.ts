@@ -4,11 +4,11 @@ import { getTextFromFile } from "../../test/helpers";
 
 describe("textSelection", () => {
     it("applySetupTextSelectionPatch correctly changes text", async () => {
-        const comparableText = "_setupTextSelectionHack(stylePaneWrapperElement) { code }";
-        let fileContents = getTextFromFile("elements/ElementsPanel.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
+        const filePath = "elements/ElementsPanessl.js"
+        let fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
         const apply = await import("./textSelection");
         const result = apply.default(fileContents);
