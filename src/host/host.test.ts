@@ -63,7 +63,6 @@ describe("host", () => {
     });
 
     describe("DOMContentLoaded", () => {
-        // TODO: Replace vscode-resource with Webview.cspSource
         it("sets resource loader", async () => {
             const mockOverride = jest.fn();
             jest.doMock("./toolsResourceLoader", () => ({
