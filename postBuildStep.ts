@@ -4,7 +4,6 @@ import * as fse from "fs-extra";
 import path from "path";
 
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
-import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import {
     applyAppendTabPatch,
@@ -95,9 +94,6 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
-        await patchFileForWebViewWrapper("dom_extension/DOMExtension.js", toolsOutDir, true, [
-            applyCreateElementPatch,
-        ]);
         await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, true, [
             applyMainViewPatch,
         ]);
@@ -122,9 +118,6 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebViewWrapper("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
             applyShowRequestBlockingTab,
-        ]);
-        await patchFileForWebViewWrapper("ui/utils/register-custom-element.js", toolsOutDir, true, [
-            applyUIUtilsPatch,
         ]);
         await patchFileForWebViewWrapper("quick_open/QuickOpen.js", toolsOutDir, true, [
             applyHandleActionPatch,
@@ -167,12 +160,6 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyHandleActionPatch,
         ]);
         // Debug file versions
-        await patchFileForWebViewWrapper("ui/utils/register-custom-element.js", toolsOutDir, false, [
-            applyUIUtilsPatch,
-        ]);
-        await patchFileForWebViewWrapper("dom_extension/DOMExtension.js", toolsOutDir, false, [
-            applyCreateElementPatch,
-        ]);
         await patchFileForWebViewWrapper("elements/ElementsPanel.js", toolsOutDir, false, [
             applySetupTextSelectionPatch,
         ]);
