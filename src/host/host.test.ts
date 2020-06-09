@@ -73,7 +73,7 @@ describe("host", () => {
             const host = await import("./host");
             host.initialize(mockGlobal);
 
-            mockGlobal._importScriptPathPrefix = "null/somepath";
+            mockGlobal.importScriptPathPrefix = "null/somepath";
 
             function getDOMLoadedCallback(mock: jest.Mock, callbackArgIndex: number = 0):
                 // Allow us to type the callback as a general 'Function' so that we get enough typing to use .call();
@@ -86,7 +86,7 @@ describe("host", () => {
             callback.call(thisObj);
 
             expect(mockOverride).toHaveBeenCalled();
-            expect(mockGlobal._importScriptPathPrefix).toBe("vscode-resource:/somepath");
+            expect(mockGlobal.importScriptPathPrefix).toBe("vscode-resource:/somepath");
         });
     });
 

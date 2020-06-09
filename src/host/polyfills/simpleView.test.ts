@@ -15,7 +15,9 @@ describe("simpleView", () => {
         };
         const mockOpen = jest.fn();
         (global as any).InspectorFrontendHost = {
-            openInEditor: mockOpen,
+            InspectorFrontendHostInstance: {
+                openInEditor: mockOpen,
+            },
         };
 
         await apply.revealInVSCode(expected, expected.omitFocus);
@@ -25,7 +27,7 @@ describe("simpleView", () => {
 
     it("applyCommonRevealerPatch correctly changes text", async () => {
         const comparableText = "let reveal = function(revealable, omitFocus) {";
-        let fileContents = getTextFromFile("common/Revealer.js");
+        let fileContents = getTextFromFile("common/common.js");
 
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
@@ -41,7 +43,7 @@ describe("simpleView", () => {
         const comparableText = "handleAction(context, actionId) {\n";
         const apply = await import("./simpleView");
 
-        let fileContents = getTextFromFile("quick_open/QuickOpen.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
 
@@ -50,7 +52,7 @@ describe("simpleView", () => {
         expect(quickOpenResult).toEqual(
             expect.stringContaining("handleAction(context, actionId) { return false;"));
 
-        fileContents = getTextFromFile("quick_open/CommandMenu.js");
+        fileContents = getTextFromFile("ui/ui.js");
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
 
@@ -62,7 +64,7 @@ describe("simpleView", () => {
 
     it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
         const comparableText = "_showDrawer(focus) {";
-        let fileContents = getTextFromFile("ui/InspectorView.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
 
@@ -74,7 +76,7 @@ describe("simpleView", () => {
 
     it("applyMainViewPatch correctly changes text", async () => {
         const comparableText = "const moreTools = getExtensions();";
-        let fileContents = getTextFromFile("main/MainImpl.js");
+        let fileContents = getTextFromFile("main/main.js");
 
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
@@ -88,7 +90,7 @@ describe("simpleView", () => {
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
         const apply = await import("./simpleView");
         const comparableText = "this._showDrawer.bind(this, false), 'drawer-view', true, true";
-        let fileContents = getTextFromFile("ui/InspectorView.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         // The file was not found, so test that at least the text is being replaced.
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyDrawerTabLocationPatch(fileContents);
@@ -101,7 +103,7 @@ describe("simpleView", () => {
         const apply = await import("./simpleView");
         const comparableText =
             " setTabIcon(id, icon) {const tab = this._tabsById.get(id); tab._setIcon(icon);this._updateTabElements();}";
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applySetTabIconPatch(fileContents);
         expect(result).not.toEqual(null);
@@ -112,7 +114,7 @@ describe("simpleView", () => {
         const apply = await import("./simpleView");
         const comparableText = `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {}
         export const Events={}`;
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyAppendTabPatch(fileContents);
         expect(result).toEqual(expect.stringContaining(
@@ -122,7 +124,7 @@ describe("simpleView", () => {
     it("applyShowElementsTab correctly changes text", async () => {
         const apply = await import("./simpleView");
         const comparableText = "this._defaultTab = defaultTab;";
-        let fileContents = getTextFromFile("ui/ViewManager.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyShowElementsTab(fileContents);
         expect(result).not.toEqual(null);
@@ -134,7 +136,7 @@ describe("simpleView", () => {
     it("applyShowRequestBlockingTab correctly changes text", async () => {
         const apply = await import("./simpleView");
         const comparableText = "if(!view.isCloseable())";
-        let fileContents = getTextFromFile("ui/ViewManager.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyShowRequestBlockingTab(fileContents);
         expect(result).not.toEqual(null);
@@ -147,7 +149,7 @@ describe("simpleView", () => {
     it("applyPersistRequestBlockingTab correctly changes text", async () => {
         const apply = await import("./simpleView");
         const comparableText = "this._closeable = closeable;";
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
+        let fileContents = getTextFromFile("ui/ui.js");
         fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyPersistRequestBlockingTab(fileContents);
         expect(result).not.toEqual(null);
