@@ -23,8 +23,8 @@ steps:
     curl "$output" --output $(Agent.TempDirectory)/edge.zip
   displayName: Downloading Edge Zip (Windows x64)
 - script: |
-    chmod +rwx scripts/pipelineUnzipEdge.sh
-    ./scripts/pipelineUnzipEdge.sh $(Agent.TempDirectory)/edge.zip $(Agent.TempDirectory)/edge
+    unzip $(Agent.TempDirectory)/edge.zip src/out/Release/gen/devtools/* -d $(Agent.TempDirectory)/edge
+    unzip $(Agent.TempDirectory)/edge.zip src/third_party/devtools-frontend/src/front_end/* -d $(Agent.TempDirectory)/edge
   displayName: Extracting DevTools Files
 - script: |
     export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
