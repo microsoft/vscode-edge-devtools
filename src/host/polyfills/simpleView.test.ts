@@ -24,11 +24,11 @@ describe("simpleView", () => {
     });
 
     it("applyCommonRevealerPatch correctly changes text", async () => {
-        const comparableText = "let reveal = function(revealable, omitFocus) {";
-        let fileContents = getTextFromFile("common/Revealer.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
+        const filePath = "common/Revealer.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
         const apply = await import("./simpleView");
         const result = apply.applyCommonRevealerPatch(fileContents);
@@ -37,34 +37,40 @@ describe("simpleView", () => {
             expect.stringContaining("let reveal = function revealInVSCode(revealable, omitFocus) {"));
     });
 
-    it("applyHandleActionPatch correctly changes handleAction text", async () => {
-        const comparableText = "handleAction(context, actionId) {\n";
+    it("applyHandleActionPatch correctly changes handleAction text for Quick Open", async () => {
+        const filePath = "quick_open/QuickOpen.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-
-        let fileContents = getTextFromFile("quick_open/QuickOpen.js");
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
-
-        const quickOpenResult = apply.applyHandleActionPatch(fileContents);
-        expect(quickOpenResult).not.toEqual(null);
-        expect(quickOpenResult).toEqual(
+        const result = apply.applyHandleActionPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(
             expect.stringContaining("handleAction(context, actionId) { return false;"));
+    });
 
-        fileContents = getTextFromFile("quick_open/CommandMenu.js");
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
+    it("applyHandleActionPatch correctly changes handleAction text for Command Menu", async () => {
+        const filePath = "quick_open/CommandMenu.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
-        const commandMenuResult = apply.applyHandleActionPatch(fileContents);
-        expect(commandMenuResult).not.toEqual(null);
-        expect(commandMenuResult).toEqual(
+        const apply = await import("./simpleView");
+        const result = apply.applyHandleActionPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(
             expect.stringContaining("handleAction(context, actionId) { return false;"));
     });
 
     it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
-        const comparableText = "_showDrawer(focus) {";
-        let fileContents = getTextFromFile("ui/InspectorView.js");
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
+        const filePath = "ui/InspectorView.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
         const apply = await import("./simpleView");
         const result = apply.applyInspectorViewShowDrawerPatch(fileContents);
@@ -73,24 +79,27 @@ describe("simpleView", () => {
     });
 
     it("applyMainViewPatch correctly changes text", async () => {
-        const comparableText = "const moreTools = getExtensions();";
-        let fileContents = getTextFromFile("main/MainImpl.js");
+        const filePath = "main/MainImpl.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
 
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
-        const result = apply.applyMainViewPatch(comparableText);
+        const result = apply.applyMainViewPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(
             expect.stringContaining("const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };"));
     });
 
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
+        const filePath = "ui/InspectorView.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = "this._showDrawer.bind(this, false), 'drawer-view', true, true";
-        let fileContents = getTextFromFile("ui/InspectorView.js");
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyDrawerTabLocationPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(
@@ -98,32 +107,39 @@ describe("simpleView", () => {
     });
 
     it("applySetTabIconPatch correctly changes text", async () => {
+        const filePath = "ui/TabbedPane.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText =
-            " setTabIcon(id, icon) {const tab = this._tabsById.get(id); tab._setIcon(icon);this._updateTabElements();}";
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applySetTabIconPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining("if(!tab){return;}"));
     });
 
     it("applyAppendTabPatch correctly changes text", async () => {
+        const filePath = "ui/TabbedPane.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {}
-        export const Events={}`;
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyAppendTabPatch(fileContents);
         expect(result).toEqual(expect.stringContaining(
             "appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"));
     });
 
     it("applyShowElementsTab correctly changes text", async () => {
+        const filePath = "ui/ViewManager.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = "this._defaultTab = defaultTab;";
-        let fileContents = getTextFromFile("ui/ViewManager.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyShowElementsTab(fileContents);
         expect(result).not.toEqual(null);
         if (result) {
@@ -132,10 +148,13 @@ describe("simpleView", () => {
     });
 
     it("applyShowRequestBlockingTab correctly changes text", async () => {
+        const filePath = "ui/ViewManager.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = "if(!view.isCloseable())";
-        let fileContents = getTextFromFile("ui/ViewManager.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyShowRequestBlockingTab(fileContents);
         expect(result).not.toEqual(null);
         if (result) {
@@ -145,10 +164,13 @@ describe("simpleView", () => {
     });
 
     it("applyPersistRequestBlockingTab correctly changes text", async () => {
+        const filePath = "ui/TabbedPane.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = "this._closeable = closeable;";
-        let fileContents = getTextFromFile("ui/TabbedPane.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyPersistRequestBlockingTab(fileContents);
         expect(result).not.toEqual(null);
         if (result) {
@@ -158,10 +180,13 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssPatch correctly changes text", async () => {
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = ":host-context(.platform-mac) .monospace,";
-        let fileContents = getTextFromFile("shell.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonCssPatch(fileContents);
 
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
@@ -174,10 +199,13 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssPatch correctly changes text (release)", async () => {
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = ":host-context(.platform-mac) .monospace,";
-        let fileContents = getTextFromFile("shell.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonCssPatch(fileContents, true);
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
         const expectedString =
@@ -190,10 +218,13 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonNetworkPatch correctly changes text", async () => {
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = ":host-context(.platform-mac) .monospace,";
-        let fileContents = getTextFromFile("shell.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonNetworkPatch(fileContents);
 
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
@@ -206,10 +237,13 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonNetworkPatch correctly changes text (release)", async () => {
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = ":host-context(.platform-mac) .monospace,";
-        let fileContents = getTextFromFile("shell.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonNetworkPatch(fileContents, true);
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
         const expectedString =
@@ -222,10 +256,13 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonContextMenuPatch correctly changes text", async () => {
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = ":host-context(.platform-mac) .monospace,";
-        let fileContents = getTextFromFile("shell.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonContextMenuPatch(fileContents);
 
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
@@ -238,10 +275,13 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonContextMenuPatch correctly changes text (release)", async () => {
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const apply = await import("./simpleView");
-        const comparableText = ":host-context(.platform-mac) .monospace,";
-        let fileContents = getTextFromFile("shell.js");
-        fileContents = fileContents ? fileContents : comparableText;
         const result = apply.applyInspectorCommonContextMenuPatch(fileContents, true);
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
         const expectedString =
@@ -254,17 +294,15 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar (release)", async () => {
-        const comparableText = `.tabbed-pane-right-toolbar {
-            margin-left: -4px;
-            flex: none;
-        }`;
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const expectedResult = `.tabbed-pane-right-toolbar {
             visibility: hidden !important;
         }`;
-        let fileContents = getTextFromFile("shell.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents);
         expect(result).not.toEqual(null);
@@ -272,16 +310,14 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar", async () => {
-        const comparableText = `.tabbed-pane-right-toolbar {
-            margin-left: -4px;
-            flex: none;
-        }`;
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const expectedResult =
             ".tabbed-pane-right-toolbar {\\n            visibility: hidden !important;\\n        }";
-        let fileContents = getTextFromFile("shell.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents, true);
         expect(result).not.toEqual(null);
@@ -289,23 +325,14 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssTabSliderPatch correctly changes tabbed-pane-tab-slider (release)", async () => {
-        const comparableText = `.tabbed-pane-tab-slider {
-            height: 2px;
-            position: absolute;
-            bottom: -1px;
-            background-color: var(--accent-color);
-            left: 0;
-            z-index: 50;
-            transform-origin: 0 100%;
-            transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
-            visibility: hidden;
-        }`;
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const expectedResult =
             ".tabbed-pane-tab-slider {\\n            display: none !important;\\n        }";
-        let fileContents = getTextFromFile("shell.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents, true);
         expect(result).not.toEqual(null);
@@ -313,24 +340,15 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorCommonCssTabSliderPatch correctly changes tabbed-pane-tab-slider", async () => {
-        const comparableText = `.tabbed-pane-tab-slider {
-            height: 2px;
-            position: absolute;
-            bottom: -1px;
-            background-color: var(--accent-color);
-            left: 0;
-            z-index: 50;
-            transform-origin: 0 100%;
-            transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);
-            visibility: hidden;
-        }`;
+        const filePath = "shell.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
         const expectedResult = `.tabbed-pane-tab-slider {
             display: none !important;
         }`;
-        let fileContents = getTextFromFile("shell.js");
-
-        // The file was not found, so test that at least the text is being replaced.
-        fileContents = fileContents ? fileContents : comparableText;
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents);
         expect(result).not.toEqual(null);
