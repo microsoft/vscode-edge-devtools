@@ -48,6 +48,7 @@ describe("devtoolsPanel", () => {
             reveal: jest.fn(),
             viewColumn: 1,
             webview: {
+                asWebviewUri: jest.fn(),
                 onDidReceiveMessage: jest.fn(),
                 postMessage: jest.fn(),
             },
