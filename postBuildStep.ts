@@ -4,7 +4,6 @@ import * as fse from "fs-extra";
 import path from "path";
 
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
-import { applyCreateElementPatch, applyUIUtilsPatch } from "./src/host/polyfills/customElements";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import {
     applyAppendTabPatch,
@@ -89,15 +88,12 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         // tslint:disable-next-line:no-console
         console.log("Patching files for release version");
         await patchFileForWebViewWrapper("shell.js", toolsOutDir, true, [
-            applyUIUtilsPatch,
-            applyCreateElementPatch,
             applyInspectorCommonContextMenuPatch,
             applyInspectorCommonCssRightToolbarPatch,
             applyInspectorCommonCssPatch,
             applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
-
         await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, true, [
             applyMainViewPatch,
         ]);
@@ -166,12 +162,6 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyHandleActionPatch,
         ]);
         // Debug file versions
-        await patchFileForWebViewWrapper("ui/UIUtils.js", toolsOutDir, false, [
-            applyUIUtilsPatch,
-        ]);
-        await patchFileForWebViewWrapper("dom_extension/DOMExtension.js", toolsOutDir, false, [
-            applyCreateElementPatch,
-        ]);
         await patchFileForWebViewWrapper("elements/ElementsPanel.js", toolsOutDir, false, [
             applySetupTextSelectionPatch,
         ]);
