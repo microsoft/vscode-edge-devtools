@@ -253,13 +253,13 @@ export class DevToolsPanel {
 
     private getHtmlForWebview() {
         const htmlPath = vscode.Uri.file(path.join(this.extensionPath, "out/tools/front_end", "inspector.html"));
-        const htmlUri = htmlPath.with({ scheme: "vscode-resource" });
+        const htmlUri = this.panel.webview.asWebviewUri(htmlPath);
 
         const scriptPath = vscode.Uri.file(path.join(this.extensionPath, "out", "host", "messaging.bundle.js"));
-        const scriptUri = scriptPath.with({ scheme: "vscode-resource" });
+        const scriptUri = this.panel.webview.asWebviewUri(scriptPath);
 
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, "out", "common", "styles.css"));
-        const stylesUri = stylesPath.with({ scheme: "vscode-resource" });
+        const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
         return `
             <!doctype html>
@@ -268,9 +268,9 @@ export class DevToolsPanel {
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
                 <meta http-equiv="Content-Security-Policy"
                     content="default-src 'none';
-                    frame-src vscode-resource:;
-                    script-src vscode-resource:;
-                    style-src vscode-resource:;">
+                    frame-src ${this.panel.webview.cspSource};
+                    script-src ${this.panel.webview.cspSource};
+                    style-src ${this.panel.webview.cspSource};">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${scriptUri}"></script>
             </head>

@@ -4,17 +4,21 @@
 export default function applyPaddingInlineCssPatch(content: string, isRelease?: boolean) {
     const separator = (isRelease ? "\\n" : "\n");
     const cssHeaderContents =
-        `.elements-disclosure .gutter-container {
-            display: none !important;
-        }`.replace(/\n/g, separator);
+    `.elements-disclosure .gutter-container {
+        display: none !important;
+    }`.replace(/\n/g, separator);
+    const elementsPattern = /(\.elements-disclosure\s*\.gutter-container\s*\{([^\}]*)?\})/g;
+    let result;
+    if (content.match(elementsPattern)) {
+        result = content.replace(elementsPattern, cssHeaderContents);
+    } else {
+        return null;
+    }
 
-    let result = content.replace(
-        /(\.elements-disclosure\s*\.gutter-container\s*\{([^\}]*)?\})/g,
-        cssHeaderContents);
-    result = result.replace(
-        /([^-])padding-inline-start:/g,
-        "$1-webkit-padding-start:",
-    );
-
-    return result;
+    const paddingPattern = /([^-])padding-inline-start:/g;
+    if (result.match(paddingPattern)) {
+        return result.replace(paddingPattern, "$1-webkit-padding-start:");
+    } else {
+        return null;
+    }
 }
