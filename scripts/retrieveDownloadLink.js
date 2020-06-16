@@ -1,4 +1,4 @@
-const TARGET_VERSION = '83.0.478.37';
+const TARGET_VERSION = '83.0.478.45';
 
 function fetchJsonFromUrl(url){
   var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
