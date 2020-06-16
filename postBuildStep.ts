@@ -98,11 +98,13 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
         await patchFileForWebViewWrapper("main/main.js", toolsOutDir, true, [
             applyMainViewPatch,
         ]);
+        await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, true, [
+            applySetupTextSelectionPatch,
+        ]);
         await patchFileForWebViewWrapper("common/common.js", toolsOutDir, true, [
             applyCommonRevealerPatch,
         ]);
         await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, true, [
-            applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebViewWrapper("inspector.html", toolsOutDir, true, [
@@ -137,7 +139,6 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyCommonRevealerPatch,
         ]);
         await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, false, [
-            applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebViewWrapper("inspector.html", toolsOutDir, false, [
