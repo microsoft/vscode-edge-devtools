@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 import ToolsHost from "../toolsHost";
 
-// Licensed under the MIT License.
 declare var InspectorFrontendHost: {
     InspectorFrontendHostInstance: ToolsHost;
 };

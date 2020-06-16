@@ -41,7 +41,7 @@ export function initialize(dtWindow: IDevToolsWindow) {
 
     // Listen for messages from the extension and forward to the tools
     const messageCallback =
-    dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
+        dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
     dtWindow.addEventListener("message", (e) => {
         parseMessageFromChannel(
             e.data,
