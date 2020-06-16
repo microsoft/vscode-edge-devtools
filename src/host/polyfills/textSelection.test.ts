@@ -4,7 +4,7 @@ import { getTextFromFile } from "../../test/helpers";
 
 describe("textSelection", () => {
     it("applySetupTextSelectionPatch correctly changes text", async () => {
-        const filePath = "elements/ElementsPanel.js";
+        const filePath = "elements/elements.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
