@@ -20,7 +20,6 @@ steps:
   displayName: Install Dependencies
 - script: |
     npm run download-edge
-    pwd
   displayName: Downloading And Extracting Edge Zip (Windows x64)
 - script: |
     export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src

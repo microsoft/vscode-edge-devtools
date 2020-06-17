@@ -31,6 +31,13 @@ function retrievePlatform(platform) {
   }
 }
 
+function removeLastDirectory(filepath)
+{
+    var arr = filepath.split('\\');
+    arr.pop();
+    return( arr.join('\\') );
+}
+
 async function downloadZipFile(downloadUrl) {
   const https = require('https');
   const fs = require('fs-extra');
@@ -41,10 +48,12 @@ async function downloadZipFile(downloadUrl) {
   const request = https.get(downloadUrl, function(response) {
     response.pipe(file);
     response.on('end', ()=>{
-      fs.createReadStream('edge.zip').pipe(unzipper.Extract({path: 'out\\edge\\'}));
+      fs.createReadStream('edge.zip').pipe(unzipper.Extract({path: 'out/edge/'}));
       fs.unlink('edge.zip', () => {} );
-      console.log('Edge files extracted to: ' + __dirname + '\\out\\edge');
-      console.log('Run this in cmd: "set EDGE_CHROMIUM_PATH=' + __dirname + '\\out\\edge\\src && set EDGE_CHROMIUM_OUT_DIR=Release"');
+      const flipSlashDirName = __dirname.replace(/\//g, '\\');
+      const rootPath = removeLastDirectory(flipSlashDirName);
+      console.log('Edge files extracted to: ' + rootPath + '\\out\\edge');
+      console.log('Run this in cmd: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&set EDGE_CHROMIUM_OUT_DIR=Release"');
     });
   });
 }
