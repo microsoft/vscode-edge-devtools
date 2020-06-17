@@ -18,30 +18,26 @@ Contributions are always welcome! We only ask that you open an issue first so we
 * Clone this repo
 * Run `npm install` in '/vscode-edge-devtools'
 * Download and Extract Edge source files
-  * Using `downloadAndExtractEdge.sh` (Windows Only)
-    * In a bash shell, run `./scripts/downloadAndExtractEdge.sh [OUTPUT_DIR]` where `[OUTPUT_DIR]` is the desired extraction output directory
-      * e.g. `./scripts/downloadAndExtractEdge.sh c:/edge`
-    * This will download the current stable version of Edge that the extension supports (currently 81.0.416)
+  * Automated Method (Windows Only)
+    * run `npm run download-edge`
+    * The files will be saved at `\vscode-edge-debug\out\edge`
+    * Run the command that `npm run download-edge` outputs in a command prompt
+      * e.g. `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src && set EDGE_CHROMIUM_OUT_DIR=Release`
   * Traditional Method
     * Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 81.0.416.
       * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
     * Extract the necessary files from the zip
-      * Use `unzipEdge.sh` (.zip format only)
-        * In a bash shell, run `./scripts/unzipEdge.sh [EDGE_ZIP_PATH] [OUTPUT_DIR]`
-          * e.g. `./scripts/unzipEdge.sh "C:\Users\username\Downloads\Microsoft Edge DevTools_81.0.416.72_Windows x64_chromium.zip" "C:/edge/"`
-        * The script is designed to be compatible with both Microsoft Edge zips and Microsoft Edge DevTools zips
-      * Manual approach (for .tar/.tgz or if scripts fail)
-        * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
-          * `mkdir c:\edge\src\out\Release\gen\devtools`
-          * `mkdir c:\edge\src\third_party\devtools-frontend\src\front_end`
-        * **Open** the zip file and (inside the zip file) navigate to:
-          * `[COMPRESSED_FILE]:\src\third_party\devtools-frontend\src\front_end`
-          * copy the contents of the "front_end" folder and paste them into `c:\edge\src\third_party\devtools-frontend\src\front_end`
-        * **Open** the zip file and (inside the zip file) navigate to:
-          * `[COMPRESSED_FILE]:\src\out\Release\gen\devtools`
-          * copy the contents of the "devtools" folder and paste them into `c:\edge\src\out\Release\gen\devtools`
-* Set the `EDGE_CHROMIUM_PATH` environment variable to `c:\edge\src` (assuming your drive is located at C:\) or to `[OUTPUT_DIR]\src` if using the scripts
-* Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
+      * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
+        * `mkdir c:\edge\src\out\Release\gen\devtools`
+        * `mkdir c:\edge\src\third_party\devtools-frontend\src\front_end`
+      * **Open** the zip file and (inside the zip file) navigate to:
+        * `[COMPRESSED_FILE]:\src\third_party\devtools-frontend\src\front_end`
+        * copy the contents of the "front_end" folder and paste them into `c:\edge\src\third_party\devtools-frontend\src\front_end`
+      * **Open** the zip file and (inside the zip file) navigate to:
+        * `[COMPRESSED_FILE]:\src\out\Release\gen\devtools`
+        * copy the contents of the "devtools" folder and paste them into `c:\edge\src\out\Release\gen\devtools`
+    * Set the `EDGE_CHROMIUM_PATH` environment variable to `c:\edge\src`
+    * Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VSCode
 * Select `Launch Extension` debug configuration
