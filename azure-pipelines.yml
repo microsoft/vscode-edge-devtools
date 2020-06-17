@@ -19,25 +19,21 @@ steps:
     npm install
   displayName: Install Dependencies
 - script: |
-    output=$(node scripts/retrieveDownloadLink.js win)
-    curl "$output" --output $(Agent.TempDirectory)/edge.zip
-  displayName: Downloading Edge Zip (Windows x64)
+    npm run download-edge
+    pwd
+  displayName: Downloading And Extracting Edge Zip (Windows x64)
 - script: |
-    unzip $(Agent.TempDirectory)/edge.zip src/out/Release/gen/devtools/* -d $(Agent.TempDirectory)/edge
-    unzip $(Agent.TempDirectory)/edge.zip src/third_party/devtools-frontend/src/front_end/* -d $(Agent.TempDirectory)/edge
-  displayName: Extracting DevTools Files
-- script: |
-    export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
+    export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
     npm run build
   displayName: Building
 - script: |
-    export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
+    export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
     npm run test
   displayName: Linting and Testing
 - script: |
-    export EDGE_CHROMIUM_PATH=$(Agent.TempDirectory)/edge/src
+    export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
     export EDGE_CHROMIUM_OUT_DIR=Release
     npm run package
   displayName: Creating .vsix
