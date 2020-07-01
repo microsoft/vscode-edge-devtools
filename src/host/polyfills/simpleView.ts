@@ -3,7 +3,9 @@
 
 import ToolsHost from "../toolsHost";
 
-declare var InspectorFrontendHost: ToolsHost;
+declare var InspectorFrontendHost: {
+    InspectorFrontendHostInstance: ToolsHost;
+};
 
 interface IRevealable {
     lineNumber: number;
@@ -15,7 +17,7 @@ interface IRevealable {
 
 export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
     if (revealable && revealable.uiSourceCode && revealable.uiSourceCode._url) {
-        InspectorFrontendHost.openInEditor(
+        InspectorFrontendHost.InspectorFrontendHostInstance.openInEditor(
             revealable.uiSourceCode._url,
             revealable.lineNumber,
             revealable.columnNumber,
@@ -27,7 +29,7 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
 }
 
 export function getApprovedTabs(callback: () => void) {
-    InspectorFrontendHost.getApprovedTabs(callback);
+    InspectorFrontendHost.InspectorFrontendHostInstance.getApprovedTabs(callback);
 }
 
 export function applyCommonRevealerPatch(content: string) {
@@ -141,7 +143,7 @@ export function applyAppendTabPatch(content: string) {
 
     const appendTabWrapper =
         /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
-    const injectionPoint = /}(\s|\n)*export\s*const\s*Events={/;
+    const injectionPoint = /}(\s|\n)*\s*let EventData;(\s|\n)*\s*const\s*Events/;
 
     // Injecting our verifications by redirecting appendTab to appendTabOverride
     if (content.match(appendTabWrapper)) {
@@ -167,7 +169,8 @@ export function applyAppendTabPatch(content: string) {
                     }
                 });
             }}
-            export const Events={`);
+            let EventData;
+            const Events`);
     } else {
         return null;
     }

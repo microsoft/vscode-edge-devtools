@@ -5,6 +5,7 @@ import path from "path";
 
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
+import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtime";
 import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
@@ -94,64 +95,60 @@ async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
             applyInspectorCommonNetworkPatch,
             applyInspectorCommonCssTabSliderPatch,
         ]);
-        await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("main/main.js", toolsOutDir, true, [
             applyMainViewPatch,
         ]);
-        await patchFileForWebViewWrapper("common/Revealer.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, true, [
+            applySetupTextSelectionPatch,
+        ]);
+        await patchFileForWebViewWrapper("common/common.js", toolsOutDir, true, [
             applyCommonRevealerPatch,
         ]);
         await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, true, [
             applyPaddingInlineCssPatch,
         ]);
-        await patchFileForWebViewWrapper("elements/ElementsPanel.js", toolsOutDir, true, [
-            applySetupTextSelectionPatch,
-        ]);
         await patchFileForWebViewWrapper("inspector.html", toolsOutDir, true, [
             applyContentSecurityPolicyPatch,
         ]);
-        await patchFileForWebViewWrapper("ui/InspectorView.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, true, [
             applyDrawerTabLocationPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/TabbedPane.js", toolsOutDir, true, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
             applySetTabIconPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
             applyShowRequestBlockingTab,
         ]);
-        await patchFileForWebViewWrapper("quick_open/QuickOpen.js", toolsOutDir, true, [
+
+        await patchFileForWebViewWrapper("root/root.js", toolsOutDir, true, [
+            applyRuntimeImportScriptPathPrefixPatch,
+        ]);
+
+        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, true, [
             applyHandleActionPatch,
         ]);
-        await patchFileForWebViewWrapper("quick_open/CommandMenu.js", toolsOutDir, true, [
+        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, true, [
             applyHandleActionPatch,
         ]);
     } else {
         // tslint:disable-next-line:no-console
         console.log("Patching files for debug version");
-        await patchFileForWebViewWrapper("main/MainImpl.js", toolsOutDir, false, [
+        await patchFileForWebViewWrapper("main/main.js", toolsOutDir, false, [
             applyMainViewPatch,
         ]);
-        await patchFileForWebViewWrapper("common/Revealer.js", toolsOutDir, false, [
+        await patchFileForWebViewWrapper("common/common.js", toolsOutDir, false, [
             applyCommonRevealerPatch,
         ]);
         await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, false, [
-            applySetupTextSelectionPatch,
             applyPaddingInlineCssPatch,
         ]);
         await patchFileForWebViewWrapper("inspector.html", toolsOutDir, false, [
             applyContentSecurityPolicyPatch,
         ]);
-        await patchFileForWebViewWrapper("ui/InspectorView.js", toolsOutDir, false, [
+        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, false, [
             applyDrawerTabLocationPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/TabbedPane.js", toolsOutDir, false, [
             applyAppendTabPatch,
             applyPersistRequestBlockingTab,
             applySetTabIconPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/ViewManager.js", toolsOutDir, true, [
             applyShowElementsTab,
             applyShowRequestBlockingTab,
         ]);

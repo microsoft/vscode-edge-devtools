@@ -15,7 +15,9 @@ describe("simpleView", () => {
         };
         const mockOpen = jest.fn();
         (global as any).InspectorFrontendHost = {
-            openInEditor: mockOpen,
+            InspectorFrontendHostInstance: {
+                openInEditor: mockOpen,
+            },
         };
 
         await apply.revealInVSCode(expected, expected.omitFocus);
@@ -24,7 +26,7 @@ describe("simpleView", () => {
     });
 
     it("applyCommonRevealerPatch correctly changes text", async () => {
-        const filePath = "common/Revealer.js";
+        const filePath = "common/common.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -38,7 +40,7 @@ describe("simpleView", () => {
     });
 
     it("applyHandleActionPatch correctly changes handleAction text for Quick Open", async () => {
-        const filePath = "quick_open/QuickOpen.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -52,7 +54,7 @@ describe("simpleView", () => {
     });
 
     it("applyHandleActionPatch correctly changes handleAction text for Command Menu", async () => {
-        const filePath = "quick_open/CommandMenu.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -66,7 +68,7 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
-        const filePath = "ui/InspectorView.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -79,7 +81,7 @@ describe("simpleView", () => {
     });
 
     it("applyMainViewPatch correctly changes text", async () => {
-        const filePath = "main/MainImpl.js";
+        const filePath = "main/main.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -93,7 +95,7 @@ describe("simpleView", () => {
     });
 
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
-        const filePath = "ui/InspectorView.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -107,7 +109,7 @@ describe("simpleView", () => {
     });
 
     it("applySetTabIconPatch correctly changes text", async () => {
-        const filePath = "ui/TabbedPane.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -120,7 +122,7 @@ describe("simpleView", () => {
     });
 
     it("applyAppendTabPatch correctly changes text", async () => {
-        const filePath = "ui/TabbedPane.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -133,7 +135,7 @@ describe("simpleView", () => {
     });
 
     it("applyShowElementsTab correctly changes text", async () => {
-        const filePath = "ui/ViewManager.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -148,7 +150,7 @@ describe("simpleView", () => {
     });
 
     it("applyShowRequestBlockingTab correctly changes text", async () => {
-        const filePath = "ui/ViewManager.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -164,7 +166,7 @@ describe("simpleView", () => {
     });
 
     it("applyPersistRequestBlockingTab correctly changes text", async () => {
-        const filePath = "ui/TabbedPane.js";
+        const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);

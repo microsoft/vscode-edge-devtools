@@ -10,7 +10,7 @@ export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
     Root: IRoot;
-    _importScriptPathPrefix: string;
+    importScriptPathPrefix: string;
 }
 
 export interface IRoot {
@@ -57,6 +57,6 @@ export function initialize(dtWindow: IDevToolsWindow) {
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
 
-        dtWindow._importScriptPathPrefix = dtWindow._importScriptPathPrefix.replace("null", "vscode-resource:");
+        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace("null", "vscode-resource:");
     });
 }
