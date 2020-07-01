@@ -469,9 +469,11 @@
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
         "lint": "tslint -c tslint.json -p tsconfig.json",
-        "test": "npm run lint && jest --coverage"
+        "test": "npm run lint && jest --coverage",
+        "download-edge": "node scripts/downloadAndExtractEdge.js win"
     },
     "dependencies": {
+        "unzipper": "0.10.11",
         "vscode-chrome-debug-core": "6.7.51",
         "vscode-extension-telemetry": "0.1.4",
         "ws": "7.1.0",
