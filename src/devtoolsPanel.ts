@@ -270,7 +270,8 @@ export class DevToolsPanel {
                     content="default-src 'none';
                     frame-src ${this.panel.webview.cspSource};
                     script-src ${this.panel.webview.cspSource};
-                    style-src ${this.panel.webview.cspSource};">
+                    style-src ${this.panel.webview.cspSource};
+                    ">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${scriptUri}"></script>
             </head>
