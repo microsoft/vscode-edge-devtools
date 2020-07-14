@@ -20,8 +20,14 @@ function fetchDownloadUrl(platform) {
 }
 
 function retrievePlatform(platform) {
+  console.log(process.platform);
   if (!platform) {
-    return 'Windows x64';
+    switch (process.platform) {
+      case 'win32':
+        return 'Windows x64';
+      default:
+        return 'Mac OS x64';
+      }
   }
   switch (platform.toLowerCase()) {
     case 'mac':
