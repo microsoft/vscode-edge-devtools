@@ -1,4 +1,5 @@
 const TARGET_VERSION = '83.0.478.45';
+var isWindows = true;
 
 function fetchJsonFromUrl(url){
   var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
@@ -12,6 +13,7 @@ function fetchDownloadUrl(platform) {
   const jsonString = fetchJsonFromUrl('https://thirdpartysource.microsoft.com/downloads');
   const jsonObjects = JSON.parse(jsonString);
   const platformString = retrievePlatform(platform);
+  console.log('Downloading Microsoft Edge DevTools version ' + TARGET_VERSION + ' for ' + platformString);
   for (let object of jsonObjects) {
     if (object.product === 'Microsoft Edge DevTools' && object.release === TARGET_VERSION && object.platform === platformString) {
       return object.url;
@@ -20,25 +22,25 @@ function fetchDownloadUrl(platform) {
 }
 
 function retrievePlatform(platform) {
-  console.log(process.platform);
   if (!platform) {
     switch (process.platform) {
       case 'win32':
         return 'Windows x64';
       default:
+        isWindows = false;
         return 'Mac OS x64';
-      }
+    }
   }
   switch (platform.toLowerCase()) {
-    case 'mac':
-      return 'Mac OS x64';
-    default:
+    case 'win':
       return 'Windows x64';
+    default:
+      isWindows = false;
+      return 'Mac OS x64';
   }
 }
 
-function removeLastDirectory(filepath)
-{
+function removeLastDirectory(filepath) {
     var arr = filepath.split('\\');
     arr.pop();
     return( arr.join('\\') );
@@ -59,7 +61,11 @@ async function downloadZipFile(downloadUrl) {
       const flipSlashDirName = __dirname.replace(/\//g, '\\');
       const rootPath = removeLastDirectory(flipSlashDirName);
       console.log('Edge files extracted to: ' + rootPath + '\\out\\edge');
-      console.log('Run this in cmd: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&set EDGE_CHROMIUM_OUT_DIR=Release"');
+      if (isWindows) {
+        console.log('Run this in cmd: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&set EDGE_CHROMIUM_OUT_DIR=Release"');
+      } else {
+        console.log('Run this in terminal: "export EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&export EDGE_CHROMIUM_OUT_DIR=Release"');
+      }
     });
   });
 }
