@@ -65,7 +65,7 @@ async function downloadZipFile(downloadUrl) {
         console.log('Edge files extracted to: ' + rootPath + '\\out\\edge');
         console.log('Run this in cmd to set env variables: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&setx EDGE_CHROMIUM_OUT_DIR=Release"');
       } else {
-        const rootPath = removeLastDirectory(flipSlashDirName);
+        const rootPath = removeLastDirectory(dirName);
         console.log('Edge files extracted to: ' + rootPath + '/out/edge');
         console.log('Run this in terminal to set env variables: "export EDGE_CHROMIUM_PATH=' + rootPath + '/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release"');
       }
