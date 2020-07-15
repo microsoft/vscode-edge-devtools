@@ -58,14 +58,18 @@ async function downloadZipFile(downloadUrl) {
     response.on('end', ()=>{
       fs.createReadStream('edge.zip').pipe(unzipper.Extract({path: 'out/edge/'}));
       fs.unlink('edge.zip', () => {} );
-      const flipSlashDirName = __dirname.replace(/\//g, '\\');
-      const rootPath = removeLastDirectory(flipSlashDirName);
-      console.log('Edge files extracted to: ' + rootPath + '\\out\\edge');
+      let dirName = __dirname;
       if (isWindows) {
-        console.log('Run this in cmd: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&set EDGE_CHROMIUM_OUT_DIR=Release"');
+        flipSlashDirName = dirName.replace(/\//g, '\\');
+        const rootPath = removeLastDirectory(flipSlashDirName);
+        console.log('Edge files extracted to: ' + rootPath + '\\out\\edge');
+        console.log('Run this in cmd to set env variables: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&setx EDGE_CHROMIUM_OUT_DIR=Release"');
       } else {
-        console.log('Run this in terminal: "export EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&export EDGE_CHROMIUM_OUT_DIR=Release"');
+        const rootPath = removeLastDirectory(flipSlashDirName);
+        console.log('Edge files extracted to: ' + rootPath + '/out/edge');
+        console.log('Run this in terminal to set env variables: "export EDGE_CHROMIUM_PATH=' + rootPath + '/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release"');
       }
+      console.log('Note this command only sets the environment variables for this session.');
     });
   });
 }
