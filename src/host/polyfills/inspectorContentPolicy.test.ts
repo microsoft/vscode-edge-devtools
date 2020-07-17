@@ -14,7 +14,7 @@ describe("inspectorContentPolicy", () => {
         const result = apply.applyContentSecurityPolicyPatch(fileContents);
         expect(result).toEqual(
             expect.stringContaining(
-                `script-src vscode-resource: 'self'`));
+                `script-src vscode-webview-resource: 'self'`));
         expect(result).toEqual(
             expect.stringContaining(
                 `<script src="../../host/host.bundle.js"></script>`));

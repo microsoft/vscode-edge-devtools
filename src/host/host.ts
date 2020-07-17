@@ -57,6 +57,6 @@ export function initialize(dtWindow: IDevToolsWindow) {
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
 
-        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace("null", "vscode-resource:");
+        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace("null", "vscode-webview-resource:");
     });
 }
