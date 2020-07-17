@@ -21,9 +21,12 @@ Contributions are always welcome! We only ask that you open an issue first so we
   * Automated Method
     * run `npm run download-edge`
     * The files will be saved at `\vscode-edge-debug\out\edge`
-    * Run the command that `npm run download-edge` outputs in a command prompt
-      * e.g. `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src && set EDGE_CHROMIUM_OUT_DIR=Release`
-      * Note the command will only set the environment variable for the current session
+    * Run `npm run download-edge`
+    * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src`
+    * Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
+      * You can use the `download-edge` script output to set it for the session
+        * e.g. `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src && set EDGE_CHROMIUM_OUT_DIR=Release`
+        * Note the command will only set the environment variable for the current session
   * Traditional Method (Use if automated method fails or if building with a version of Edge other than the currently supported version)
     * Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 81.0.416.
       * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
