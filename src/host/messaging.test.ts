@@ -65,12 +65,14 @@ describe("messaging", () => {
 
         const expectedToolsWindowMessage = "to tools window";
         messageCallback.call(messageThis,
-            { source: { location: { protocol: "data:" } }, data: expectedToolsWindowMessage } as MessageEvent);
+            { data: expectedToolsWindowMessage,
+              source: { location: { protocol: "vscode-webview:" } },
+             } as MessageEvent);
         expect(mockToolsWindow.contentWindow.postMessage).toBeCalledWith(expectedToolsWindowMessage, "*");
 
         const expectedVSCodeMessage = "to vscode";
         messageCallback.call(messageThis,
-            { source: { location: { protocol: "null" } }, data: expectedVSCodeMessage } as MessageEvent);
+            { data: expectedVSCodeMessage, source: { location: { protocol: "null" } } } as MessageEvent);
         expect(mockVSCode.postMessage).toBeCalledWith(expectedVSCodeMessage);
     });
 });
