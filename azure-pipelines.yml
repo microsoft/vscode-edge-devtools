@@ -38,10 +38,10 @@ jobs:
       npm run package
     displayName: Creating .vsix
   - task: CopyFiles@2
-    displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+    displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)/mac_drop'
     inputs:
       Contents: '*.vsix'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/mac_drop'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: drop'
 - job: Windows
@@ -75,9 +75,9 @@ jobs:
       npm run package
     displayName: Creating .vsix
   - task: CopyFiles@2
-    displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+    displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)/win_drop'
     inputs:
       Contents: '*.vsix'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/win_drop'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: drop'
