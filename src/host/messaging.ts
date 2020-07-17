@@ -18,7 +18,7 @@ export function initializeMessaging() {
         // See: https://blog.mattbierner.com/vscode-webview-web-learnings/
         let sendToDevTools = false;
         try {
-            sendToDevTools = (messageEvent.source as Window).location.protocol === "data:";
+            sendToDevTools = (messageEvent.source as Window).location.protocol === "vscode-webview:";
         } catch { /* NO-OP */ }
 
         if (!sendToDevTools) {

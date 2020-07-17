@@ -5,7 +5,7 @@ export function applyContentSecurityPolicyPatch(content: string) {
     const scriptPattern = /script-src\s*'self'/g;
     let result;
     if (content.match(scriptPattern)) {
-        result = content.replace(scriptPattern, `script-src vscode-resource: 'self'`);
+        result = content.replace(scriptPattern, `script-src vscode-webview-resource: 'self'`);
     } else {
         return null;
     }
