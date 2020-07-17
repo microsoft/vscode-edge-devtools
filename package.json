@@ -470,7 +470,9 @@
         "watch-wp": "webpack --watch",
         "lint": "tslint -c tslint.json -p tsconfig.json",
         "test": "npm run lint && jest --coverage",
-        "download-edge": "node scripts/downloadAndExtractEdge.js win"
+        "download-edge": "node scripts/downloadAndExtractEdge.js",
+        "download-edge-win": "node scripts/downloadAndExtractEdge.js win",
+        "download-edge-mac": "node scripts/downloadAndExtractEdge.js mac"
     },
     "dependencies": {
         "unzipper": "0.10.11",
