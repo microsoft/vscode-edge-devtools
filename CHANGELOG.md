@@ -1,3 +1,10 @@
+## 1.0.9
+* Updated to version 83.0.478.45
+* Added extension settings toggle to toggle network panel on and off - [PR #136](https://github.com/microsoft/vscode-edge-devtools/pull/136)
+* Upgraded DevOps pipeline to build and test using Edge source code - [PR #145](https://github.com/microsoft/vscode-edge-devtools/pull/145)
+* Improved contributing workflow by implementing a download script - [PR #167](https://github.com/microsoft/vscode-edge-devtools/pull/167)
+* Other bug fixes and quality of life improvements
+
 ## 1.0.8
 * Downgraded Edge DevTools version to 81.0.416 (Microsoft Edge Stable)
 * Merged Network Tool into the extension - [PR #128](https://github.com/microsoft/vscode-edge-devtools/pull/128)
