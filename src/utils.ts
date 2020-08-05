@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as cp from "child_process";
 import * as fse from "fs-extra";
 import * as http from "http";
 import * as https from "https";
@@ -13,6 +12,8 @@ import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 import packageJson from "../package.json";
 import DebugTelemetryReporter from "./debugTelemetryReporter";
+
+import puppeteer from "puppeteer-core";
 
 export type BrowserFlavor = "Default" | "Stable" | "Beta" | "Dev" | "Canary";
 
@@ -282,23 +283,23 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @param targetUrl The url of the page to open
  * @param userDataDir The user data directory for the launched instance
  */
-export function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string) {
+export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string) {
     const args = [
         "--no-first-run",
         "--no-default-browser-check",
         `--remote-debugging-port=${port}`,
         targetUrl,
     ];
+
+    if (isHeadlessEnabled()) {
+        args.push("--headless");
+    }
+
     if (userDataDir) {
         args.unshift(`--user-data-dir=${userDataDir}`);
     }
 
-    const proc = cp.spawn(browserPath, args, {
-        detached: true,
-        stdio: "ignore",
-    });
-
-    proc.unref();
+    await puppeteer.launch({executablePath: browserPath, args});
 }
 
 /**
@@ -436,6 +437,15 @@ export function applyPathMapping(
     }
 
     return sourcePath;
+}
+
+/**
+ * Verifies if the headless checkbox in extension settings is enabled.
+ */
+function isHeadlessEnabled() {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const headless: boolean = settings.get("headless") || false;
+    return headless;
 }
 
 /**

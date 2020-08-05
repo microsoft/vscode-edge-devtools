@@ -548,43 +548,91 @@ describe("utils", () => {
     });
 
     describe("launchBrowser", () => {
-        it("spawns the process", async () => {
-            jest.doMock("child_process");
+        beforeEach(async () => {
+            jest.mock("puppeteer-core", () => {
+                return {
+                    launch: jest.fn(),
+                };
+            });
             jest.doMock("path");
             jest.doMock("os");
             jest.resetModules();
+        });
+
+        it("spawns the process", async () => {
             utils = await import("./utils");
-
-            const cp = jest.requireMock("child_process");
-            cp.spawn.mockReturnValue({
-                unref: jest.fn(),
-            });
-
             const expectedTempPath = "C:\\someTempPath";
             const os = jest.requireMock("os");
             os.tmpdir.mockReturnValue(expectedTempPath);
 
-            const expectedPath = "somePath";
+            const executablePath = "somePath";
             const expectedPort = 9222;
             const expectedUrl = "http://example.com";
             const expectedUserDataDir = "profile";
-            utils.launchBrowser(expectedPath, expectedPort, expectedUrl, expectedUserDataDir);
+            await utils.launchBrowser(executablePath, expectedPort, expectedUrl, expectedUserDataDir);
+            const puppeteer = jest.requireMock("puppeteer-core");
+            expect(puppeteer.launch).toHaveBeenCalledWith(
+                {
+                    args: [
+                        "--user-data-dir=profile",
+                        "--no-first-run",
+                        "--no-default-browser-check",
+                        `--remote-debugging-port=${expectedPort}`,
+                        expectedUrl,
+                    ],
+                    executablePath,
+                },
+            );
 
-            expect(cp.spawn).toHaveBeenCalledWith(
-                expectedPath,
-                expect.arrayContaining([
-                    `--user-data-dir=${expectedUserDataDir}`,
-                    `--remote-debugging-port=${expectedPort}`,
-                    expectedUrl]),
-                expect.any(Object));
+            utils.launchBrowser(executablePath, expectedPort, expectedUrl);
+            expect(puppeteer.launch).toHaveBeenCalledWith(
+                {
+                    args: [
+                        "--no-first-run",
+                        "--no-default-browser-check",
+                        `--remote-debugging-port=${expectedPort}`,
+                        expectedUrl,
+                    ],
+                    executablePath,
+                },
+            );
+        });
 
-            utils.launchBrowser(expectedPath, expectedPort, expectedUrl);
-            expect(cp.spawn).toHaveBeenCalledWith(
-                expectedPath,
-                expect.arrayContaining([
-                    `--remote-debugging-port=${expectedPort}`,
-                    expectedUrl]),
-                expect.any(Object));
+        it("spawns the process in headless", async () => {
+            // Mock out the settings
+            const expectedSettings = {
+               headless: true,
+            };
+            const configMock = {
+                get: (name: string) => (expectedSettings as any)[name],
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
+            utils = await import("./utils");
+            const expectedTempPath = "C:\\someTempPath";
+            const os = jest.requireMock("os");
+            os.tmpdir.mockReturnValue(expectedTempPath);
+
+            const executablePath = "somePath";
+            const expectedPort = 9222;
+            const expectedUrl = "http://example.com";
+            const expectedUserDataDir = "profile";
+            await utils.launchBrowser(executablePath, expectedPort, expectedUrl, expectedUserDataDir);
+            const puppeteer = jest.requireMock("puppeteer-core");
+            expect(puppeteer.launch).toHaveBeenCalledWith(
+                {
+                    args: [
+                        "--user-data-dir=profile",
+                        "--no-first-run",
+                        "--no-default-browser-check",
+                        `--remote-debugging-port=${expectedPort}`,
+                        expectedUrl,
+                        "--headless",
+                    ],
+                    executablePath,
+                },
+            );
         });
     });
 

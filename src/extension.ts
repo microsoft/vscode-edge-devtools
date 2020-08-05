@@ -204,7 +204,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
 
-        launchBrowser(browserPath, port, url, userDataDir);
+        await launchBrowser(browserPath, port, url, userDataDir);
         await attach(context, url, config);
     }
 }
