@@ -291,15 +291,13 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
         targetUrl,
     ];
 
-    if (isHeadlessEnabled()) {
-        args.push("--headless");
-    }
+    const headless: boolean = isHeadlessEnabled();
 
     if (userDataDir) {
         args.unshift(`--user-data-dir=${userDataDir}`);
     }
 
-    await puppeteer.launch({executablePath: browserPath, args});
+    await puppeteer.launch({executablePath: browserPath, args, headless});
 }
 
 /**

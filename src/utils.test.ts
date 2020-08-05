@@ -569,6 +569,7 @@ describe("utils", () => {
             const expectedPort = 9222;
             const expectedUrl = "http://example.com";
             const expectedUserDataDir = "profile";
+            const headless = false;
             await utils.launchBrowser(executablePath, expectedPort, expectedUrl, expectedUserDataDir);
             const puppeteer = jest.requireMock("puppeteer-core");
             expect(puppeteer.launch).toHaveBeenCalledWith(
@@ -581,6 +582,7 @@ describe("utils", () => {
                         expectedUrl,
                     ],
                     executablePath,
+                    headless,
                 },
             );
 
@@ -594,6 +596,7 @@ describe("utils", () => {
                         expectedUrl,
                     ],
                     executablePath,
+                    headless,
                 },
             );
         });
@@ -628,9 +631,9 @@ describe("utils", () => {
                         "--no-default-browser-check",
                         `--remote-debugging-port=${expectedPort}`,
                         expectedUrl,
-                        "--headless",
                     ],
                     executablePath,
+                    headless: expectedSettings.headless,
                 },
             );
         });
