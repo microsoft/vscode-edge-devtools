@@ -157,6 +157,11 @@
                     "description": "Enable network panel (requires relaunching extension)",
                     "default": false
                 },
+                "vscode-edge-devtools.headless": {
+                    "type": "boolean",
+                    "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",
+                    "default": false
+                },
                 "vscode-edge-devtools.timeout": {
                     "type": "number",
                     "description": "The number of milliseconds that the Microsoft Edge Tools will keep trying to attach the browser before timing out",
@@ -469,12 +474,13 @@
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
         "lint": "tslint -c tslint.json -p tsconfig.json",
-        "test": "npm run lint && jest --coverage",
+        "test": "npm run lint && jest --config package.json --runInBand",
         "download-edge": "node scripts/downloadAndExtractEdge.js",
         "download-edge-win": "node scripts/downloadAndExtractEdge.js win",
         "download-edge-mac": "node scripts/downloadAndExtractEdge.js mac"
     },
     "dependencies": {
+        "puppeteer-core": "5.2.1",
         "unzipper": "0.10.11",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.4",
@@ -482,6 +488,7 @@
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
+        "@types/puppeteer-core": "2.0.0",
         "@types/fs-extra": "8.0.0",
         "@types/jest": "24.0.15",
         "@types/node": "12.6.8",
