@@ -31,7 +31,7 @@ async function copyFile(srcDir: string, outDir: string, name: string) {
     );
 }
 
-async function copyStaticFiles(debugMode: boolean) {
+async function copyStaticFiles() {
     // Copy the static css file to the out directory
     const commonSrcDir = "./src/common/";
     const commonOutDir = "./out/common/";
@@ -40,7 +40,7 @@ async function copyStaticFiles(debugMode: boolean) {
 
     // Must set environment variables EDGE_CHROMIUM_PATH and EDGE_CHROMIUM_OUT_DIR
     // E.g. set EDGE_CHROMIUM_PATH=F:/git/Edge/src
-    //      set EDGE_CHROMIUM_OUT_DIR=debug_x64
+    //      set EDGE_CHROMIUM_OUT_DIR=Release
     // See CONTRIBUTING.md for more details
 
     const toolsSrcDir =
@@ -80,125 +80,74 @@ async function copyStaticFiles(debugMode: boolean) {
     }
 
     // Patch older versions of the webview with our workarounds
-    await patchFilesForWebView(toolsOutDir, debugMode);
+    await patchFilesForWebView(toolsOutDir);
 }
 
-async function patchFilesForWebView(toolsOutDir: string, debugMode: boolean) {
-    // Release file versions
-    if (!debugMode) {
-        // tslint:disable-next-line:no-console
-        console.log("Patching files for release version");
-        await patchFileForWebViewWrapper("shell.js", toolsOutDir, true, [
-            applyInspectorCommonContextMenuPatch,
-            applyInspectorCommonCssRightToolbarPatch,
-            applyInspectorCommonCssPatch,
-            applyInspectorCommonNetworkPatch,
-            applyInspectorCommonCssTabSliderPatch,
-        ]);
-        await patchFileForWebViewWrapper("main/main.js", toolsOutDir, true, [
-            applyMainViewPatch,
-        ]);
-        await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, true, [
-            applySetupTextSelectionPatch,
-        ]);
-        await patchFileForWebViewWrapper("common/common.js", toolsOutDir, true, [
-            applyCommonRevealerPatch,
-        ]);
-        await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, true, [
-            applyPaddingInlineCssPatch,
-        ]);
-        await patchFileForWebViewWrapper("inspector.html", toolsOutDir, true, [
-            applyContentSecurityPolicyPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, true, [
-            applyDrawerTabLocationPatch,
-            applyAppendTabPatch,
-            applyPersistRequestBlockingTab,
-            applySetTabIconPatch,
-            applyShowElementsTab,
-            applyShowRequestBlockingTab,
-        ]);
+async function patchFilesForWebView(toolsOutDir: string) {
+    // tslint:disable-next-line:no-console
+    console.log("Patching files.");
+    await patchFileForWebViewWrapper("shell.js", toolsOutDir, [
+        applyInspectorCommonContextMenuPatch,
+        applyInspectorCommonCssRightToolbarPatch,
+        applyInspectorCommonCssPatch,
+        applyInspectorCommonNetworkPatch,
+        applyInspectorCommonCssTabSliderPatch,
+    ]);
+    await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
+        applyMainViewPatch,
+    ]);
+    await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
+        applySetupTextSelectionPatch,
+    ]);
+    await patchFileForWebViewWrapper("common/common.js", toolsOutDir, [
+        applyCommonRevealerPatch,
+    ]);
+    await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, [
+        applyPaddingInlineCssPatch,
+    ]);
+    await patchFileForWebViewWrapper("inspector.html", toolsOutDir, [
+        applyContentSecurityPolicyPatch,
+    ]);
+    await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
+        applyDrawerTabLocationPatch,
+        applyAppendTabPatch,
+        applyPersistRequestBlockingTab,
+        applySetTabIconPatch,
+        applyShowElementsTab,
+        applyShowRequestBlockingTab,
+    ]);
 
-        await patchFileForWebViewWrapper("root/root.js", toolsOutDir, true, [
-            applyRuntimeImportScriptPathPrefixPatch,
-        ]);
+    await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
+        applyRuntimeImportScriptPathPrefixPatch,
+    ]);
 
-        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, true, [
-            applyHandleActionPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, true, [
-            applyHandleActionPatch,
-        ]);
-    } else {
-        // tslint:disable-next-line:no-console
-        console.log("Patching files for debug version");
-        await patchFileForWebViewWrapper("main/main.js", toolsOutDir, false, [
-            applyMainViewPatch,
-        ]);
-        await patchFileForWebViewWrapper("common/common.js", toolsOutDir, false, [
-            applyCommonRevealerPatch,
-        ]);
-        await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, false, [
-            applyPaddingInlineCssPatch,
-        ]);
-        await patchFileForWebViewWrapper("inspector.html", toolsOutDir, false, [
-            applyContentSecurityPolicyPatch,
-        ]);
-        await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, false, [
-            applyDrawerTabLocationPatch,
-            applyAppendTabPatch,
-            applyPersistRequestBlockingTab,
-            applySetTabIconPatch,
-            applyShowElementsTab,
-            applyShowRequestBlockingTab,
-        ]);
-        await patchFileForWebViewWrapper("quick_open/QuickOpen.js", toolsOutDir, true, [
-            applyHandleActionPatch,
-        ]);
-        await patchFileForWebViewWrapper("quick_open/CommandMenu.js", toolsOutDir, true, [
-            applyHandleActionPatch,
-        ]);
-        // Debug file versions
-        await patchFileForWebViewWrapper("elements/ElementsPanel.js", toolsOutDir, false, [
-            applySetupTextSelectionPatch,
-        ]);
-        await patchFileForWebViewWrapper("themes/base.css", toolsOutDir, false, [
-            applyInspectorCommonContextMenuPatch,
-            applyInspectorCommonCssPatch,
-            applyInspectorCommonNetworkPatch,
-            applyInspectorCommonCssRightToolbarPatch,
-            applyInspectorCommonCssTabSliderPatch,
-        ]);
-        await patchFileForWebViewWrapper("elements/elementsTreeOutline.css", toolsOutDir, false, [
-            applyPaddingInlineCssPatch,
-        ]);
-        await patchFileForWebViewWrapper("elements/stylesSectionTree.css", toolsOutDir, false, [
-            applyPaddingInlineCssPatch,
-        ]);
-    }
+    await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
+        applyHandleActionPatch,
+    ]);
+    await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
+        applyHandleActionPatch,
+    ]);
 }
 
 // This function wraps the patchFileForWebView function to catch any errors thrown, log them
 // and return with an exit code of 1.
 // Returning the exit code of 1 will ensure that the Azure Pipeline will fail when patching fails.
 async function patchFileForWebViewWrapper(
-  filename: string,
-  dir: string,
-  isRelease: boolean,
-  patches: Array<(content: string, isRelease?: boolean) => string | null>) {
-  await patchFileForWebView(filename, dir, isRelease, patches)
-      .catch((errorMessage) => {
-        // tslint:disable-next-line:no-console
-        console.error(errorMessage);
-        process.exit(1);
-      });
+    filename: string,
+    dir: string,
+    patches: Array<(content: string) => string | null>) {
+    await patchFileForWebView(filename, dir, patches)
+        .catch((errorMessage) => {
+            // tslint:disable-next-line:no-console
+            console.error(errorMessage);
+            process.exit(1);
+        });
 }
 
 async function patchFileForWebView(
     filename: string,
     dir: string,
-    isRelease: boolean,
-    patches: Array<(content: string, isRelease?: boolean) => string | null>) {
+    patches: Array<(content: string) => string | null>) {
     const file = path.join(dir, filename);
 
     if (!await fse.pathExists(file)) {
@@ -211,7 +160,7 @@ async function patchFileForWebView(
 
     // Apply each patch in order
     patches.forEach((patchFunction) => {
-        const patchResult: string | null = patchFunction(content, isRelease);
+        const patchResult: string | null = patchFunction(content);
         if (patchResult) {
             content = patchResult;
         } else {
@@ -233,16 +182,11 @@ function isDirectory(fullPath: string) {
 }
 
 function main() {
-    let debugMode = false;
-    if (process.argv && process.argv.length === 3 && process.argv[2] === "debug") {
-        debugMode = true;
-    }
-
-    copyStaticFiles(debugMode)
+    copyStaticFiles()
         .catch((errorMessage) => {
-          // tslint:disable-next-line:no-console
-          console.error(errorMessage);
-          process.exit(1);
+            // tslint:disable-next-line:no-console
+            console.error(errorMessage);
+            process.exit(1);
         });
 }
 

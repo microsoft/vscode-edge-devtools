@@ -12,8 +12,10 @@ describe("cssPaddingInline", () => {
 
         const apply = await import("./cssPaddingInline");
         const result = apply.default(fileContents);
+        const expectedResult =
+        ".elements-disclosure .gutter-container {\\n        display: none !important;\\n    }";
         expect(result).toEqual(
-            expect.stringContaining(".elements-disclosure .gutter-container {\n        display: none !important;"));
+            expect.stringContaining(expectedResult));
     });
 
     it("applyPaddingInlineCssPatch correctly changes padding-inline-start text", async () => {
