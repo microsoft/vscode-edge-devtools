@@ -15,9 +15,7 @@ describe("simpleView", () => {
         };
         const mockOpen = jest.fn();
         (global as any).InspectorFrontendHost = {
-            InspectorFrontendHostInstance: {
                 openInEditor: mockOpen,
-            },
         };
 
         await apply.revealInVSCode(expected, expected.omitFocus);
