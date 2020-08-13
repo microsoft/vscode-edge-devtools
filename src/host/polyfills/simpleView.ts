@@ -221,9 +221,9 @@ export function applyDrawerTabLocationPatch(content: string) {
     }
 }
 
-export function applyInspectorCommonCssPatch(content: string, isRelease?: boolean) {
+export function applyInspectorCommonCssPatch(content: string) {
     // Hides the more tools button in the drawer and reveals the screen cast button.
-    const separator = (isRelease ? "\\n" : "\n");
+    const separator = "\\n";
 
     const hideMoreToolsBtn =
         `.toolbar-button[aria-label='More Tools'] {
@@ -247,9 +247,9 @@ export function applyInspectorCommonCssPatch(content: string, isRelease?: boolea
     }
 }
 
-export function applyInspectorCommonNetworkPatch(content: string, isRelease?: boolean) {
+export function applyInspectorCommonNetworkPatch(content: string) {
     // Hides export HAR button and pretty print button and reveals the Network search close button in the Network Panel.
-    const separator = (isRelease ? "\\n" : "\n");
+    const separator = "\\n";
 
     const hideExportHarBtn =
         `.toolbar-button[aria-label='Export HAR...'] {
@@ -280,9 +280,9 @@ export function applyInspectorCommonNetworkPatch(content: string, isRelease?: bo
     }
 }
 
-export function applyInspectorCommonContextMenuPatch(content: string, isRelease?: boolean) {
+export function applyInspectorCommonContextMenuPatch(content: string) {
     // Hides certain context menu items from elements in the Network Panel.
-    const separator = (isRelease ? "\\n" : "\n");
+    const separator = "\\n";
 
     const hideContextMenuItems =
         `.soft-context-menu-separator,
@@ -303,8 +303,8 @@ export function applyInspectorCommonContextMenuPatch(content: string, isRelease?
     }
 }
 
-export function applyInspectorCommonCssRightToolbarPatch(content: string, isRelease?: boolean) {
-    const separator = (isRelease ? "\\n" : "\n");
+export function applyInspectorCommonCssRightToolbarPatch(content: string) {
+    const separator = "\\n";
     const cssRightToolbar =
         `.tabbed-pane-right-toolbar {
             visibility: hidden !important;
@@ -321,8 +321,8 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string, isRele
     }
 }
 
-export function applyInspectorCommonCssTabSliderPatch(content: string, isRelease?: boolean) {
-    const separator = (isRelease ? "\\n" : "\n");
+export function applyInspectorCommonCssTabSliderPatch(content: string) {
+    const separator = "\\n";
     const cssTabSlider =
         `.tabbed-pane-tab-slider {
             display: none !important;

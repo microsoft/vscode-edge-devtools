@@ -188,25 +188,6 @@ describe("simpleView", () => {
 
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssPatch(fileContents);
-
-        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString =
-            ".toolbar-button[aria-label='Toggle screencast'] {\n            visibility: visible !important;";
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
-    });
-
-    it("applyInspectorCommonCssPatch correctly changes text (release)", async () => {
-        const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssPatch(fileContents, true);
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
         const expectedString =
             ".toolbar-button[aria-label='Toggle screencast'] {\\n            visibility: visible !important;";
@@ -226,25 +207,6 @@ describe("simpleView", () => {
 
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonNetworkPatch(fileContents);
-
-        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString =
-            ".toolbar-button[aria-label='Export HAR...'] {\n            display: none !important;";
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
-    });
-
-    it("applyInspectorCommonNetworkPatch correctly changes text (release)", async () => {
-        const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonNetworkPatch(fileContents, true);
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
         const expectedString =
             ".toolbar-button[aria-label='Export HAR...'] {\\n            display: none !important;";
@@ -264,25 +226,6 @@ describe("simpleView", () => {
 
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonContextMenuPatch(fileContents);
-
-        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString =
-            ".soft-context-menu-item[aria-label='Save as...'] {\n            display: none !important;";
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
-    });
-
-    it("applyInspectorCommonContextMenuPatch correctly changes text (release)", async () => {
-        const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonContextMenuPatch(fileContents, true);
         // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
         const expectedString =
             ".soft-context-menu-item[aria-label='Save as...'] {\\n            display: none !important;";
@@ -291,22 +234,6 @@ describe("simpleView", () => {
         if (result) {
             expect(result).toEqual(expect.stringContaining(expectedString));
         }
-    });
-
-    it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar (release)", async () => {
-        const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const expectedResult = `.tabbed-pane-right-toolbar {
-            visibility: hidden !important;
-        }`;
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
     });
 
     it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar", async () => {
@@ -319,22 +246,7 @@ describe("simpleView", () => {
         const expectedResult =
             ".tabbed-pane-right-toolbar {\\n            visibility: hidden !important;\\n        }";
         const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents, true);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
-    });
-
-    it("applyInspectorCommonCssTabSliderPatch correctly changes tabbed-pane-tab-slider (release)", async () => {
-        const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const expectedResult =
-            ".tabbed-pane-tab-slider {\\n            display: none !important;\\n        }";
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents, true);
+        const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
@@ -346,9 +258,8 @@ describe("simpleView", () => {
             throw new Error(`Could not find file: ${filePath}`);
         }
 
-        const expectedResult = `.tabbed-pane-tab-slider {
-            display: none !important;
-        }`;
+        const expectedResult =
+            ".tabbed-pane-tab-slider {\\n            display: none !important;\\n        }";
         const apply = await import("./simpleView");
         const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents);
         expect(result).not.toEqual(null);
