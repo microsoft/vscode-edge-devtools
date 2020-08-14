@@ -25,23 +25,26 @@ Contributions are always welcome! We only ask that you open an issue first so we
     * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src`
     * Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
       * You can use the `download-edge` script output to set it for the session
-        * e.g. `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src && set EDGE_CHROMIUM_OUT_DIR=Release`
+        * e.g. 
+            * **Windows**: `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src&&set EDGE_CHROMIUM_OUT_DIR=Release`
+            * **Mac/Linux**: `export EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release`
         * Note the command will only set the environment variable for the current session
   * Traditional Method (Use if automated method fails or if building with a version of Edge other than the currently supported version)
     * Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 83.0.478.45.
       * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
     * Extract the necessary files from the zip
       * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
-        * `mkdir c:\edge\src\out\Release\gen\devtools`
-        * `mkdir c:\edge\src\third_party\devtools-frontend\src\front_end`
+        * **Windows**: `mkdir [PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src\out\Release\gen\devtools&&mkdir [PATH_TO_EXTENSION]\out\edge\src\third_party\devtools-frontend\src\front_end`
+        * **Mac/Linux**: `mkdir -p [PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/out/Release/gen/devtools&&mkdir -p [PATH_TO_EXTENSION]/out/edge/src/third_party/devtools-frontend/src/front_end`
       * **Open** the zip file and (inside the zip file) navigate to:
         * `[COMPRESSED_FILE]:\src\third_party\devtools-frontend\src\front_end`
-        * copy the contents of the "front_end" folder and paste them into `c:\edge\src\third_party\devtools-frontend\src\front_end`
+        * copy the contents of the "front_end" folder and paste them into `[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/third_party/devtools-frontend/src/front_end`
       * **Open** the zip file and (inside the zip file) navigate to:
         * `[COMPRESSED_FILE]:\src\out\Release\gen\devtools`
-        * copy the contents of the "devtools" folder and paste them into `c:\edge\src\out\Release\gen\devtools`
-    * Set the `EDGE_CHROMIUM_PATH` environment variable to `c:\edge\src`
-    * Set the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
+        * copy the contents of the "devtools" folder and paste them into `[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/out/Release/gen/devtools`
+    * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src` and `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
+        * **Windows**: `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src&&set EDGE_CHROMIUM_OUT_DIR=Release`
+        * **Mac/Linux**: `export EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release`
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VSCode
 * Select `Launch Extension` debug configuration
