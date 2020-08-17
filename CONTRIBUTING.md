@@ -20,18 +20,15 @@ Contributions are always welcome! We only ask that you open an issue first so we
 * Download and Extract Edge source files
   * run `npm run download-edge`
   * The files will be saved at `\vscode-edge-debug\out\edge`
-  * Run `npm run download-edge`
   * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src` and the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
-    * You can use the `download-edge` script output to set it for the session
-      * e.g.
-          * **Windows**: `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src&&set EDGE_CHROMIUM_OUT_DIR=Release`
-          * **Mac/Linux**: `export EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release`
+    * Check the `download-edge` script output for the command line to set the environment variables for the session
       * Note the command will only set the environment variable for the current session
   * If this step fails or if you want to use a different version of the Edge DevTools, look at the [Legacy Source File Setup](#legacy-source-file-setup)
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VSCode
 * Select `Launch Extension` debug configuration
 * Press `F5` to launch the VSCode extension host environment and debug the extension
+* The extension should appear on the left sidebar.  Click the Edge icon on the sidebar to access the extension.
 
 Here are a list of recommended VSCode extensions to use when developing for vscode-edge-devtools:
 * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
