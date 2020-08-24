@@ -36,8 +36,8 @@ Here are a list of recommended VSCode extensions to use when developing for vsco
 
 ## Using Different Edge Versions
 * Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com) with the desired version
-* Use the `legacyExtractEdge.js` script to extract from the downloaded zip file:
-  * run `node scripts/legacyExtractEdge.js [ZIP_PATH]` which will extract the needed files to `\vscode-edge-debug\out\edge`.
+* Use the `extractEdgeFromFullZip.js` script to extract from the downloaded zip file:
+  * run `node scripts/extractEdgeFromFullZip.js [ZIP_PATH]` which will extract the needed files to `\vscode-edge-debug\out\edge`.
   * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src` and the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`.
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VSCode
