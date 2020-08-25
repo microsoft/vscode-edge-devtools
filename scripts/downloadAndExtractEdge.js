@@ -1,5 +1,19 @@
 const TARGET_VERSION = '83.0.478.45';
+const targetVersionMap = new Map([
+  ['81', '81.0.415.72'],
+  ['83', '83.0.478.45'],
+  ['84', '84.0.522.63'],
+  ['85', '85.0.564.40']
+]);
 var isWindows = true;
+
+function getTargetVersion(version) {
+  let fullVersion = targetVersionMap.get(version);
+  if (!fullVersion) {
+    fullVersion = TARGET_VERSION;
+  }
+  return fullVersion;
+}
 
 function fetchJsonFromUrl(url){
   var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
@@ -9,30 +23,25 @@ function fetchJsonFromUrl(url){
   return Httpreq.responseText;
 }
 
-function fetchDownloadUrl(platform) {
+function fetchDownloadUrl(version) {
   const jsonString = fetchJsonFromUrl('https://thirdpartysource.microsoft.com/downloads');
   const jsonObjects = JSON.parse(jsonString);
-  const platformString = retrievePlatform(platform);
-  console.log('Downloading Microsoft Edge DevTools version ' + TARGET_VERSION + ' for ' + platformString);
+  const platformString = retrievePlatform();
+  let fullVersion = TARGET_VERSION;
+  if (version) {
+    fullVersion = getTargetVersion(version);
+  }
+  console.log('Downloading Microsoft Edge DevTools version ' + fullVersion + ' for ' + platformString);
   for (let object of jsonObjects) {
-    if (object.product === 'Microsoft Edge DevTools' && object.release === TARGET_VERSION && object.platform === platformString) {
+    if (object.product === 'Microsoft Edge DevTools' && object.release === fullVersion && object.platform === platformString) {
       return object.url;
     }
   }
 }
 
-function retrievePlatform(platform) {
-  if (!platform) {
-    switch (process.platform) {
-      case 'win32':
-        return 'Windows x64';
-      default:
-        isWindows = false;
-        return 'Mac OS x64';
-    }
-  }
-  switch (platform.toLowerCase()) {
-    case 'win':
+function retrievePlatform() {
+  switch (process.platform) {
+    case 'win32':
       return 'Windows x64';
     default:
       isWindows = false;
@@ -75,6 +84,6 @@ async function downloadZipFile(downloadUrl) {
   });
 }
 
-const platform = process.argv.slice(2)[0];
-const downloadUrl = fetchDownloadUrl(platform);
+const version = process.argv.slice(2)[0];
+const downloadUrl = fetchDownloadUrl(version);
 downloadZipFile(downloadUrl);
