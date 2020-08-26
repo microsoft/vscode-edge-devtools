@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
+import { IDevToolsWindow } from "../host";
 import ToolsHost from "../toolsHost";
 
 declare var InspectorFrontendHost: {
@@ -17,7 +17,8 @@ interface IRevealable {
 
 export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
     if (revealable && revealable.uiSourceCode && revealable.uiSourceCode._url) {
-        InspectorFrontendHost.InspectorFrontendHostInstance.openInEditor(
+        // using Devtools legacy mode.
+        (self as any as IDevToolsWindow).InspectorFrontendHost.openInEditor(
             revealable.uiSourceCode._url,
             revealable.lineNumber,
             revealable.columnNumber,
