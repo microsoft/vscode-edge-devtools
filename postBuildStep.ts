@@ -62,6 +62,7 @@ async function copyStaticFiles() {
 
     // Copy the devtools to the out directory
     const toolsOutDir = "./out/tools/front_end/";
+    await fse.remove("./out/tools/front_end/");
     await fse.ensureDir(toolsOutDir);
     await fse.copy(toolsSrcDir, toolsOutDir);
 
