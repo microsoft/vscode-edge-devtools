@@ -475,9 +475,7 @@
         "watch-wp": "webpack --watch",
         "lint": "tslint -c tslint.json -p tsconfig.json",
         "test": "npm run lint && jest --config package.json --runInBand",
-        "download-edge": "node scripts/downloadAndExtractEdge.js",
-        "download-edge-win": "node scripts/downloadAndExtractEdge.js win",
-        "download-edge-mac": "node scripts/downloadAndExtractEdge.js mac"
+        "download-edge": "node scripts/downloadAndExtractEdge.js"
     },
     "dependencies": {
         "puppeteer-core": "5.2.1",
