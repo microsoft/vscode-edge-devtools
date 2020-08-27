@@ -1,4 +1,4 @@
-## 1.0.10
+## 1.1.0
 * Updated to version 84.0.522.63
 * Improved Mac contributing workflow - [PR #174](https://github.com/microsoft/vscode-edge-devtools/pull/174)
 * Webview resources fix to work with newer versions of vscode - [PR #176](https://github.com/microsoft/vscode-edge-devtools/pull/176)
