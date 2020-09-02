@@ -486,10 +486,10 @@
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
-        "@types/puppeteer-core": "2.0.0",
         "@types/fs-extra": "8.0.0",
         "@types/jest": "24.0.15",
         "@types/node": "12.6.8",
+        "@types/puppeteer-core": "2.0.0",
         "@types/vscode": "1.38.0",
         "@types/ws": "6.0.1",
         "fs-extra": "8.1.0",
@@ -501,7 +501,7 @@
         "typescript": "3.5.3",
         "vsce": "1.75.0",
         "vscode-test": "1.0.2",
-        "webpack": "4.36.1",
-        "webpack-cli": "3.3.6"
+        "webpack": "4.44.1",
+        "webpack-cli": "3.3.12"
     }
 }
