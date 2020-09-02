@@ -28,7 +28,7 @@
         "dom"
     ],
     "engines": {
-        "vscode": "^1.38.0"
+        "vscode": "^1.48.0"
     },
     "categories": [
         "Debuggers"

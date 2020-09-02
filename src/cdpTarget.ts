@@ -10,9 +10,23 @@ export default class CDPTarget extends vscode.TreeItem {
     public readonly propertyName: string | null = null;
     public readonly iconPath: { dark: string, light: string } | undefined;
     public readonly contextValue: "cdpTarget" | "cdpTargetProperty";
-    public description: string = this.getDescription();
-    public tooltip: string = this.getTooltip();
-    public websocketUrl: string = this.getWebsocketUrl();
+
+    /**
+     * Issue: https://github.com/microsoft/vscode-edge-devtools/issues/199
+     */
+    // @ts-ignore
+    public get description(): string {
+        return (this.propertyName ? this.targetJson[this.propertyName] : this.targetJson.url);
+    }
+
+    // @ts-ignore
+    public get tooltip(): string {
+        return `${this.label} - ${this.description}`;
+    }
+
+    public get websocketUrl(): string {
+        return this.targetJson.webSocketDebuggerUrl;
+    }
 
     private readonly extensionPath: string | undefined;
     private children: CDPTarget[] = [];
@@ -45,17 +59,5 @@ export default class CDPTarget extends vscode.TreeItem {
         }
 
         return this.children;
-    }
-
-    private getDescription() {
-        return this.propertyName ? this.targetJson[this.propertyName] : this.targetJson.url;
-    }
-
-    private getTooltip() {
-        return `${this.label} - ${this.description}`;
-    }
-
-    private getWebsocketUrl() {
-        return this.targetJson.webSocketDebuggerUrl;
     }
 }
