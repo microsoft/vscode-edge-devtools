@@ -10,12 +10,12 @@ export default class CDPTarget extends vscode.TreeItem {
     public readonly propertyName: string | null = null;
     public readonly iconPath: { dark: string, light: string } | undefined;
     public readonly contextValue: "cdpTarget" | "cdpTargetProperty";
-    private readonly extensionPath: string | undefined;
-    private children: CDPTarget[] = [];
-
     public description: string = this.getDescription();
     public tooltip: string = this.getTooltip();
     public websocketUrl: string = this.getWebsocketUrl();
+
+    private readonly extensionPath: string | undefined;
+    private children: CDPTarget[] = [];
 
     constructor(targetJson: IRemoteTargetJson, propertyName: string, extensionPath?: string) {
         super(propertyName || targetJson.title || "Target",
