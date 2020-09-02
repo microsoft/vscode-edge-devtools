@@ -482,7 +482,7 @@
         "unzipper": "0.10.11",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.4",
-        "ws": "7.3.0",
+        "ws": "7.3.1",
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
