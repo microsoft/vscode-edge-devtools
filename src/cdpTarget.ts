@@ -7,21 +7,15 @@ import { IRemoteTargetJson } from "./utils";
 
 export default class CDPTarget extends vscode.TreeItem {
     public readonly targetJson: IRemoteTargetJson;
-    public readonly propertyName: string;
+    public readonly propertyName: string | null = null;
     public readonly iconPath: { dark: string, light: string } | undefined;
     public readonly contextValue: "cdpTarget" | "cdpTargetProperty";
     private readonly extensionPath: string | undefined;
     private children: CDPTarget[] = [];
 
-    public get description(): string {
-        return (this.propertyName ? this.targetJson[this.propertyName] : this.targetJson.url);
-    }
-    public get tooltip(): string {
-        return `${this.label} - ${this.description}`;
-    }
-    public get websocketUrl(): string {
-        return this.targetJson.webSocketDebuggerUrl;
-    }
+    public description: string = this.getDescription();
+    public tooltip: string = this.getTooltip();
+    public websocketUrl: string = this.getWebsocketUrl();
 
     constructor(targetJson: IRemoteTargetJson, propertyName: string, extensionPath?: string) {
         super(propertyName || targetJson.title || "Target",
@@ -51,5 +45,17 @@ export default class CDPTarget extends vscode.TreeItem {
         }
 
         return this.children;
+    }
+
+    private getDescription() {
+        return this.propertyName ? this.targetJson[this.propertyName] : this.targetJson.url;
+    }
+
+    private getTooltip() {
+        return `${this.label} - ${this.description}`;
+    }
+
+    private getWebsocketUrl() {
+        return this.targetJson.webSocketDebuggerUrl;
     }
 }
