@@ -499,7 +499,7 @@
         "ts-node": "8.3.0",
         "tslint": "5.18.0",
         "typescript": "3.5.3",
-        "vsce": "1.75.0",
+        "vsce": "1.79.5",
         "vscode-test": "1.0.2",
         "webpack": "4.44.1",
         "webpack-cli": "3.3.12"
