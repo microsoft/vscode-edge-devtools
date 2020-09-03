@@ -7,13 +7,13 @@ import CDPTarget from "./cdpTarget";
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson } from "./utils";
 
 export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
-    public readonly onDidChangeTreeData: vscode.Event<CDPTarget | undefined>;
-    private changeDataEvent: vscode.EventEmitter<CDPTarget | undefined>;
+    public readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
+    private changeDataEvent: vscode.EventEmitter<CDPTarget | null>;
     private extensionPath: string;
     private telemetryReporter: Readonly<TelemetryReporter>;
 
     constructor(context: vscode.ExtensionContext, telemetryReporter: Readonly<TelemetryReporter>) {
-        this.changeDataEvent = new vscode.EventEmitter<CDPTarget | undefined>();
+        this.changeDataEvent = new vscode.EventEmitter<CDPTarget | null>();
         this.onDidChangeTreeData = this.changeDataEvent.event;
         this.extensionPath = context.extensionPath;
         this.telemetryReporter = telemetryReporter;
@@ -68,6 +68,6 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
 
     public refresh(): void {
         this.telemetryReporter.sendTelemetryEvent("view/refresh");
-        this.changeDataEvent.fire();
+        this.changeDataEvent.fire(null);
     }
 }

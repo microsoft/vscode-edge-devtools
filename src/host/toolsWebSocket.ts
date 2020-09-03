@@ -15,9 +15,6 @@ interface IMessageEvent {
  */
 export default class ToolsWebSocket {
     private static devtoolsWebSocket: ToolsWebSocket;
-    public static get instance() {
-        return ToolsWebSocket.devtoolsWebSocket;
-    }
 
     public onopen: (() => void) | undefined;
     public onclose: (() => void) | undefined;
@@ -62,5 +59,9 @@ export default class ToolsWebSocket {
                 }
                 break;
         }
+    }
+
+    public static get instance() {
+        return ToolsWebSocket.devtoolsWebSocket;
     }
 }

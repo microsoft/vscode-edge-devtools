@@ -7,7 +7,6 @@ import {
     createFakeExtensionContext,
     createFakeTelemetryReporter,
     createFakeVSCode,
-    getFirstCallback,
     Mocked,
 } from "./test/helpers";
 import { SETTINGS_STORE_NAME } from "./utils";
@@ -53,8 +52,7 @@ describe("launchDebugProvider", () => {
         });
 
         it("calls attach on edge debugger", async () => {
-            const mockSetTimeout = jest.fn();
-            global.setTimeout = mockSetTimeout;
+            jest.useFakeTimers();
 
             // Mock out the settings
             const expectedSettings = {
@@ -75,10 +73,7 @@ describe("launchDebugProvider", () => {
                 urlFilter: "http://localhost/index.html",
             };
             await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
-
-            const { callback, thisObj } = getFirstCallback(mockSetTimeout);
-            callback.call(thisObj);
-
+            jest.runAllTimers();
             expect(attach).toHaveBeenCalledWith(expect.any(Object), mockConfig.urlFilter, mockConfig, true);
         });
 
