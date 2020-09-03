@@ -136,7 +136,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
 async function patchFileForWebViewWrapper(
     filename: string,
     dir: string,
-    patches: Array<(content: string) => string | null>) {
+    patches: ((content: string) => string | null)[]) {
     await patchFileForWebView(filename, dir, patches)
         .catch((errorMessage) => {
             // tslint:disable-next-line:no-console
@@ -148,7 +148,7 @@ async function patchFileForWebViewWrapper(
 async function patchFileForWebView(
     filename: string,
     dir: string,
-    patches: Array<(content: string) => string | null>) {
+    patches: ((content: string) => string | null)[]) {
     const file = path.join(dir, filename);
 
     if (!await fse.pathExists(file)) {
