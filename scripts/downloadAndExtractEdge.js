@@ -1,4 +1,4 @@
-const TARGET_VERSION = '83.0.478.45';
+const TARGET_VERSION = '84.0.522.63';
 const targetVersionMap = new Map([
   ['83', '83.0.478.45'],
   ['84', '84.0.522.63'],

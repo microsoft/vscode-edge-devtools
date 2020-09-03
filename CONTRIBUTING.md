@@ -44,7 +44,7 @@ Here are a list of recommended VSCode extensions to use when developing for vsco
 
 ## Legacy Source File Setup
 Use this method if the automated methods fail or if the desired version is not supported by the download script.
-* Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 83.0.478.45.
+* Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 84.0.522.63.
   * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
 * Extract the necessary files from the zip
   * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
