@@ -39,7 +39,7 @@ async function copyStaticFiles() {
     await fse.ensureDir(commonOutDir);
     await copyFile(commonSrcDir, commonOutDir, "styles.css");
 
-    const dirName = __dirname.replace('\\', '/');
+    const dirName = __dirname.replace(/\\/g, '/');
     const sourceFilesPath = dirName + '/out/edge/src';
 
     const toolsSrcDir =

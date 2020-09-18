@@ -142,7 +142,8 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
  * @param uri The uri relative to the 'gen' folder.
  */
 export function getTextFromFile(uri: string) {
-    const dirName = __dirname.replace('\\', '/');
+    // Changing from C:\[vscode_directory]\src\test to C:/[vscode_directory]
+    const dirName = removeLastTwoDirectories(__dirname.replace(/\\/g, '/'));
     const sourceFilesPath = dirName + '/out/edge/src';
 
     const toolsGenDir =
@@ -153,4 +154,14 @@ export function getTextFromFile(uri: string) {
     }
 
     return null;
+}
+
+/**
+ * @param filepath
+ */
+function removeLastTwoDirectories(filepath: string) {
+    const arr = filepath.split('/');
+    arr.pop();
+    arr.pop();
+    return( arr.join('/') );
 }

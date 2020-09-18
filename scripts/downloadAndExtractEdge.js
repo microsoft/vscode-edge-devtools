@@ -50,7 +50,7 @@ function retrievePlatform() {
 
 function removeLastDirectory(filepath) {
     const splitChar = isWindows ? '\\' : '/';
-    var arr = filepath.split(splitChar);
+    const arr = filepath.split(splitChar);
     arr.pop();
     return( arr.join(splitChar) );
 }
