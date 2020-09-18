@@ -69,16 +69,14 @@ async function downloadZipFile(downloadUrl) {
       fs.unlink('edge.zip', () => {} );
       let dirName = __dirname;
       if (isWindows) {
-        flipSlashDirName = dirName.replace(/\//g, '\\');
+        const flipSlashDirName = dirName.replace(/\//g, '\\');
+        console.log(dirName);
         const rootPath = removeLastDirectory(flipSlashDirName);
         console.log('Edge files extracted to: ' + rootPath + '\\out\\edge\n');
-        console.log('Run this in cmd to set env variables: "set EDGE_CHROMIUM_PATH=' + rootPath + '\\out\\edge\\src&&set EDGE_CHROMIUM_OUT_DIR=Release"\n');
       } else {
         const rootPath = removeLastDirectory(dirName);
         console.log('Edge files extracted to: ' + rootPath + '/out/edge');
-        console.log('Run this in terminal to set env variables: "export EDGE_CHROMIUM_PATH=' + rootPath + '/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release"\n');
       }
-      console.log('*Note: this command only sets the environment variables for this session.');
     });
   });
 }

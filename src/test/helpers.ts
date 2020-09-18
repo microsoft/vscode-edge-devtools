@@ -139,11 +139,14 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
 
 /**
  * Returns the contents of the specified file, if the file is not found returns null
- * @param uri The uri relative to the 'gen' folder specified in EDGE_CHROMIUM_PATH environment variable.
+ * @param uri The uri relative to the 'gen' folder.
  */
 export function getTextFromFile(uri: string) {
+    const dirName = __dirname.replace('\\', '/');
+    const sourceFilesPath = dirName + '/out/edge/src';
+
     const toolsGenDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
+        `${sourceFilesPath}/out/Release/gen/devtools/`;
     const filePath = `${toolsGenDir}${uri}`;
     if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, "utf8");
