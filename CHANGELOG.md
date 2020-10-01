@@ -1,3 +1,10 @@
+## 1.1.0
+* Updated to version 84.0.522.63
+* Improved Mac contributing workflow - [PR #174](https://github.com/microsoft/vscode-edge-devtools/pull/174)
+* Webview resources fix to work with newer versions of vscode - [PR #176](https://github.com/microsoft/vscode-edge-devtools/pull/176)
+* Debug mode removed - [PR #183](https://github.com/microsoft/vscode-edge-devtools/pull/183)
+* Introduced headless browser mode - [PR #185](https://github.com/microsoft/vscode-edge-devtools/pull/185)
+
 ## 1.0.9
 * Updated to version 83.0.478.45
 * Added extension settings toggle to toggle network panel on and off - [PR #136](https://github.com/microsoft/vscode-edge-devtools/pull/136)
