@@ -5,7 +5,7 @@
     "version": "1.0.9",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
-    "preview": true,
+    "preview": false,
     "icon": "icon.png",
     "extensionKind": [
         "ui"
