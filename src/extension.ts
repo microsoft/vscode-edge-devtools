@@ -43,7 +43,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
-    // Register the Microsoft Edge (Chromium) debugger types
+    // Register the Microsoft Edge debugger types
     vscode.debug.registerDebugConfigurationProvider("edge",
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
     vscode.debug.registerDebugConfigurationProvider("msedge",

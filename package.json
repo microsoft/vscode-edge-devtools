@@ -1,7 +1,7 @@
 {
     "name": "vscode-edge-devtools",
-    "displayName": "Microsoft Edge (Chromium) Tools for VSCode",
-    "description": "Use the Microsoft Edge (Chromium) Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
+    "displayName": "Microsoft Edge Tools for VS Code",
+    "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
     "version": "1.0.9",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
@@ -88,7 +88,7 @@
             }
         ],
         "configuration": {
-            "title": "Microsoft Edge (Chromium) Tools",
+            "title": "Microsoft Edge Tools",
             "type": "object",
             "properties": {
                 "vscode-edge-devtools.hostname": {
@@ -177,11 +177,11 @@
                         "Canary"
                     ],
                     "enumDescriptions": [
-                        "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
-                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Stable version",
-                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Beta version",
-                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Dev version",
-                        "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Canary version"
+                        "Microsoft Edge Tools for VS Code will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
+                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Stable version",
+                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Beta version",
+                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
+                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                     ]
                 }
             }
@@ -288,11 +288,11 @@
                                     "Canary"
                                 ],
                                 "enumDescriptions": [
-                                    "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Stable version",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Beta version",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Dev version",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Canary version"
+                                    "Microsoft Edge Tools for VS Code will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Stable version",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Beta version",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                                 ]
                             }
                         }
@@ -370,11 +370,11 @@
                                     "Canary"
                                 ],
                                 "enumDescriptions": [
-                                    "Microsoft Edge (Chromium) Tools for VSCode will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Stable version",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Beta version",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Dev version",
-                                    "Microsoft Edge (Chromium) Tools for VSCode will use Microsoft Edge Canary version"
+                                    "Microsoft Edge Tools for VS Code will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Stable version",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Beta version",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
+                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                                 ]
                             }
                         }
@@ -434,7 +434,7 @@
             "activitybar": [
                 {
                     "id": "vscode-edge-devtools-view",
-                    "title": "Microsoft Edge (Chromium) Tools",
+                    "title": "Microsoft Edge Tools",
                     "icon": "resources/viewIcon.svg"
                 }
             ]
