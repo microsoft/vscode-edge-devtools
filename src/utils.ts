@@ -455,11 +455,11 @@ function isHeadlessEnabled() {
 /**
  * Replaces the workspaceFolder placeholder in a specified path, returns the
  * given path with file disk path.
- * @param mappedPath The path that will be replaced.
+ * @param customPath The path that will be replaced.
  */
-function replaceWorkSpaceFolderPlaceholder(path: string) {
+function replaceWorkSpaceFolderPlaceholder(customPath: string) {
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0].uri.toString()) {
-        const replacedPath = path.replace("${workspaceFolder}",
+        const replacedPath = customPath.replace("${workspaceFolder}",
             vscode.workspace.workspaceFolders[0].uri.toString());
         return debugCore.utils.canonicalizeUrl(replacedPath);
     } else {
