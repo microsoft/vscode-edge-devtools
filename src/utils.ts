@@ -358,8 +358,17 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         }
     }
 
+    // replace workspaceFolder with local paths
+    const resolvedMappingOverrides: IStringDictionary<string> = {};
+    for (const customPathMapped in pathMapping) {
+        if (pathMapping.hasOwnProperty(customPathMapped)) {
+            resolvedMappingOverrides[customPathMapped] =
+                replaceWorkSpaceFolderPlaceholder(pathMapping[customPathMapped])
+        }
+    }
+
     return {
-        pathMapping,
+        pathMapping: resolvedMappingOverrides,
         sourceMapPathOverrides: resolvedOverrides,
         sourceMaps,
         webRoot,
@@ -427,10 +436,7 @@ export function applyPathMapping(
         const wildcardValue = overridePatternMatches[1];
         let mappedPath = rightPattern.replace(/\*/g, wildcardValue);
         mappedPath = debugCore.utils.properJoin(mappedPath); // Fix any ..'s
-        mappedPath = mappedPath.replace(
-            "${workspaceFolder}",
-            vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.toString() : "" || "");
-
+        mappedPath = replaceWorkSpaceFolderPlaceholder(mappedPath);
         return mappedPath;
     }
 
@@ -444,6 +450,21 @@ function isHeadlessEnabled() {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const headless: boolean = settings.get("headless") || false;
     return headless;
+}
+
+/**
+ * Replaces the workspaceFolder placeholder in a specified path, returns the
+ * given path with file disk path.
+ * @param mappedPath The path that will be replaced.
+ */
+function replaceWorkSpaceFolderPlaceholder(path: string) {
+    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0].uri.toString()) {
+        const replacedPath = path.replace("${workspaceFolder}",
+            vscode.workspace.workspaceFolders[0].uri.toString());
+        return debugCore.utils.canonicalizeUrl(replacedPath);
+    } else {
+        return "";
+    }
 }
 
 /**
