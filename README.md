@@ -1,9 +1,9 @@
 
-# Microsoft Edge Developer Tools for VS Code
+# Microsoft Edge Developer Tools for Visual Studio Code
 
-**Show the browser's Elements and Network tool inside the VS Code editor and use it to fix CSS issues with your site and inspect the Network.**
+**Show the browser's Elements and Network tool inside the Visual Studio Code editor and use it to fix CSS issues with your site and inspect the Network.**
 
-A VS Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, and view network requests. All without leaving VS Code.
+A Visual Studio Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, and view network requests. All without leaving Visual Studio Code.
 
 **Note**: This extension _only_ supports Microsoft Edge
 
@@ -14,7 +14,7 @@ A VS Code extension that allows you to use the browser's Elements and Network to
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools,
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
-* Screen-casting feature to allow you to see your page without leaving VS Code.
+* Screen-casting feature to allow you to see your page without leaving Visual Studio Code.
 * Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
 * Auto attach the Microsoft Edge Tools when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 * Debug using a windowed or headless version of the Microsoft Edge Browser
@@ -23,7 +23,7 @@ A VS Code extension that allows you to use the browser's Elements and Network to
 
 ### Getting Started
 
-For use inside VS Code:
+For use inside Visual Studio Code:
 
 1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge](https://aka.ms/edgeinsider).
 1. Install the extension [Microsoft Edge Tools](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
@@ -48,7 +48,7 @@ You can see an example of the change in the following screencast. After restart,
 
 #### Turning on Headless Mode
 
-By default, the extension will launch the browser in its own window. This means you get an extra browser icon in your task bar and you need to turn on casting to see the browser inside the editor. You can also choose "headless mode" to not have the browser open in an own window, but embed itself directly into VS Code.
+By default, the extension will launch the browser in its own window. This means you get an extra browser icon in your task bar and you need to turn on casting to see the browser inside the editor. You can also choose "headless mode" to not have the browser open in an own window, but embed itself directly into Visual Studio Code.
 
 **Note**: In the past we had issues on Macintosh computers where the Microsoft Edge instance reported itself as "inactive" when the window wasn't visible. Using headless mode fixes that problem.
 
@@ -60,7 +60,7 @@ You can see an example of the change in the following screencast:
 
 ### Using the tools
 
-The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a VS Code task or from your command-line. Using the `url` parameter you simply tell VS Code which URL to either open or launch in the browser.
+The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a Visual Studio Code task or from your command-line. Using the `url` parameter you simply tell Visual Studio Code which URL to either open or launch in the browser.
 
 You can now use the high-fidelity tools to tweak your CSS and inspect network calls and go directly back to your code without leaving the editor.
 
@@ -72,7 +72,7 @@ One of the features of the Elements tool is that it can show you what file appli
 
 ![Microsoft Edge Tools - Links](links.png)
 
-The source files for these applied styles and attached event handlers appear in the form of links to a url specified by the browser. Clicking on one will attempt to open that file inside the VS Code editor window. Correctly mapping these runtime locations to actual files on disk that are part of your current workspace, may require you to enable source maps as part of your build environment.
+The source files for these applied styles and attached event handlers appear in the form of links to a url specified by the browser. Clicking on one will attempt to open that file inside the Visual Studio Code editor window. Correctly mapping these runtime locations to actual files on disk that are part of your current workspace, may require you to enable source maps as part of your build environment.
 
 An example webpack configuration for sass and typescript is given below:
 
@@ -102,13 +102,13 @@ With source maps enabled, you may also need to configure the extension settings/
 
 #### Debug Configuration
 
-You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. However, Microsoft Edge Tools isn't a debugger and so any breakpoints set in VS Code won't be hit, you can use a different debug extension instead and attach the Microsoft Edge Tools extension once debugging has started.
+You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. However, Microsoft Edge Tools isn't a debugger and so any breakpoints set in Visual Studio Code won't be hit, you can use a different debug extension instead and attach the Microsoft Edge Tools extension once debugging has started.
 
 To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
 
 * `type` - The name of the debugger which must be `vscode-edge-devtools.debug.` **Required.**
 * `request` - `launch` to open a new browser tab or `attach` to connect to an existing tab. **Required.**
-* `name` - A friendly name to show in the VS Code UI. **Required.**
+* `name` - A friendly name to show in the Visual Studio Code UI. **Required.**
 * `url` - The url for the new tab or of the existing tab. **Optional.**
 * `file` - The local file path for the new tab or of the existing tab. **Optional.**
 * `webRoot` - The directory that files are served from. Used to resolve urls like `http://localhost:8000/app.js` to a file on disk like `/out/app.js`. **Optional.**
@@ -227,7 +227,7 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
   * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
 * Start Microsoft Edge for debugging.
   * Once debugging has started, the Microsoft Edge Tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
-  * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` VS Code setting.
+  * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` Visual Studio Code setting.
 
 # Contributing
 
