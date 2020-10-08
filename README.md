@@ -7,7 +7,13 @@ A Visual Studio Code extension that allows you to use the browser's Elements and
 
 **Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
 
+![Microsoft Edge Tools - Demo](basic_usage.gif)
 
+## Supported Features
+
+* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
+
+**Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
 
 ![Microsoft Edge Tools - Demo](basic_usage.gif)
 
