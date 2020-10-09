@@ -470,7 +470,7 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
 
     return await findFlavorPath(item);
 
-    // Verifies if the path existis in disk.
+    // Verifies if the path exists in disk.
     async function findFlavorPath(browserPath: IBrowserPath | undefined) {
         if (!browserPath) {
             return "";
