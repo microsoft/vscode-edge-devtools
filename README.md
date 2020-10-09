@@ -1,23 +1,23 @@
 
 <h1 align="center">
   <br>
-  VS Code - Microsoft Edge Tools
+  VS Code - Microsoft Edge (Chromium) Tools
   <br>
 </h1>
 
-<h4 align="center">Show the browser's Elements and Network tool inside the VS Code editor and use it to fix styling, layout, and CSS issues with your site.</h4>
+<h4 align="center">Show the browser's Elements and Network tool inside the VSCode editor and use it to fix styling, layout, and CSS issues with your site.</h4>
 
 A VS Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, and view network requests. All without leaving VS Code.
 
-**Note**: This extension only supports Microsoft Edge
+**Note**: This extension only supports Microsoft Edge (Chromium)
 
-![Microsoft Edge Tools - Demo](demo.gif)
+![Microsoft Edge (Chromium) Tools - Demo](demo.gif)
 
 **Supported Features**
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools,
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
-* Screen-casting feature to allow you to see your page without leaving VS Code.
+* Screen-casting feature to allow you to see your page without leaving VSCode.
 * Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
 * Auto attach the Microsoft Edge Tools when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
 
@@ -25,7 +25,7 @@ A VS Code extension that allows you to use the browser's Elements and Network to
 ## Getting Started
 For use inside VS Code:
 
-1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge](https://aka.ms/edgeinsider).
+1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge (Chromium)](https://aka.ms/edgeinsider).
 1. Install the extension [Microsoft Edge Tools](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
 1. Open the folder containing the project you want to work on.
 1. (Optional) Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
@@ -100,7 +100,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 ```
 
 #### Other optional launch config fields
-* `browserPath`: The full path to the browser executable that will be launched. If not specified the most stable channel of Microsoft Edge will be launched from the default install location instead.
+* `browserPath`: The full path to the browser executable that will be launched. If not specified the most stable channel of Microsoft Edge (Chromium) will be launched from the default install location instead.
 * `hostname`: By default the extension searches for debuggable instances using `localhost`. If you are hosting your web app on a remote machine you can specify the hostname using this setting.
 * `port`: By default the extension will set the remote-debugging-port to `9222`. Use this option to specify a different port on which to connect.
 * `userDataDir`: Normally, if Microsoft Edge is already running when you start debugging with a launch config, then the new instance won't start in remote debugging mode. So by default, the extension launches Microsoft Edge with a separate user profile in a temp folder. Use this option to set a different path to use, or set to false to launch with your default user profile instead.
@@ -170,12 +170,12 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
   * `msedge.exe --remote-debugging-port=9222`
   * Navigate the browser to the desired URL.
 * Attach the Microsoft Edge Tools via a command:
-  * Run the command `Microsoft Edge Tools: Attach to a target`
+  * Run the command `Microsoft Edge (Chromium) Tools: Attach to a target`
   * Select a target from the drop down.
 
 ### Attaching automatically when launching the browser for debugging
 * Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension
-* Setup your `launch.json` configuration to launch and debug Microsoft Edge.
+* Setup your `launch.json` configuration to launch and debug Microsoft Edge (Chromium).
   * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
 * Start Microsoft Edge for debugging.
   * Once debugging has started, the Microsoft Edge Tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
