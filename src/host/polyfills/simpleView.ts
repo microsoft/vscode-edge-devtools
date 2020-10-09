@@ -91,7 +91,6 @@ export function applyShowElementsTab(content: string) {
     }
 }
 
-// remove const breakpointsMenu=contextMenu.debugSection().appendSubMenuItem(UIString.UIString('Break on'));for(const key in Protocol.DOMDebugger.DOMBreakpointType){const type=Protocol.DOMDebugger.DOMBreakpointType[key];const label=Sources.DebuggerPausedMessage.BreakpointTypeNouns.get(type);breakpointsMenu.defaultSection().appendCheckboxItem(label,toggleBreakpoint.bind(null,type),domDebuggerModel.hasDOMBreakpoint(node,type));}}
 export function applyRemoveBreakOnContextMenuItem(content: string) {
     const pattern = /const breakpointsMenu=.+hasDOMBreakpoint\(.*\);}/;
     if (content.match(pattern)) {

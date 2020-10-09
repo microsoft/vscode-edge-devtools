@@ -158,7 +158,7 @@ describe("simpleView", () => {
         const result = apply.applyRemoveBreakOnContextMenuItem(fileContents);
         expect(result).not.toEqual(null);
         if (result) {
-            expect(result).toEqual(expect.stringContaining("domDebuggerModel.setDOMBreakpoint(node,type);}}\n}}"));
+            expect(result).not.toEqual(expect.stringContaining("const breakpointsMenu"));
         }
     });
 
