@@ -12,6 +12,14 @@ A Visual Studio Code extension that allows you to use the browser's Elements and
 ## Supported Features
 
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
+
+**Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
+
+![Microsoft Edge Tools - Demo](basic_usage.gif)
+
+## Supported Features
+
+* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving Visual Studio Code.
@@ -60,7 +68,7 @@ You can see an example of the change in the following screencast:
 
 ### Using the tools
 
-The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a Visual Studio Code task or from your command-line. Using the `url` parameter you tell Visual Studio Code which URL to either open or launch in the browser.
+The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a Visual Studio Code task or from your command-line. Using the `url` parameter you simply tell Visual Studio Code which URL to either open or launch in the browser.
 
 You can now use the high-fidelity tools to tweak your CSS and inspect network calls and go directly back to your code without leaving the editor.
 
@@ -115,7 +123,7 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `file` - The local file path for the new tab or of the existing tab. **Optional.**
 * `webRoot` - The directory that files are served from. Used to resolve urls like `http://localhost:8000/app.js` to a file on disk like `/out/app.js`. **Optional.**
 
-```javascript
+```json
 {
     "version": "0.1.0",
     "configurations": [
@@ -158,7 +166,7 @@ The left hand side of the mapping is a pattern that can contain a wildcard, and 
 A few mappings are applied by default, corresponding to some common default configs for Webpack and Meteor:
 Note: These are the mappings that are included by default out of the box, with examples of how they could be resolved in different scenarios. These are not mappings that would make sense together in one project.
 
-```javascript
+```json
 "sourceMapPathOverrides": {
     "webpack:///./~/*": "${webRoot}/node_modules/*",
     "webpack:///./*": "${webRoot}/*",
@@ -172,7 +180,7 @@ If you set `sourceMapPathOverrides` in your launch config, that will override th
 
 See the following examples for each entry in the default mappings (`webRoot = /Users/me/project`):
 
-```javascript
+``` json
 "webpack:///./~/*": "${webRoot}/node_modules/*" 
 Example:
 "webpack:///./~/querystring/index.js"
@@ -199,7 +207,7 @@ Example:
 
 Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, try this setting:
 
-```javascript
+```json
 "sourceMapPathOverrides": {
     "/source/*": "${workspaceFolder}/*"
 }
