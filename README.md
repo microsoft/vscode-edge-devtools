@@ -5,21 +5,13 @@
 
 A Visual Studio Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, and view network requests. All without leaving Visual Studio Code.
 
-**Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
+**Note**: This extension _only_ supports Microsoft Edge
 
 ![Microsoft Edge Tools - Demo](basic_usage.gif)
 
 ## Supported Features
 
-* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
-
-**Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
-
-![Microsoft Edge Tools - Demo](basic_usage.gif)
-
-## Supported Features
-
-* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
+* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools,
 * Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving Visual Studio Code.
@@ -110,9 +102,7 @@ With source maps enabled, you may also need to configure the extension settings/
 
 #### Debug Configuration
 
-You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. 
-
-Microsoft Edge Tools works great when paired with [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge), you can use the first one to design your frontend and the latter to debug your code and set breakpoints
+You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. However, Microsoft Edge Tools isn't a debugger and so any breakpoints set in Visual Studio Code won't be hit, you can use a different debug extension instead and attach the Microsoft Edge Tools extension once debugging has started.
 
 To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
 
