@@ -133,6 +133,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
 // This function wraps the patchFileForWebView function to catch any errors thrown, log them
 // and return with an exit code of 1.
 // Returning the exit code of 1 will ensure that the Azure Pipeline will fail when patching fails.
+// Test
 async function patchFileForWebViewWrapper(
     filename: string,
     dir: string,
