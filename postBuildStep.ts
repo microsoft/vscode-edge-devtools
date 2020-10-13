@@ -122,10 +122,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
 
-    await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
-        applyHandleActionPatch,
-    ]);
-    await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
+    await patchFileForWebViewWrapper("quick_open/quick_open.js", toolsOutDir, [
         applyHandleActionPatch,
     ]);
 }

@@ -38,7 +38,7 @@ describe("simpleView", () => {
     });
 
     it("applyHandleActionPatch correctly changes handleAction text for Quick Open", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "quick_open/quick_open.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -48,11 +48,11 @@ describe("simpleView", () => {
         const result = apply.applyHandleActionPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(
-            expect.stringContaining("handleAction(context, actionId) { return false;"));
+            expect.stringContaining("handleAction(context, actionId) { return false;switch(actionId){case'quickOpen.show"));
     });
 
     it("applyHandleActionPatch correctly changes handleAction text for Command Menu", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "quick_open/quick_open.js";
         const fileContents = getTextFromFile(filePath);
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
@@ -62,7 +62,7 @@ describe("simpleView", () => {
         const result = apply.applyHandleActionPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(
-            expect.stringContaining("handleAction(context, actionId) { return false;"));
+            expect.stringContaining("handleAction(context, actionId) { return false;InspectorFrontendHost"));
     });
 
     it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
