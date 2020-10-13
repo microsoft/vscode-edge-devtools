@@ -18,6 +18,7 @@ import {
     applyInspectorCommonNetworkPatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
+    applyRemoveBreakOnContextMenuItem,
     applySetTabIconPatch,
     applyShowElementsTab,
     applyShowRequestBlockingTab,
@@ -128,6 +129,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyHandleActionPatch,
     ]);
+    await patchFileForWebViewWrapper("browser_debugger/browser_debugger.js", toolsOutDir, [
+        applyRemoveBreakOnContextMenuItem,
+    ])
 }
 
 // This function wraps the patchFileForWebView function to catch any errors thrown, log them
