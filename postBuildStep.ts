@@ -39,25 +39,21 @@ async function copyStaticFiles() {
     await fse.ensureDir(commonOutDir);
     await copyFile(commonSrcDir, commonOutDir, "styles.css");
 
-    const dirName = __dirname.replace(/\\/g, '/');
-    const sourceFilesPath = dirName + '/out/edge/src';
+    const sourceFilesPath = path.normalize(__dirname + '/out/edge/src');
 
-    const toolsSrcDir =
-        `${sourceFilesPath}/third_party/devtools-frontend/src/front_end/`;
+    const toolsSrcDir = path.normalize(`${sourceFilesPath}/third_party/devtools-frontend/src/front_end/`);
     if (!isDirectory(toolsSrcDir)) {
         throw new Error(`Could not find Microsoft Edge DevTools path at '${toolsSrcDir}'. ` +
             "Did you run the 'npm run download-edge' script?");
     }
 
-    const toolsGenDir =
-        `${sourceFilesPath}/out/Release/gen/devtools/`;
+    const toolsGenDir = path.normalize(`${sourceFilesPath}/out/Release/gen/devtools/`);
     if (!isDirectory(toolsGenDir)) {
         throw new Error(`Could not find Microsoft Edge output path at '${toolsGenDir}'. ` +
             "Did you run the 'npm run download-edge' script?");
     }
 
-    const toolsResDir =
-        `${sourceFilesPath}/out/Release/resources/inspector/`;
+    const toolsResDir = path.normalize(`${sourceFilesPath}/out/Release/resources/inspector/`);
 
     // Copy the devtools to the out directory
     const toolsOutDir = "./out/tools/front_end/";

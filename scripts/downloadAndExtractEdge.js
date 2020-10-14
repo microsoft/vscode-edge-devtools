@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 const TARGET_VERSION = '84.0.522.63';
 const targetVersionMap = new Map([
   ['83', '83.0.478.45'],
@@ -49,10 +52,10 @@ function retrievePlatform() {
 }
 
 function removeLastDirectory(filepath) {
-    const splitChar = isWindows ? '\\' : '/';
-    const arr = filepath.split(splitChar);
-    arr.pop();
-    return( arr.join(splitChar) );
+  const splitChar = isWindows ? '\\' : '/';
+  const arr = filepath.split(splitChar);
+  arr.pop();
+  return( arr.join(splitChar) );
 }
 
 async function downloadZipFile(downloadUrl) {
@@ -70,7 +73,6 @@ async function downloadZipFile(downloadUrl) {
       let dirName = __dirname;
       if (isWindows) {
         const flipSlashDirName = dirName.replace(/\//g, '\\');
-        console.log(dirName);
         const rootPath = removeLastDirectory(flipSlashDirName);
         console.log('Edge files extracted to: ' + rootPath + '\\out\\edge\n');
       } else {

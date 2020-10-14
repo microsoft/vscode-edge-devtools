@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import fs from "fs";
+import path from "path";
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
@@ -143,7 +144,7 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
  */
 export function getTextFromFile(uri: string) {
     // Changing from C:\[vscode_directory]\src\test to C:/[vscode_directory]
-    const dirName = removeLastTwoDirectories(__dirname.replace(/\\/g, '/'));
+    const dirName = removeLastTwoDirectories(path.normalize(__dirname));
     const sourceFilesPath = dirName + '/out/edge/src';
 
     const toolsGenDir =
@@ -160,8 +161,7 @@ export function getTextFromFile(uri: string) {
  * @param filepath
  */
 function removeLastTwoDirectories(filepath: string) {
-    const arr = filepath.split('/');
-    arr.pop();
-    arr.pop();
-    return( arr.join('/') );
+    const arr = filepath.split(path.sep);
+    arr.splice(-2);
+    return path.join(...arr);
 }
