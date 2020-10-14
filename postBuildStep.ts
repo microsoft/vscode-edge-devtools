@@ -39,27 +39,21 @@ async function copyStaticFiles() {
     await fse.ensureDir(commonOutDir);
     await copyFile(commonSrcDir, commonOutDir, "styles.css");
 
-    // Must set environment variables EDGE_CHROMIUM_PATH and EDGE_CHROMIUM_OUT_DIR
-    // E.g. set EDGE_CHROMIUM_PATH=F:/git/Edge/src
-    //      set EDGE_CHROMIUM_OUT_DIR=Release
-    // See CONTRIBUTING.md for more details
+    const sourceFilesPath = path.normalize(__dirname + '/out/edge/src');
 
-    const toolsSrcDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/third_party/devtools-frontend/src/front_end/`;
+    const toolsSrcDir = path.normalize(`${sourceFilesPath}/third_party/devtools-frontend/src/front_end/`);
     if (!isDirectory(toolsSrcDir)) {
         throw new Error(`Could not find Microsoft Edge DevTools path at '${toolsSrcDir}'. ` +
-            "Did you set the EDGE_CHROMIUM_PATH environment variable?");
+            "Did you run the 'npm run download-edge' script?");
     }
 
-    const toolsGenDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
+    const toolsGenDir = path.normalize(`${sourceFilesPath}/out/Release/gen/devtools/`);
     if (!isDirectory(toolsGenDir)) {
         throw new Error(`Could not find Microsoft Edge output path at '${toolsGenDir}'. ` +
-            "Did you set the EDGE_CHROMIUM_OUT_DIR environment variable?");
+            "Did you run the 'npm run download-edge' script?");
     }
 
-    const toolsResDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/resources/inspector/`;
+    const toolsResDir = path.normalize(`${sourceFilesPath}/out/Release/resources/inspector/`);
 
     // Copy the devtools to the out directory
     const toolsOutDir = "./out/tools/front_end/";

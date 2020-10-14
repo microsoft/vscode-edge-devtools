@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import fs from "fs";
+import path from "path";
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
@@ -139,15 +140,28 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
 
 /**
  * Returns the contents of the specified file, if the file is not found returns null
- * @param uri The uri relative to the 'gen' folder specified in EDGE_CHROMIUM_PATH environment variable.
+ * @param uri The uri relative to the 'gen' folder.
  */
 export function getTextFromFile(uri: string) {
+    // Grabbing the vscode-edge-devtools root directory path
+    const dirName = removeLastTwoDirectories(__dirname);
+    const sourceFilesPath = dirName + '/out/edge/src';
+
     const toolsGenDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
-    const filePath = `${toolsGenDir}${uri}`;
+        `${sourceFilesPath}/out/Release/gen/devtools/`;
+    const filePath = path.normalize(`${toolsGenDir}${uri}`);
     if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, "utf8");
     }
 
     return null;
+}
+
+/**
+ * @param filepath
+ */
+function removeLastTwoDirectories(filepath: string) {
+    const arr = filepath.split(path.sep);
+    arr.splice(-2);
+    return arr.join(path.sep);
 }

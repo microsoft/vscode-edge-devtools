@@ -22,9 +22,6 @@ Contributions are always welcome! We only ask that you open an issue first so we
     * If this step fails, see [Legacy Source File Setup](#legacy-source-file-setup)
     * See [Building with different Edge versions](#building-with-different-edge-versions) to target other versions of Edge
   * The files will be saved at `\vscode-edge-debug\out\edge`
-  * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src` and the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
-    * Check the `download-edge` script output for the command line to set the environment variables for the session
-      * Note the command will only set the environment variable for the current session
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VS Code
 * Select `Launch Extension` debug configuration
@@ -56,9 +53,6 @@ Use this method if the automated methods fail or if the desired version is not s
   * **Open** the zip file and (inside the zip file) navigate to:
     * `[COMPRESSED_FILE]\src\out\Release\gen\devtools`
     * copy the contents of the "devtools" folder and paste them into `[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/out/Release/gen/devtools`
-* Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src` and `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
-    * **Windows**: `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src&&set EDGE_CHROMIUM_OUT_DIR=Release`
-    * **Mac/Linux**: `export EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release`
 
 ## Testing
 * There are a set of jest tests which can be run with `npm run test`.
