@@ -149,7 +149,7 @@ export function getTextFromFile(uri: string) {
 
     const toolsGenDir =
         `${sourceFilesPath}/out/Release/gen/devtools/`;
-    const filePath = `${toolsGenDir}${uri}`;
+    const filePath = path.normalize(`${toolsGenDir}${uri}`);
     if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, "utf8");
     }
