@@ -354,7 +354,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
             const replacePatternValue = replaceWebRootInSourceMapPathOverridesEntry(
                 webRoot, sourceMapPathOverrides[pattern]);
 
-            resolvedOverrides[replacePattern] = replacePatternValue;
+            resolvedOverrides[replacePattern] = replaceWorkSpaceFolderPlaceholder(replacePatternValue);
         }
     }
 
@@ -367,11 +367,12 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         }
     }
 
+    const resolvedWebRoot = replaceWorkSpaceFolderPlaceholder(webRoot);
     return {
         pathMapping: resolvedMappingOverrides,
         sourceMapPathOverrides: resolvedOverrides,
         sourceMaps,
-        webRoot,
+        webRoot: resolvedWebRoot,
     };
 }
 
@@ -463,7 +464,7 @@ function replaceWorkSpaceFolderPlaceholder(customPath: string) {
             vscode.workspace.workspaceFolders[0].uri.toString());
         return debugCore.utils.canonicalizeUrl(replacedPath);
     } else {
-        return "";
+        return customPath;
     }
 }
 
