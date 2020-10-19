@@ -108,6 +108,7 @@ export class DevToolsPanel {
     }
 
     private onKeyPress(message: string) {
+        console.log(message);
         // const telemetry: TelemetryData = JSON.parse(message);
     }
 
@@ -284,6 +285,11 @@ export class DevToolsPanel {
             <body>
                 <iframe id="host" frameBorder="0" src="${htmlUri}?ws=trueD&experiments=true&edgeThemes=true"></iframe>
             </body>
+            <script>
+            window.addEventListener("message", (e) => {
+                window.dispatchEvent(new KeyboardEvent('keydown', JSON.parse(e.data)));
+            }, false);
+            </script>
             </html>
             `;
     }
