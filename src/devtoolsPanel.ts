@@ -60,6 +60,7 @@ export class DevToolsPanel {
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
+        this.panelSocket.on("keyObject", (msg) => this.onKeyPress(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -104,6 +105,10 @@ export class DevToolsPanel {
                 break;
         }
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: e, message });
+    }
+
+    private onKeyPress(message: string) {
+        // const telemetry: TelemetryData = JSON.parse(message);
     }
 
     private onSocketReady() {
@@ -251,6 +256,7 @@ export class DevToolsPanel {
         this.panel.webview.html = this.getHtmlForWebview();
     }
 
+    // potentially add keydown to the webview here.
     private getHtmlForWebview() {
         const htmlPath = vscode.Uri.file(path.join(this.extensionPath, "out/tools/front_end", "inspector.html"));
         const htmlUri = this.panel.webview.asWebviewUri(htmlPath);

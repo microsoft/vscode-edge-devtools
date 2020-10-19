@@ -59,4 +59,20 @@ export function initialize(dtWindow: IDevToolsWindow) {
 
         dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace("null", "vscode-webview-resource:");
     });
+
+    dtWindow.addEventListener("keydown", (e) => {
+        window.parent.dispatchEvent(new KeyboardEvent('keydown', e));
+        // const obj = {
+        //     altKey: e.altKey,
+        //     code: e.code,
+        //     ctrlKey: e.ctrlKey,
+        //     isComposing: e.isComposing,
+        //     key: e.key,
+        //     location: e.location,
+        //     metaKey: e.metaKey,
+        //     repeat: e.repeat,
+        //     shiftKey: e.shiftKey
+        // }
+        // dtWindow.InspectorFrontendHost.sendKeyObject(obj);
+    });
 }

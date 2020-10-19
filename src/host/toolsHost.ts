@@ -86,6 +86,10 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getApprovedTabs", {id});
     }
 
+    public sendKeyObject(keyObject: Object) {
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "keyObject", keyObject);
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {
