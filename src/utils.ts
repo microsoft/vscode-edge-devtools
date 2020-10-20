@@ -459,12 +459,18 @@ function isHeadlessEnabled() {
  * @param customPath The path that will be replaced.
  */
 function replaceWorkSpaceFolderPlaceholder(customPath: string) {
-    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0].uri.toString()) {
-        const replacedPath = customPath.replace("${workspaceFolder}",
-            vscode.workspace.workspaceFolders[0].uri.toString());
+    let parsedPath = customPath;
+    if (vscode.workspace.workspaceFolders &&
+        vscode.workspace.workspaceFolders[0].uri.toString()) {
+        /**
+         * vscode can have several workspaceFolders, the first one is the
+         * one currently open by the user.
+         **/
+        parsedPath = vscode.workspace.workspaceFolders[0].uri.toString();
+        const replacedPath = customPath.replace("${workspaceFolder}", parsedPath);
         return debugCore.utils.canonicalizeUrl(replacedPath);
-    } else {
-        return customPath;
+    } else{
+        return parsedPath;
     }
 }
 
