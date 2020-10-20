@@ -61,18 +61,11 @@ export function initialize(dtWindow: IDevToolsWindow) {
     });
 
     dtWindow.addEventListener("keydown", (e) => {
-        const obj = {
-            altKey: e.altKey,
-            code: e.code,
-            ctrlKey: e.ctrlKey,
-            isComposing: e.isComposing,
-            key: e.key,
-            location: e.location,
-            metaKey: e.metaKey,
-            repeat: e.repeat,
-            shiftKey: e.shiftKey
+        if (e.metaKey && e.code === "KeyC") {
+            const selection = dtWindow.getSelection();
+            if (selection) {
+                dtWindow.InspectorFrontendHost.copyText(selection.toString());
+            }
         }
-        window.parent.postMessage( JSON.stringify(obj), '*');
-        dtWindow.InspectorFrontendHost.sendKeyObject(obj);
     });
 }

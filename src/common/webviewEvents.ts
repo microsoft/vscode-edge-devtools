@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 export type WebviewEvent = "getState" | "getUrl" | "openInEditor" | "ready" | "setState" | "telemetry" | "websocket"
-| "getApprovedTabs" | "keyObject";
+| "getApprovedTabs" | "copyText";
 export const webviewEventNames: WebviewEvent[] = [
     "getState",
     "getUrl",
@@ -12,7 +12,7 @@ export const webviewEventNames: WebviewEvent[] = [
     "telemetry",
     "websocket",
     "getApprovedTabs",
-    "keyObject",
+    "copyText",
 ];
 
 export type WebSocketEvent = "open" | "close" | "error" | "message";
