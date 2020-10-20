@@ -94,7 +94,7 @@ describe("devtoolsPanel", () => {
 
     describe("dispose", () => {
         it("calls dispose on all event handlers", async () => {
-            const expectedDisposables: Array<{ dispose: () => void }> = [];
+            const expectedDisposables: ({ dispose: () => void }[]) = [];
 
             // Create the function used for each event handler so that we can store the disposable objects
             // and ensure they get correctly disposed later

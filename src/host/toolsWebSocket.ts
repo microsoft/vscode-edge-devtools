@@ -9,15 +9,12 @@ interface IMessageEvent {
 
 /**
  * Class used to override the real WebSocket constructor in the webview.
- * This is required as a VSCode webview cannot create a WebSocket connection,
+ * This is required as a VS Code webview cannot create a WebSocket connection,
  * so instead we replace it and forward all messages to/from the extension
  * which is able to create the real websocket connection to the target page.
  */
 export default class ToolsWebSocket {
     private static devtoolsWebSocket: ToolsWebSocket;
-    public static get instance() {
-        return ToolsWebSocket.devtoolsWebSocket;
-    }
 
     public onopen: (() => void) | undefined;
     public onclose: (() => void) | undefined;
@@ -62,5 +59,9 @@ export default class ToolsWebSocket {
                 }
                 break;
         }
+    }
+
+    public static get instance() {
+        return ToolsWebSocket.devtoolsWebSocket;
     }
 }

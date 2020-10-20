@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import fs from "fs";
+import path from "path";
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
@@ -20,8 +21,8 @@ export type Writable<T> = {
 };
 
 /**
- * Create a fake VSCode API object that can be used in tests
- * Since the VSCode API is only available in the extension host you must use this as a virtual mock:
+ * Create a fake VS Code API object that can be used in tests
+ * Since the VS Code API is only available in the extension host you must use this as a virtual mock:
  * E.g. jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
  * Tests can then override the default behavior for their specific scenario by using requireMock:
  * E.g. const mock = await jest.requireMock("vscode"); mock.window.showErrorMessage = () => null;
@@ -72,7 +73,7 @@ export function createFakeVSCode() {
 }
 
 /**
- * Create a fake VSCode extension context that can be used in tests
+ * Create a fake VS Code extension context that can be used in tests
  */
 export function createFakeExtensionContext() {
     return {
@@ -139,15 +140,28 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
 
 /**
  * Returns the contents of the specified file, if the file is not found returns null
- * @param uri The uri relative to the 'gen' folder specified in EDGE_CHROMIUM_PATH environment variable.
+ * @param uri The uri relative to the 'gen' folder.
  */
 export function getTextFromFile(uri: string) {
+    // Grabbing the vscode-edge-devtools root directory path
+    const dirName = removeLastTwoDirectories(__dirname);
+    const sourceFilesPath = dirName + '/out/edge/src';
+
     const toolsGenDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
-    const filePath = `${toolsGenDir}${uri}`;
+        `${sourceFilesPath}/out/Release/gen/devtools/`;
+    const filePath = path.normalize(`${toolsGenDir}${uri}`);
     if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, "utf8");
     }
 
     return null;
+}
+
+/**
+ * @param filepath
+ */
+function removeLastTwoDirectories(filepath: string) {
+    const arr = filepath.split(path.sep);
+    arr.splice(-2);
+    return arr.join(path.sep);
 }

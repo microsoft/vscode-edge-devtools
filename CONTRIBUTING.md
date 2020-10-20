@@ -22,16 +22,13 @@ Contributions are always welcome! We only ask that you open an issue first so we
     * If this step fails, see [Legacy Source File Setup](#legacy-source-file-setup)
     * See [Building with different Edge versions](#building-with-different-edge-versions) to target other versions of Edge
   * The files will be saved at `\vscode-edge-debug\out\edge`
-  * Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\scripts\out\edge\src` and the `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
-    * Check the `download-edge` script output for the command line to set the environment variables for the session
-      * Note the command will only set the environment variable for the current session
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
-* Open the directory in VSCode
+* Open the directory in VS Code
 * Select `Launch Extension` debug configuration
-* Press `F5` to launch the VSCode extension host environment and debug the extension
+* Press `F5` to launch the VS Code extension host environment and debug the extension
 * The extension should appear on the left sidebar.  Click the Edge icon on the sidebar to access the extension.
 
-Here are a list of recommended VSCode extensions to use when developing for vscode-edge-devtools:
+Here are a list of recommended VS Code extensions to use when developing for vscode-edge-devtools:
 * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
 * [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin)
 
@@ -44,7 +41,7 @@ Here are a list of recommended VSCode extensions to use when developing for vsco
 
 ## Legacy Source File Setup
 Use this method if the automated methods fail or if the desired version is not supported by the download script.
-* Download a copy of the Microsoft Edge (Chromium) build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 83.0.478.45.
+* Download a copy of the Microsoft Edge build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 84.0.522.63.
   * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
 * Extract the necessary files from the zip
   * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
@@ -56,14 +53,11 @@ Use this method if the automated methods fail or if the desired version is not s
   * **Open** the zip file and (inside the zip file) navigate to:
     * `[COMPRESSED_FILE]\src\out\Release\gen\devtools`
     * copy the contents of the "devtools" folder and paste them into `[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/out/Release/gen/devtools`
-* Set the `EDGE_CHROMIUM_PATH` environment variable to `[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src` and `EDGE_CHROMIUM_OUT_DIR` environment variable to `Release`
-    * **Windows**: `set EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src&&set EDGE_CHROMIUM_OUT_DIR=Release`
-    * **Mac/Linux**: `export EDGE_CHROMIUM_PATH=[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src&&export EDGE_CHROMIUM_OUT_DIR=Release`
 
 ## Testing
 * There are a set of jest tests which can be run with `npm run test`.
 * You may also run `npm run lint` separately to check your code against our tslint rules.
-* Open the directory in VSCode
+* Open the directory in VS Code
 * Select `Launch Tests` debug configuration
 * Press `F5` to attach the debugger and start the tests
 

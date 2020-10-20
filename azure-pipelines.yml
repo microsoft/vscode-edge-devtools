@@ -23,18 +23,12 @@ jobs:
       npm run download-edge
     displayName: Downloading And Extracting Edge Zip (Windows x64)
   - script: |
-      export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      export EDGE_CHROMIUM_OUT_DIR=Release
       npm run build
     displayName: Building
   - script: |
-      export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      export EDGE_CHROMIUM_OUT_DIR=Release
       npm run test
     displayName: Linting and Testing
   - script: |
-      export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      export EDGE_CHROMIUM_OUT_DIR=Release
       npm run package
     displayName: Creating .vsix
   - task: CopyFiles@2
@@ -60,18 +54,12 @@ jobs:
       npm run download-edge
     displayName: Downloading And Extracting Edge Zip (Windows x64)
   - script: |
-      export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      export EDGE_CHROMIUM_OUT_DIR=Release
       npm run build
     displayName: Building
   - script: |
-      export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      export EDGE_CHROMIUM_OUT_DIR=Release
       npm run test
     displayName: Linting and Testing
   - script: |
-      export EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      export EDGE_CHROMIUM_OUT_DIR=Release
       npm run package
     displayName: Creating .vsix
   - task: CopyFiles@2
@@ -97,18 +85,12 @@ jobs:
       npm run download-edge
     displayName: Downloading And Extracting Edge Zip (Windows x64)
   - script: |
-      set EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      set EDGE_CHROMIUM_OUT_DIR=Release
       npm run build
     displayName: Building
   - script: |
-      set EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      set EDGE_CHROMIUM_OUT_DIR=Release
       npm run test
     displayName: Linting and Testing
   - script: |
-      set EDGE_CHROMIUM_PATH=$(Build.Repository.LocalPath)/out/edge/src
-      set EDGE_CHROMIUM_OUT_DIR=Release
       npm run package
     displayName: Creating .vsix
   - task: CopyFiles@2

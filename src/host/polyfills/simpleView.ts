@@ -87,7 +87,16 @@ export function applyShowElementsTab(content: string) {
     if (content.match(pattern)) {
         return content.replace(pattern, "this._defaultTab = 'elements';");
     } else {
-    return null;
+        return null;
+    }
+}
+
+export function applyRemoveBreakOnContextMenuItem(content: string) {
+    const pattern = /const breakpointsMenu=.+hasDOMBreakpoint\(.*\);}/;
+    if (content.match(pattern)) {
+        return content.replace(pattern, "");
+    } else {
+        return null;
     }
 }
 
@@ -134,7 +143,6 @@ export function applyAppendTabPatch(content: string) {
         "Computed",
         "accessibility.view",
         "elements.domProperties",
-        "elements.domBreakpoints",
         "elements.eventListeners",
     ];
 

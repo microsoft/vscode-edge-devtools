@@ -147,6 +147,21 @@ describe("simpleView", () => {
         }
     });
 
+    it("applyRemoveBreakOnContextMenuItem correctly changes text", async () => {
+        const filePath = "browser_debugger/browser_debugger.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const apply = await import("./simpleView");
+        const result = apply.applyRemoveBreakOnContextMenuItem(fileContents);
+        expect(result).not.toEqual(null);
+        if (result) {
+            expect(result).not.toEqual(expect.stringContaining("const breakpointsMenu"));
+        }
+    });
+
     it("applyShowRequestBlockingTab correctly changes text", async () => {
         const filePath = "ui/ui.js";
         const fileContents = getTextFromFile(filePath);

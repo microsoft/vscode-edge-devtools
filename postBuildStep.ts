@@ -18,6 +18,7 @@ import {
     applyInspectorCommonNetworkPatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
+    applyRemoveBreakOnContextMenuItem,
     applySetTabIconPatch,
     applyShowElementsTab,
     applyShowRequestBlockingTab,
@@ -38,27 +39,21 @@ async function copyStaticFiles() {
     await fse.ensureDir(commonOutDir);
     await copyFile(commonSrcDir, commonOutDir, "styles.css");
 
-    // Must set environment variables EDGE_CHROMIUM_PATH and EDGE_CHROMIUM_OUT_DIR
-    // E.g. set EDGE_CHROMIUM_PATH=F:/git/Edge/src
-    //      set EDGE_CHROMIUM_OUT_DIR=Release
-    // See CONTRIBUTING.md for more details
+    const sourceFilesPath = path.normalize(__dirname + '/out/edge/src');
 
-    const toolsSrcDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/third_party/devtools-frontend/src/front_end/`;
+    const toolsSrcDir = path.normalize(`${sourceFilesPath}/third_party/devtools-frontend/src/front_end/`);
     if (!isDirectory(toolsSrcDir)) {
-        throw new Error(`Could not find Microsoft Edge (Chromium) DevTools path at '${toolsSrcDir}'. ` +
-            "Did you set the EDGE_CHROMIUM_PATH environment variable?");
+        throw new Error(`Could not find Microsoft Edge DevTools path at '${toolsSrcDir}'. ` +
+            "Did you run the 'npm run download-edge' script?");
     }
 
-    const toolsGenDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/gen/devtools/`;
+    const toolsGenDir = path.normalize(`${sourceFilesPath}/out/Release/gen/devtools/`);
     if (!isDirectory(toolsGenDir)) {
-        throw new Error(`Could not find Microsoft Edge (Chromium) output path at '${toolsGenDir}'. ` +
-            "Did you set the EDGE_CHROMIUM_OUT_DIR environment variable?");
+        throw new Error(`Could not find Microsoft Edge output path at '${toolsGenDir}'. ` +
+            "Did you run the 'npm run download-edge' script?");
     }
 
-    const toolsResDir =
-        `${process.env.EDGE_CHROMIUM_PATH}/out/${process.env.EDGE_CHROMIUM_OUT_DIR}/resources/inspector/`;
+    const toolsResDir = path.normalize(`${sourceFilesPath}/out/Release/resources/inspector/`);
 
     // Copy the devtools to the out directory
     const toolsOutDir = "./out/tools/front_end/";
@@ -128,6 +123,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyHandleActionPatch,
     ]);
+    await patchFileForWebViewWrapper("browser_debugger/browser_debugger.js", toolsOutDir, [
+        applyRemoveBreakOnContextMenuItem,
+    ])
 }
 
 // This function wraps the patchFileForWebView function to catch any errors thrown, log them
@@ -136,7 +134,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
 async function patchFileForWebViewWrapper(
     filename: string,
     dir: string,
-    patches: Array<(content: string) => string | null>) {
+    patches: ((content: string) => string | null)[]) {
     await patchFileForWebView(filename, dir, patches)
         .catch((errorMessage) => {
             // tslint:disable-next-line:no-console
@@ -148,7 +146,7 @@ async function patchFileForWebViewWrapper(
 async function patchFileForWebView(
     filename: string,
     dir: string,
-    patches: Array<(content: string) => string | null>) {
+    patches: ((content: string) => string | null)[]) {
     const file = path.join(dir, filename);
 
     if (!await fse.pathExists(file)) {

@@ -149,7 +149,7 @@ describe("extension", () => {
     });
 
     describe("attach", () => {
-        let target: IRemoteTargetJson;
+        let target: any;
         let mocks: {
             panel: any,
             utils: Partial<Mocked<typeof import("./utils")>>,
