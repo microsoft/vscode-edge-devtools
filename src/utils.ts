@@ -18,6 +18,7 @@ import puppeteer from "puppeteer-core";
 export type BrowserFlavor = "Default" | "Stable" | "Beta" | "Dev" | "Canary";
 
 interface IBrowserPath {
+    debianLinux: string;
     windows: {
         primary: string;
         secondary: string;
@@ -271,9 +272,10 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
         case "OSX": {
             return await verifyFlavorPath(flavor, "OSX");
         }
+        case "Linux": {
+            return await verifyFlavorPath(flavor, "Linux");
+        }
     }
-
-    return "";
 }
 
 /**
@@ -513,7 +515,10 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
         } else if (await fse.pathExists(browserPath.osx) &&
             (platform === "OSX" || flavor === "Default")) {
             return browserPath.osx;
-        }
+        }  else if (await fse.pathExists(browserPath.debianLinux) &&
+            (platform === "Linux" || flavor === "Default")) {
+            return browserPath.debianLinux;
+    }
 
         return "";
     }
@@ -522,6 +527,7 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
 (function initialize() {
     // insertion order matters.
     msEdgeBrowserMapping.set("Stable", {
+        debianLinux: "/opt/microsoft/msedge/msedge",
         osx: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
@@ -529,6 +535,7 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
         },
     });
     msEdgeBrowserMapping.set("Beta", {
+        debianLinux: "/opt/microsoft/msedge-beta/msedge",
         osx: "/Applications/Microsoft Edge Beta.app/Contents/MacOS/Microsoft Edge Beta",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge Beta\\Application\\msedge.exe",
@@ -536,6 +543,7 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
         },
     });
     msEdgeBrowserMapping.set("Dev", {
+        debianLinux: "/opt/microsoft/msedge-dev/msedge",
         osx: "/Applications/Microsoft Edge Dev.app/Contents/MacOS/Microsoft Edge Dev",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe",
@@ -543,6 +551,7 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
         },
     });
     msEdgeBrowserMapping.set("Canary", {
+        debianLinux: "/opt/microsoft/msedge-canary/msedge",
         osx: "/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary",
         windows: {
             primary: "C:\\Program Files (x86)\\Microsoft\\Edge SxS\\Application\\msedge.exe",
