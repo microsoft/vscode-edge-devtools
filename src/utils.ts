@@ -356,15 +356,25 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
             const replacePatternValue = replaceWebRootInSourceMapPathOverridesEntry(
                 webRoot, sourceMapPathOverrides[pattern]);
 
-            resolvedOverrides[replacePattern] = replacePatternValue;
+            resolvedOverrides[replacePattern] = replaceWorkSpaceFolderPlaceholder(replacePatternValue);
         }
     }
 
+    // replace workspaceFolder with local paths
+    const resolvedMappingOverrides: IStringDictionary<string> = {};
+    for (const customPathMapped in pathMapping) {
+        if (pathMapping.hasOwnProperty(customPathMapped)) {
+            resolvedMappingOverrides[customPathMapped] =
+                replaceWorkSpaceFolderPlaceholder(pathMapping[customPathMapped])
+        }
+    }
+
+    const resolvedWebRoot = replaceWorkSpaceFolderPlaceholder(webRoot);
     return {
-        pathMapping,
+        pathMapping: resolvedMappingOverrides,
         sourceMapPathOverrides: resolvedOverrides,
         sourceMaps,
-        webRoot,
+        webRoot: resolvedWebRoot,
     };
 }
 
@@ -429,10 +439,7 @@ export function applyPathMapping(
         const wildcardValue = overridePatternMatches[1];
         let mappedPath = rightPattern.replace(/\*/g, wildcardValue);
         mappedPath = debugCore.utils.properJoin(mappedPath); // Fix any ..'s
-        mappedPath = mappedPath.replace(
-            "${workspaceFolder}",
-            vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.toString() : "" || "");
-
+        mappedPath = replaceWorkSpaceFolderPlaceholder(mappedPath);
         return mappedPath;
     }
 
@@ -446,6 +453,27 @@ function isHeadlessEnabled() {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const headless: boolean = settings.get("headless") || false;
     return headless;
+}
+
+/**
+ * Replaces the workspaceFolder placeholder in a specified path, returns the
+ * given path with file disk path.
+ * @param customPath The path that will be replaced.
+ */
+function replaceWorkSpaceFolderPlaceholder(customPath: string) {
+    let parsedPath = customPath;
+    if (vscode.workspace.workspaceFolders &&
+        vscode.workspace.workspaceFolders[0].uri.toString()) {
+        /**
+         * vscode can have several workspaceFolders, the first one is the
+         * one currently open by the user.
+         */
+        parsedPath = vscode.workspace.workspaceFolders[0].uri.toString();
+        const replacedPath = customPath.replace("${workspaceFolder}", parsedPath);
+        return debugCore.utils.canonicalizeUrl(replacedPath);
+    } else{
+        return parsedPath;
+    }
 }
 
 /**
