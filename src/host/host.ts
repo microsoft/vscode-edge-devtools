@@ -59,4 +59,27 @@ export function initialize(dtWindow: IDevToolsWindow) {
 
         dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace("null", "vscode-webview-resource:");
     });
+
+    dtWindow.addEventListener("keydown", (e) => {
+        if (e.metaKey) {
+            if (e.code === "KeyC") {
+                dtWindow.document.execCommand("copy");
+            }
+            if (e.code === "KeyX") {
+                dtWindow.document.execCommand("cut");
+            }
+            if (e.code === "KeyV") {
+                dtWindow.document.execCommand("paste");
+            }
+            if (e.code === "KeyA") {
+                dtWindow.document.execCommand("selectAll");
+            }
+            if (e.code === "KeyZ") {
+                dtWindow.document.execCommand("undo");
+            }
+            if (e.code === "KeyY") {
+                dtWindow.document.execCommand("redo");
+            }
+        }
+    });
 }
