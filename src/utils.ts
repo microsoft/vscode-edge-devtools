@@ -467,7 +467,7 @@ function replaceWorkSpaceFolderPlaceholder(customPath: string) {
         /**
          * vscode can have several workspaceFolders, the first one is the
          * one currently open by the user.
-         **/
+         */
         parsedPath = vscode.workspace.workspaceFolders[0].uri.toString();
         const replacedPath = customPath.replace("${workspaceFolder}", parsedPath);
         return debugCore.utils.canonicalizeUrl(replacedPath);
