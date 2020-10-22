@@ -680,41 +680,46 @@ describe("utils", () => {
     });
 
     describe("getRuntimeConfig", () => {
-        it("returns the stored settings", async () => {
+        let fse: Mocked<typeof import("fs-extra")>;
+        beforeEach(() => {
+            jest.resetModules();
+            fse = jest.requireMock("fs-extra");
+            fse.pathExists.mockImplementation(() => Promise.resolve(true));
+        });
+
+        it("returns the default settings", async () => {
+            const testPath = "g:\\GIT\\testPage";
             const expected = {
                 pathMapping: {
-                    "/app": "${workspaceFolder}/dist",
+                    "/": testPath,
                 },
                 sourceMapPathOverrides: {
                     "webpack:///./*": "${webRoot}/*",
                 },
-                sourceMaps: false,
-                webRoot: "/out",
+                sourceMaps: true,
+                webRoot: testPath,
             };
 
             const expectedResolvedOverride = {
-                "webpack:///./*": "/out/*",
+                "meteor://💻app/*": `${testPath}\\*`,
+                "webpack:///./*": `${testPath}\\*`,
+                "webpack:///./~/*": `${testPath}\\node_modules\\*`,
+                "webpack:///*": "*",
+                "webpack:///src/*": `${testPath}\\*`
             };
-
-            // Override the configuration mock to return our custom test values
-            const configMock = {
-                get: (name: string) => (expected as any)[name],
-            };
-            const vscodeMock = await jest.requireMock("vscode");
-            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
             // Ensure the new values are returned
             const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig();
-            expect(pathMapping).toBe(expected.pathMapping);
+            expect(pathMapping).toEqual(expected.pathMapping);
             expect(sourceMapPathOverrides).toEqual(expectedResolvedOverride);
             expect(sourceMaps).toBe(expected.sourceMaps);
             expect(webRoot).toBe(expected.webRoot);
         });
 
-        it("uses user config", async () => {
+        it("uses user config with workspace", async () => {
             const config = {
                 pathMapping: {
-                    "/app": "${workspaceFolder}/dist",
+                    "/app": "${workspaceFolder}/out",
                 },
                 sourceMapPathOverrides: {
                     "webpack:///./*": "${webRoot}/*",
@@ -723,38 +728,52 @@ describe("utils", () => {
                 webRoot: "/out",
             };
 
-            const expectedResolvedOverride = {
-                "webpack:///./*": "/out/*",
+            const expectedConfig = {
+                pathMapping: {
+                    "/app": `g:\\GIT\\testPage\\out`,
+                },
+                sourceMapPathOverrides: {
+                    "webpack:///./*": "/out/*",
+                },
+                sourceMaps: false,
+                webRoot: "/out",
             };
 
             const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig(config);
-            expect(pathMapping).toBe(config.pathMapping);
-            expect(sourceMapPathOverrides).toEqual(expectedResolvedOverride);
-            expect(sourceMaps).toBe(config.sourceMaps);
-            expect(webRoot).toBe(config.webRoot);
+            expect(pathMapping).toEqual(expectedConfig.pathMapping);
+            expect(sourceMapPathOverrides).toEqual(expectedConfig.sourceMapPathOverrides);
+            expect(sourceMaps).toEqual(expectedConfig.sourceMaps);
+            expect(webRoot).toEqual(expectedConfig.webRoot);
         });
 
-        it("uses correct fallbacks on failure", async () => {
-            // Override the configuration mock to return our custom test values
-            const configMock = {
-                get: (name: string) => undefined,
+        it("uses user config with an absolute path", async () => {
+            const config = {
+                pathMapping: {
+                    "/app": "c:/user/test/out",
+                },
+                sourceMapPathOverrides: {
+                    "webpack:///./*": "${webRoot}/*",
+                },
+                sourceMaps: false,
+                webRoot: "/out",
             };
-            const vscodeMock = await jest.requireMock("vscode");
-            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
-            const expectedResolvedOverrides = utils.SETTINGS_DEFAULT_PATH_OVERRIDES;
-            for (const i in expectedResolvedOverrides) {
-                if (expectedResolvedOverrides.hasOwnProperty(i)) {
-                    expectedResolvedOverrides[i] =
-                        expectedResolvedOverrides[i].replace("${webRoot}", utils.SETTINGS_DEFAULT_WEB_ROOT);
-                }
-            }
+            const expectedConfig = {
+                pathMapping: {
+                    "/app": `c:\\user\\test\\out`,
+                },
+                sourceMapPathOverrides: {
+                    "webpack:///./*": "/out/*",
+                },
+                sourceMaps: false,
+                webRoot: "/out",
+            };
 
-            const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig();
-            expect(pathMapping).toBe(utils.SETTINGS_DEFAULT_PATH_MAPPING);
-            expect(sourceMapPathOverrides).toEqual(expectedResolvedOverrides);
-            expect(sourceMaps).toBe(utils.SETTINGS_DEFAULT_SOURCE_MAPS);
-            expect(webRoot).toBe(utils.SETTINGS_DEFAULT_WEB_ROOT);
+            const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig(config);
+            expect(pathMapping).toEqual(expectedConfig.pathMapping);
+            expect(sourceMapPathOverrides).toEqual(expectedConfig.sourceMapPathOverrides);
+            expect(sourceMaps).toEqual(expectedConfig.sourceMaps);
+            expect(webRoot).toEqual(expectedConfig.webRoot);
         });
     });
 
