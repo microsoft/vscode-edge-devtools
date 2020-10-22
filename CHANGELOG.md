@@ -1,3 +1,8 @@
+## 1.1.1
+* Adding support for Linux - [PR #225](https://github.com/microsoft/vscode-edge-devtools/pull/225)
+* Fixing command key shortcuts for Mac users - [PR #223](https://github.com/microsoft/vscode-edge-devtools/pull/223)
+* Tools rename to "Microsoft Edge Tools for VS Code" - [PR #206](https://github.com/microsoft/vscode-edge-devtools/pull/206)
+
 ## 1.1.0
 * Updated to version 84.0.522.63
 * Improved Mac contributing workflow - [PR #174](https://github.com/microsoft/vscode-edge-devtools/pull/174)
