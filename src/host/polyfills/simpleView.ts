@@ -401,3 +401,35 @@ export function applyRemoveNonSupportedRevealContextMenu(content: string) {
         return null;
     }
 }
+
+export function getThemes(callback: (arg0: object) => void) {
+    InspectorFrontendHost.InspectorFrontendHostInstance.getThemes(callback);
+}
+
+export function applyThemePatch(content: string) {
+    const pattern = /themeSetting\.get\(\)==='systemPreferred'\?findSystemPreferredTheme\(\):themeSetting\.get\(\)/;
+    if (content.match(pattern)) {
+        return content.replace(pattern, `'default'`);
+    } else {
+        return null;
+    }
+    // Sets the theme of the DevTools
+
+}
+
+export function applyUIThemePatch(content: string) {
+    // Sets the theme of the DevTools
+    const constructorPattern = /this\._themableProperties=/;
+    if (content.match(constructorPattern)) {
+        content = content.replace(constructorPattern, "updateThemeName();this._themableProperties=");
+    } else {
+        return null;
+    }
+
+    const addFunctionPattern = /return this\._themeName;}/;
+    if (content.match(addFunctionPattern)) {
+        return content.replace(addFunctionPattern, `return this._themeName;} ${getThemes.toString().slice(9)} updateThemeName(){getThemes((object)=>{const themeString = object.themeString; this._themeName = 'default'})}`);
+    } else {
+        return null;
+    }
+}

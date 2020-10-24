@@ -6,7 +6,7 @@ import { createFakeVSCode } from "../test/helpers";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
-describe("tabSettingsProvider", () => {
+describe("settingsProvider", () => {
   beforeEach(() => {
     const mockVSCode = createFakeVSCode();
     jest.doMock("vscode", () => mockVSCode, { virtual: true });
@@ -15,17 +15,17 @@ describe("tabSettingsProvider", () => {
 
   describe("GetTabConfiguration", () => {
     it("test that singleton provides the right instance", async () => {
-      const tsp = await import("../common/tabSettingsProvider");
-      const instance = tsp.TabSettingsProvider.instance;
-      const instanceB = tsp.TabSettingsProvider.instance;
+      const tsp = await import("../common/settingsProvider");
+      const instance = tsp.SettingsProvider.instance;
+      const instanceB = tsp.SettingsProvider.instance;
       expect(instance).not.toEqual(null);
       expect(instance).toEqual(instanceB);
     });
 
     it("test that the right value is retrieved for networkEnabled configuration", async () => {
       jest.requireMock("vscode");
-      const tsp = await import("../common/tabSettingsProvider");
-      const instance = tsp.TabSettingsProvider.instance;
+      const tsp = await import("../common/settingsProvider");
+      const instance = tsp.SettingsProvider.instance;
       expect(instance).not.toEqual(null);
       const result = instance.isNetworkEnabled();
       expect(result).toEqual(true);

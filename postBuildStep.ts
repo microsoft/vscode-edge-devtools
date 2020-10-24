@@ -24,6 +24,8 @@ import {
     applySetTabIconPatch,
     applyShowElementsTab,
     applyShowRequestBlockingTab,
+    applyThemePatch,
+    applyUIThemePatch,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
 
@@ -112,22 +114,25 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyDrawerTabLocationPatch,
         applyAppendTabPatch,
+        applyHandleActionPatch,
         applyPersistRequestBlockingTab,
         applySetTabIconPatch,
         applyShowElementsTab,
         applyShowRequestBlockingTab,
+        applyUIThemePatch,
     ]);
-
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
-
     await patchFileForWebViewWrapper("quick_open/quick_open.js", toolsOutDir, [
         applyCommandMenuPatch,
         applyQuickOpenPatch,
     ]);
     await patchFileForWebViewWrapper("browser_debugger/browser_debugger.js", toolsOutDir, [
         applyRemoveBreakOnContextMenuItem,
+    ]);
+    await patchFileForWebViewWrapper("themes/themes.js", toolsOutDir, [
+        applyThemePatch,
     ])
 }
 

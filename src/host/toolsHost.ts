@@ -86,6 +86,12 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getApprovedTabs", {id});
     }
 
+    public getThemes(callback: (arg0: object) => void) {
+        const id = this.getHostCallbacksNextId++;
+        this.getHostCallbacks.set(id, callback);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getThemes", {id});
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {
@@ -112,6 +118,13 @@ export default class ToolsHost {
                         enableNetwork,
                 });
                 break;
+            }
+
+            case "getThemes": {
+                const { id, themeString } = JSON.parse(args);
+                this.fireGetHostCallback(id, {
+                    themeString,
+                })
             }
         }
         return true;

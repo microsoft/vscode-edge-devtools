@@ -183,6 +183,23 @@
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                     ]
+                },
+                "vscode-edge-devtools.themes": {
+                    "type": "string",
+                    "enum": [
+                        "System preference",
+                        "Light",
+                        "Dark",
+                        "Light (Chromium)",
+                        "Dark (Chromium)"
+                    ],
+                    "enumDescriptions": [
+                        "Microsoft Edge Tools for VS Code will use the system preferred setting for themes",
+                        "Microsoft Edge Tools for VS Code will use the Edge DevTools light theme",
+                        "Microsoft Edge Tools for VS Code will use the Edge DevTools dark theme",
+                        "Microsoft Edge Tools for VS Code will use the Chromium DevTools light theme",
+                        "Microsoft Edge Tools for VS Code will use the Chromium DevTools dark theme"
+                    ]
                 }
             }
         },
