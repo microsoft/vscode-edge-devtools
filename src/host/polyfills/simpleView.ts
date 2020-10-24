@@ -407,28 +407,56 @@ export function getThemes(callback: (arg0: object) => void) {
 }
 
 export function applyThemePatch(content: string) {
-    const pattern = /themeSetting\.get\(\)==='systemPreferred'\?findSystemPreferredTheme\(\):themeSetting\.get\(\)/;
-    if (content.match(pattern)) {
-        return content.replace(pattern, `'default'`);
+    // Sets the theme of the DevTools
+    const parameterPattern = /function init\(\)/;
+    if (content.match(parameterPattern)) {
+        content = content.replace(parameterPattern, `function init(themeString)`);
     } else {
         return null;
     }
-    // Sets the theme of the DevTools
 
+    const setPattern = /const settingDescriptor/;
+    if (content.match(setPattern)) {
+        return content.replace(setPattern, `if(themeString){themeSetting.set(themeString);} const settingDescriptor`);
+    } else {
+        return null;
+    }
 }
 
-export function applyUIThemePatch(content: string) {
+export function applyMainThemePatch(content: string) {
     // Sets the theme of the DevTools
-    const constructorPattern = /this\._themableProperties=/;
-    if (content.match(constructorPattern)) {
-        content = content.replace(constructorPattern, "updateThemeName();this._themableProperties=");
+    const injectFunctionsPattern = /async _createAppUI/;
+    if (content.match(injectFunctionsPattern)) {
+        content = content.replace(injectFunctionsPattern, `${getThemes.toString().slice(9)} getThemeStringPromise(){
+            const promise = new Promise(function(resolve){
+                this.getThemes((object)=>{
+                  const themeString = object.themeString;
+                  console.log('IN FUNCTION ' + themeString);
+                  switch(themeString) {
+                    case 'System preference':
+                        resolve('systemPreferred');
+                    case 'Light':
+                        resolve('default');
+                    case 'Dark':
+                        resolve('dark');
+                    case 'Light (Chromium)':
+                        resolve('lightChromium');
+                    case 'Dark (Chromium)':
+                        resolve('darkChromium');
+                    default:
+                        resolve(null);
+                  }
+                });
+              }.bind(this));
+              return promise;
+        } async _createAppUI`);
     } else {
         return null;
     }
 
-    const addFunctionPattern = /return this\._themeName;}/;
-    if (content.match(addFunctionPattern)) {
-        return content.replace(addFunctionPattern, `return this._themeName;} ${getThemes.toString().slice(9)} updateThemeName(){getThemes((object)=>{const themeString = object.themeString; this._themeName = 'default'})}`);
+    const createAppPattern = /;init\(\);/;
+    if (content.match(createAppPattern)) {
+        return content.replace(createAppPattern, `;const themeString = await this.getThemeStringPromise(); console.log('createApp ' + themeString); init(themeString);`);
     } else {
         return null;
     }
