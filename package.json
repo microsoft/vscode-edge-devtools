@@ -186,19 +186,16 @@
                 },
                 "vscode-edge-devtools.themes": {
                     "type": "string",
+                    "description": "Set the theme of the Microsoft Edge Tools extension (reload required after changing).",
                     "enum": [
                         "System preference",
                         "Light",
-                        "Dark",
-                        "Light (Chromium)",
-                        "Dark (Chromium)"
+                        "Dark"
                     ],
                     "enumDescriptions": [
                         "Microsoft Edge Tools for VS Code will use the system preferred setting for themes",
                         "Microsoft Edge Tools for VS Code will use the Edge DevTools light theme",
-                        "Microsoft Edge Tools for VS Code will use the Edge DevTools dark theme",
-                        "Microsoft Edge Tools for VS Code will use the Chromium DevTools light theme",
-                        "Microsoft Edge Tools for VS Code will use the Chromium DevTools dark theme"
+                        "Microsoft Edge Tools for VS Code will use the Edge DevTools dark theme"
                     ]
                 }
             }

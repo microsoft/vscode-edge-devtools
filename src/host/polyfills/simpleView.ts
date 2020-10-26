@@ -438,10 +438,6 @@ export function applyMainThemePatch(content: string) {
                         resolve('default');
                     case 'Dark':
                         resolve('dark');
-                    case 'Light (Chromium)':
-                        resolve('lightChromium');
-                    case 'Dark (Chromium)':
-                        resolve('darkChromium');
                     default:
                         resolve(null);
                   }
