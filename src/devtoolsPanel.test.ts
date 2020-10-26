@@ -492,6 +492,31 @@ describe("devtoolsPanel", () => {
                 expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
             });
 
+            it("calls getThemes", async () => {
+                const expectedId = { id: 0 };
+                const expectedState = { themeString: "System preference" };
+                (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
+
+                const dtp = await import("./devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                hookedEvents.get("getThemes")!(JSON.stringify(expectedId));
+                expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
+                    expect.any(Function),
+                    "getThemes",
+                    {
+                        themeString: expectedState.themeString,
+                        id: expectedId.id,
+                    },
+                );
+
+                // Ensure that the encoded message is actually passed over to the webview
+                const expectedPostedMessage = "encodedMessage";
+                const { callback, thisObj } = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
+                callback.call(thisObj, expectedPostedMessage);
+                expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
+            });
+
             it("shows an error for unmapped urls", async () => {
                 const expectedRequest = {
                     column: 5,

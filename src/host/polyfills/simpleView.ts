@@ -431,7 +431,6 @@ export function applyMainThemePatch(content: string) {
             const promise = new Promise(function(resolve){
                 this.getThemes((object)=>{
                   const themeString = object.themeString;
-                  console.log('IN FUNCTION ' + themeString);
                   switch(themeString) {
                     case 'System preference':
                         resolve('systemPreferred');
@@ -456,7 +455,7 @@ export function applyMainThemePatch(content: string) {
 
     const createAppPattern = /;init\(\);/;
     if (content.match(createAppPattern)) {
-        return content.replace(createAppPattern, `;const themeString = await this.getThemeStringPromise(); console.log('createApp ' + themeString); init(themeString);`);
+        return content.replace(createAppPattern, `;const themeString = await this.getThemeStringPromise(); init(themeString);`);
     } else {
         return null;
     }
