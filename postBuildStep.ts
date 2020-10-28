@@ -9,8 +9,9 @@ import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtim
 import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
+    applyCommandMenuPatch,
     applyDrawerTabLocationPatch,
-    applyHandleActionPatch,
+    applyQuickOpenPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
@@ -118,7 +119,8 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
 
     await patchFileForWebViewWrapper("quick_open/quick_open.js", toolsOutDir, [
-        applyHandleActionPatch,
+        applyCommandMenuPatch,
+        applyQuickOpenPatch,
     ]);
     await patchFileForWebViewWrapper("browser_debugger/browser_debugger.js", toolsOutDir, [
         applyRemoveBreakOnContextMenuItem,

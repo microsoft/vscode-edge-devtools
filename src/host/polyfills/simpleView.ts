@@ -43,14 +43,33 @@ export function applyCommonRevealerPatch(content: string) {
     }
 }
 
-export function applyHandleActionPatch(content: string) {
+export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the
-    // quick open menu (CTRL + P) and command menu (CTRL + SHIFT + P)
-    const pattern = /handleAction\(context,\s*actionId\)\s*{/g;
+    // quick open menu (CTRL + P)
+    const pattern = /handleAction\(context,actionId\){switch\(actionId\)/;
 
     if (content.match(pattern)) {
         return content
-        .replace(pattern, "handleAction(context, actionId) { return false;");
+        .replace(pattern, "handleAction(context, actionId) { actionId = null; switch(actionId)");
+    } else {
+        return null;
+    }
+}
+
+export function applyCommandMenuPatch(content: string) {
+    // This patch modifies the available options in the command menu.
+    const pattern = /action\.category\(\);if\(\!category\)/;
+
+    if(content.match(pattern)) {
+        content = content.replace(pattern, "action.category();if(!category || category !== 'Elements')");
+    } else {
+        return null;
+    }
+
+    const pattern2 = /if\(command.available\(\)\){this\._commands\.push\(command\);}/;
+
+    if(content.match(pattern2)) {
+        return content.replace(pattern2, "if(command.available()){if(command.category() !== 'Elements'){continue;} this._commands.push(command);}");
     } else {
         return null;
     }
