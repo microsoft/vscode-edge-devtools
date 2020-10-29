@@ -78,12 +78,10 @@ export function applyCommandMenuPatch(content: string) {
                 condition = condition && category !== 'Network';
               }
               if (!condition) {
-                /** @type {!ActionCommandOptions} */
                 const options = {action, userActionCode: undefined};
                 this._commands.push(CommandMenu.createActionCommand(options));
               }
             }
-      
             for (const command of allCommands) {
               let condition = (command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints');
               if (networkEnabled) {
@@ -99,10 +97,6 @@ export function applyCommandMenuPatch(content: string) {
     } else {
         return null;
     }
-}
-
-export function applyCommandMenuFilter(content: string) {
-    return "if( (command.category() !== 'Elements' && command.category() !== 'Network') || (command.category() === 'Network' && approvedTabs.enableNetwork) || command.title() === 'Show DOM Breakpoints') {continue;}";
 }
 
 // This function is needed for Elements-only version, but we need the drawer

@@ -48,7 +48,21 @@ describe("simpleView", () => {
         const result = apply.applyQuickOpenPatch(fileContents);
         expect(result).not.toEqual(null);
         expect(result).toEqual(
-            expect.stringContaining("handleAction(context, actionId) { return false;switch(actionId){case'quickOpen.show"));
+            expect.stringContaining("handleAction(context, actionId) { actionId = null; switch(actionId)"));
+    });
+
+    it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
+        const filePath = "quick_open/quick_open.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const apply = await import("./simpleView");
+        const result = apply.applyCommandMenuPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(
+            expect.stringContaining("this.getApprovedTabs((networkSettings)"));
     });
 
     it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
