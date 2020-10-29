@@ -44,8 +44,7 @@ export function applyCommonRevealerPatch(content: string) {
 }
 
 export function applyQuickOpenPatch(content: string) {
-    // This patch removes the ability to use the
-    // quick open menu (CTRL + P)
+    // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,actionId\){switch\(actionId\)/;
 
     if (content.match(pattern)) {
@@ -67,12 +66,15 @@ export function applyCommandMenuPatch(content: string) {
     }
 
     const pattern2 = /if\(command.available\(\)\){this\._commands\.push\(command\);}/;
-
     if(content.match(pattern2)) {
-        return content.replace(pattern2, "if(command.available()){if(command.category() !== 'Elements'){continue;} this._commands.push(command);}");
+        return content.replace(pattern2, "if(command.available()){if(command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints'){continue;} this._commands.push(command);}");
     } else {
         return null;
     }
+}
+
+export function applyCommandMenuFilter(content: string) {
+    return "if( (command.category() !== 'Elements' && command.category() !== 'Network') || (command.category() === 'Network' && approvedTabs.enableNetwork) || command.title() === 'Show DOM Breakpoints') {continue;}";
 }
 
 // This function is needed for Elements-only version, but we need the drawer
