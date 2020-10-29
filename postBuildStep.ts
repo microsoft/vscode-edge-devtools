@@ -19,6 +19,7 @@ import {
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
+    applyRemoveNonSupportedRevealContextMenu,
     applySetTabIconPatch,
     applyShowElementsTab,
     applyShowRequestBlockingTab,
@@ -97,6 +98,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper("common/common.js", toolsOutDir, [
         applyCommonRevealerPatch,
+    ]);
+    await patchFileForWebViewWrapper("components/components.js", toolsOutDir, [
+        applyRemoveNonSupportedRevealContextMenu,
     ]);
     await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, [
         applyPaddingInlineCssPatch,
