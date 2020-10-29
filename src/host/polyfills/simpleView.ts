@@ -389,3 +389,14 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
         return null;
     }
 }
+
+export function applyRemoveNonSupportedRevealContextMenu(content: string) {
+    const pattern = /result\.push\({section:'reveal',title:destination.+reveal\(revealable\)}\);/;
+    const match = content.match(pattern);
+    if (match) {
+        const matchedString = match[0];
+        return content.replace(pattern, `if(destination === "Elements panel"){${matchedString}}`);
+    } else {
+        return null;
+    }
+}
