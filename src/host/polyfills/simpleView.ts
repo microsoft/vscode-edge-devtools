@@ -57,17 +57,45 @@ export function applyQuickOpenPatch(content: string) {
 
 export function applyCommandMenuPatch(content: string) {
     // This patch modifies the available options in the command menu.
-    const pattern = /action\.category\(\);if\(\!category\)/;
-
-    if(content.match(pattern)) {
-        content = content.replace(pattern, "action.category();if(!category || category !== 'Elements')");
+    const functionPattern = /attach\(\){const allCommands/;
+    if (content.match(functionPattern)) {
+        content = content.replace(functionPattern, `${getApprovedTabs.toString().slice(9)} attach(){const allCommands`);
     } else {
         return null;
     }
 
-    const pattern2 = /if\(command.available\(\)\){this\._commands\.push\(command\);}/;
-    if(content.match(pattern2)) {
-        return content.replace(pattern2, "if(command.available()){if(command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints'){continue;} this._commands.push(command);}");
+    const pattern = /for\(const action of actions\){const category=action[\s\S]+this\._commands\.sort\(commandComparator\);/;
+    if(content.match(pattern)) {
+        return content.replace(pattern, `this.getApprovedTabs((networkSettings) => {
+            const networkEnabled = networkSettings.enableNetwork;
+            for (const action of actions) {
+              const category = action.category();
+              if (!category) {
+                continue;
+              }
+              let condition = (category !== 'Elements' || action.title() === 'Show DOM Breakpoints');
+              if (networkEnabled) {
+                condition = condition && category !== 'Network';
+              }
+              if (!condition) {
+                /** @type {!ActionCommandOptions} */
+                const options = {action, userActionCode: undefined};
+                this._commands.push(CommandMenu.createActionCommand(options));
+              }
+            }
+      
+            for (const command of allCommands) {
+              let condition = (command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints');
+              if (networkEnabled) {
+                condition = condition && command.category() !== 'Network';
+              }
+              if (!condition && command.available()) {
+                this._commands.push(command);
+              }
+            }
+            this._commands = this._commands.sort(commandComparator);
+            this._refreshCallback();
+          });`);
     } else {
         return null;
     }
