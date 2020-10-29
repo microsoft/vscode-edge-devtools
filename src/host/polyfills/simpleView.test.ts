@@ -280,4 +280,18 @@ describe("simpleView", () => {
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
+
+    it("applyRemoveNonSupportedRevealContextMenu correctly changes text", async () => {
+        const filePath = "components/components.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "if(destination === \"Elements panel\")";
+        const apply = await import("./simpleView");
+        const result = apply.applyRemoveNonSupportedRevealContextMenu(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+    });
 });
