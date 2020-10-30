@@ -23,6 +23,8 @@ export const webSocketEventNames: WebSocketEvent[] = [
     "message",
 ];
 
+export type ThemeString = "System preference" | "Light" | "Dark";
+
 export type TelemetryEvent = "enumerated" | "performance" | "error";
 
 export interface ITelemetryMeasures { [key: string]: number; }

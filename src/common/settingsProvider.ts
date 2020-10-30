@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 import * as vscode from "vscode";
 import { SETTINGS_STORE_NAME } from "../utils";
+import { ThemeString } from "./webviewEvents";
 
 export class SettingsProvider {
 
@@ -13,9 +14,9 @@ export class SettingsProvider {
     return networkEnabled;
   }
 
-  public getThemeSettings(): string {
+  public getThemeSettings(): ThemeString {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const themeString: string = settings.get("themes") || "System preference";
+    const themeString: ThemeString = settings.get("themes") || "System preference";
     return themeString;
   }
 

@@ -5,6 +5,7 @@ import {
     encodeMessageForChannel,
     IOpenEditorData,
     TelemetryData,
+    ThemeString,
     WebSocketEvent,
     WebviewEvent,
 } from "../common/webviewEvents";
@@ -121,9 +122,25 @@ export default class ToolsHost {
             }
 
             case "getThemes": {
-                const { id, themeString } = JSON.parse(args);
+                const parsedArgs = JSON.parse(args);
+                const id: number = parsedArgs.id;
+                const themeString: ThemeString = parsedArgs.themeString;
+                let theme;
+                switch(themeString) {
+                    case 'System preference':
+                        theme = 'systemPreferred';
+                        break;
+                    case 'Light':
+                        theme = 'default';
+                        break;
+                    case 'Dark':
+                        theme = 'dark';
+                        break;
+                    default:
+                        theme = null;
+                }
                 this.fireGetHostCallback(id, {
-                    themeString,
+                    theme,
                 })
             }
         }
