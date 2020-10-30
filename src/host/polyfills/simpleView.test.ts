@@ -294,4 +294,35 @@ describe("simpleView", () => {
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
     });
+
+    it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
+        const filePath = "themes/themes.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+        const expectedResult = "function init(theme)";
+        const expectedResult2 = "if(theme){themeSetting.set(theme);}";
+        const apply = await import("./simpleView");
+        const result = apply.applyThemePatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+        expect(result).toEqual(expect.stringContaining(expectedResult2));
+    });
+
+    it("applyMainThemePatch correctly modifes main.js to pass in themes from settings", async () => {
+        const filePath = "main/main.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "resolve(theme);";
+        const expectedResult2 = "await this.getThemePromise()";
+        const apply = await import("./simpleView");
+        const result = apply.applyMainThemePatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+        expect(result).toEqual(expect.stringContaining(expectedResult2));
+    });
 });

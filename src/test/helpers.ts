@@ -62,6 +62,8 @@ export function createFakeVSCode() {
                     switch(name) {
                         case "enableNetwork":
                             return true;
+                        case "themeString":
+                            return "System preference";
                         default:
                             return undefined;
                     }

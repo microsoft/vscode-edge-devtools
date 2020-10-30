@@ -5,6 +5,7 @@ import {
     encodeMessageForChannel,
     IOpenEditorData,
     TelemetryData,
+    ThemeString,
     WebSocketEvent,
     WebviewEvent,
 } from "../common/webviewEvents";
@@ -86,6 +87,12 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getApprovedTabs", {id});
     }
 
+    public getThemes(callback: (arg0: object) => void) {
+        const id = this.getHostCallbacksNextId++;
+        this.getHostCallbacks.set(id, callback);
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getThemes", {id});
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {
@@ -112,6 +119,29 @@ export default class ToolsHost {
                         enableNetwork,
                 });
                 break;
+            }
+
+            case "getThemes": {
+                const parsedArgs = JSON.parse(args);
+                const id: number = parsedArgs.id;
+                const themeString: ThemeString = parsedArgs.themeString;
+                let theme;
+                switch(themeString) {
+                    case 'System preference':
+                        theme = 'systemPreferred';
+                        break;
+                    case 'Light':
+                        theme = 'default';
+                        break;
+                    case 'Dark':
+                        theme = 'dark';
+                        break;
+                    default:
+                        theme = null;
+                }
+                this.fireGetHostCallback(id, {
+                    theme,
+                })
             }
         }
         return true;

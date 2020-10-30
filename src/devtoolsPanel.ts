@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
 
-import { TabSettingsProvider } from "./common/tabSettingsProvider";
+import { SettingsProvider } from "./common/settingsProvider";
 import {
     encodeMessageForChannel,
     IOpenEditorData,
@@ -56,6 +56,7 @@ export class DevToolsPanel {
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
         this.panelSocket.on("getApprovedTabs", (msg) => this.onSocketGetApprovedTabs(msg));
+        this.panelSocket.on("getThemes", (msg) => this.onSocketGetThemes(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
@@ -164,7 +165,14 @@ export class DevToolsPanel {
     private onSocketGetApprovedTabs(message: string) {
         const { id } = JSON.parse(message) as { id: number };
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getApprovedTabs", {
-            enableNetwork: TabSettingsProvider.instance.isNetworkEnabled(),
+            enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
+            id });
+    }
+
+    private onSocketGetThemes(message: string) {
+        const { id } = JSON.parse(message) as { id: number };
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getThemes", {
+            themeString: SettingsProvider.instance.getThemeSettings(),
             id });
     }
 

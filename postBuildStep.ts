@@ -17,6 +17,7 @@ import {
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
     applyInspectorCommonNetworkPatch,
+    applyMainThemePatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
@@ -24,6 +25,7 @@ import {
     applySetTabIconPatch,
     applyShowElementsTab,
     applyShowRequestBlockingTab,
+    applyThemePatch,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
 
@@ -92,6 +94,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorCommonCssTabSliderPatch,
     ]);
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
+        applyMainThemePatch,
         applyMainViewPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
@@ -117,17 +120,18 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyShowElementsTab,
         applyShowRequestBlockingTab,
     ]);
-
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
-
     await patchFileForWebViewWrapper("quick_open/quick_open.js", toolsOutDir, [
         applyCommandMenuPatch,
         applyQuickOpenPatch,
     ]);
     await patchFileForWebViewWrapper("browser_debugger/browser_debugger.js", toolsOutDir, [
         applyRemoveBreakOnContextMenuItem,
+    ]);
+    await patchFileForWebViewWrapper("themes/themes.js", toolsOutDir, [
+        applyThemePatch,
     ])
 }
 

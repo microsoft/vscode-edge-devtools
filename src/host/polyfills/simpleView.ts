@@ -401,3 +401,49 @@ export function applyRemoveNonSupportedRevealContextMenu(content: string) {
         return null;
     }
 }
+
+export function getThemes(callback: (arg0: object) => void) {
+    InspectorFrontendHost.InspectorFrontendHostInstance.getThemes(callback);
+}
+
+export function applyThemePatch(content: string) {
+    // Sets the theme of the DevTools
+    const parameterPattern = /function init\(\)/;
+    if (content.match(parameterPattern)) {
+        content = content.replace(parameterPattern, `function init(theme)`);
+    } else {
+        return null;
+    }
+
+    const setPattern = /const settingDescriptor/;
+    if (content.match(setPattern)) {
+        return content.replace(setPattern, `if(theme){themeSetting.set(theme);} const settingDescriptor`);
+    } else {
+        return null;
+    }
+}
+
+export function applyMainThemePatch(content: string) {
+    // Sets the theme of the DevTools
+    const injectFunctionsPattern = /async _createAppUI/;
+    if (content.match(injectFunctionsPattern)) {
+        content = content.replace(injectFunctionsPattern, `${getThemes.toString().slice(9)} getThemePromise(){
+            const promise = new Promise(function(resolve){
+                this.getThemes((object)=>{
+                  const theme = object.theme;
+                  resolve(theme);
+                });
+              }.bind(this));
+              return promise;
+        } async _createAppUI`);
+    } else {
+        return null;
+    }
+
+    const createAppPattern = /;init\(\);/;
+    if (content.match(createAppPattern)) {
+        return content.replace(createAppPattern, `;const theme = await this.getThemePromise(); init(theme);`);
+    } else {
+        return null;
+    }
+}
