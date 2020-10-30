@@ -64,6 +64,7 @@ export function applyCommandMenuPatch(content: string) {
         return null;
     }
 
+    // pattern intended to match logic of CommandMenu.attach()
     const pattern = /for\(const action of actions\){const category=action[\s\S]+this\._commands\.sort\(commandComparator\);/;
     if(content.match(pattern)) {
         return content.replace(pattern, `this.getApprovedTabs((networkSettings) => {
