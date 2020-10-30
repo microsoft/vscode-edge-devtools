@@ -301,8 +301,8 @@ describe("simpleView", () => {
         if (!fileContents) {
             throw new Error(`Could not find file: ${filePath}`);
         }
-        const expectedResult = "function init(themeString)";
-        const expectedResult2 = "if(themeString){themeSetting.set(themeString);}";
+        const expectedResult = "function init(theme)";
+        const expectedResult2 = "if(theme){themeSetting.set(theme);}";
         const apply = await import("./simpleView");
         const result = apply.applyThemePatch(fileContents);
         expect(result).not.toEqual(null);
@@ -317,8 +317,8 @@ describe("simpleView", () => {
             throw new Error(`Could not find file: ${filePath}`);
         }
 
-        const expectedResult = "switch(themeString)";
-        const expectedResult2 = "await this.getThemeStringPromise()";
+        const expectedResult = "resolve(theme);";
+        const expectedResult2 = "await this.getThemePromise()";
         const apply = await import("./simpleView");
         const result = apply.applyMainThemePatch(fileContents);
         expect(result).not.toEqual(null);

@@ -431,7 +431,6 @@ export function applyMainThemePatch(content: string) {
             const promise = new Promise(function(resolve){
                 this.getThemes((object)=>{
                   const theme = object.theme;
-                  console.log('Theme =' + theme);
                   resolve(theme);
                 });
               }.bind(this));
