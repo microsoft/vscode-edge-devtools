@@ -20,6 +20,5 @@
         "userdatadir",
         "vsce",
         "vsix"
-    ],
-    "webview.experimental.useIframes": true
+    ]
 }
