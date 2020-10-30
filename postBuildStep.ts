@@ -115,7 +115,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyDrawerTabLocationPatch,
         applyAppendTabPatch,
-        applyHandleActionPatch,
         applyPersistRequestBlockingTab,
         applySetTabIconPatch,
         applyShowElementsTab,
