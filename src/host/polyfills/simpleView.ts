@@ -43,14 +43,58 @@ export function applyCommonRevealerPatch(content: string) {
     }
 }
 
-export function applyHandleActionPatch(content: string) {
-    // This patch removes the ability to use the
-    // quick open menu (CTRL + P) and command menu (CTRL + SHIFT + P)
-    const pattern = /handleAction\(context,\s*actionId\)\s*{/g;
+export function applyQuickOpenPatch(content: string) {
+    // This patch removes the ability to use the quick open menu (CTRL + P)
+    const pattern = /handleAction\(context,actionId\){switch\(actionId\)/;
 
     if (content.match(pattern)) {
         return content
-        .replace(pattern, "handleAction(context, actionId) { return false;");
+        .replace(pattern, "handleAction(context, actionId) { actionId = null; switch(actionId)");
+    } else {
+        return null;
+    }
+}
+
+export function applyCommandMenuPatch(content: string) {
+    // This patch modifies the available options in the command menu.
+    const functionPattern = /attach\(\){const allCommands/;
+    if (content.match(functionPattern)) {
+        content = content.replace(functionPattern, `${getApprovedTabs.toString().slice(9)} attach(){const allCommands`);
+    } else {
+        return null;
+    }
+
+    // pattern intended to match logic of CommandMenu.attach()
+    const pattern = /for\(const action of actions\){const category=action[\s\S]+this\._commands\.sort\(commandComparator\);/;
+    if(content.match(pattern)) {
+        return content.replace(pattern, `this.getApprovedTabs((networkSettings) => {
+            const networkEnabled = networkSettings.enableNetwork;
+            for (const action of actions) {
+              const category = action.category();
+              if (!category) {
+                continue;
+              }
+              let condition = (category !== 'Elements' || action.title() === 'Show DOM Breakpoints');
+              if (networkEnabled) {
+                condition = condition && category !== 'Network';
+              }
+              if (!condition) {
+                const options = {action, userActionCode: undefined};
+                this._commands.push(CommandMenu.createActionCommand(options));
+              }
+            }
+            for (const command of allCommands) {
+              let condition = (command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints');
+              if (networkEnabled) {
+                condition = condition && command.category() !== 'Network';
+              }
+              if (!condition && command.available()) {
+                this._commands.push(command);
+              }
+            }
+            this._commands = this._commands.sort(commandComparator);
+            this._refreshCallback();
+          });`);
     } else {
         return null;
     }
@@ -353,6 +397,52 @@ export function applyRemoveNonSupportedRevealContextMenu(content: string) {
     if (match) {
         const matchedString = match[0];
         return content.replace(pattern, `if(destination === "Elements panel"){${matchedString}}`);
+    } else {
+        return null;
+    }
+}
+
+export function getThemes(callback: (arg0: object) => void) {
+    InspectorFrontendHost.InspectorFrontendHostInstance.getThemes(callback);
+}
+
+export function applyThemePatch(content: string) {
+    // Sets the theme of the DevTools
+    const parameterPattern = /function init\(\)/;
+    if (content.match(parameterPattern)) {
+        content = content.replace(parameterPattern, `function init(theme)`);
+    } else {
+        return null;
+    }
+
+    const setPattern = /const settingDescriptor/;
+    if (content.match(setPattern)) {
+        return content.replace(setPattern, `if(theme){themeSetting.set(theme);} const settingDescriptor`);
+    } else {
+        return null;
+    }
+}
+
+export function applyMainThemePatch(content: string) {
+    // Sets the theme of the DevTools
+    const injectFunctionsPattern = /async _createAppUI/;
+    if (content.match(injectFunctionsPattern)) {
+        content = content.replace(injectFunctionsPattern, `${getThemes.toString().slice(9)} getThemePromise(){
+            const promise = new Promise(function(resolve){
+                this.getThemes((object)=>{
+                  const theme = object.theme;
+                  resolve(theme);
+                });
+              }.bind(this));
+              return promise;
+        } async _createAppUI`);
+    } else {
+        return null;
+    }
+
+    const createAppPattern = /;init\(\);/;
+    if (content.match(createAppPattern)) {
+        return content.replace(createAppPattern, `;const theme = await this.getThemePromise(); init(theme);`);
     } else {
         return null;
     }
