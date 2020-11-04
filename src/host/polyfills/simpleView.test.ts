@@ -132,21 +132,6 @@ describe("simpleView", () => {
             "appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"));
     });
 
-    it("applyShowElementsTab correctly changes text", async () => {
-        const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const apply = await import("./simpleView");
-        const result = apply.applyShowElementsTab(fileContents);
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining("this._defaultTab = 'elements';"));
-        }
-    });
-
     it("applyRemoveBreakOnContextMenuItem correctly changes text", async () => {
         const filePath = "browser_debugger/browser_debugger.js";
         const fileContents = getTextFromFile(filePath);
@@ -324,5 +309,33 @@ describe("simpleView", () => {
         expect(result).not.toEqual(null);
         expect(result).toEqual(expect.stringContaining(expectedResult));
         expect(result).toEqual(expect.stringContaining(expectedResult2));
+    });
+
+    it("applyDefaultTabPatch correctly modifies text to prevent usage of TabbedLocation._defaultTab", async () => {
+        const filePath = "ui/ui.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "this._defaultTab=undefined;";
+        const apply = await import("./simpleView");
+        const result = apply.applyDefaultTabPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+    });
+
+    it("applyRemovePreferencePatch correctly modifes host.js to ignore localStorage deletion", async () => {
+        const filePath = "host/host.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "removePreference(name){return;}";
+        const apply = await import("./simpleView");
+        const result = apply.applyRemovePreferencePatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
     });
 });

@@ -1,3 +1,8 @@
+## 1.1.2
+* Bumping Edge Devtools version from 84.0.522.63 to 85.0.564.40 - [PR #234](https://github.com/microsoft/vscode-edge-devtools/pull/234)
+* Included Debugger for Microsoft Edge as a dependency - [PR #233](https://github.com/microsoft/vscode-edge-devtools/pull/233)
+* Implemented settings option to change extension themes - [PR #229](https://github.com/microsoft/vscode-edge-devtools/pull/229)
+
 ## 1.1.1
 * Adding support for Linux - [PR #225](https://github.com/microsoft/vscode-edge-devtools/pull/225)
 * Fixing command key shortcuts for Mac users - [PR #223](https://github.com/microsoft/vscode-edge-devtools/pull/223)
