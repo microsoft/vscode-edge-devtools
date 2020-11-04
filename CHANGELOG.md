@@ -1,5 +1,5 @@
 ## 1.1.2
-* Bumping Edge Devtools version from 84.0.522.63 to 85.0.564.40 - [PR #234](https://github.com/microsoft/vscode-edge-devtools/pull/234)
+* Bumping Edge Devtools version from 84.0.522.63 to 85.0.564.40 - [PR #235](https://github.com/microsoft/vscode-edge-devtools/pull/235)
 * Included Debugger for Microsoft Edge as a dependency - [PR #233](https://github.com/microsoft/vscode-edge-devtools/pull/233)
 * Implemented settings option to change extension themes - [PR #229](https://github.com/microsoft/vscode-edge-devtools/pull/229)
 
