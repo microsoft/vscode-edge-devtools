@@ -10,6 +10,7 @@ import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
     applyCommandMenuPatch,
+    applyDefaultTabPatch,
     applyDrawerTabLocationPatch,
     applyQuickOpenPatch,
     applyInspectorCommonContextMenuPatch,
@@ -22,8 +23,8 @@ import {
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
     applyRemoveNonSupportedRevealContextMenu,
+    applyRemovePreferencePatch,
     applySetTabIconPatch,
-    applyShowElementsTab,
     applyShowRequestBlockingTab,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
@@ -109,15 +110,18 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, [
         applyPaddingInlineCssPatch,
     ]);
+    await patchFileForWebViewWrapper("host/host.js", toolsOutDir, [
+        applyRemovePreferencePatch,
+    ]);
     await patchFileForWebViewWrapper("inspector.html", toolsOutDir, [
         applyContentSecurityPolicyPatch,
     ]);
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
-        applyDrawerTabLocationPatch,
         applyAppendTabPatch,
+        applyDefaultTabPatch,
+        applyDrawerTabLocationPatch,
         applyPersistRequestBlockingTab,
         applySetTabIconPatch,
-        applyShowElementsTab,
         applyShowRequestBlockingTab,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [

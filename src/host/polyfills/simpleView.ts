@@ -123,18 +123,6 @@ export function applyMainViewPatch(content: string) {
     }
 }
 
-export function applyShowElementsTab(content: string) {
-    // This tab sets the Elements tool as the default tab,
-    // so the extension will always show the Elements tool first.
-    const pattern = /this\._defaultTab\s*=\s*defaultTab;/;
-
-    if (content.match(pattern)) {
-        return content.replace(pattern, "this._defaultTab = 'elements';");
-    } else {
-        return null;
-    }
-}
-
 export function applyRemoveBreakOnContextMenuItem(content: string) {
     const pattern = /const breakpointsMenu=.+hasDOMBreakpoint\(.*\);}/;
     if (content.match(pattern)) {
@@ -260,6 +248,16 @@ export function applyEnableNetworkPatch(): string {
     return `if(approvedTabs.enableNetwork) {
         patchedCondition = patchedCondition && (${networkCondition});
     }`;
+}
+
+export function applyDefaultTabPatch(content: string) {
+    // This patches removes the _defaultTab property
+    const pattern = /this\._defaultTab=[^;]+;/g;
+    if (content.match(pattern)) {
+        return content.replace(pattern,"this._defaultTab=undefined;");
+    } else {
+        return null;
+    }
 }
 
 export function applyDrawerTabLocationPatch(content: string) {
@@ -443,6 +441,17 @@ export function applyMainThemePatch(content: string) {
     const createAppPattern = /;init\(\);/;
     if (content.match(createAppPattern)) {
         return content.replace(createAppPattern, `;const theme = await this.getThemePromise(); init(theme);`);
+    } else {
+        return null;
+    }
+}
+
+export function applyRemovePreferencePatch(content: string) {
+    // This patch returns early whe trying to remove localStorage which we already set as undefined
+    const pattern = /removePreference\(name\){delete window\.localStorage\[name\];}/;
+    const match = content.match(pattern);
+    if (match) {
+        return content.replace(pattern, "removePreference(name){return;}");
     } else {
         return null;
     }
