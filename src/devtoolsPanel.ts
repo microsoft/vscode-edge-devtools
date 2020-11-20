@@ -61,6 +61,7 @@ export class DevToolsPanel {
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
+        this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -119,6 +120,10 @@ export class DevToolsPanel {
 
     private onSocketClose() {
         this.dispose();
+    }
+
+    private onSocketCopyText(msg: string) {
+        vscode.env.clipboard.writeText(msg)
     }
 
     private onSocketTelemetry(message: string) {
