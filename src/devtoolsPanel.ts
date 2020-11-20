@@ -122,8 +122,9 @@ export class DevToolsPanel {
         this.dispose();
     }
 
-    private onSocketCopyText(msg: string) {
-        vscode.env.clipboard.writeText(msg)
+    private onSocketCopyText(message: string) {
+        const { clipboardData } = JSON.parse(message) as { clipboardData: string };
+        vscode.env.clipboard.writeText(clipboardData);
     }
 
     private onSocketTelemetry(message: string) {

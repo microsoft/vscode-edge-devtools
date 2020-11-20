@@ -94,8 +94,7 @@ export default class ToolsHost {
     }
 
     public copyText(clipboardData: string) {
-        const postMessage = "copyText:" + clipboardData;
-        window.parent.postMessage(postMessage, "*");
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "copyText", {clipboardData});
     }
 
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
