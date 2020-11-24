@@ -81,16 +81,16 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
     }
 
-    public getApprovedTabs(callback: () => void) {
+    public getNetworkSetting(callback: () => void) {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getApprovedTabs", {id});
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getNetworkSetting", {id});
     }
 
-    public getThemes(callback: (arg0: object) => void) {
+    public getThemesSetting(callback: (arg0: object) => void) {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getThemes", {id});
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getThemesSetting", {id});
     }
 
     public copyText(clipboardData: string) {
@@ -125,7 +125,7 @@ export default class ToolsHost {
                 break;
             }
 
-            case "getApprovedTabs": {
+            case "getNetworkSetting": {
                 const { id, enableNetwork } = JSON.parse(args);
                 this.fireGetHostCallback(id, {
                         enableNetwork,
@@ -133,7 +133,7 @@ export default class ToolsHost {
                 break;
             }
 
-            case "getThemes": {
+            case "getThemesSetting": {
                 const parsedArgs = JSON.parse(args);
                 const id: number = parsedArgs.id;
                 const themeString: ThemeString = parsedArgs.themeString;

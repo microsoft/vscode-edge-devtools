@@ -29,8 +29,65 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
     return Promise.resolve();
 }
 
-export function getApprovedTabs(callback: () => void) {
-    InspectorFrontendHost.InspectorFrontendHostInstance.getApprovedTabs(callback);
+export function getNetworkSetting(callback: () => void) {
+    // @ts-ignore we inject this function into the Runtime constructor where we call InspectorFrontendHost, not InspectorFrontendHost.InspectorFrontendHostInstance
+    InspectorFrontendHost.getNetworkSetting(callback);
+}
+
+export function getThemesSetting(callback: (arg0: object) => void) {
+    // @ts-ignore we inject this function into the Runtime constructor where we call InspectorFrontendHost, not InspectorFrontendHost.InspectorFrontendHostInstance
+    InspectorFrontendHost.getThemesSetting(callback);
+}
+
+export function applyCreateExtensionSettingsPatch(content: string) {
+    const pattern = /const experiments=new ExperimentsSupport\(\);/;
+    const match = content.match(pattern);
+    if (match) {
+        const matchedString = match[0];
+        content = content.replace(pattern, `const extensionSettings=new Map();${matchedString}`);
+    } else {
+        return null;
+    }
+
+    const pattern2 = /experiments:experiments/;
+    const match2 = content.match(pattern2);
+    if (match2) {
+        const matchedString = match2[0];
+        return content.replace(pattern2, `${matchedString}, extensionSettings:extensionSettings`);
+    } else {
+        return null;
+    }
+}
+
+export function applyCreateExtensionSettingsLegacyPatch(content: string) {
+    const pattern = /Root\.Runtime\.experiments/g
+    const match = content.match(pattern);
+    if (match) {
+        const matchedString = match[0];
+        return content.replace(pattern, `Root.Runtime.extensionSettings = RootModule.Runtime.extensionSettings; ${matchedString}`);
+    } else {
+        return null;
+    }
+}
+
+export function applyPortSettingsPatch(content: string) {
+    const pattern = /static instance/g;
+    const match = content.match(pattern);
+    if (match) {
+        const matchedString = match[0];
+        content = content.replace(pattern, `${getNetworkSetting.toString().slice(9)} ${getThemesSetting.toString().slice(9)} ${matchedString}`);
+    } else {
+        return null;
+    }
+
+    const constructorPattern = /this._descriptorsMap={};/g;
+    const constructorMatch = content.match(constructorPattern);
+    if (constructorMatch) {
+        const matchedString = constructorMatch[0];
+        return content.replace(constructorPattern, `${matchedString} this.getNetworkSetting((networkSettings) => {const networkEnabled = networkSettings.enableNetwork; extensionSettings.set('networkEnabled', networkEnabled);}); this.getThemesSetting((themeSettings) => {const theme = themeSettings.theme; extensionSettings.set('theme', theme);});`);
+    } else {
+        return null;
+    }
 }
 
 export function applyCommonRevealerPatch(content: string) {
@@ -56,19 +113,11 @@ export function applyQuickOpenPatch(content: string) {
 }
 
 export function applyCommandMenuPatch(content: string) {
-    // This patch modifies the available options in the command menu.
-    const functionPattern = /attach\(\){const allCommands/;
-    if (content.match(functionPattern)) {
-        content = content.replace(functionPattern, `${getApprovedTabs.toString().slice(9)} attach(){const allCommands`);
-    } else {
-        return null;
-    }
-
     // pattern intended to match logic of CommandMenu.attach()
     const pattern = /for\(const action of actions\){const category=action[\s\S]+this\._commands\.sort\(commandComparator\);/;
     if(content.match(pattern)) {
-        return content.replace(pattern, `this.getApprovedTabs((networkSettings) => {
-            const networkEnabled = networkSettings.enableNetwork;
+        return content.replace(pattern, `
+            const networkEnabled = Root.Runtime.extensionSettings.get('networkEnabled');
             for (const action of actions) {
               const category = action.category();
               if (!category) {
@@ -92,9 +141,7 @@ export function applyCommandMenuPatch(content: string) {
                 this._commands.push(command);
               }
             }
-            this._commands = this._commands.sort(commandComparator);
-            this._refreshCallback();
-          });`);
+            this._commands = this._commands.sort(commandComparator);`);
     } else {
         return null;
     }
@@ -199,16 +246,12 @@ export function applyAppendTabPatch(content: string) {
     if (content.match(injectionPoint)) {
         content = content.replace(
             injectionPoint,
-            // points to the getApprovedTabs, then take the out the "function" from the string (slice(9))
-            `${getApprovedTabs.toString().slice(9)};
-            appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
+            `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
                 let patchedCondition = ${condition};
-                this.getApprovedTabs((approvedTabs)=>{
-                    ${applyEnableNetworkPatch()}
-                    if (!patchedCondition) {
-                        this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
-                    }
-                });
+                ${applyEnableNetworkPatch()}
+                if (!patchedCondition) {
+                    this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
+                }
             }}
             let EventData;
             const Events`);
@@ -245,7 +288,7 @@ export function applyEnableNetworkPatch(): string {
         return `id !== '${tab}'`;
     }).join(" && ");
 
-    return `if(approvedTabs.enableNetwork) {
+    return `if(Root.Runtime.extensionSettings.get('networkEnabled')) {
         patchedCondition = patchedCondition && (${networkCondition});
     }`;
 }
@@ -400,47 +443,11 @@ export function applyRemoveNonSupportedRevealContextMenu(content: string) {
     }
 }
 
-export function getThemes(callback: (arg0: object) => void) {
-    InspectorFrontendHost.InspectorFrontendHostInstance.getThemes(callback);
-}
-
 export function applyThemePatch(content: string) {
     // Sets the theme of the DevTools
-    const parameterPattern = /function init\(\)/;
-    if (content.match(parameterPattern)) {
-        content = content.replace(parameterPattern, `function init(theme)`);
-    } else {
-        return null;
-    }
-
     const setPattern = /const settingDescriptor/;
     if (content.match(setPattern)) {
-        return content.replace(setPattern, `if(theme){themeSetting.set(theme);} const settingDescriptor`);
-    } else {
-        return null;
-    }
-}
-
-export function applyMainThemePatch(content: string) {
-    // Sets the theme of the DevTools
-    const injectFunctionsPattern = /async _createAppUI/;
-    if (content.match(injectFunctionsPattern)) {
-        content = content.replace(injectFunctionsPattern, `${getThemes.toString().slice(9)} getThemePromise(){
-            const promise = new Promise(function(resolve){
-                this.getThemes((object)=>{
-                  const theme = object.theme;
-                  resolve(theme);
-                });
-              }.bind(this));
-              return promise;
-        } async _createAppUI`);
-    } else {
-        return null;
-    }
-
-    const createAppPattern = /;init\(\);/;
-    if (content.match(createAppPattern)) {
-        return content.replace(createAppPattern, `;const theme = await this.getThemePromise(); init(theme);`);
+        return content.replace(setPattern, `const theme = Root.Runtime.extensionSettings.get('theme');if(theme){themeSetting.set(theme);} const settingDescriptor`);
     } else {
         return null;
     }

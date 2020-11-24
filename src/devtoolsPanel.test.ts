@@ -467,7 +467,7 @@ describe("devtoolsPanel", () => {
                 expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
             });
 
-            it("calls getApprovedTabs", async () => {
+            it("calls getNetworkSetting", async () => {
                 const expectedId = { id: 0 };
                 const expectedState = { enableNetwork: true };
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
@@ -475,10 +475,10 @@ describe("devtoolsPanel", () => {
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
-                hookedEvents.get("getApprovedTabs")!(JSON.stringify(expectedId));
+                hookedEvents.get("getNetworkSetting")!(JSON.stringify(expectedId));
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
-                    "getApprovedTabs",
+                    "getNetworkSetting",
                     {
                         enableNetwork: expectedState.enableNetwork,
                         id: expectedId.id,
@@ -492,7 +492,7 @@ describe("devtoolsPanel", () => {
                 expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
             });
 
-            it("calls getThemes", async () => {
+            it("calls getThemesSetting", async () => {
                 const expectedId = { id: 0 };
                 const expectedState = { themeString: "System preference" };
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
@@ -500,10 +500,10 @@ describe("devtoolsPanel", () => {
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
-                hookedEvents.get("getThemes")!(JSON.stringify(expectedId));
+                hookedEvents.get("getThemesSetting")!(JSON.stringify(expectedId));
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
-                    "getThemes",
+                    "getThemesSetting",
                     {
                         themeString: expectedState.themeString,
                         id: expectedId.id,

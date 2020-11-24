@@ -70,7 +70,7 @@ describe("simpleView", () => {
     it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
         const filePath = "quick_open/quick_open.js";
         const patch = SimpleView.applyCommandMenuPatch;
-        const expectedStrings = ["this.getApprovedTabs((networkSettings)"];
+        const expectedStrings = ["Root.Runtime.extensionSettings.get('networkEnabled');"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -190,15 +190,7 @@ describe("simpleView", () => {
     it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
         const filePath = "themes/themes.js";
         const patch = SimpleView.applyThemePatch;
-        const expectedStrings = ["function init(theme)", "if(theme){themeSetting.set(theme);}"];
-
-        await testPatch(filePath, patch, expectedStrings);
-    });
-
-    it("applyMainThemePatch correctly modifes main.js to pass in themes from settings", async () => {
-        const filePath = "main/main.js";
-        const patch = SimpleView.applyMainThemePatch;
-        const expectedStrings = ["resolve(theme);", "await this.getThemePromise()"];
+        const expectedStrings = ["Root.Runtime.extensionSettings.get('theme');"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -217,5 +209,49 @@ describe("simpleView", () => {
         const expectedStrings = ["removePreference(name){return;}"];
 
         await testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyCreateExtensionSettingsPatch correctly changes root.js to include extensionSettings global const", async () => {
+        const filePath = "root/root.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "extensionSettings:extensionSettings";
+        const apply = await import("./simpleView");
+        const result = apply.applyCreateExtensionSettingsPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+    });
+
+    it("applyCreateExtensionSettingsLegacyPatch correctly changes root-legacy.js to include extensionSettings glbal const", async () => {
+        const filePath = "root/root-legacy.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "Root.Runtime.extensionSettings";
+        const apply = await import("./simpleView");
+        const result = apply.applyCreateExtensionSettingsLegacyPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+    });
+
+    it("applyPortSettingsPatch correctly changes root.js to set extensionSettings map", async () => {
+        const filePath = "root/root.js";
+        const fileContents = getTextFromFile(filePath);
+        if (!fileContents) {
+            throw new Error(`Could not find file: ${filePath}`);
+        }
+
+        const expectedResult = "this.getNetworkSetting";
+        const expectedResult2 = "this.getThemesSetting";
+        const apply = await import("./simpleView");
+        const result = apply.applyPortSettingsPatch(fileContents);
+        expect(result).not.toEqual(null);
+        expect(result).toEqual(expect.stringContaining(expectedResult));
+        expect(result).toEqual(expect.stringContaining(expectedResult2));
     });
 });
