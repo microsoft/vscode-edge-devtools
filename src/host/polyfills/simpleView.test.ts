@@ -4,16 +4,17 @@ import { getTextFromFile } from "../../test/helpers";
 import * as SimpleView from "./simpleView"
 
 /**
+ * This helper test function grabs the source code, applies the given patch, checks to see if the patch is applied, and checks for expected and unexpected strings.
  * @param filename
  * @param patchFunction
  * @param expectedStrings
+ * @param unexpectedStrings
  * @return
  */
-async function testPatch(filename: string, patch: (content:string)=>string|null, expectedStrings?: string[], nonExpectedStrings?: string[]) {
-    const filePath = filename;
-    const fileContents = getTextFromFile(filePath);
+async function testPatch(filename: string, patch: (content:string)=>string|null, expectedStrings?: string[], unexpectedStrings?: string[]) {
+    const fileContents = getTextFromFile(filename);
     if (!fileContents) {
-        throw new Error(`Could not find file: ${filePath}`);
+        throw new Error(`Could not find file: ${filename}`);
     }
 
     const result = patch(fileContents);
@@ -23,9 +24,9 @@ async function testPatch(filename: string, patch: (content:string)=>string|null,
             expect(result).toEqual(expect.stringContaining(expectedString));
         }
     }
-    if (nonExpectedStrings) {
-        for (const nonExpectedString of nonExpectedStrings) {
-            expect(result).not.toEqual(expect.stringContaining(nonExpectedString));
+    if (unexpectedStrings) {
+        for (const unexpectedString of unexpectedStrings) {
+            expect(result).not.toEqual(expect.stringContaining(unexpectedString));
         }
     }
 }
@@ -117,9 +118,9 @@ describe("simpleView", () => {
     it("applyRemoveBreakOnContextMenuItem correctly changes text", async () => {
         const filePath = "browser_debugger/browser_debugger.js";
         const patch = SimpleView.applyRemoveBreakOnContextMenuItem;
-        const nonExpectedStrings = ["const breakpointsMenu"];
+        const unexpectedStrings = ["const breakpointsMenu"];
 
-        await testPatch(filePath, patch, undefined, nonExpectedStrings);
+        await testPatch(filePath, patch, undefined, unexpectedStrings);
     });
 
     it("applyShowRequestBlockingTab correctly changes text", async () => {
