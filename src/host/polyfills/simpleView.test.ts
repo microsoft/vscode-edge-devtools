@@ -70,7 +70,7 @@ describe("simpleView", () => {
     it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
         const filePath = "quick_open/quick_open.js";
         const patch = SimpleView.applyCommandMenuPatch;
-        const expectedStrings = ["Root.Runtime.extensionSettings.get('networkEnabled');"];
+        const expectedStrings = ["Root.Runtime.vscodeSettings.enableNetwork;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -190,7 +190,7 @@ describe("simpleView", () => {
     it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
         const filePath = "themes/themes.js";
         const patch = SimpleView.applyThemePatch;
-        const expectedStrings = ["Root.Runtime.extensionSettings.get('theme');"];
+        const expectedStrings = ["Root.Runtime.vscodeSettings.theme;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -213,45 +213,25 @@ describe("simpleView", () => {
 
     it("applyCreateExtensionSettingsPatch correctly changes root.js to include extensionSettings global const", async () => {
         const filePath = "root/root.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyCreateExtensionSettingsPatch;
+        const expectedStrings = ["const vscodeSettings={}", "vscodeSettings:vscodeSettings"];
 
-        const expectedResult = "extensionSettings:extensionSettings";
-        const apply = await import("./simpleView");
-        const result = apply.applyCreateExtensionSettingsPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyCreateExtensionSettingsLegacyPatch correctly changes root-legacy.js to include extensionSettings glbal const", async () => {
         const filePath = "root/root-legacy.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyCreateExtensionSettingsLegacyPatch;
+        const expectedStrings = ["Root.Runtime.vscodeSettings = RootModule.Runtime.vscodeSettings"];
 
-        const expectedResult = "Root.Runtime.extensionSettings";
-        const apply = await import("./simpleView");
-        const result = apply.applyCreateExtensionSettingsLegacyPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyPortSettingsPatch correctly changes root.js to set extensionSettings map", async () => {
         const filePath = "root/root.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyPortSettingsPatch;
+        const expectedStrings = ["InspectorFrontendHost.getVscodeSettings(callback);", "this.getVscodeSettings"];
 
-        const expectedResult = "this.getNetworkSetting";
-        const expectedResult2 = "this.getThemesSetting";
-        const apply = await import("./simpleView");
-        const result = apply.applyPortSettingsPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
-        expect(result).toEqual(expect.stringContaining(expectedResult2));
+        testPatch(filePath, patch, expectedStrings);
     });
 });

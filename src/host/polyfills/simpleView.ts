@@ -3,9 +3,7 @@
 import { IDevToolsWindow } from "../host";
 import ToolsHost from "../toolsHost";
 
-declare var InspectorFrontendHost: {
-    InspectorFrontendHostInstance: ToolsHost;
-};
+declare var InspectorFrontendHost: ToolsHost;
 
 interface IRevealable {
     lineNumber: number;
@@ -29,14 +27,8 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
     return Promise.resolve();
 }
 
-export function getNetworkSetting(callback: () => void) {
-    // @ts-ignore we inject this function into the Runtime constructor where we call InspectorFrontendHost, not InspectorFrontendHost.InspectorFrontendHostInstance
-    InspectorFrontendHost.getNetworkSetting(callback);
-}
-
-export function getThemesSetting(callback: (arg0: object) => void) {
-    // @ts-ignore we inject this function into the Runtime constructor where we call InspectorFrontendHost, not InspectorFrontendHost.InspectorFrontendHostInstance
-    InspectorFrontendHost.getThemesSetting(callback);
+export function getVscodeSettings(callback: (arg0: object) => void) {
+    InspectorFrontendHost.getVscodeSettings(callback);
 }
 
 export function applyCreateExtensionSettingsPatch(content: string) {
@@ -44,7 +36,7 @@ export function applyCreateExtensionSettingsPatch(content: string) {
     const match = content.match(pattern);
     if (match) {
         const matchedString = match[0];
-        content = content.replace(pattern, `const extensionSettings=new Map();${matchedString}`);
+        content = content.replace(pattern, `const vscodeSettings={};${matchedString}`);
     } else {
         return null;
     }
@@ -53,7 +45,7 @@ export function applyCreateExtensionSettingsPatch(content: string) {
     const match2 = content.match(pattern2);
     if (match2) {
         const matchedString = match2[0];
-        return content.replace(pattern2, `${matchedString}, extensionSettings:extensionSettings`);
+        return content.replace(pattern2, `${matchedString}, vscodeSettings:vscodeSettings`);
     } else {
         return null;
     }
@@ -64,7 +56,7 @@ export function applyCreateExtensionSettingsLegacyPatch(content: string) {
     const match = content.match(pattern);
     if (match) {
         const matchedString = match[0];
-        return content.replace(pattern, `Root.Runtime.extensionSettings = RootModule.Runtime.extensionSettings; ${matchedString}`);
+        return content.replace(pattern, `Root.Runtime.vscodeSettings = RootModule.Runtime.vscodeSettings; ${matchedString}`);
     } else {
         return null;
     }
@@ -75,7 +67,7 @@ export function applyPortSettingsPatch(content: string) {
     const match = content.match(pattern);
     if (match) {
         const matchedString = match[0];
-        content = content.replace(pattern, `${getNetworkSetting.toString().slice(9)} ${getThemesSetting.toString().slice(9)} ${matchedString}`);
+        content = content.replace(pattern, `${getVscodeSettings.toString().slice(9)} ${matchedString}`);
     } else {
         return null;
     }
@@ -84,7 +76,7 @@ export function applyPortSettingsPatch(content: string) {
     const constructorMatch = content.match(constructorPattern);
     if (constructorMatch) {
         const matchedString = constructorMatch[0];
-        return content.replace(constructorPattern, `${matchedString} this.getNetworkSetting((networkSettings) => {const networkEnabled = networkSettings.enableNetwork; extensionSettings.set('networkEnabled', networkEnabled);}); this.getThemesSetting((themeSettings) => {const theme = themeSettings.theme; extensionSettings.set('theme', theme);});`);
+        return content.replace(constructorPattern, `${matchedString} this.getVscodeSettings((vscodeSettingsObject) => {Object.assign(vscodeSettings, vscodeSettingsObject);});`);
     } else {
         return null;
     }
@@ -117,7 +109,7 @@ export function applyCommandMenuPatch(content: string) {
     const pattern = /for\(const action of actions\){const category=action[\s\S]+this\._commands\.sort\(commandComparator\);/;
     if(content.match(pattern)) {
         return content.replace(pattern, `
-            const networkEnabled = Root.Runtime.extensionSettings.get('networkEnabled');
+            const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
             for (const action of actions) {
               const category = action.category();
               if (!category) {
@@ -288,7 +280,7 @@ export function applyEnableNetworkPatch(): string {
         return `id !== '${tab}'`;
     }).join(" && ");
 
-    return `if(Root.Runtime.extensionSettings.get('networkEnabled')) {
+    return `if(Root.Runtime.vscodeSettings.enableNetwork) {
         patchedCondition = patchedCondition && (${networkCondition});
     }`;
 }
@@ -447,7 +439,7 @@ export function applyThemePatch(content: string) {
     // Sets the theme of the DevTools
     const setPattern = /const settingDescriptor/;
     if (content.match(setPattern)) {
-        return content.replace(setPattern, `const theme = Root.Runtime.extensionSettings.get('theme');if(theme){themeSetting.set(theme);} const settingDescriptor`);
+        return content.replace(setPattern, `const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor`);
     } else {
         return null;
     }

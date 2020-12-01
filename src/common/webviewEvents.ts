@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 export type WebviewEvent = "getState" | "getUrl" | "openInEditor" | "ready" | "setState" | "telemetry" | "websocket"
-| "getNetworkSetting" | "getThemesSetting" | "copyText" | "focusEditor" | "focusEditorGroup";
+| "getVscodeSettings" | "copyText" | "focusEditor" | "focusEditorGroup";
 export const webviewEventNames: WebviewEvent[] = [
     "getState",
     "getUrl",
@@ -11,8 +11,7 @@ export const webviewEventNames: WebviewEvent[] = [
     "setState",
     "telemetry",
     "websocket",
-    "getNetworkSetting",
-    "getThemesSetting",
+    "getVscodeSettings",
     "copyText",
     "focusEditor",
     "focusEditorGroup",
