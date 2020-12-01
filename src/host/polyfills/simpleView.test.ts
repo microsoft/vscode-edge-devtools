@@ -1,10 +1,38 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { getTextFromFile } from "../../test/helpers";
+import * as SimpleView from "./simpleView"
+
+/**
+ * This helper test function grabs the source code, applies the given patch, checks to see if the patch is applied, and checks for expected and unexpected strings.
+ * @param filename
+ * @param patchFunction
+ * @param expectedStrings
+ * @param unexpectedStrings
+ * @return
+ */
+async function testPatch(filename: string, patch: (content:string)=>string|null, expectedStrings?: string[], unexpectedStrings?: string[]) {
+    const fileContents = getTextFromFile(filename);
+    if (!fileContents) {
+        throw new Error(`Could not find file: ${filename}`);
+    }
+
+    const result = patch(fileContents);
+    expect(result).not.toEqual(null);
+    if (expectedStrings) {
+        for (const expectedString of expectedStrings) {
+            expect(result).toEqual(expect.stringContaining(expectedString));
+        }
+    }
+    if (unexpectedStrings) {
+        for (const unexpectedString of unexpectedStrings) {
+            expect(result).not.toEqual(expect.stringContaining(unexpectedString));
+        }
+    }
+}
 
 describe("simpleView", () => {
     it("revealInVSCode calls openInEditor", async () => {
-        const apply = await import("./simpleView");
         const expected = {
             columnNumber: 0,
             lineNumber: 0,
@@ -18,324 +46,176 @@ describe("simpleView", () => {
                 openInEditor: mockOpen,
         };
 
-        await apply.revealInVSCode(expected, expected.omitFocus);
+        await SimpleView.revealInVSCode(expected, expected.omitFocus);
 
         expect(mockOpen).toHaveBeenCalled();
     });
 
     it("applyCommonRevealerPatch correctly changes text", async () => {
         const filePath = "common/common.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyCommonRevealerPatch;
+        const expectedStrings = ["let reveal = function revealInVSCode(revealable, omitFocus) {"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyCommonRevealerPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(
-            expect.stringContaining("let reveal = function revealInVSCode(revealable, omitFocus) {"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyQuickOpenPatch correctly changes handleAction text for Quick Open", async () => {
         const filePath = "quick_open/quick_open.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyQuickOpenPatch;
+        const expectedStrings = ["handleAction(context, actionId) { actionId = null; switch(actionId)"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyQuickOpenPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(
-            expect.stringContaining("handleAction(context, actionId) { actionId = null; switch(actionId)"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
         const filePath = "quick_open/quick_open.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyCommandMenuPatch;
+        const expectedStrings = ["this.getApprovedTabs((networkSettings)"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyCommandMenuPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(
-            expect.stringContaining("this.getApprovedTabs((networkSettings)"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyInspectorViewShowDrawerPatch;
+        const expectedStrings = ["_showDrawer(focus) { return false;"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorViewShowDrawerPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining("_showDrawer(focus) { return false;"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyMainViewPatch correctly changes text", async () => {
         const filePath = "main/main.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyMainViewPatch;
+        const expectedStrings = ["const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyMainViewPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(
-            expect.stringContaining("const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyDrawerTabLocationPatch;
+        const expectedStrings = ["this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls'"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyDrawerTabLocationPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(
-            "this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls'"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applySetTabIconPatch correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applySetTabIconPatch;
+        const expectedStrings = ["if(!tab){return;}"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applySetTabIconPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining("if(!tab){return;}"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyAppendTabPatch correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyAppendTabPatch;
+        const expectedStrings = ["appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyAppendTabPatch(fileContents);
-        expect(result).toEqual(expect.stringContaining(
-            "appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyRemoveBreakOnContextMenuItem correctly changes text", async () => {
         const filePath = "browser_debugger/browser_debugger.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyRemoveBreakOnContextMenuItem;
+        const unexpectedStrings = ["const breakpointsMenu"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyRemoveBreakOnContextMenuItem(fileContents);
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).not.toEqual(expect.stringContaining("const breakpointsMenu"));
-        }
+        await testPatch(filePath, patch, undefined, unexpectedStrings);
     });
 
     it("applyShowRequestBlockingTab correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyShowRequestBlockingTab;
+        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls')"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyShowRequestBlockingTab(fileContents);
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(
-                "if(!view.isCloseable()||id==='network.blocked-urls')"));
-        }
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyPersistRequestBlockingTab correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyPersistRequestBlockingTab;
+        const expectedStrings = ["this._closeable=id==='network.blocked-urls'?false:closeable;"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyPersistRequestBlockingTab(fileContents);
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(
-                "this._closeable=id==='network.blocked-urls'?false:closeable;"));
-        }
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyInspectorCommonCssPatch correctly changes text", async () => {
         const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyInspectorCommonCssPatch;
+        const expectedStrings = [".toolbar-button[aria-label='Toggle screencast'] {\\n            visibility: visible !important;"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssPatch(fileContents);
-        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString =
-            ".toolbar-button[aria-label='Toggle screencast'] {\\n            visibility: visible !important;";
-
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyInspectorCommonNetworkPatch correctly changes text", async () => {
         const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyInspectorCommonNetworkPatch;
+        const expectedStrings = [".toolbar-button[aria-label='Export HAR...'] {\\n            display: none !important;"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonNetworkPatch(fileContents);
-        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString =
-            ".toolbar-button[aria-label='Export HAR...'] {\\n            display: none !important;";
-
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyInspectorCommonContextMenuPatch correctly changes text", async () => {
         const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyInspectorCommonContextMenuPatch;
+        const expectedStrings = [".soft-context-menu-item[aria-label='Save as...'] {\\n            display: none !important;"];
 
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonContextMenuPatch(fileContents);
-        // If this part of the css was correctly applied to the file, the rest of the css will be there as well.
-        const expectedString =
-            ".soft-context-menu-item[aria-label='Save as...'] {\\n            display: none !important;";
-
-        expect(result).not.toEqual(null);
-        if (result) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyInspectorCommonCssRightToolbarPatch correctly changes tabbed-pane-right-toolbar", async () => {
         const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyInspectorCommonCssRightToolbarPatch;
+        const expectedStrings = [".tabbed-pane-right-toolbar {\\n            visibility: hidden !important;\\n        }"];
 
-        const expectedResult =
-            ".tabbed-pane-right-toolbar {\\n            visibility: hidden !important;\\n        }";
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssRightToolbarPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyInspectorCommonCssTabSliderPatch correctly changes tabbed-pane-tab-slider", async () => {
         const filePath = "shell.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyInspectorCommonCssTabSliderPatch;
+        const expectedStrings = [".tabbed-pane-tab-slider {\\n            display: none !important;\\n        }"];
 
-        const expectedResult =
-            ".tabbed-pane-tab-slider {\\n            display: none !important;\\n        }";
-        const apply = await import("./simpleView");
-        const result = apply.applyInspectorCommonCssTabSliderPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyRemoveNonSupportedRevealContextMenu correctly changes text", async () => {
         const filePath = "components/components.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyRemoveNonSupportedRevealContextMenu;
+        const expectedStrings = ["if(destination === \"Elements panel\")"];
 
-        const expectedResult = "if(destination === \"Elements panel\")";
-        const apply = await import("./simpleView");
-        const result = apply.applyRemoveNonSupportedRevealContextMenu(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
         const filePath = "themes/themes.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-        const expectedResult = "function init(theme)";
-        const expectedResult2 = "if(theme){themeSetting.set(theme);}";
-        const apply = await import("./simpleView");
-        const result = apply.applyThemePatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
-        expect(result).toEqual(expect.stringContaining(expectedResult2));
+        const patch = SimpleView.applyThemePatch;
+        const expectedStrings = ["function init(theme)", "if(theme){themeSetting.set(theme);}"];
+
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyMainThemePatch correctly modifes main.js to pass in themes from settings", async () => {
         const filePath = "main/main.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyMainThemePatch;
+        const expectedStrings = ["resolve(theme);", "await this.getThemePromise()"];
 
-        const expectedResult = "resolve(theme);";
-        const expectedResult2 = "await this.getThemePromise()";
-        const apply = await import("./simpleView");
-        const result = apply.applyMainThemePatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
-        expect(result).toEqual(expect.stringContaining(expectedResult2));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyDefaultTabPatch correctly modifies text to prevent usage of TabbedLocation._defaultTab", async () => {
         const filePath = "ui/ui.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyDefaultTabPatch;
+        const expectedStrings = ["this._defaultTab=undefined;"];
 
-        const expectedResult = "this._defaultTab=undefined;";
-        const apply = await import("./simpleView");
-        const result = apply.applyDefaultTabPatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        await testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyRemovePreferencePatch correctly modifes host.js to ignore localStorage deletion", async () => {
         const filePath = "host/host.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const patch = SimpleView.applyRemovePreferencePatch;
+        const expectedStrings = ["removePreference(name){return;}"];
 
-        const expectedResult = "removePreference(name){return;}";
-        const apply = await import("./simpleView");
-        const result = apply.applyRemovePreferencePatch(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining(expectedResult));
+        await testPatch(filePath, patch, expectedStrings);
     });
 });
