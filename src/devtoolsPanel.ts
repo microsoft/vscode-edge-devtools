@@ -315,4 +315,12 @@ export class DevToolsPanel {
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
         }
     }
+
+    public static showDevTools() {
+        const column = vscode.ViewColumn.Beside;
+
+        if (DevToolsPanel.instance) {
+            DevToolsPanel.instance.panel.reveal(column);
+        }
+    }
 }

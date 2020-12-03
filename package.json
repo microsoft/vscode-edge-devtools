@@ -38,6 +38,7 @@
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
         "onCommand:vscode-edge-devtools.launch",
+        "onCommand:vscode-edge-devtools.focus",
         "onWebviewPanel:vscode-edge-devtools",
         "onView:vscode-edge-devtools-view.targets",
         "onDebug"
@@ -55,6 +56,11 @@
             {
                 "command": "vscode-edge-devtools.launch",
                 "title": "Launch Edge and then attach to a target",
+                "category": "Microsoft Edge Tools"
+            },
+            {
+                "command": "vscode-edge-devtools.focus",
+                "title": "Focus the DevTools Window",
                 "category": "Microsoft Edge Tools"
             },
             {
@@ -397,6 +403,14 @@
                         }
                     }
                 }
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "vscode-edge-devtools.focus",
+                "key": "ctrl+alt+d",
+                "mac": "cmd+alt+d",
+                "when": "editorTextFocus"
             }
         ],
         "menus": {

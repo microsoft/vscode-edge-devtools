@@ -39,6 +39,10 @@ export function activate(context: vscode.ExtensionContext) {
         launch(context);
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.focus`, () => {
+        DevToolsPanel.showDevTools();
+    }));
+
     // Register the launch provider
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
