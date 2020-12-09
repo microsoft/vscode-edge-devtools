@@ -81,5 +81,11 @@ export function initialize(dtWindow: IDevToolsWindow) {
                 dtWindow.document.execCommand("redo");
             }
         }
+        if (e.ctrlKey && e.code === "PageDown") {
+            dtWindow.InspectorFrontendHost.focusNextEditor();
+        }
+        if (e.ctrlKey && e.code === "PageUp") {
+            dtWindow.InspectorFrontendHost.focusPreviousEditor();
+        }
     });
 }
