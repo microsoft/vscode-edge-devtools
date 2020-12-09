@@ -62,6 +62,8 @@ export class DevToolsPanel {
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
         this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
+        this.panelSocket.on("focusNextEditor", () => this.onSocketFocusNextEditor());
+        this.panelSocket.on("focusPreviousEditor", () => this.onSocketFocusPreviousEditor());
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -125,6 +127,14 @@ export class DevToolsPanel {
     private onSocketCopyText(message: string) {
         const { clipboardData } = JSON.parse(message) as { clipboardData: string };
         vscode.env.clipboard.writeText(clipboardData);
+    }
+
+    private onSocketFocusNextEditor() {
+        vscode.commands.executeCommand("workbench.action.nextEditor");
+    }
+
+    private onSocketFocusPreviousEditor() {
+        vscode.commands.executeCommand("workbench.action.previousEditor");
     }
 
     private onSocketTelemetry(message: string) {
