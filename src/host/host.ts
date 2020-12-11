@@ -6,6 +6,8 @@ import ToolsHost from "./toolsHost";
 import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
+let listenForSecondKeyChord = false;
+
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
@@ -81,11 +83,29 @@ export function initialize(dtWindow: IDevToolsWindow) {
                 dtWindow.document.execCommand("redo");
             }
         }
-        if (e.ctrlKey && e.code === "PageDown") {
-            dtWindow.InspectorFrontendHost.focusNextEditor();
+        const isCtrlOrCmdKey = (e.ctrlKey || e.metaKey);
+        if (!isCtrlOrCmdKey && listenForSecondKeyChord) {
+            listenForSecondKeyChord = false;
         }
-        if (e.ctrlKey && e.code === "PageUp") {
-            dtWindow.InspectorFrontendHost.focusPreviousEditor();
+
+        if (isCtrlOrCmdKey && e.code === "PageDown") {
+            dtWindow.InspectorFrontendHost.focusEditor(/** next= */ true);
+        }
+        if (isCtrlOrCmdKey && e.code === "PageUp") {
+            dtWindow.InspectorFrontendHost.focusEditor(/** next= */ false);
+        }
+        if (isCtrlOrCmdKey && e.code === "KeyK") {
+            listenForSecondKeyChord = true;
+        }
+        if (listenForSecondKeyChord) {
+            if (isCtrlOrCmdKey  && e.code === "ArrowRight"){
+                dtWindow.InspectorFrontendHost.focusEditorGroup(/** next= */ true);
+                listenForSecondKeyChord = false;
+            }
+            if (isCtrlOrCmdKey && e.code === "ArrowLeft") {
+                dtWindow.InspectorFrontendHost.focusEditorGroup(/** next= */ false);
+                listenForSecondKeyChord = false;
+            }
         }
     });
 }
