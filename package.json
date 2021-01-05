@@ -89,8 +89,8 @@
                 "category": "Microsoft Edge Tools",
                 "title": "Close instance",
                 "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
+                    "light": "resources/light/close_browser_page.svg",
+                    "dark": "resources/dark/close_browser_page.svg"
                 }
             },
             {

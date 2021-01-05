@@ -26,7 +26,7 @@ import {
 } from "./utils";
 
 let telemetryReporter: Readonly<TelemetryReporter>;
-let browserInstances: Map<string, Browser> = new Map();
+let browserInstance: Browser;
 
 export function activate(context: vscode.ExtensionContext) {
     if (!telemetryReporter) {
@@ -74,12 +74,24 @@ export function activate(context: vscode.ExtensionContext) {
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
-        (target: CDPTarget) => {
+        async (target: CDPTarget) => {
+
+            // update with the latest information, in case user has navigated to a different page via browser.
+            cdpTargetsProvider.refresh();
             let normalizedPath = new URL(target.description).toString();
-            let currentInstance = browserInstances.get(normalizedPath);
-            if (currentInstance) {
-                browserInstances.delete(normalizedPath);
-                currentInstance.close();
+            if (browserInstance) {
+                const browserPages = await browserInstance.pages();
+                for (const page of browserPages) {
+                    // URL needs to be accessed through the target as the page could be handling errors in a different way.
+                    // e.g redirecting to chrome-error: protocol
+                    if (!page.isClosed() && (normalizedPath === page.target().url())) {
+                        // fire and forget
+                        page.close();
+                        break;
+                    }
+                }
+
+                // display the latest information to user.
                 cdpTargetsProvider.refresh();
             }
         }));
@@ -216,8 +228,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             const browserProps = { exe: `${knownBrowser.toLowerCase()}` };
             telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
-        let normalizedPath = new URL(url).toString();
-        browserInstances.set(normalizedPath, await launchBrowser(browserPath, port, url, userDataDir));
+        browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
         await attach(context, url, config);
     }
 }
