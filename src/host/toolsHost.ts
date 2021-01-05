@@ -97,6 +97,14 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "copyText", {clipboardData});
     }
 
+    public focusEditor(next: boolean) {
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "focusEditor", {next});
+    }
+
+    public focusEditorGroup(next: boolean) {
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "focusEditorGroup", {next});
+    }
+
     public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case "getState": {

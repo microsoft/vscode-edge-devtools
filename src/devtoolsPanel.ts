@@ -62,6 +62,8 @@ export class DevToolsPanel {
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
         this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
+        this.panelSocket.on("focusEditor", (msg) => this.onSocketFocusEditor(msg));
+        this.panelSocket.on("focusEditorGroup", (msg) => this.onSocketFocusEditorGroup(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -125,6 +127,24 @@ export class DevToolsPanel {
     private onSocketCopyText(message: string) {
         const { clipboardData } = JSON.parse(message) as { clipboardData: string };
         vscode.env.clipboard.writeText(clipboardData);
+    }
+
+    private onSocketFocusEditor(message: string) {
+        const { next } = JSON.parse(message) as { next: boolean };
+        if (next) {
+            vscode.commands.executeCommand("workbench.action.nextEditor");
+        } else {
+            vscode.commands.executeCommand("workbench.action.previousEditor");
+        }
+    }
+
+    private onSocketFocusEditorGroup(message: string) {
+        const { next } = JSON.parse(message) as { next: boolean };
+        if (next) {
+            vscode.commands.executeCommand("workbench.action.focusNextGroup");
+        } else {
+            vscode.commands.executeCommand("workbench.action.focusPreviousGroup");
+        }
     }
 
     private onSocketTelemetry(message: string) {
