@@ -72,8 +72,8 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(7);
-            expect(commandMock).toHaveBeenCalledTimes(6);
+            expect(context.subscriptions.length).toBe(8);
+            expect(commandMock).toHaveBeenCalledTimes(7);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
@@ -85,7 +85,9 @@ describe("extension", () => {
             expect(commandMock)
                 .toHaveBeenNthCalledWith(5, `${SETTINGS_VIEW_NAME}.attach`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(6, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
+                .toHaveBeenNthCalledWith(6, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(7, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
             expect(mockRegisterTree)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
@@ -142,7 +144,7 @@ describe("extension", () => {
             attach.callback.call(attach.thisObj, { websocketUrl: "" });
             expect(mockPanelShow).toHaveBeenCalled();
 
-            const copy = getCommandCallback(5);
+            const copy = getCommandCallback(6);
             copy.callback.call(copy.thisObj, { tooltip: "something" });
             expect(mockClipboard).toHaveBeenCalledWith("something");
         });

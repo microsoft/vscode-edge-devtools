@@ -299,7 +299,8 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
         args.unshift(`--user-data-dir=${userDataDir}`);
     }
 
-    await puppeteer.launch({executablePath: browserPath, args, headless});
+    const browserInstance = await puppeteer.launch({executablePath: browserPath, args, headless});
+    return browserInstance;
 }
 
 /**
