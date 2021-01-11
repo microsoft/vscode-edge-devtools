@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import { Browser } from "puppeteer-core";
 import * as vscode from "vscode";
 import * as debugCore from "vscode-chrome-debug-core";
 import TelemetryReporter from "vscode-extension-telemetry";
@@ -25,6 +26,7 @@ import {
 } from "./utils";
 
 let telemetryReporter: Readonly<TelemetryReporter>;
+let browserInstance: Browser;
 
 export function activate(context: vscode.ExtensionContext) {
     if (!telemetryReporter) {
@@ -69,6 +71,29 @@ export function activate(context: vscode.ExtensionContext) {
             telemetryReporter.sendTelemetryEvent("view/devtools");
             const runtimeConfig = getRuntimeConfig();
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.close-instance`,
+        async (target: CDPTarget) => {
+
+            // update with the latest information, in case user has navigated to a different page via browser.
+            cdpTargetsProvider.refresh();
+            const normalizedPath = new URL(target.description).toString();
+            if (browserInstance) {
+                const browserPages = await browserInstance.pages();
+                for (const page of browserPages) {
+                    // URL needs to be accessed through the target as the page could be handling errors in a different way.
+                    // e.g redirecting to chrome-error: protocol
+                    if (!page.isClosed() && (normalizedPath === page.target().url())) {
+                        // fire and forget
+                        page.close();
+                        break;
+                    }
+                }
+
+                // display the latest information to user.
+                cdpTargetsProvider.refresh();
+            }
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.copyItem`,
@@ -203,8 +228,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             const browserProps = { exe: `${knownBrowser.toLowerCase()}` };
             telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
-
-        await launchBrowser(browserPath, port, url, userDataDir);
+        browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
         await attach(context, url, config);
     }
 }
