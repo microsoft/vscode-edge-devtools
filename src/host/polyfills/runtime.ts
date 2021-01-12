@@ -7,7 +7,7 @@ export default function applyRuntimeImportScriptPathPrefixPatch(content: string)
     // Exposes it again as a global and remove the local declaration.
     const importScriptReplacementPattern =
         `self.importScriptPathPrefix=baseUrl.substring(0,baseUrl.lastIndexOf('/')+1);})();`;
-    const pattern = /importScriptPathPrefix=baseUrl\.substring\(0,baseUrl\.lastIndexOf\('\/'\)\+1\);\}\)\(\);/g;
+    const pattern = /importScriptPathPrefix\s=\sbaseUrl\.substring\(0,\sbaseUrl\.lastIndexOf\('\/'\)\s\+\s1\);\s+\}\)\(\);/g;
 
     // Remove declaration
     const variableDeclarationPattern = /let\s*importScriptPathPrefix;/g;

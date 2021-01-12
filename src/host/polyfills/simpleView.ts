@@ -83,7 +83,7 @@ export function applyPortSettingsPatch(content: string) {
 }
 
 export function applyCommonRevealerPatch(content: string) {
-    const pattern = /let reveal\s*=\s*function\(revealable,\s*omitFocus\)\s*{/g;
+    const pattern = /let reveal\s*=\s*function\s\(revealable,\s*omitFocus\)\s*{/g;
     if (content.match(pattern)) {
         return content.replace(pattern,
             `let reveal = ${revealInVSCode.toString().slice(0, -1)}`);
@@ -94,7 +94,7 @@ export function applyCommonRevealerPatch(content: string) {
 
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
-    const pattern = /handleAction\(context,actionId\){switch\(actionId\)/;
+    const pattern = /handleAction\(context,\sactionId\)\s{\s+switch\s\(actionId\)/;
 
     if (content.match(pattern)) {
         return content
@@ -106,7 +106,7 @@ export function applyQuickOpenPatch(content: string) {
 
 export function applyCommandMenuPatch(content: string) {
     // pattern intended to match logic of CommandMenu.attach()
-    const pattern = /for\(const action of actions\){const category=action[\s\S]+this\._commands\.sort\(commandComparator\);/;
+    const pattern = /for\s\(const action of actions\)\s{\s+const category\s=\saction[\s\S]+this\._commands\.sort\(commandComparator\);/;
     if(content.match(pattern)) {
         return content.replace(pattern, `
             const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
@@ -223,7 +223,7 @@ export function applyAppendTabPatch(content: string) {
 
     const appendTabWrapper =
         /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
-    const injectionPoint = /}(\s|\n)*\s*let EventData;(\s|\n)*\s*const\s*Events/;
+    const injectionPoint = /return\stab\s\?\stab\.isCloseable\(\)\s:\sfalse;\s*}/;
 
     // Injecting our verifications by redirecting appendTab to appendTabOverride
     if (content.match(appendTabWrapper)) {
@@ -238,15 +238,14 @@ export function applyAppendTabPatch(content: string) {
     if (content.match(injectionPoint)) {
         content = content.replace(
             injectionPoint,
-            `appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
+            `return tab ? tab.isCloseable() : false;}
+            appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
                 let patchedCondition = ${condition};
                 ${applyEnableNetworkPatch()}
                 if (!patchedCondition) {
                     this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
                 }
-            }}
-            let EventData;
-            const Events`);
+            }`);
     } else {
         return null;
     }
@@ -287,7 +286,7 @@ export function applyEnableNetworkPatch(): string {
 
 export function applyDefaultTabPatch(content: string) {
     // This patches removes the _defaultTab property
-    const pattern = /this\._defaultTab=[^;]+;/g;
+    const pattern = /this\._defaultTab\s=\s[^;]+;/g;
     if (content.match(pattern)) {
         return content.replace(pattern,"this._defaultTab=undefined;");
     } else {
@@ -425,7 +424,7 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
 }
 
 export function applyRemoveNonSupportedRevealContextMenu(content: string) {
-    const pattern = /result\.push\({section:'reveal',title:destination.+reveal\(revealable\)}\);/;
+    const pattern = /result\.push\({\s+section:\s'reveal',\s+title:\sdestination[\s\S]+reveal\(revealable\)\s+}\);/;
     const match = content.match(pattern);
     if (match) {
         const matchedString = match[0];
@@ -447,7 +446,7 @@ export function applyThemePatch(content: string) {
 
 export function applyRemovePreferencePatch(content: string) {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
-    const pattern = /removePreference\(name\){delete window\.localStorage\[name\];}/;
+    const pattern = /removePreference\(name\)\s{\s+delete window\.localStorage\[name\];\s+}/;
     const match = content.match(pattern);
     if (match) {
         return content.replace(pattern, "removePreference(name){return;}");
