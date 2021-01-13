@@ -55,8 +55,7 @@ export class DevToolsPanel {
         this.panelSocket.on("websocket", () => this.onSocketMessage());
         this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
         this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
-        this.panelSocket.on("getApprovedTabs", (msg) => this.onSocketGetApprovedTabs(msg));
-        this.panelSocket.on("getThemes", (msg) => this.onSocketGetThemes(msg));
+        this.panelSocket.on("getVscodeSettings", (msg) => this.onSocketGetVscodeSettings(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
@@ -188,16 +187,10 @@ export class DevToolsPanel {
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getState", { id, preferences });
     }
 
-    private onSocketGetApprovedTabs(message: string) {
+    private onSocketGetVscodeSettings(message: string) {
         const { id } = JSON.parse(message) as { id: number };
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getApprovedTabs", {
+        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getVscodeSettings", {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
-            id });
-    }
-
-    private onSocketGetThemes(message: string) {
-        const { id } = JSON.parse(message) as { id: number };
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getThemes", {
             themeString: SettingsProvider.instance.getThemeSettings(),
             id });
     }

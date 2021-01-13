@@ -70,7 +70,7 @@ describe("simpleView", () => {
     it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
         const filePath = "quick_open/quick_open.js";
         const patch = SimpleView.applyCommandMenuPatch;
-        const expectedStrings = ["this.getApprovedTabs((networkSettings)"];
+        const expectedStrings = ["Root.Runtime.vscodeSettings.enableNetwork;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -190,15 +190,7 @@ describe("simpleView", () => {
     it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
         const filePath = "themes/themes.js";
         const patch = SimpleView.applyThemePatch;
-        const expectedStrings = ["function init(theme)", "if(theme){themeSetting.set(theme);}"];
-
-        await testPatch(filePath, patch, expectedStrings);
-    });
-
-    it("applyMainThemePatch correctly modifes main.js to pass in themes from settings", async () => {
-        const filePath = "main/main.js";
-        const patch = SimpleView.applyMainThemePatch;
-        const expectedStrings = ["resolve(theme);", "await this.getThemePromise()"];
+        const expectedStrings = ["Root.Runtime.vscodeSettings.theme;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -217,5 +209,29 @@ describe("simpleView", () => {
         const expectedStrings = ["removePreference(name){return;}"];
 
         await testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyCreateExtensionSettingsPatch correctly changes root.js to include extensionSettings global const", async () => {
+        const filePath = "root/root.js";
+        const patch = SimpleView.applyCreateExtensionSettingsPatch;
+        const expectedStrings = ["const vscodeSettings={}", "vscodeSettings:vscodeSettings"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyCreateExtensionSettingsLegacyPatch correctly changes root-legacy.js to include extensionSettings glbal const", async () => {
+        const filePath = "root/root-legacy.js";
+        const patch = SimpleView.applyCreateExtensionSettingsLegacyPatch;
+        const expectedStrings = ["Root.Runtime.vscodeSettings = RootModule.Runtime.vscodeSettings"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyPortSettingsPatch correctly changes root.js to set extensionSettings map", async () => {
+        const filePath = "root/root.js";
+        const patch = SimpleView.applyPortSettingsPatch;
+        const expectedStrings = ["InspectorFrontendHost.getVscodeSettings(callback);", "this.getVscodeSettings"];
+
+        testPatch(filePath, patch, expectedStrings);
     });
 });

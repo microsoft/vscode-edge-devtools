@@ -467,45 +467,21 @@ describe("devtoolsPanel", () => {
                 expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
             });
 
-            it("calls getApprovedTabs", async () => {
+            it("calls getVscodeSettings", async () => {
                 const expectedId = { id: 0 };
-                const expectedState = { enableNetwork: true };
+                const expectedState = { enableNetwork: true, themeString: "System preference" };
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
 
                 const dtp = await import("./devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
-                hookedEvents.get("getApprovedTabs")!(JSON.stringify(expectedId));
+                hookedEvents.get("getVscodeSettings")!(JSON.stringify(expectedId));
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
-                    "getApprovedTabs",
-                    {
-                        enableNetwork: expectedState.enableNetwork,
-                        id: expectedId.id,
-                    },
-                );
-
-                // Ensure that the encoded message is actually passed over to the webview
-                const expectedPostedMessage = "encodedMessage";
-                const { callback, thisObj } = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
-                callback.call(thisObj, expectedPostedMessage);
-                expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
-            });
-
-            it("calls getThemes", async () => {
-                const expectedId = { id: 0 };
-                const expectedState = { themeString: "System preference" };
-                (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
-
-                const dtp = await import("./devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
-
-                hookedEvents.get("getThemes")!(JSON.stringify(expectedId));
-                expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
-                    expect.any(Function),
-                    "getThemes",
+                    "getVscodeSettings",
                     {
                         themeString: expectedState.themeString,
+                        enableNetwork: expectedState.enableNetwork,
                         id: expectedId.id,
                     },
                 );

@@ -10,15 +10,17 @@ import {
     applyAppendTabPatch,
     applyCommonRevealerPatch,
     applyCommandMenuPatch,
+    applyCreateExtensionSettingsPatch,
+    applyCreateExtensionSettingsLegacyPatch,
     applyDefaultTabPatch,
     applyDrawerTabLocationPatch,
+    applyPortSettingsPatch,
     applyQuickOpenPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
     applyInspectorCommonNetworkPatch,
-    applyMainThemePatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
@@ -95,7 +97,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorCommonCssTabSliderPatch,
     ]);
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
-        applyMainThemePatch,
         applyMainViewPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
@@ -125,7 +126,12 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyShowRequestBlockingTab,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
+        applyCreateExtensionSettingsPatch,
+        applyPortSettingsPatch,
         applyRuntimeImportScriptPathPrefixPatch,
+    ]);
+    await patchFileForWebViewWrapper("root/root-legacy.js", toolsOutDir, [
+        applyCreateExtensionSettingsLegacyPatch,
     ]);
     await patchFileForWebViewWrapper("quick_open/quick_open.js", toolsOutDir, [
         applyCommandMenuPatch,

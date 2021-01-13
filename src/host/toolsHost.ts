@@ -81,16 +81,10 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
     }
 
-    public getApprovedTabs(callback: () => void) {
+    public getVscodeSettings(callback: (arg0: object) => void) {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getApprovedTabs", {id});
-    }
-
-    public getThemes(callback: (arg0: object) => void) {
-        const id = this.getHostCallbacksNextId++;
-        this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getThemes", {id});
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getVscodeSettings", {id});
     }
 
     public copyText(clipboardData: string) {
@@ -125,38 +119,35 @@ export default class ToolsHost {
                 break;
             }
 
-            case "getApprovedTabs": {
-                const { id, enableNetwork } = JSON.parse(args);
-                this.fireGetHostCallback(id, {
-                        enableNetwork,
-                });
-                break;
-            }
-
-            case "getThemes": {
+            case "getVscodeSettings": {
                 const parsedArgs = JSON.parse(args);
-                const id: number = parsedArgs.id;
-                const themeString: ThemeString = parsedArgs.themeString;
-                let theme;
-                switch(themeString) {
-                    case 'System preference':
-                        theme = 'systemPreferred';
-                        break;
-                    case 'Light':
-                        theme = 'default';
-                        break;
-                    case 'Dark':
-                        theme = 'dark';
-                        break;
-                    default:
-                        theme = null;
-                }
-                this.fireGetHostCallback(id, {
-                    theme,
-                })
+                this.parseVscodeSettingsObject(parsedArgs)
             }
         }
         return true;
+    }
+
+    private parseVscodeSettingsObject(vscodeObject: any) {
+        const id: number = vscodeObject.id;
+        const themeString: ThemeString = vscodeObject.themeString;
+        let theme;
+        switch(themeString) {
+            case 'System preference':
+                theme = 'systemPreferred';
+                break;
+            case 'Light':
+                theme = 'default';
+                break;
+            case 'Dark':
+                theme = 'dark';
+                break;
+            default:
+                theme = null;
+        }
+        this.fireGetHostCallback(id, {
+            enableNetwork: vscodeObject.enableNetwork,
+            theme,
+        });
     }
 
     private sendTelemetry(telemetry: TelemetryData) {
