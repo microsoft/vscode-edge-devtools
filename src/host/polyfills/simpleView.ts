@@ -32,7 +32,7 @@ export function getVscodeSettings(callback: (arg0: object) => void) {
 }
 
 export function applyCreateExtensionSettingsPatch(content: string) {
-    const pattern = /const experiments=new ExperimentsSupport\(\);/;
+    const pattern = /const experiments\s*=\s*new ExperimentsSupport\(\);/;
     const match = content.match(pattern);
     if (match) {
         const matchedString = match[0];
@@ -41,7 +41,7 @@ export function applyCreateExtensionSettingsPatch(content: string) {
         return null;
     }
 
-    const pattern2 = /experiments:experiments/;
+    const pattern2 = /experiments:\s*experiments/;
     const match2 = content.match(pattern2);
     if (match2) {
         const matchedString = match2[0];
@@ -72,7 +72,7 @@ export function applyPortSettingsPatch(content: string) {
         return null;
     }
 
-    const constructorPattern = /this._descriptorsMap={};/g;
+    const constructorPattern = /this._descriptorsMap\s*=\s*{};/g;
     const constructorMatch = content.match(constructorPattern);
     if (constructorMatch) {
         const matchedString = constructorMatch[0];
@@ -94,7 +94,7 @@ export function applyCommonRevealerPatch(content: string) {
 
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
-    const pattern = /handleAction\(context,\sactionId\)\s{\s+switch\s\(actionId\)/;
+    const pattern = /handleAction\(context,\sactionId\)\s{\s*switch\s\(actionId\)/;
 
     if (content.match(pattern)) {
         return content
@@ -106,7 +106,7 @@ export function applyQuickOpenPatch(content: string) {
 
 export function applyCommandMenuPatch(content: string) {
     // pattern intended to match logic of CommandMenu.attach()
-    const pattern = /for\s\(const action of actions\)\s{\s+const category\s=\saction[\s\S]+this\._commands\.sort\(commandComparator\);/;
+    const pattern = /for\s\(const action of actions\)\s{\s*const category\s=\saction[\s\S]+this\._commands\.sort\(commandComparator\);/;
     if(content.match(pattern)) {
         return content.replace(pattern, `
             const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
@@ -424,7 +424,7 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
 }
 
 export function applyRemoveNonSupportedRevealContextMenu(content: string) {
-    const pattern = /result\.push\({\s+section:\s'reveal',\s+title:\sdestination[\s\S]+reveal\(revealable\)\s+}\);/;
+    const pattern = /result\.push\({\s*section:\s'reveal',\s*title:\sdestination[\s\S]+reveal\(revealable\)\s*}\);/;
     const match = content.match(pattern);
     if (match) {
         const matchedString = match[0];
@@ -446,7 +446,7 @@ export function applyThemePatch(content: string) {
 
 export function applyRemovePreferencePatch(content: string) {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
-    const pattern = /removePreference\(name\)\s{\s+delete window\.localStorage\[name\];\s+}/;
+    const pattern = /removePreference\(name\)\s{\s*delete window\.localStorage\[name\];\s*}/;
     const match = content.match(pattern);
     if (match) {
         return content.replace(pattern, "removePreference(name){return;}");
