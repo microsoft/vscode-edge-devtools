@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-const TARGET_VERSION = '86.0.623.0';
+const TARGET_VERSION = '87.0.668.0';
 const targetVersionMap = new Map([
   ['83', '83.0.478.45'],
   ['84', '84.0.522.63'],
   ['85', '85.0.564.40'],
-  ['86', '86.0.623.0']
+  ['86', '86.0.623.0'],
+  ['87', '87.0.668.0']
 ]);
 var isWindows = true;
 
