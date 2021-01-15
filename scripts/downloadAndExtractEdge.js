@@ -30,26 +30,15 @@ function fetchJsonFromUrl(url){
 function fetchDownloadUrl(version) {
   const jsonString = fetchJsonFromUrl('https://thirdpartysource.microsoft.com/downloads');
   const jsonObjects = JSON.parse(jsonString);
-  const platformString = retrievePlatform();
   let fullVersion = TARGET_VERSION;
   if (version) {
     fullVersion = getTargetVersion(version);
   }
-  console.log('Downloading Microsoft Edge DevTools version ' + fullVersion + ' for ' + platformString);
+  console.log('Downloading Microsoft Edge DevTools version ' + fullVersion);
   for (let object of jsonObjects) {
-    if (object.product === 'Microsoft Edge DevTools' && object.release === fullVersion && object.platform === platformString) {
+    if (object.product === 'Microsoft Edge DevTools' && object.release === fullVersion && object.platform === 'Windows x64') {
       return object.url;
     }
-  }
-}
-
-function retrievePlatform() {
-  switch (process.platform) {
-    case 'win32':
-      return 'Windows x64';
-    default:
-      isWindows = false;
-      return 'Mac OS x64';
   }
 }
 
