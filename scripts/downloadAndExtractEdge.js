@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-const TARGET_VERSION = '85.0.564.40';
+const TARGET_VERSION = '87.0.668.0';
 const targetVersionMap = new Map([
   ['83', '83.0.478.45'],
   ['84', '84.0.522.63'],
-  ['85', '85.0.564.40']
+  ['85', '85.0.564.40'],
+  ['86', '86.0.623.0'],
+  ['87', '87.0.668.0']
 ]);
 var isWindows = true;
 
@@ -28,26 +30,15 @@ function fetchJsonFromUrl(url){
 function fetchDownloadUrl(version) {
   const jsonString = fetchJsonFromUrl('https://thirdpartysource.microsoft.com/downloads');
   const jsonObjects = JSON.parse(jsonString);
-  const platformString = retrievePlatform();
   let fullVersion = TARGET_VERSION;
   if (version) {
     fullVersion = getTargetVersion(version);
   }
-  console.log('Downloading Microsoft Edge DevTools version ' + fullVersion + ' for ' + platformString);
+  console.log(`Downloading Microsoft Edge DevTools version ${fullVersion}`);
   for (let object of jsonObjects) {
-    if (object.product === 'Microsoft Edge DevTools' && object.release === fullVersion && object.platform === platformString) {
+    if (object.product === 'Microsoft Edge DevTools' && object.release === fullVersion && object.platform === 'Windows x64') {
       return object.url;
     }
-  }
-}
-
-function retrievePlatform() {
-  switch (process.platform) {
-    case 'win32':
-      return 'Windows x64';
-    default:
-      isWindows = false;
-      return 'Mac OS x64';
   }
 }
 

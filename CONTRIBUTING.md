@@ -41,7 +41,7 @@ Here are a list of recommended VS Code extensions to use when developing for vsc
 
 ## Legacy Source File Setup
 Use this method if the automated methods fail or if the desired version is not supported by the download script.
-* Download a copy of the Microsoft Edge build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 85.0.564.40.
+* Download a copy of the Microsoft Edge build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 87.0.668.0.
   * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
 * Extract the necessary files from the zip
   * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
