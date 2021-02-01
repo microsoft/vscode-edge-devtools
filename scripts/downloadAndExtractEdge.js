@@ -34,7 +34,7 @@ function fetchDownloadUrl(version) {
   if (version) {
     fullVersion = getTargetVersion(version);
   }
-  console.log('Downloading Microsoft Edge DevTools version ' + fullVersion);
+  console.log(`Downloading Microsoft Edge DevTools version ${fullVersion}`);
   for (let object of jsonObjects) {
     if (object.product === 'Microsoft Edge DevTools' && object.release === fullVersion && object.platform === 'Windows x64') {
       return object.url;
