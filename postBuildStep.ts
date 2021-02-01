@@ -7,14 +7,17 @@ import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtime";
 import {
-    applyAppendTabPatch,
+    applyAppendTabOverridePatch,
+    applyAppendTabConditionsPatch,
     applyCommonRevealerPatch,
     applyCommandMenuPatch,
-    applyCreateExtensionSettingsPatch,
     applyCreateExtensionSettingsLegacyPatch,
     applyDefaultTabPatch,
     applyDrawerTabLocationPatch,
-    applyPortSettingsPatch,
+    applyExtensionSettingsInstantiatePatch,
+    applyExtensionSettingsRuntimeObjectPatch,
+    applyPortSettingsFunctionCallPatch,
+    applyPortSettingsFunctionCreationPatch,
     applyQuickOpenPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
@@ -118,7 +121,8 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyContentSecurityPolicyPatch,
     ]);
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
-        applyAppendTabPatch,
+        applyAppendTabOverridePatch,
+        applyAppendTabConditionsPatch,
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
         applyPersistRequestBlockingTab,
@@ -126,8 +130,10 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyShowRequestBlockingTab,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
-        applyCreateExtensionSettingsPatch,
-        applyPortSettingsPatch,
+        applyExtensionSettingsInstantiatePatch,
+        applyExtensionSettingsRuntimeObjectPatch,
+        applyPortSettingsFunctionCallPatch,
+        applyPortSettingsFunctionCreationPatch,
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
     await patchFileForWebViewWrapper("root/root-legacy.js", toolsOutDir, [
