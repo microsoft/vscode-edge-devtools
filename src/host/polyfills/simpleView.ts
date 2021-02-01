@@ -101,15 +101,6 @@ export function applyStylesRevealerPatch(content: string) {
     }
 }
 
-export function applyLinkActionsPatch(content: string) {
-    const pattern = /\"Elements panel\"/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, '"Elements panel" || destination === "Sources panel"');
-    } else {
-        return null;
-    }
-}
-
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
