@@ -18,7 +18,7 @@ const enum KeepMatchedText {
     AtEnd = 2
 }
 
-function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText: KeepMatchedText | undefined) {
+function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText) {
     const match = content.match(pattern);
     if (match) {
         if (keepMatchedText) {
@@ -86,14 +86,14 @@ export function applyPortSettingsFunctionCallPatch(content: string) {
 export function applyCommonRevealerPatch(content: string) {
     const pattern = /let reveal\s*=\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
     const replacementText = `let reveal = ${revealInVSCode.toString().slice(0, -1)}`;
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
     const replacementText = "handleAction(context, actionId) { actionId = null; switch(actionId)";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyCommandMenuPatch(content: string) {
@@ -125,7 +125,7 @@ export function applyCommandMenuPatch(content: string) {
         }
         }
         this._commands = this._commands.sort(commandComparator);`
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 // This function is needed for Elements-only version, but we need the drawer
@@ -134,33 +134,33 @@ export function applyInspectorViewShowDrawerPatch(content: string) {
     // This patch hides the drawer.
     const pattern = /_showDrawer\(focus\)\s*{/g;
     const replacementText = "_showDrawer(focus) { return false;";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyMainViewPatch(content: string) {
     const pattern = /const moreTools\s*=\s*[^;]+;/g;
     const replacementText = "const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemoveBreakOnContextMenuItem(content: string) {
     const pattern = /const breakpointsMenu=.+hasDOMBreakpoint\(.*\);}/;
     const replacementText = "";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyShowRequestBlockingTab(content: string) {
     // Appends the Request Blocking tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
     const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyPersistRequestBlockingTab(content: string) {
     // Removes the close button from the Request blocking tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
     const replacementText = "this._closeable=id==='network.blocked-urls'?false:closeable;";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applySetTabIconPatch(content: string) {
@@ -168,7 +168,7 @@ export function applySetTabIconPatch(content: string) {
     // This is needed due to applyAppendTabPatch which removes unused tabs from the tablist.
     const pattern = /setTabIcon\(id,\s*icon\)\s*{\s*const tab\s*=\s*this\._tabsById\.get\(id\);/;
     const replacementText = "setTabIcon(id,icon){const tab=this._tabsById.get(id); if(!tab){return;}";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyAppendTabOverridePatch(content: string) {
@@ -178,7 +178,7 @@ export function applyAppendTabOverridePatch(content: string) {
     const pattern =
         /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
     const replacementText = `appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {`;
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyAppendTabConditionsPatch(content: string) {
@@ -206,7 +206,7 @@ export function applyAppendTabConditionsPatch(content: string) {
                 this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
             }
         }`;
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyEnableNetworkPatch(): string {
@@ -244,14 +244,14 @@ export function applyDefaultTabPatch(content: string) {
     // This patches removes the _defaultTab property
     const pattern = /this\._defaultTab\s*=\s*[^;]+;/g;
     const replacementText = "this._defaultTab=undefined;";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyDrawerTabLocationPatch(content: string) {
     // This shows the drawer with the network.blocked-urls tab open.
     const pattern = /this._showDrawer.bind\s*\(this,\s*false\),\s*'drawer-view',\s*true,\s*true/g;
     const replacementText = "this._showDrawer.bind\(this, false\), 'drawer-view', true, true, 'network.blocked-urls'";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonCssPatch(content: string) {
@@ -274,7 +274,7 @@ export function applyInspectorCommonCssPatch(content: string) {
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     const replacementText = `${topHeaderCSS}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonNetworkPatch(content: string) {
@@ -304,7 +304,7 @@ export function applyInspectorCommonNetworkPatch(content: string) {
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     const replacementText = `${networkCSS}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonContextMenuPatch(content: string) {
@@ -324,7 +324,7 @@ export function applyInspectorCommonContextMenuPatch(content: string) {
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
     const replacementText = `${hideContextMenuItems}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonCssRightToolbarPatch(content: string) {
@@ -333,7 +333,7 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string) {
         `.tabbed-pane-right-toolbar {
             visibility: hidden !important;
         }`.replace(/\n/g, "\\n");
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonCssTabSliderPatch(content: string) {
@@ -342,7 +342,7 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
         `.tabbed-pane-tab-slider {
             display: none !important;
         }`.replace(/\n/g, "\\n");
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemoveNonSupportedRevealContextMenu(content: string) {
@@ -360,12 +360,12 @@ export function applyThemePatch(content: string) {
     // Sets the theme of the DevTools
     const pattern = /const settingDescriptor/;
     const replacementText = "const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemovePreferencePatch(content: string) {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
     const replacementText = "removePreference(name){return;}";
-    return replaceInSourceCode(content, pattern, replacementText, undefined);
+    return replaceInSourceCode(content, pattern, replacementText);
 }
