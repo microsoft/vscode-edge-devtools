@@ -24,9 +24,9 @@ function replaceInSourceCode(content: string, pattern: RegExp, replacementText: 
         if (keepMatchedText) {
             const matchedText = match[0];
             if (keepMatchedText === KeepMatchedText.AtEnd) {
-                replacementText = replacementText + matchedText;
+                replacementText = `${replacementText}${matchedText}`;
             } else {
-                replacementText = matchedText + replacementText;
+                replacementText = `${matchedText}${replacementText}`;
             }
         }
         return content.replace(pattern, replacementText);
