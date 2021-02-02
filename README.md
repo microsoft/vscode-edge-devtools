@@ -9,6 +9,8 @@ A Visual Studio Code extension that allows you to use the browser's Elements and
 
 ![Microsoft Edge Tools - Demo](basic_usage.gif)
 
+# Table of Contents
+
 * [Supported Features](#supported-features)
 * [Using the Extension](#using-the-extension)
   * [Getting Started](#getting-started)
