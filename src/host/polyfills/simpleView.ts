@@ -13,6 +13,28 @@ interface IRevealable {
     };
 }
 
+const enum KeepMatchedText {
+    InFront = 1,
+    AtEnd = 2
+}
+
+function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText) {
+    const match = content.match(pattern);
+    if (match) {
+        if (keepMatchedText) {
+            const matchedText = match[0];
+            if (keepMatchedText === KeepMatchedText.AtEnd) {
+                replacementText = `${replacementText}${matchedText}`;
+            } else {
+                replacementText = `${matchedText}${replacementText}`;
+            }
+        }
+        return content.replace(pattern, replacementText);
+    } else {
+        return null;
+    }
+}
+
 export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
     if (revealable && revealable.uiSourceCode && revealable.uiSourceCode._url) {
         // using Devtools legacy mode.
@@ -146,10 +168,17 @@ export function applyInspectorViewShowDrawerPatch(content: string) {
     const pattern = /_showDrawer\(focus\)\s*{/g;
 
     if (content.match(pattern)) {
-        return content.replace(pattern, "_showDrawer(focus) { return false;");
+        return content.replace(pattern, "_showDrawer(focus) { if (!Root.Runtime.vscodeSettings.enableNetwork) {return false;}");
     } else {
         return null;
     }
+}
+
+export function applyInspectorViewCloseDrawerPatch(content: string) {
+    // this patch closes the drawer if the network tool is disabled
+    const pattern = /self\.UI\.inspectorView\.createToolbars\(\);/g;
+    const replacementText = 'if (!Root.Runtime.vscodeSettings.enableNetwork) {self.UI.InspectorView.instance()._closeDrawer();}';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyMainViewPatch(content: string) {
