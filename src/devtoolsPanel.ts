@@ -35,6 +35,7 @@ export class DevToolsPanel {
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
+    private consoleOutput: vscode.OutputChannel;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -48,6 +49,7 @@ export class DevToolsPanel {
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
         this.config = config;
+        this.consoleOutput = vscode.window.createOutputChannel("DevTools Console");
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
@@ -129,6 +131,7 @@ export class DevToolsPanel {
     }
 
     private onSocketFocusEditor(message: string) {
+        this.consoleOutput.appendLine("I am a banana.");
         const { next } = JSON.parse(message) as { next: boolean };
         if (next) {
             vscode.commands.executeCommand("workbench.action.nextEditor");
@@ -138,6 +141,7 @@ export class DevToolsPanel {
     }
 
     private onSocketFocusEditorGroup(message: string) {
+        this.consoleOutput.appendLine("I am a fruit.");
         const { next } = JSON.parse(message) as { next: boolean };
         if (next) {
             vscode.commands.executeCommand("workbench.action.focusNextGroup");
