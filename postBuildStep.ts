@@ -7,27 +7,33 @@ import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtime";
 import {
-    applyAppendTabPatch,
+    applyAppendTabOverridePatch,
+    applyAppendTabConditionsPatch,
     applyCommonRevealerPatch,
     applyCommandMenuPatch,
-    applyCreateExtensionSettingsPatch,
     applyCreateExtensionSettingsLegacyPatch,
     applyDefaultTabPatch,
     applyDrawerTabLocationPatch,
-    applyPortSettingsPatch,
+    applyExtensionSettingsInstantiatePatch,
+    applyExtensionSettingsRuntimeObjectPatch,
+    applyPortSettingsFunctionCallPatch,
+    applyPortSettingsFunctionCreationPatch,
     applyQuickOpenPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
     applyInspectorCommonNetworkPatch,
+    applyInspectorViewCloseDrawerPatch,
+    applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
-    applyRemoveNonSupportedRevealContextMenu,
+    applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applySetTabIconPatch,
     applyShowRequestBlockingTab,
+    applyStylesRevealerPatch,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
@@ -97,6 +103,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorCommonCssTabSliderPatch,
     ]);
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
+        applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
@@ -106,10 +113,13 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyCommonRevealerPatch,
     ]);
     await patchFileForWebViewWrapper("components/components.js", toolsOutDir, [
-        applyRemoveNonSupportedRevealContextMenu,
+        applyContextMenuRevealOption,
     ]);
     await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, [
         applyPaddingInlineCssPatch,
+    ]);
+    await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
+        applyStylesRevealerPatch,
     ]);
     await patchFileForWebViewWrapper("host/host.js", toolsOutDir, [
         applyRemovePreferencePatch,
@@ -118,16 +128,20 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyContentSecurityPolicyPatch,
     ]);
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
-        applyAppendTabPatch,
+        applyAppendTabOverridePatch,
+        applyAppendTabConditionsPatch,
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
+        applyInspectorViewShowDrawerPatch,
         applyPersistRequestBlockingTab,
         applySetTabIconPatch,
         applyShowRequestBlockingTab,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
-        applyCreateExtensionSettingsPatch,
-        applyPortSettingsPatch,
+        applyExtensionSettingsInstantiatePatch,
+        applyExtensionSettingsRuntimeObjectPatch,
+        applyPortSettingsFunctionCallPatch,
+        applyPortSettingsFunctionCreationPatch,
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
     await patchFileForWebViewWrapper("root/root-legacy.js", toolsOutDir, [
