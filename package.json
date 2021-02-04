@@ -167,7 +167,7 @@
                 "vscode-edge-devtools.enableNetwork": {
                     "type": "boolean",
                     "description": "Enable network panel (requires relaunching extension)",
-                    "default": false
+                    "default": true
                 },
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
