@@ -187,10 +187,10 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyRemoveNonSupportedRevealContextMenu correctly changes text", async () => {
+    it("applyContextMenuRevealOption correctly changes text", async () => {
         const filePath = "components/components.js";
-        const patch = SimpleView.applyRemoveNonSupportedRevealContextMenu;
-        const expectedStrings = ["if(destination === \"Elements panel\")"];
+        const patch = SimpleView.applyContextMenuRevealOption;
+        const expectedStrings = ['destination = "Visual Studio Code"'];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -257,5 +257,13 @@ describe("simpleView", () => {
         const expectedStrings = ["this.getVscodeSettings"];
 
         testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyStylesRevealerPatch correctly changes root.js to set extensionSettings map", async () => {
+        const filePath = "elements/elements.js";
+        const patch = SimpleView.applyStylesRevealerPatch;
+        const unexpectedStrings = ["this._navigateToSource(selectElement, true);"];
+
+        testPatch(filePath, patch, [], unexpectedStrings);
     });
 });

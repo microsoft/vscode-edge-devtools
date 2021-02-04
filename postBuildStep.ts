@@ -27,10 +27,11 @@ import {
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
-    applyRemoveNonSupportedRevealContextMenu,
+    applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applySetTabIconPatch,
     applyShowRequestBlockingTab,
+    applyStylesRevealerPatch,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
@@ -109,10 +110,13 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyCommonRevealerPatch,
     ]);
     await patchFileForWebViewWrapper("components/components.js", toolsOutDir, [
-        applyRemoveNonSupportedRevealContextMenu,
+        applyContextMenuRevealOption,
     ]);
     await patchFileForWebViewWrapper("elements/elements_module.js", toolsOutDir, [
         applyPaddingInlineCssPatch,
+    ]);
+    await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
+        applyStylesRevealerPatch,
     ]);
     await patchFileForWebViewWrapper("host/host.js", toolsOutDir, [
         applyRemovePreferencePatch,

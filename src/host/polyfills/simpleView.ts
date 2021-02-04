@@ -89,6 +89,12 @@ export function applyCommonRevealerPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyStylesRevealerPatch(content: string) {
+    const pattern = /this\._navigateToSource\(selectElement,\s*true\);/g;
+    const replacementText = '';
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
@@ -345,15 +351,14 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyRemoveNonSupportedRevealContextMenu(content: string) {
-    const pattern = /result\.push\({\s*section:\s*'reveal',\s*title:\s*destination[\s\S]+reveal\(revealable\)\s*}\);/;
-    const match = content.match(pattern);
-    if (match) {
-        const matchedString = match[0];
-        return content.replace(pattern, `if(destination === "Elements panel"){${matchedString}}`);
-    } else {
-        return null;
-    }
+export function applyContextMenuRevealOption(content: string) {
+    const pattern = /const destination\s*=\s*Revealer\.revealDestination\(revealable\);/;
+    const replacementText = `
+        let destination = Revealer.revealDestination(revealable);
+        if (destination==="Sources panel") {
+            destination = "Visual Studio Code";
+        };`
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyThemePatch(content: string) {
