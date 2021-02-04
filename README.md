@@ -9,6 +9,29 @@ A Visual Studio Code extension that allows you to use the browser's Elements and
 
 ![Microsoft Edge Tools - Demo](basic_usage.gif)
 
+# Table of Contents
+
+* [Supported Features](#supported-features)
+* [Using the Extension](#using-the-extension)
+  * [Getting Started](#getting-started)
+  * [Changing Extension Settings](#changing-extension-settings)
+    * [Turning on Network Inspection](#turning-on-network-inspection)
+    * [Turning on Headless Mode](#turning-on-headless-mode)
+  * [Using the tools](#using-the-tools)
+    * [Setting up your project to show live changes in the extension](#setting-up-your-project-to-show-live-changes-in-the-extension)
+    * [Opening source files from the Elements tool](#opening-source-files-from-the-elements-tool)
+    * [Debug Configuration](#debug-configuration)
+    * [Other optional launch config fields](#other-optional-launch-config-fields)
+    * [Sourcemaps](#sourcemaps)
+    * [Ionic and gulp sourcemaps note](#ionic-and-gulp-sourcemaps-note)
+  * [Launching the browser via the side bar view](#launching-the-browser-via-the-side-bar-view)
+  * [Launching the browser manually](#launching-the-browser-manually)
+  * [Attaching automatically when launching the browser for debugging](#attaching-automatically-when-launching-the-browser-for-debugging)
+* [Contributing](#contributing)
+* [Other information](#other-information)
+  * [Data and Telemetry](#data-telemetry)
+  * [Reporting Security Issues](#reporting-security-issues)
+
 ## Supported Features
 
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
@@ -32,7 +55,6 @@ For use inside Visual Studio Code:
 *[Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension will be also installed to enable debugging on VSCode.
 
 ### Changing Extension Settings
-
 You can customize the extension to your needs. You can reach the settings by clicking the gear icon of the extension listing or via the settings menu.
 
 ![The gear icon in the extension listing](edge-devtools-for-vscode-settings.png)
@@ -216,7 +238,7 @@ Example:
 "meteor://💻app/main.ts"` -> `"/Users/me/project/main.ts"
 ```
 
-#### Ionic/gulp-sourcemaps note
+#### Ionic and gulp sourcemaps note
 
 Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, try this setting:
 
@@ -262,7 +284,7 @@ See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/mas
 
 # Other information
 
-## Data/Telemetry
+## Data and Telemetry
 
 This project collects usage data and sends it to Microsoft to help improve our products and services. Read [Microsoft's privacy statement](https://privacy.microsoft.com/en-US/privacystatement) to learn more.
 
