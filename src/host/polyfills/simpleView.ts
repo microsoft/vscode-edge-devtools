@@ -91,11 +91,8 @@ export function applyCommonRevealerPatch(content: string) {
 
 export function applyStylesRevealerPatch(content: string) {
     const pattern = /this\._navigateToSource\(selectElement,\s*true\);/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, '');
-    } else {
-        return null;
-    }
+    const replacementText = '';
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyQuickOpenPatch(content: string) {
@@ -356,16 +353,12 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
 
 export function applyContextMenuRevealOption(content: string) {
     const pattern = /const destination\s*=\s*Revealer\.revealDestination\(revealable\);/;
-    const match = content.match(pattern);
-    if (match) {
-        return content.replace(pattern, `
-            let destination = Revealer.revealDestination(revealable);
-            if (destination==="Sources panel") {
-                destination = "Visual Studio Code";
-            };`);
-    } else {
-        return null;
-    }
+    const replacementText = `
+        let destination = Revealer.revealDestination(revealable);
+        if (destination==="Sources panel") {
+            destination = "Visual Studio Code";
+        };`
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyThemePatch(content: string) {
