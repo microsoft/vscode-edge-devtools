@@ -107,10 +107,18 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyAppendTabPatch correctly changes text", async () => {
+    it("applyAppendTabOverridePatch correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const patch = SimpleView.applyAppendTabPatch;
+        const patch = SimpleView.applyAppendTabOverridePatch;
         const expectedStrings = ["appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"];
+
+        await testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyAppendTabConditionsPatch correctly changes text", async () => {
+        const filePath = "ui/ui.js";
+        const patch = SimpleView.applyAppendTabConditionsPatch;
+        const expectedStrings = ["if (!patchedCondition) {"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -211,10 +219,18 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyCreateExtensionSettingsPatch correctly changes root.js to include extensionSettings global const", async () => {
+    it("applyExtensionSettingsInstantiatePatch correctly changes root.js to include extensionSettings global const", async () => {
         const filePath = "root/root.js";
-        const patch = SimpleView.applyCreateExtensionSettingsPatch;
-        const expectedStrings = ["const vscodeSettings={}", "vscodeSettings:vscodeSettings"];
+        const patch = SimpleView.applyExtensionSettingsInstantiatePatch;
+        const expectedStrings = ["const vscodeSettings={}"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyExtensionSettingsRuntimeObjectPatch correctly changes RuntimeObject to include extensionSettings global const", async () => {
+        const filePath = "root/root.js";
+        const patch = SimpleView.applyExtensionSettingsRuntimeObjectPatch;
+        const expectedStrings = ["vscodeSettings:vscodeSettings"];
 
         testPatch(filePath, patch, expectedStrings);
     });
@@ -227,10 +243,18 @@ describe("simpleView", () => {
         testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyPortSettingsPatch correctly changes root.js to set extensionSettings map", async () => {
+    it("applyPortSettingsFunctionCreationPatch correctly changes root.js to create settings function", async () => {
         const filePath = "root/root.js";
-        const patch = SimpleView.applyPortSettingsPatch;
-        const expectedStrings = ["InspectorFrontendHost.getVscodeSettings(callback);", "this.getVscodeSettings"];
+        const patch = SimpleView.applyPortSettingsFunctionCreationPatch;
+        const expectedStrings = ["InspectorFrontendHost.getVscodeSettings(callback);"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyPortSettingsFunctionCallPatch correctly changes root.js to call settings function", async () => {
+        const filePath = "root/root.js";
+        const patch = SimpleView.applyPortSettingsFunctionCallPatch;
+        const expectedStrings = ["this.getVscodeSettings"];
 
         testPatch(filePath, patch, expectedStrings);
     });

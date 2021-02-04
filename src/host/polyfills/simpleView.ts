@@ -13,6 +13,28 @@ interface IRevealable {
     };
 }
 
+const enum KeepMatchedText {
+    InFront = 1,
+    AtEnd = 2
+}
+
+function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText) {
+    const match = content.match(pattern);
+    if (match) {
+        if (keepMatchedText) {
+            const matchedText = match[0];
+            if (keepMatchedText === KeepMatchedText.AtEnd) {
+                replacementText = `${replacementText}${matchedText}`;
+            } else {
+                replacementText = `${matchedText}${replacementText}`;
+            }
+        }
+        return content.replace(pattern, replacementText);
+    } else {
+        return null;
+    }
+}
+
 export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
     if (revealable && revealable.uiSourceCode && revealable.uiSourceCode._url) {
         // using Devtools legacy mode.
@@ -31,112 +53,79 @@ export function getVscodeSettings(callback: (arg0: object) => void) {
     InspectorFrontendHost.getVscodeSettings(callback);
 }
 
-export function applyCreateExtensionSettingsPatch(content: string) {
+export function applyExtensionSettingsInstantiatePatch(content: string) {
     const pattern = /const experiments\s*=\s*new ExperimentsSupport\(\);/;
-    const match = content.match(pattern);
-    if (match) {
-        const matchedString = match[0];
-        content = content.replace(pattern, `const vscodeSettings={};${matchedString}`);
-    } else {
-        return null;
-    }
+    const replacementText = `const vscodeSettings={};`
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
+}
 
-    const pattern2 = /experiments:\s*experiments/;
-    const match2 = content.match(pattern2);
-    if (match2) {
-        const matchedString = match2[0];
-        return content.replace(pattern2, `${matchedString}, vscodeSettings:vscodeSettings`);
-    } else {
-        return null;
-    }
+export function applyExtensionSettingsRuntimeObjectPatch(content: string){
+    const pattern = /experiments:\s*experiments/;
+    const replacementText = ', vscodeSettings:vscodeSettings';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyCreateExtensionSettingsLegacyPatch(content: string) {
-    const pattern = /Root\.Runtime\.experiments/g
-    const match = content.match(pattern);
-    if (match) {
-        const matchedString = match[0];
-        return content.replace(pattern, `Root.Runtime.vscodeSettings = RootModule.Runtime.vscodeSettings; ${matchedString}`);
-    } else {
-        return null;
-    }
+    const pattern = /Root\.Runtime\.experiments/g;
+    const replacementText = 'Root.Runtime.vscodeSettings = RootModule.Runtime.vscodeSettings;';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
-export function applyPortSettingsPatch(content: string) {
+export function applyPortSettingsFunctionCreationPatch(content: string) {
     const pattern = /static instance/g;
-    const match = content.match(pattern);
-    if (match) {
-        const matchedString = match[0];
-        content = content.replace(pattern, `${getVscodeSettings.toString().slice(9)} ${matchedString}`);
-    } else {
-        return null;
-    }
+    const replacementText = getVscodeSettings.toString().slice(9);
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
+}
 
-    const constructorPattern = /this._descriptorsMap\s*=\s*{};/g;
-    const constructorMatch = content.match(constructorPattern);
-    if (constructorMatch) {
-        const matchedString = constructorMatch[0];
-        return content.replace(constructorPattern, `${matchedString} this.getVscodeSettings((vscodeSettingsObject) => {Object.assign(vscodeSettings, vscodeSettingsObject);});`);
-    } else {
-        return null;
-    }
+export function applyPortSettingsFunctionCallPatch(content: string) {
+    const pattern = /this._descriptorsMap\s*=\s*{};/g;
+    const replacementText = 'this.getVscodeSettings((vscodeSettingsObject) => {Object.assign(vscodeSettings, vscodeSettingsObject);});';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyCommonRevealerPatch(content: string) {
     const pattern = /let reveal\s*=\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern,
-            `let reveal = ${revealInVSCode.toString().slice(0, -1)}`);
-    } else {
-        return null;
-    }
+    const replacementText = `let reveal = ${revealInVSCode.toString().slice(0, -1)}`;
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
-
-    if (content.match(pattern)) {
-        return content
-        .replace(pattern, "handleAction(context, actionId) { actionId = null; switch(actionId)");
-    } else {
-        return null;
-    }
+    const replacementText = "handleAction(context, actionId) { actionId = null; switch(actionId)";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyCommandMenuPatch(content: string) {
     // pattern intended to match logic of CommandMenu.attach()
     const pattern = /for\s*\(const action of actions\)\s*{\s*const category\s*=\s*action[\s\S]+this\._commands\.sort\(commandComparator\);/;
-    if(content.match(pattern)) {
-        return content.replace(pattern, `
-            const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
-            for (const action of actions) {
-              const category = action.category();
-              if (!category) {
-                continue;
-              }
-              let condition = (category !== 'Elements' || action.title() === 'Show DOM Breakpoints');
-              if (networkEnabled) {
-                condition = condition && category !== 'Network';
-              }
-              if (!condition) {
-                const options = {action, userActionCode: undefined};
-                this._commands.push(CommandMenu.createActionCommand(options));
-              }
-            }
-            for (const command of allCommands) {
-              let condition = (command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints');
-              if (networkEnabled) {
-                condition = condition && command.category() !== 'Network';
-              }
-              if (!condition && command.available()) {
-                this._commands.push(command);
-              }
-            }
-            this._commands = this._commands.sort(commandComparator);`);
-    } else {
-        return null;
-    }
+    const replacementText =
+        `const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
+        for (const action of actions) {
+        const category = action.category();
+        if (!category) {
+            continue;
+        }
+        let condition = (category !== 'Elements' || action.title() === 'Show DOM Breakpoints');
+        if (networkEnabled) {
+            condition = condition && category !== 'Network';
+        }
+        if (!condition) {
+            const options = {action, userActionCode: undefined};
+            this._commands.push(CommandMenu.createActionCommand(options));
+        }
+        }
+        for (const command of allCommands) {
+        let condition = (command.category() !== 'Elements' || command.title() === 'Show DOM Breakpoints');
+        if (networkEnabled) {
+            condition = condition && command.category() !== 'Network';
+        }
+        if (!condition && command.available()) {
+            this._commands.push(command);
+        }
+        }
+        this._commands = this._commands.sort(commandComparator);`
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 // This function is needed for Elements-only version, but we need the drawer
@@ -144,70 +133,55 @@ export function applyCommandMenuPatch(content: string) {
 export function applyInspectorViewShowDrawerPatch(content: string) {
     // This patch hides the drawer.
     const pattern = /_showDrawer\(focus\)\s*{/g;
-
-    if (content.match(pattern)) {
-        return content.replace(pattern, "_showDrawer(focus) { return false;");
-    } else {
-        return null;
-    }
+    const replacementText = "_showDrawer(focus) { return false;";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyMainViewPatch(content: string) {
     const pattern = /const moreTools\s*=\s*[^;]+;/g;
-
-    if (content.match(pattern)) {
-        return content.replace(pattern, "const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };");
-    } else {
-        return null;
-    }
+    const replacementText = "const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemoveBreakOnContextMenuItem(content: string) {
     const pattern = /const breakpointsMenu=.+hasDOMBreakpoint\(.*\);}/;
-    if (content.match(pattern)) {
-        return content.replace(pattern, "");
-    } else {
-        return null;
-    }
+    const replacementText = "";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyShowRequestBlockingTab(content: string) {
     // Appends the Request Blocking tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
-
-    if (content.match(pattern)) {
-        return content.replace(pattern, "if(!view.isCloseable()||id==='network.blocked-urls')");
-    } else {
-        return null;
-    }
+    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyPersistRequestBlockingTab(content: string) {
     // Removes the close button from the Request blocking tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-
-    if (content.match(pattern)) {
-        return content.replace(pattern, "this._closeable=id==='network.blocked-urls'?false:closeable;");
-    } else {
-        return null;
-    }
+    const replacementText = "this._closeable=id==='network.blocked-urls'?false:closeable;";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applySetTabIconPatch(content: string) {
     // Adding undefined check in SetTabIcon so it doesn't throw an error trying to access disabled tabs.
     // This is needed due to applyAppendTabPatch which removes unused tabs from the tablist.
     const pattern = /setTabIcon\(id,\s*icon\)\s*{\s*const tab\s*=\s*this\._tabsById\.get\(id\);/;
-
-    if (content.match(pattern)) {
-        return content.replace(pattern, "setTabIcon(id,icon){const tab=this._tabsById.get(id); if(!tab){return;}");
-    } else {
-        return null;
-    }
+    const replacementText = "setTabIcon(id,icon){const tab=this._tabsById.get(id); if(!tab){return;}";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyAppendTabPatch(content: string) {
+export function applyAppendTabOverridePatch(content: string) {
     // The appendTab function chooses which tabs to put in the tabbed pane header section
     // showTabElement and selectTab are only called by tabs that have already been appended via appendTab.
+    // Injecting our verifications by redirecting appendTab to appendTabOverride
+    const pattern =
+        /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
+    const replacementText = `appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {`;
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
+export function applyAppendTabConditionsPatch(content: string) {
     const elementsTabs = [
         "elements",
         "Styles",
@@ -221,36 +195,18 @@ export function applyAppendTabPatch(content: string) {
         return `id !== '${tab}'`;
     }).join(" && ");
 
-    const appendTabWrapper =
-        /appendTab\(id,\s*tabTitle\s*,\s*view,\s*tabTooltip,\s*userGesture,\s*isCloseable,\s*index\)\s*{/;
-    const injectionPoint = /return\s*tab\s*\?\s*tab\.isCloseable\(\)\s*:\s*false;\s*}/;
-
-    // Injecting our verifications by redirecting appendTab to appendTabOverride
-    if (content.match(appendTabWrapper)) {
-        content = content.replace(
-            appendTabWrapper,
-            `appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {`);
-    } else {
-        return null;
-    }
-
     // We then replace with the verifications itself.
-    if (content.match(injectionPoint)) {
-        content = content.replace(
-            injectionPoint,
-            `return tab ? tab.isCloseable() : false;}
-            appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
-                let patchedCondition = ${condition};
-                ${applyEnableNetworkPatch()}
-                if (!patchedCondition) {
-                    this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
-                }
-            }`);
-    } else {
-        return null;
-    }
-
-    return content;
+    const pattern = /return\s*tab\s*\?\s*tab\.isCloseable\(\)\s*:\s*false;\s*}/;
+    const replacementText =
+        `return tab ? tab.isCloseable() : false;}
+        appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
+            let patchedCondition = ${condition};
+            ${applyEnableNetworkPatch()}
+            if (!patchedCondition) {
+                this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
+            }
+        }`;
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyEnableNetworkPatch(): string {
@@ -287,22 +243,15 @@ export function applyEnableNetworkPatch(): string {
 export function applyDefaultTabPatch(content: string) {
     // This patches removes the _defaultTab property
     const pattern = /this\._defaultTab\s*=\s*[^;]+;/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern,"this._defaultTab=undefined;");
-    } else {
-        return null;
-    }
+    const replacementText = "this._defaultTab=undefined;";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyDrawerTabLocationPatch(content: string) {
     // This shows the drawer with the network.blocked-urls tab open.
     const pattern = /this._showDrawer.bind\s*\(this,\s*false\),\s*'drawer-view',\s*true,\s*true/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern,
-            `this._showDrawer.bind\(this, false\), 'drawer-view', true, true, 'network.blocked-urls'`);
-    } else {
-        return null;
-    }
+    const replacementText = "this._showDrawer.bind\(this, false\), 'drawer-view', true, true, 'network.blocked-urls'";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonCssPatch(content: string) {
@@ -324,11 +273,8 @@ export function applyInspectorCommonCssPatch(content: string) {
         unHideScreenCastBtn;
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, `${topHeaderCSS}${separator} $1`);
-    } else {
-        return null;
-    }
+    const replacementText = `${topHeaderCSS}${separator} $1`;
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonNetworkPatch(content: string) {
@@ -357,11 +303,8 @@ export function applyInspectorCommonNetworkPatch(content: string) {
         unHideSearchCloseButton;
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, `${networkCSS}${separator} $1`);
-    } else {
-        return null;
-    }
+    const replacementText = `${networkCSS}${separator} $1`;
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonContextMenuPatch(content: string) {
@@ -380,47 +323,26 @@ export function applyInspectorCommonContextMenuPatch(content: string) {
         }`.replace(/\n/g, separator);
 
     const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    if (content.match(pattern)) {
-        return content.replace(pattern, `${hideContextMenuItems}${separator} $1`);
-    } else {
-        return null;
-    }
+    const replacementText = `${hideContextMenuItems}${separator} $1`;
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonCssRightToolbarPatch(content: string) {
-    const separator = "\\n";
-    const cssRightToolbar =
+    const pattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
+    const replacementText =
         `.tabbed-pane-right-toolbar {
             visibility: hidden !important;
-        }`.replace(/\n/g, separator);
-
-    const tabbedPanePattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
-
-    if (content.match(tabbedPanePattern)) {
-        return content.replace(
-                tabbedPanePattern,
-                cssRightToolbar);
-    } else {
-        return null;
-    }
+        }`.replace(/\n/g, "\\n");
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorCommonCssTabSliderPatch(content: string) {
-    const separator = "\\n";
-    const cssTabSlider =
+    const pattern = /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g;
+    const replacementText =
         `.tabbed-pane-tab-slider {
             display: none !important;
-        }`.replace(/\n/g, separator);
-
-    const tabbedPaneSlider = /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g;
-
-    if (content.match(tabbedPaneSlider)) {
-        return content.replace(
-            tabbedPaneSlider,
-            cssTabSlider);
-    } else {
-        return null;
-    }
+        }`.replace(/\n/g, "\\n");
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemoveNonSupportedRevealContextMenu(content: string) {
@@ -436,21 +358,14 @@ export function applyRemoveNonSupportedRevealContextMenu(content: string) {
 
 export function applyThemePatch(content: string) {
     // Sets the theme of the DevTools
-    const setPattern = /const settingDescriptor/;
-    if (content.match(setPattern)) {
-        return content.replace(setPattern, `const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor`);
-    } else {
-        return null;
-    }
+    const pattern = /const settingDescriptor/;
+    const replacementText = "const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemovePreferencePatch(content: string) {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
-    const match = content.match(pattern);
-    if (match) {
-        return content.replace(pattern, "removePreference(name){return;}");
-    } else {
-        return null;
-    }
+    const replacementText = "removePreference(name){return;}";
+    return replaceInSourceCode(content, pattern, replacementText);
 }
