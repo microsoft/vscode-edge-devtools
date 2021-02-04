@@ -139,8 +139,15 @@ export function applyCommandMenuPatch(content: string) {
 export function applyInspectorViewShowDrawerPatch(content: string) {
     // This patch hides the drawer.
     const pattern = /_showDrawer\(focus\)\s*{/g;
-    const replacementText = "_showDrawer(focus) { return false;";
+    const replacementText = "_showDrawer(focus) { if (!Root.Runtime.vscodeSettings.enableNetwork) {return false;}";
     return replaceInSourceCode(content, pattern, replacementText);
+}
+
+export function applyInspectorViewCloseDrawerPatch(content: string) {
+    // this patch closes the drawer if the network tool is disabled
+    const pattern = /self\.UI\.inspectorView\.createToolbars\(\);/g;
+    const replacementText = 'if (!Root.Runtime.vscodeSettings.enableNetwork) {self.UI.InspectorView.instance()._closeDrawer();}';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyMainViewPatch(content: string) {

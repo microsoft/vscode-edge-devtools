@@ -75,10 +75,18 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyInspectorViewPatch correctly changes _showDrawer text", async () => {
+    it("applyInspectorViewShowDrawerPatch correctly changes _showDrawer text", async () => {
         const filePath = "ui/ui.js";
         const patch = SimpleView.applyInspectorViewShowDrawerPatch;
-        const expectedStrings = ["_showDrawer(focus) { return false;"];
+        const expectedStrings = ["if (!Root.Runtime.vscodeSettings.enableNetwork) {return false;}"];
+
+        await testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyInspectorViewCloseDrawerPatch correctly changes _showAppUI text", async () => {
+        const filePath = "main/main.js";
+        const patch = SimpleView.applyInspectorViewCloseDrawerPatch;
+        const expectedStrings = ["self.UI.InspectorView.instance()._closeDrawer();"];
 
         await testPatch(filePath, patch, expectedStrings);
     });

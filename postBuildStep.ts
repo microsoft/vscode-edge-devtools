@@ -24,6 +24,8 @@ import {
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
     applyInspectorCommonNetworkPatch,
+    applyInspectorViewCloseDrawerPatch,
+    applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
     applyPersistRequestBlockingTab,
     applyRemoveBreakOnContextMenuItem,
@@ -101,6 +103,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorCommonCssTabSliderPatch,
     ]);
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
+        applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
@@ -129,6 +132,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyAppendTabConditionsPatch,
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
+        applyInspectorViewShowDrawerPatch,
         applyPersistRequestBlockingTab,
         applySetTabIconPatch,
         applyShowRequestBlockingTab,
