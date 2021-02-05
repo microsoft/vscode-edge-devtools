@@ -274,4 +274,12 @@ describe("simpleView", () => {
 
         testPatch(filePath, patch, [], unexpectedStrings);
     });
+
+    it("applyRerouteConsoleMessagePatch correctly changes root.js to set extensionSettings map", async () => {
+        const filePath = "sdk/sdk.js";
+        const patch = SimpleView.applyRerouteConsoleMessagePatch;
+        const expectedStrings = ["sendToVscodeOutput"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
 });

@@ -53,6 +53,10 @@ export function getVscodeSettings(callback: (arg0: object) => void) {
     InspectorFrontendHost.getVscodeSettings(callback);
 }
 
+export function sendToVscodeOutput(message: string) {
+    InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
+}
+
 export function applyExtensionSettingsInstantiatePatch(content: string) {
     const pattern = /const experiments\s*=\s*new ExperimentsSupport\(\);/;
     const replacementText = `const vscodeSettings={};`
@@ -380,4 +384,10 @@ export function applyRemovePreferencePatch(content: string) {
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
     const replacementText = "removePreference(name){return;}";
     return replaceInSourceCode(content, pattern, replacementText);
+}
+
+export function applyRerouteConsoleMessagePatch(content: string) {
+    const pattern = /this\.dispatchEventToListeners\(Events\$h\.MessageAdded,\s*msg\);/g;
+    const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
