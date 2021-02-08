@@ -50,7 +50,7 @@ export function createFakeVSCode() {
             machineId: "someValue.machineId",
         },
         window: {
-            createOutputChannel: jest.fn(),
+            createOutputChannel: jest.fn().mockReturnValue({ appendLine: jest.fn() }),
             createWebviewPanel: jest.fn(),
             registerTreeDataProvider: jest.fn(),
             showErrorMessage: jest.fn(),
