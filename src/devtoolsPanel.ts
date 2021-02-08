@@ -50,6 +50,9 @@ export class DevToolsPanel {
         this.targetUrl = targetUrl;
         this.config = config;
         this.consoleOutput = vscode.window.createOutputChannel("DevTools Console");
+        this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
+        this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
+        this.consoleOutput.appendLine('');
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
