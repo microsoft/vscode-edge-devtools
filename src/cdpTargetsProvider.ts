@@ -45,7 +45,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
                             if (actualTarget.type !== 'page') {
                                 targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
                             } else {
-                                const iconPath = await this.downloadFaviconFromSitePromise(actualTarget.url, targets, actualTarget);
+                                const iconPath = await this.downloadFaviconFromSitePromise(actualTarget.url);
                                 if (iconPath) {
                                     targets.push(new CDPTarget(actualTarget, "", this.extensionPath, iconPath));
                                 } else {
