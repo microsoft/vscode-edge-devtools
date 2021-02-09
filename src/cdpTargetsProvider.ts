@@ -88,7 +88,10 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         this.changeDataEvent.fire(null);
     }
 
-    private downloadFaviconFromSitePromise(url: string, targets: any, actualTarget: any) : Promise<string | null> | null {
+    private downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
+        if (!this.extensionPath || !url) {
+            return null;
+        }
         const https = require('https');
         const fs = require('fs');
         const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
@@ -107,10 +110,6 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
 
         // Replacing ".microsoft.com/en-us/microsoft-edge/" with ".microsoft.com/favicon.ico"
         const faviconUrl = url.replace(faviconRegex, "$1favicon.ico");
-
-        if (!this.extensionPath) {
-            return null;
-        }
 
         const filePath = path.join(this.extensionPath, "resources", "favicons", filename);
 
