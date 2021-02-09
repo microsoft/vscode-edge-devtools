@@ -63,5 +63,8 @@ typings/
 # project specific
 out/
 coverage/
-resources/favicons/
 *.vsix
+
+# favicons - we want to ignore any downloaded .ico files but keep the directory that stores them.
+resources/favicons/*
+!resources/favicons/.gitkeep
