@@ -3,6 +3,7 @@
 
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
+import * as path from "path";
 import CDPTarget from "./cdpTarget";
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson } from "./utils";
 
@@ -36,15 +37,31 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
                     undefined,
                     { targetCount: responseArray.length },
                 );
-
-                responseArray.forEach((target: IRemoteTargetJson) => {
-                    const actualTarget = fixRemoteWebSocket(hostname, port, target);
-                    targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
-                });
+                if (responseArray.length) {
+                    await new Promise<void>((resolve) => {
+                        let targetsProcessed = 0;
+                        responseArray.forEach(async (target: IRemoteTargetJson) => {
+                            const actualTarget = fixRemoteWebSocket(hostname, port, target);
+                            if (actualTarget.type !== 'page') {
+                                targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
+                            } else {
+                                const iconPath = await this.downloadFaviconFromSitePromise(actualTarget.url, targets, actualTarget);
+                                if (iconPath) {
+                                    targets.push(new CDPTarget(actualTarget, "", this.extensionPath, iconPath));
+                                } else {
+                                    targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
+                                }
+                            }
+                            targetsProcessed++;
+                            if (targetsProcessed === responseArray.length) {
+                                resolve();
+                            }
+                        });
+                    });
+                }
             } else {
                 this.telemetryReporter.sendTelemetryEvent("view/error/no_json_array");
             }
-
             // Sort the targets by type and then title, but keep 'page' types at the top
             // since those are the ones most likely to be the ones the user wants.
             targets.sort((a: CDPTarget, b: CDPTarget) => {
@@ -69,5 +86,59 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     public refresh(): void {
         this.telemetryReporter.sendTelemetryEvent("view/refresh");
         this.changeDataEvent.fire(null);
+    }
+
+    private downloadFaviconFromSitePromise(url: string, targets: any, actualTarget: any) : Promise<string | null> | null {
+        const https = require('https');
+        const fs = require('fs');
+        const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
+
+        // Example regex match: https://docs.microsoft.com/en-us/microsoft-edge/
+        // urlMatch[0] = .microsoft.com/en-us/microsoft-edge/
+        // urlMatch[1] = .microsoft.com/
+        // urlMatch[2] = microsoft
+        const urlMatch = url.match(faviconRegex);
+        let filename;
+        if (urlMatch) {
+            filename = `${urlMatch[2]}Favicon.ico`;
+        } else {
+            return null;
+        }
+
+        // Replacing ".microsoft.com/en-us/microsoft-edge/" with ".microsoft.com/favicon.ico"
+        const faviconUrl = url.replace(faviconRegex, "$1favicon.ico");
+
+        if (!this.extensionPath) {
+            return null;
+        }
+
+        const filePath = path.join(this.extensionPath, "resources", "favicons", filename);
+
+        const file = fs.createWriteStream(filePath);
+        const promise = new Promise<string | null>((resolve, reject) => {
+            https.get(faviconUrl, (response: any) => {
+                response.pipe(file);
+                file.on('error', () => {
+                    resolve(null);
+                });
+                file.on('finish', () => {
+                    if (file.bytesWritten) {
+                        resolve(filePath);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            });
+        });
+
+        const timeout = new Promise<null>((resolve) => {
+            const id = setTimeout(() => {
+              clearTimeout(id);
+              resolve(null);
+            }, 1000);
+        });
+
+        // If it takes over a second to download, we will resolve null and use default icons.
+        return Promise.race([promise, timeout]);
     }
 }

@@ -63,4 +63,5 @@ typings/
 # project specific
 out/
 coverage/
+resources/favicons/
 *.vsix

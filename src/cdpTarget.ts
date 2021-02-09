@@ -14,7 +14,7 @@ export default class CDPTarget extends vscode.TreeItem {
     private readonly extensionPath: string | undefined;
     private children: CDPTarget[] = [];
 
-    constructor(targetJson: IRemoteTargetJson, propertyName: string, extensionPath?: string) {
+    constructor(targetJson: IRemoteTargetJson, propertyName: string, extensionPath?: string, iconPath?: string) {
         super(propertyName || targetJson.title || "Target",
               (propertyName ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed));
         this.targetJson = targetJson;
@@ -24,11 +24,18 @@ export default class CDPTarget extends vscode.TreeItem {
 
         // Get the icon for this type of target
         if (this.extensionPath) {
-            const icon = `${this.targetJson.type}.svg`;
-            this.iconPath = {
-                dark: path.join(this.extensionPath, "resources", "dark", icon),
-                light: path.join(this.extensionPath, "resources", "light", icon),
-            };
+            if (iconPath) {
+                this.iconPath = {
+                    dark: iconPath,
+                    light: iconPath,
+                };
+            } else {
+                const icon = `${this.targetJson.type}.svg`;
+                this.iconPath = {
+                    dark: path.join(this.extensionPath, "resources", "dark", icon),
+                    light: path.join(this.extensionPath, "resources", "light", icon),
+                };
+            }
         }
     }
 
