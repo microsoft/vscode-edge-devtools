@@ -274,4 +274,12 @@ describe("simpleView", () => {
 
         testPatch(filePath, patch, [], unexpectedStrings);
     });
+
+    it("applyScreencastCursorPatch correctly changes inspector.js text to remove touch cursor", async () => {
+        const filePath = "screencast/screencast.js";
+        const patch = SimpleView.applyScreencastCursorPatch;
+        const expectedStrings = ["this._canvasContainerElement.style.cursor = 'unset';"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
 });
