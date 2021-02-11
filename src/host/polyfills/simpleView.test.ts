@@ -147,9 +147,9 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyPersistRequestBlockingTab correctly changes text", async () => {
+    it("applyPersistDrawerTabs correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const patch = SimpleView.applyPersistRequestBlockingTab;
+        const patch = SimpleView.applyPersistDrawerTabs;
         const expectedStrings = ["this._closeable=id==='network.blocked-urls'?false:closeable;"];
 
         await testPatch(filePath, patch, expectedStrings);

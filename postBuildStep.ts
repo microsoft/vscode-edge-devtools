@@ -6,6 +6,7 @@ import path from "path";
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtime";
+import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from "./src/host/polyfills/releaseNotes";
 import {
     applyAppendTabOverridePatch,
     applyAppendTabConditionsPatch,
@@ -24,10 +25,8 @@ import {
     applyInspectorCommonCssRightToolbarPatch,
     applyInspectorCommonCssTabSliderPatch,
     applyInspectorCommonNetworkPatch,
-    applyInspectorViewCloseDrawerPatch,
-    applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
-    applyPersistRequestBlockingTab,
+    applyPersistDrawerTabs,
     applyRemoveBreakOnContextMenuItem,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
@@ -103,7 +102,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorCommonCssTabSliderPatch,
     ]);
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
-        applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
@@ -132,8 +130,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyAppendTabConditionsPatch,
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
-        applyInspectorViewShowDrawerPatch,
-        applyPersistRequestBlockingTab,
+        applyPersistDrawerTabs,
         applySetTabIconPatch,
         applyShowRequestBlockingTab,
     ]);
@@ -156,6 +153,11 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper("themes/themes.js", toolsOutDir, [
         applyThemePatch,
+    ]);
+    await patchFileForWebViewWrapper("help/help.js", toolsOutDir, [
+        applyAnnouncementNamePatch,
+        applyGithubLinksPatch,
+        applyReleaseNotePatch,
     ])
 }
 

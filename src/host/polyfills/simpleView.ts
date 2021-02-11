@@ -165,14 +165,14 @@ export function applyRemoveBreakOnContextMenuItem(content: string) {
 export function applyShowRequestBlockingTab(content: string) {
     // Appends the Request Blocking tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
-    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
+    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyPersistRequestBlockingTab(content: string) {
+export function applyPersistDrawerTabs(content: string) {
     // Removes the close button from the Request blocking tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-    const replacementText = "this._closeable=id==='network.blocked-urls'?false:closeable;";
+    const replacementText = "this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -202,6 +202,7 @@ export function applyAppendTabConditionsPatch(content: string) {
         "accessibility.view",
         "elements.domProperties",
         "elements.eventListeners",
+        "release-note",
     ];
 
     const condition = elementsTabs.map((tab) => {
