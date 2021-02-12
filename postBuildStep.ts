@@ -33,7 +33,7 @@ import {
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applySetTabIconPatch,
-    applyShowRequestBlockingTab,
+    applyShowDrawerTabs,
     applyStylesRevealerPatch,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
@@ -136,7 +136,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorViewShowDrawerPatch,
         applyPersistDrawerTabs,
         applySetTabIconPatch,
-        applyShowRequestBlockingTab,
+        applyShowDrawerTabs,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
         applyExtensionSettingsInstantiatePatch,
