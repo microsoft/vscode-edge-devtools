@@ -1,39 +1,27 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { getTextFromFile } from "../../test/helpers";
+import { testPatch } from "../../test/helpers";
+import applyPaddingInlineCssPatch from "./cssPaddingInline";
 
 describe("cssPaddingInline", () => {
     it("applyPaddingInlineCssPatch correctly changes elements-disclosure text", async () => {
         const filePath = "elements/elements_module.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const expectedStrings =
+        [".elements-disclosure .gutter-container {\\n        display: none !important;\\n    }"];
 
-        const apply = await import("./cssPaddingInline");
-        const result = apply.default(fileContents);
-        const expectedResult =
-        ".elements-disclosure .gutter-container {\\n        display: none !important;\\n    }";
-        expect(result).toEqual(
-            expect.stringContaining(expectedResult));
+        testPatch(filePath, applyPaddingInlineCssPatch, expectedStrings);
     });
 
     it("applyPaddingInlineCssPatch correctly changes padding-inline-start text", async () => {
         const filePath = "elements/elements_module.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
+        const expectedStrings = ["webkit-padding-start"];
 
-        const apply = await import("./cssPaddingInline");
-        const result = apply.default(fileContents);
-        expect(result).toEqual(expect.stringContaining("webkit-padding-start"));
+        testPatch(filePath, applyPaddingInlineCssPatch, expectedStrings);
     });
 
     it("applyPaddingInlineCssPatch ignores other text", async () => {
-        const apply = await import("./cssPaddingInline");
-        const expectedText = "body { scroll-padding-inline-start: 10px; }";
-        const result = apply.default(expectedText);
+        const sampleText = "body { scroll-padding-inline-start: 10px; }";
+        const result = applyPaddingInlineCssPatch(sampleText);
         expect(result).toEqual(null);
     });
 });
