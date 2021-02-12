@@ -16,6 +16,8 @@ export default class ToolsHost {
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId: number = 0;
     private getHostCallbacks: Map<number, (preferences: object) => void> = new Map();
+    // We need to add a dummy property to get around build errors for sendToVscodeOutput.
+    InspectorFrontendHostInstance: any;
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
