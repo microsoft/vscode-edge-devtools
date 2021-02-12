@@ -391,3 +391,10 @@ export function applyRerouteConsoleMessagePatch(content: string) {
     const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
+
+export function applyScreencastCursorPatch(content: string) {
+    // This patch removes the touch cursor from the screencast view
+    const pattern = /\('div',\s*'screencast-canvas-container'\);/g
+    const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
+}
