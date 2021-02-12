@@ -13,7 +13,6 @@ import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export default class ToolsHost {
-    [x: string]: any;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId: number = 0;
     private getHostCallbacks: Map<number, (preferences: object) => void> = new Map();

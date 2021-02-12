@@ -54,6 +54,7 @@ export function getVscodeSettings(callback: (arg0: object) => void) {
 }
 
 export function sendToVscodeOutput(message: string) {
+    // Since we are calling InspectorFrontendHost outside of root.js, we need to use InspectorFrontendHost.InspectorFrontendHostInstance
     InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
 }
 
