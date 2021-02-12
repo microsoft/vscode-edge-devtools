@@ -78,7 +78,7 @@ describe("simpleView", () => {
     it("applyInspectorViewShowDrawerPatch correctly changes _showDrawer text", async () => {
         const filePath = "ui/ui.js";
         const patch = SimpleView.applyInspectorViewShowDrawerPatch;
-        const expectedStrings = ["if (!Root.Runtime.vscodeSettings.enableNetwork) {return false;}"];
+        const expectedStrings = ["if (!(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)) {return false;}"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -139,10 +139,10 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, undefined, unexpectedStrings);
     });
 
-    it("applyShowRequestBlockingTab correctly changes text", async () => {
+    it("applyShowDrawerTabs correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const patch = SimpleView.applyShowRequestBlockingTab;
-        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls')"];
+        const patch = SimpleView.applyShowDrawerTabs;
+        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -150,7 +150,7 @@ describe("simpleView", () => {
     it("applyPersistDrawerTabs correctly changes text", async () => {
         const filePath = "ui/ui.js";
         const patch = SimpleView.applyPersistDrawerTabs;
-        const expectedStrings = ["this._closeable=id==='network.blocked-urls'?false:closeable;"];
+        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });

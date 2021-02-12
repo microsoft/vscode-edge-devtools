@@ -193,6 +193,7 @@ export class DevToolsPanel {
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getVscodeSettings", {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
+            whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
             id });
     }
 

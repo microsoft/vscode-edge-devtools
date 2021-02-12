@@ -151,6 +151,7 @@ export default class ToolsHost {
         this.fireGetHostCallback(id, {
             enableNetwork: vscodeObject.enableNetwork,
             theme,
+            whatsNew: vscodeObject.whatsNew,
         });
     }
 
