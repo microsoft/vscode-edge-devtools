@@ -91,12 +91,12 @@ export function applyGithubLinksPatch(content: string) {
 }
 
 export function applyAnnouncementNamePatch(content: string) {
-  const microsoftAnnouncement = /Announcements from the Microsoft Edge DevTools team/;
-  const chromiumAnnouncement = /Announcements from the Chromium project/;
-  if (content.match(microsoftAnnouncement) && content.match(chromiumAnnouncement)) {
-    content = content.replace(microsoftAnnouncement, 'Announcements from the Microsoft Edge Developer Tools for Visual Studio Code Team');
-    return content.replace(chromiumAnnouncement, 'Announcements from the Developer Tools Team');
-  } else {
-    return null;
-  }
+    const microsoftAnnouncement = /Announcements from the Microsoft Edge DevTools team/;
+    const chromiumAnnouncement = /Announcements from the Chromium project/;
+    if (content.match(microsoftAnnouncement) && content.match(chromiumAnnouncement)) {
+        content = content.replace(microsoftAnnouncement, 'New extension features');
+        return content.replace(chromiumAnnouncement, 'New in Developer Tools');
+    } else {
+        return null;
+    }
 }
