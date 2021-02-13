@@ -31,6 +31,7 @@ import {
     applyRemoveBreakOnContextMenuItem,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
+    applyScreencastCursorPatch,
     applySetTabIconPatch,
     applyShowRequestBlockingTab,
     applyStylesRevealerPatch,
@@ -126,6 +127,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper("inspector.html", toolsOutDir, [
         applyContentSecurityPolicyPatch,
+    ]);
+    await patchFileForWebViewWrapper("screencast/screencast.js", toolsOutDir, [
+        applyScreencastCursorPatch,
     ]);
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyAppendTabOverridePatch,
