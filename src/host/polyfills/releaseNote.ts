@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import {DevToolsHighlights, ExtensionHighlights} from "./releaseNoteContent";
+import {devtoolsHighlights, extensionHighlights} from "./releaseNoteContent";
 
 export function applyReleaseNotePatch(content: string) {
     const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+var ReleaseNoteText_edge\s*=/;
@@ -10,8 +10,8 @@ export function applyReleaseNotePatch(content: string) {
             {
             version: 1,
             header: ls\`Highlights from the latest version of Microsoft Edge Developer Tools for Visual Studio Code\`,
-            highlightsEdge: ${ExtensionHighlights}
-            highlights: ${DevToolsHighlights}
+            highlightsEdge: ${extensionHighlights}
+            highlights: ${devtoolsHighlights}
             githubLink: 'https://github.com/microsoft/vscode-edge-devtools',
             issuesLink: 'https://github.com/microsoft/vscode-edge-devtools/issues',
             },

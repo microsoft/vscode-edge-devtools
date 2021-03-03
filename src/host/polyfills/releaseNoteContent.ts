@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export const ExtensionHighlights = `[
+export const extensionHighlights = `[
     {
         title: ls\`DevTools Extension Console rerouting to VSCode output window\`,
         subtitle:
@@ -34,7 +34,7 @@ export const ExtensionHighlights = `[
     },
 ],`
 
-export const DevToolsHighlights = `[
+export const devtoolsHighlights = `[
     {
         title: ls\`CSS grid overlay improvements and new experimental grid features\`,
         subtitle:
