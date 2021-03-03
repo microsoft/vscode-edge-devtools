@@ -171,7 +171,7 @@
                 },
                 "vscode-edge-devtools.whatsNew": {
                     "type": "boolean",
-                    "description": "Enable What's New panel (requires relaunching extension)",
+                    "description": "Enable What's New panel in the drawer (requires relaunching extension)",
                     "default": true
                 },
                 "vscode-edge-devtools.headless": {
