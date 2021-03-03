@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 export const ExtensionHighlights = `[
     {
         title: ls\`DevTools Extension Console rerouting to VSCode output window\`,
