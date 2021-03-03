@@ -86,6 +86,26 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     public refresh(): void {
         this.telemetryReporter.sendTelemetryEvent("view/refresh");
         this.changeDataEvent.fire(null);
+        this.clearFaviconResourceDirectory();
+    }
+
+    private clearFaviconResourceDirectory() {
+      const fs = require('fs');
+      const path = require('path');
+
+      const directory = path.join(this.extensionPath, "resources", "favicons");
+
+      fs.readdir(directory, (err: Error, files: File[]) => {
+        if (err) throw err;
+
+        for (const file of files) {
+          if (file.toString() !== ".gitkeep") {
+            fs.unlink(path.join(directory, file), (err: Error) => {
+              if (err) throw err;
+            });
+          }
+        }
+      });
     }
 
     private downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
@@ -114,8 +134,11 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         const filePath = path.join(this.extensionPath, "resources", "favicons", filename);
 
         const file = fs.createWriteStream(filePath);
-        const promise = new Promise<string | null>((resolve, reject) => {
+        const promise = new Promise<string | null>((resolve) => {
             https.get(faviconUrl, (response: any) => {
+                if (response.headers["content-type"] !== "image/x-icon") {
+                  resolve(null);
+                }
                 response.pipe(file);
                 file.on('error', () => {
                     resolve(null);
