@@ -50,6 +50,7 @@ export function createFakeVSCode() {
             machineId: "someValue.machineId",
         },
         window: {
+            createOutputChannel: jest.fn().mockReturnValue({ appendLine: jest.fn() }),
             createWebviewPanel: jest.fn(),
             registerTreeDataProvider: jest.fn(),
             showErrorMessage: jest.fn(),
@@ -64,6 +65,8 @@ export function createFakeVSCode() {
                             return true;
                         case "themeString":
                             return "System preference";
+                        case "whatsNew":
+                            return true;
                         default:
                             return undefined;
                     }

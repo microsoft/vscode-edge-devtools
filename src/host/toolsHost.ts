@@ -13,6 +13,9 @@ import ToolsResourceLoader from "./toolsResourceLoader";
 import ToolsWebSocket from "./toolsWebSocket";
 
 export default class ToolsHost {
+    // We need to add a dummy property to get around build errors for sendToVscodeOutput.
+    // tslint:disable-next-line:variable-name
+    public InspectorFrontendHostInstance: any;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId: number = 0;
     private getHostCallbacks: Map<number, (preferences: object) => void> = new Map();
@@ -87,8 +90,16 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getVscodeSettings", {id});
     }
 
+    public sendToVscodeOutput(consoleMessage: string) {
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "consoleOutput", {consoleMessage});
+    }
+
     public copyText(clipboardData: string) {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "copyText", {clipboardData});
+    }
+
+    public openInNewTab(url: string) {
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openUrl", {url});
     }
 
     public focusEditor(next: boolean) {
@@ -147,6 +158,7 @@ export default class ToolsHost {
         this.fireGetHostCallback(id, {
             enableNetwork: vscodeObject.enableNetwork,
             theme,
+            whatsNew: vscodeObject.whatsNew,
         });
     }
 

@@ -35,6 +35,7 @@ export class DevToolsPanel {
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
+    private consoleOutput: vscode.OutputChannel;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -48,6 +49,10 @@ export class DevToolsPanel {
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
         this.config = config;
+        this.consoleOutput = vscode.window.createOutputChannel("DevTools Console");
+        this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
+        this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
+        this.consoleOutput.appendLine('');
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
@@ -58,11 +63,13 @@ export class DevToolsPanel {
         this.panelSocket.on("getVscodeSettings", (msg) => this.onSocketGetVscodeSettings(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
+        this.panelSocket.on("openUrl", (msg) => this.onSocketOpenUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
         this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
         this.panelSocket.on("focusEditor", (msg) => this.onSocketFocusEditor(msg));
         this.panelSocket.on("focusEditorGroup", (msg) => this.onSocketFocusEditorGroup(msg));
+        this.panelSocket.on("consoleOutput", (msg) => this.onSocketConsoleOutput(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -146,6 +153,11 @@ export class DevToolsPanel {
         }
     }
 
+    private onSocketConsoleOutput(message: string) {
+        const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
+        this.consoleOutput.appendLine(consoleMessage);
+    }
+
     private onSocketTelemetry(message: string) {
         const telemetry: TelemetryData = JSON.parse(message);
 
@@ -192,6 +204,7 @@ export class DevToolsPanel {
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getVscodeSettings", {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
+            whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
             id });
     }
 
@@ -215,6 +228,11 @@ export class DevToolsPanel {
         }
 
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", { id: request.id, content });
+    }
+
+    private async onSocketOpenUrl(message: string) {
+      const { url } = JSON.parse(message) as { url: string };
+      vscode.env.openExternal(vscode.Uri.parse(url));
     }
 
     private async onSocketOpenInEditor(message: string) {

@@ -18,6 +18,8 @@ const enum KeepMatchedText {
     AtEnd = 2
 }
 
+const isDrawerEnabled = "(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)";
+
 function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText) {
     const match = content.match(pattern);
     if (match) {
@@ -51,6 +53,11 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
 
 export function getVscodeSettings(callback: (arg0: object) => void) {
     InspectorFrontendHost.getVscodeSettings(callback);
+}
+
+export function sendToVscodeOutput(message: string) {
+    // Since we are calling InspectorFrontendHost outside of root.js, we need to use InspectorFrontendHost.InspectorFrontendHostInstance
+    InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
 }
 
 export function applyExtensionSettingsInstantiatePatch(content: string) {
@@ -139,14 +146,14 @@ export function applyCommandMenuPatch(content: string) {
 export function applyInspectorViewShowDrawerPatch(content: string) {
     // This patch hides the drawer.
     const pattern = /_showDrawer\(focus\)\s*{/g;
-    const replacementText = "_showDrawer(focus) { if (!Root.Runtime.vscodeSettings.enableNetwork) {return false;}";
+    const replacementText = `_showDrawer(focus) { if (!${isDrawerEnabled}) {return false;}`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyInspectorViewCloseDrawerPatch(content: string) {
     // this patch closes the drawer if the network tool is disabled
     const pattern = /self\.UI\.inspectorView\.createToolbars\(\);/g;
-    const replacementText = 'if (!Root.Runtime.vscodeSettings.enableNetwork) {self.UI.InspectorView.instance()._closeDrawer();}';
+    const replacementText = `if (!${isDrawerEnabled}) {self.UI.InspectorView.instance()._closeDrawer();}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
@@ -162,17 +169,17 @@ export function applyRemoveBreakOnContextMenuItem(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyShowRequestBlockingTab(content: string) {
-    // Appends the Request Blocking tab in the drawer even if it is not open.
+export function applyShowDrawerTabs(content: string) {
+    // Appends the Request Blocking tab or Whats New tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
-    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
+    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyPersistRequestBlockingTab(content: string) {
-    // Removes the close button from the Request blocking tab by making the tab non-closeable.
+export function applyPersistDrawerTabs(content: string) {
+    // Removes the close button from the Request blocking and Whats New tab tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-    const replacementText = "this._closeable=id==='network.blocked-urls'?false:closeable;";
+    const replacementText = "this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -215,6 +222,10 @@ export function applyAppendTabConditionsPatch(content: string) {
         appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
             let patchedCondition = ${condition};
             ${applyEnableNetworkPatch()}
+            console.log(Root.Runtime.vscodeSettings.whatsNew);
+            if(Root.Runtime.vscodeSettings.whatsNew) {
+              patchedCondition = patchedCondition && (id !== "release-note");
+            }
             if (!patchedCondition) {
                 this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
             }
@@ -380,6 +391,12 @@ export function applyRemovePreferencePatch(content: string) {
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
     const replacementText = "removePreference(name){return;}";
     return replaceInSourceCode(content, pattern, replacementText);
+}
+
+export function applyRerouteConsoleMessagePatch(content: string) {
+    const pattern = /this\.dispatchEventToListeners\(Events\$h\.MessageAdded,\s*msg\);/g;
+    const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyScreencastCursorPatch(content: string) {
