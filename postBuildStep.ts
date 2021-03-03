@@ -6,6 +6,7 @@ import path from "path";
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtime";
+import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from "./src/host/polyfills/releaseNote";
 import {
     applyAppendTabOverridePatch,
     applyAppendTabConditionsPatch,
@@ -27,14 +28,14 @@ import {
     applyInspectorViewCloseDrawerPatch,
     applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
-    applyPersistRequestBlockingTab,
+    applyPersistDrawerTabs,
     applyRemoveBreakOnContextMenuItem,
     applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applyScreencastCursorPatch,
     applySetTabIconPatch,
-    applyShowRequestBlockingTab,
+    applyShowDrawerTabs,
     applyStylesRevealerPatch,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
@@ -138,9 +139,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
         applyInspectorViewShowDrawerPatch,
-        applyPersistRequestBlockingTab,
+        applyPersistDrawerTabs,
         applySetTabIconPatch,
-        applyShowRequestBlockingTab,
+        applyShowDrawerTabs,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
         applyExtensionSettingsInstantiatePatch,
@@ -162,6 +163,11 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("themes/themes.js", toolsOutDir, [
         applyThemePatch,
     ]);
+    await patchFileForWebViewWrapper("help/help.js", toolsOutDir, [
+        applyAnnouncementNamePatch,
+        applyGithubLinksPatch,
+        applyReleaseNotePatch,
+    ])
     await patchFileForWebViewWrapper("sdk/sdk.js", toolsOutDir, [
         applyRerouteConsoleMessagePatch,
     ]);

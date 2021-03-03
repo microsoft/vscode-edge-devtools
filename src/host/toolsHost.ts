@@ -98,6 +98,10 @@ export default class ToolsHost {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "copyText", {clipboardData});
     }
 
+    public openInNewTab(url: string) {
+        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openUrl", {url});
+    }
+
     public focusEditor(next: boolean) {
         encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "focusEditor", {next});
     }
@@ -154,6 +158,7 @@ export default class ToolsHost {
         this.fireGetHostCallback(id, {
             enableNetwork: vscodeObject.enableNetwork,
             theme,
+            whatsNew: vscodeObject.whatsNew,
         });
     }
 

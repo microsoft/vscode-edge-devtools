@@ -169,6 +169,11 @@
                     "description": "Enable network panel (requires relaunching extension)",
                     "default": true
                 },
+                "vscode-edge-devtools.whatsNew": {
+                    "type": "boolean",
+                    "description": "Enable What's New panel in the drawer (requires relaunching extension)",
+                    "default": true
+                },
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
                     "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",

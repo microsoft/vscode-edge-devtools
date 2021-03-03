@@ -63,6 +63,7 @@ export class DevToolsPanel {
         this.panelSocket.on("getVscodeSettings", (msg) => this.onSocketGetVscodeSettings(msg));
         this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
         this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
+        this.panelSocket.on("openUrl", (msg) => this.onSocketOpenUrl(msg));
         this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
         this.panelSocket.on("close", () => this.onSocketClose());
         this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
@@ -203,6 +204,7 @@ export class DevToolsPanel {
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getVscodeSettings", {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
+            whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
             id });
     }
 
@@ -226,6 +228,11 @@ export class DevToolsPanel {
         }
 
         encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", { id: request.id, content });
+    }
+
+    private async onSocketOpenUrl(message: string) {
+      const { url } = JSON.parse(message) as { url: string };
+      vscode.env.openExternal(vscode.Uri.parse(url));
     }
 
     private async onSocketOpenInEditor(message: string) {

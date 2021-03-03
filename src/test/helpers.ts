@@ -65,6 +65,8 @@ export function createFakeVSCode() {
                             return true;
                         case "themeString":
                             return "System preference";
+                        case "whatsNew":
+                            return true;
                         default:
                             return undefined;
                     }
