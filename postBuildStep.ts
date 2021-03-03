@@ -30,6 +30,7 @@ import {
     applyMainViewPatch,
     applyPersistDrawerTabs,
     applyRemoveBreakOnContextMenuItem,
+    applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applyScreencastCursorPatch,
@@ -167,6 +168,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyGithubLinksPatch,
         applyReleaseNotePatch,
     ])
+    await patchFileForWebViewWrapper("sdk/sdk.js", toolsOutDir, [
+        applyRerouteConsoleMessagePatch,
+    ]);
 }
 
 // This function wraps the patchFileForWebView function to catch any errors thrown, log them

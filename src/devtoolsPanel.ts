@@ -35,6 +35,7 @@ export class DevToolsPanel {
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
+    private consoleOutput: vscode.OutputChannel;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -48,6 +49,10 @@ export class DevToolsPanel {
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
         this.config = config;
+        this.consoleOutput = vscode.window.createOutputChannel("DevTools Console");
+        this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
+        this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
+        this.consoleOutput.appendLine('');
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
@@ -64,6 +69,7 @@ export class DevToolsPanel {
         this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
         this.panelSocket.on("focusEditor", (msg) => this.onSocketFocusEditor(msg));
         this.panelSocket.on("focusEditorGroup", (msg) => this.onSocketFocusEditorGroup(msg));
+        this.panelSocket.on("consoleOutput", (msg) => this.onSocketConsoleOutput(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -145,6 +151,11 @@ export class DevToolsPanel {
         } else {
             vscode.commands.executeCommand("workbench.action.focusPreviousGroup");
         }
+    }
+
+    private onSocketConsoleOutput(message: string) {
+        const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
+        this.consoleOutput.appendLine(consoleMessage);
     }
 
     private onSocketTelemetry(message: string) {
