@@ -91,17 +91,17 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
 
     private clearFaviconResourceDirectory() {
       const fs = require('fs');
-      const path = require('path');
 
       const directory = path.join(this.extensionPath, "resources", "favicons");
 
-      fs.readdir(directory, (err: Error, files: File[]) => {
-        if (err) throw err;
+      fs.readdir(directory, (readdirError: Error, files: File[]) => {
+        if (readdirError) throw readdirError;
 
         for (const file of files) {
-          if (file.toString() !== ".gitkeep") {
-            fs.unlink(path.join(directory, file), (err: Error) => {
-              if (err) throw err;
+          const fileString = file.toString();
+          if (fileString !== ".gitkeep") {
+            fs.unlink(path.join(directory, fileString), (unlinkError: Error) => {
+              if (unlinkError) throw unlinkError;
             });
           }
         }
@@ -136,20 +136,21 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         const file = fs.createWriteStream(filePath);
         const promise = new Promise<string | null>((resolve) => {
             https.get(faviconUrl, (response: any) => {
-                if (response.headers["content-type"] !== "image/x-icon") {
+                if (response.headers["content-type"] === "image/x-icon") {
+                  response.pipe(file);
+                  file.on('error', () => {
+                      resolve(null);
+                  });
+                  file.on('finish', () => {
+                      if (file.bytesWritten) {
+                          resolve(filePath);
+                      } else {
+                          resolve(null);
+                      }
+                  });
+                } else {
                   resolve(null);
                 }
-                response.pipe(file);
-                file.on('error', () => {
-                    resolve(null);
-                });
-                file.on('finish', () => {
-                    if (file.bytesWritten) {
-                        resolve(filePath);
-                    } else {
-                        resolve(null);
-                    }
-                });
             });
         });
 
