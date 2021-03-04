@@ -112,8 +112,8 @@ describe("CDPTargetsProvider", () => {
         const provider = new cdpTargetsProvider(mockContext, mockReporter);
         const microsoftIcon = await provider.downloadFaviconFromSitePromise("https://docs.microsoft.com/en-us/microsoft-edge/");
         const bingIcon = await provider.downloadFaviconFromSitePromise("https://www.bing.com/");
-        expect(microsoftIcon).toEqual("resources\\favicons\\microsoftFavicon.ico");
-        expect(bingIcon).toEqual("resources\\favicons\\bingFavicon.ico");
+        expect(microsoftIcon).not.toEqual(null);
+        expect(bingIcon).not.toEqual(null);
         const checkFileLengthPromise = new Promise<number>((resolve) => {
             fs.readdir(dir, (err: Error, files: File[]) => {
                 resolve(files.length);
