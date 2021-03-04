@@ -1,9 +1,9 @@
 ## 1.1.4
-* [Feature] DevTools Console messages now reroute to the VSCode output window - [PR #275](https://github.com/microsoft/vscode-edge-devtools/pull/275)
-* [Feature] Target website favicon displays in the extension's target list - [PR #278](https://github.com/microsoft/vscode-edge-devtools/pull/278)
-* [Bug Fix]: Links to source code in Elements pane now redirect as expected - [PR #264](https://github.com/microsoft/vscode-edge-devtools/pull/264)
-* [Bug Fix]: Screencase cursor now uses default cursor - [PR #279](https://github.com/microsoft/vscode-edge-devtools/pull/279)
-* [Feature] Read about the latest changes like these in the What's New tab - [PR #281](https://github.com/microsoft/vscode-edge-devtools/pull/281)
+* **[Feature]**: DevTools Console messages now reroute to the VSCode output window - [PR #275](https://github.com/microsoft/vscode-edge-devtools/pull/275)
+* **[Feature]**: Target website favicon displays in the extension's target list - [PR #278](https://github.com/microsoft/vscode-edge-devtools/pull/278)
+* **[Bug Fix]**: Links to source code in Elements pane now redirect as expected - [PR #264](https://github.com/microsoft/vscode-edge-devtools/pull/264)
+* **[Bug Fix]**: Screencase cursor now uses default cursor - [PR #279](https://github.com/microsoft/vscode-edge-devtools/pull/279)
+* **[Feature]**: Read about the latest changes like these in the What's New tab - [PR #281](https://github.com/microsoft/vscode-edge-devtools/pull/281)
 
 ## 1.1.3
 * Bumping Edge Devtools version from 85.0.564.40 to 87.0.668.0 - [PR #235](https://github.com/microsoft/vscode-edge-devtools/pull/251)
