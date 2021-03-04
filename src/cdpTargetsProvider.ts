@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import * as path from "path";
+import * as fs from "fs";
 import CDPTarget from "./cdpTarget";
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson } from "./utils";
 
@@ -89,31 +90,40 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         this.clearFaviconResourceDirectory();
     }
 
-    private clearFaviconResourceDirectory() {
-      const fs = require('fs');
-
+    public async clearFaviconResourceDirectory(): Promise<void> {
       const directory = path.join(this.extensionPath, "resources", "favicons");
+      let finalFile = false;
 
-      fs.readdir(directory, (readdirError: Error, files: File[]) => {
-        if (readdirError) throw readdirError;
-
-        for (const file of files) {
-          const fileString = file.toString();
-          if (fileString !== ".gitkeep") {
-            fs.unlink(path.join(directory, fileString), (unlinkError: Error) => {
-              if (unlinkError) throw unlinkError;
-            });
-          }
-        }
+      const promise = new Promise<void>((resolve) => {
+        fs.readdir(directory, (readdirError: Error | null, files: string[]) => {
+            if (readdirError) throw readdirError;
+            for (let i = 0; i < files.length; i++) {
+              if (i === files.length - 1) {
+                  finalFile = true;
+              }
+              const file = files[i];
+              const fileString = file.toString();
+              if (fileString !== ".gitkeep") {
+                fs.unlink(path.join(directory, fileString), (unlinkError) => {
+                  if (unlinkError) throw unlinkError;
+                  if (finalFile) {
+                      resolve();
+                  }
+                });
+              } else if (finalFile) {
+                  resolve();
+              }
+            }
+          });
       });
+      await promise;
     }
 
-    private downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
-        if (!this.extensionPath || !url) {
+    public downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
+        if (!url) {
             return null;
         }
         const https = require('https');
-        const fs = require('fs');
         const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
 
         // Example regex match: https://docs.microsoft.com/en-us/microsoft-edge/
@@ -136,7 +146,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         const file = fs.createWriteStream(filePath);
         const promise = new Promise<string | null>((resolve) => {
             https.get(faviconUrl, (response: any) => {
-                if (response.headers["content-type"] === "image/x-icon") {
+                if (response.headers["content-type"].includes('icon')) {
                   response.pipe(file);
                   file.on('error', () => {
                       resolve(null);

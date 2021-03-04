@@ -103,4 +103,32 @@ describe("CDPTargetsProvider", () => {
         expect(result2.length).toEqual(0);
         expect(mockReporter.sendTelemetryEvent).toHaveBeenCalled();
     });
+
+    it("check if favicons are downloaded and cleared correctly", async () => {
+        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
+        const fs = require('fs');
+        const dir = './resources/favicons/';
+
+        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const microsoftIcon = await provider.downloadFaviconFromSitePromise("https://docs.microsoft.com/en-us/microsoft-edge/");
+        const bingIcon = await provider.downloadFaviconFromSitePromise("https://www.bing.com/");
+        expect(microsoftIcon).toEqual("resources\\favicons\\microsoftFavicon.ico");
+        expect(bingIcon).toEqual("resources\\favicons\\bingFavicon.ico");
+        const checkFileLengthPromise = new Promise<number>((resolve) => {
+            fs.readdir(dir, (err: Error, files: File[]) => {
+                resolve(files.length);
+            });
+        });
+        const numFiles = await checkFileLengthPromise;
+        expect(numFiles).toEqual(3); // Two favicon files plus the .gitkeep file.
+
+        await provider.clearFaviconResourceDirectory();
+        const checkFileLengthAfterDeletionPromise = new Promise<number>((resolve) => {
+            fs.readdir(dir, (err: Error, files: File[]) => {
+                resolve(files.length);
+            });
+        });
+        const numFilesAfterDeletion = await checkFileLengthAfterDeletionPromise;
+        expect(numFilesAfterDeletion).toEqual(1); // the .gitkeep file.
+    });
 });
