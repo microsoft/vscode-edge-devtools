@@ -160,7 +160,7 @@ export async function attach(
                 DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
             } else if (useRetry) {
                 // Wait for a little bit until we retry
-                await new Promise((resolve, reject) => {
+                await new Promise<void>((resolve) => {
                     setTimeout(() => {
                         resolve();
                     }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
