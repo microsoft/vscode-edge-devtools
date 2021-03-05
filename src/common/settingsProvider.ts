@@ -20,6 +20,12 @@ export class SettingsProvider {
     return themeString;
   }
 
+  public getWhatsNewSettings(): boolean {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const whatsNewEnabled: boolean = settings.get("whatsNew") || false;
+    return whatsNewEnabled;
+  }
+
   public static get instance() {
     if (!SettingsProvider.singletonInstance) {
       SettingsProvider.singletonInstance = new SettingsProvider();

@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.1.3",
+    "version": "1.1.4",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -167,6 +167,11 @@
                 "vscode-edge-devtools.enableNetwork": {
                     "type": "boolean",
                     "description": "Enable network panel (requires relaunching extension)",
+                    "default": true
+                },
+                "vscode-edge-devtools.whatsNew": {
+                    "type": "boolean",
+                    "description": "Enable What's New panel in the drawer (requires relaunching extension)",
                     "default": true
                 },
                 "vscode-edge-devtools.headless": {
@@ -530,7 +535,7 @@
         "ts-node": "9.0.0",
         "tslint": "6.1.3",
         "typescript": "4.0.2",
-        "vsce": "1.79.5",
+        "vsce": "1.85.1",
         "vscode-test": "1.4.0",
         "webpack": "4.44.1",
         "webpack-cli": "3.3.12"

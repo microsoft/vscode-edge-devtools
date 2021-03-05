@@ -6,6 +6,7 @@ import path from "path";
 import applyPaddingInlineCssPatch from "./src/host/polyfills/cssPaddingInline";
 import { applyContentSecurityPolicyPatch } from "./src/host/polyfills/inspectorContentPolicy";
 import applyRuntimeImportScriptPathPrefixPatch from "./src/host/polyfills/runtime";
+import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from "./src/host/polyfills/releaseNote";
 import {
     applyAppendTabOverridePatch,
     applyAppendTabConditionsPatch,
@@ -27,12 +28,14 @@ import {
     applyInspectorViewCloseDrawerPatch,
     applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
-    applyPersistRequestBlockingTab,
+    applyPersistDrawerTabs,
     applyRemoveBreakOnContextMenuItem,
+    applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
+    applyScreencastCursorPatch,
     applySetTabIconPatch,
-    applyShowRequestBlockingTab,
+    applyShowDrawerTabs,
     applyStylesRevealerPatch,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
@@ -127,15 +130,18 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("inspector.html", toolsOutDir, [
         applyContentSecurityPolicyPatch,
     ]);
+    await patchFileForWebViewWrapper("screencast/screencast.js", toolsOutDir, [
+        applyScreencastCursorPatch,
+    ]);
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyAppendTabOverridePatch,
         applyAppendTabConditionsPatch,
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
         applyInspectorViewShowDrawerPatch,
-        applyPersistRequestBlockingTab,
+        applyPersistDrawerTabs,
         applySetTabIconPatch,
-        applyShowRequestBlockingTab,
+        applyShowDrawerTabs,
     ]);
     await patchFileForWebViewWrapper("root/root.js", toolsOutDir, [
         applyExtensionSettingsInstantiatePatch,
@@ -156,7 +162,15 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper("themes/themes.js", toolsOutDir, [
         applyThemePatch,
+    ]);
+    await patchFileForWebViewWrapper("help/help.js", toolsOutDir, [
+        applyAnnouncementNamePatch,
+        applyGithubLinksPatch,
+        applyReleaseNotePatch,
     ])
+    await patchFileForWebViewWrapper("sdk/sdk.js", toolsOutDir, [
+        applyRerouteConsoleMessagePatch,
+    ]);
 }
 
 // This function wraps the patchFileForWebView function to catch any errors thrown, log them

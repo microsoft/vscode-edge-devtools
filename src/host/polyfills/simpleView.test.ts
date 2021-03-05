@@ -50,7 +50,7 @@ describe("simpleView", () => {
     it("applyInspectorViewShowDrawerPatch correctly changes _showDrawer text", async () => {
         const filePath = "ui/ui.js";
         const patch = SimpleView.applyInspectorViewShowDrawerPatch;
-        const expectedStrings = ["if (!Root.Runtime.vscodeSettings.enableNetwork) {return false;}"];
+        const expectedStrings = ["if (!(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)) {return false;}"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -111,18 +111,18 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, undefined, unexpectedStrings);
     });
 
-    it("applyShowRequestBlockingTab correctly changes text", async () => {
+    it("applyShowDrawerTabs correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const patch = SimpleView.applyShowRequestBlockingTab;
-        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls')"];
+        const patch = SimpleView.applyShowDrawerTabs;
+        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyPersistRequestBlockingTab correctly changes text", async () => {
+    it("applyPersistDrawerTabs correctly changes text", async () => {
         const filePath = "ui/ui.js";
-        const patch = SimpleView.applyPersistRequestBlockingTab;
-        const expectedStrings = ["this._closeable=id==='network.blocked-urls'?false:closeable;"];
+        const patch = SimpleView.applyPersistDrawerTabs;
+        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -245,5 +245,21 @@ describe("simpleView", () => {
         const unexpectedStrings = ["this._navigateToSource(selectElement, true);"];
 
         testPatch(filePath, patch, [], unexpectedStrings);
+    });
+
+    it("applyRerouteConsoleMessagePatch correctly changes root.js to set extensionSettings map", async () => {
+        const filePath = "sdk/sdk.js";
+        const patch = SimpleView.applyRerouteConsoleMessagePatch;
+        const expectedStrings = ["sendToVscodeOutput"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyScreencastCursorPatch correctly changes inspector.js text to remove touch cursor", async () => {
+        const filePath = "screencast/screencast.js";
+        const patch = SimpleView.applyScreencastCursorPatch;
+        const expectedStrings = ["this._canvasContainerElement.style.cursor = 'unset';"];
+
+        testPatch(filePath, patch, expectedStrings);
     });
 });
