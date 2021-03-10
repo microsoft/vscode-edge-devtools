@@ -98,6 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.copyItem`,
         (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
+    vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
 }
 
 export async function attach(
