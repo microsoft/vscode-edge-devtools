@@ -6,7 +6,7 @@ import TelemetryReporter from "vscode-extension-telemetry";
 import * as path from "path";
 import * as fs from "fs";
 import CDPTarget from "./cdpTarget";
-import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson } from "./utils";
+import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from "./utils";
 
 export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     public readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
@@ -28,6 +28,8 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     public async getChildren(element?: CDPTarget): Promise<CDPTarget[]> {
         let targets: CDPTarget[] = [];
 
+        const willShowWorkers = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('showWorkers');
+
         if (!element) {
             // Get a list of the targets available
             const { hostname, port, useHttps } = getRemoteEndpointSettings();
@@ -43,15 +45,15 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
                         let targetsProcessed = 0;
                         responseArray.forEach(async (target: IRemoteTargetJson) => {
                             const actualTarget = fixRemoteWebSocket(hostname, port, target);
-                            if (actualTarget.type !== 'page') {
-                                targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
-                            } else {
+                            if (actualTarget.type === 'page' || actualTarget.type === 'iframe') {
                                 const iconPath = await this.downloadFaviconFromSitePromise(actualTarget.url);
                                 if (iconPath) {
                                     targets.push(new CDPTarget(actualTarget, "", this.extensionPath, iconPath));
                                 } else {
                                     targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
                                 }
+                            } else if ((actualTarget.type !== 'service_worker' && actualTarget.type !== 'shared_worker') || willShowWorkers) {
+                                targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
                             }
                             targetsProcessed++;
                             if (targetsProcessed === responseArray.length) {
