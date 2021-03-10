@@ -169,6 +169,33 @@ export function getTextFromFile(uri: string) {
 }
 
 /**
+ * This helper test function grabs the source code, applies the given patch, checks to see if the patch is applied, and checks for expected and unexpected strings.
+ * @param filePath Path to the source file (e.g. elements/elements.js)
+ * @param patchFunction The patch function that replaces source code
+ * @param expectedStrings An array of expected strings after running the patchFunction
+ * @param unexpectedStrings An array of non-expected strings after running the patchFunction
+ */
+export async function testPatch(filePath: string, patch: (content:string)=>string|null, expectedStrings?: string[], unexpectedStrings?: string[]) {
+    const fileContents = getTextFromFile(filePath);
+    if (!fileContents) {
+        throw new Error(`Could not find file: ${filePath}`);
+    }
+
+    const result = patch(fileContents);
+    expect(result).not.toEqual(null);
+    if (expectedStrings) {
+        for (const expectedString of expectedStrings) {
+            expect(result).toEqual(expect.stringContaining(expectedString));
+        }
+    }
+    if (unexpectedStrings) {
+        for (const unexpectedString of unexpectedStrings) {
+            expect(result).not.toEqual(expect.stringContaining(unexpectedString));
+        }
+    }
+}
+
+/**
  * @param filepath
  */
 function removeLastTwoDirectories(filepath: string) {
