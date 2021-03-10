@@ -1,25 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { getTextFromFile } from "../../test/helpers";
+import { testPatch } from "../../test/helpers";
+import applySetupTextSelectionPatch from "./textSelection";
 
 describe("textSelection", () => {
     it("applySetupTextSelectionPatch correctly changes text", async () => {
         const filePath = "elements/elements.js";
-        const fileContents = getTextFromFile(filePath);
-        if (!fileContents) {
-            throw new Error(`Could not find file: ${filePath}`);
-        }
-
-        const apply = await import("./textSelection");
-        const result = apply.default(fileContents);
-        expect(result).not.toEqual(null);
-        expect(result).toEqual(expect.stringContaining("_setupTextSelectionHack() { return;"));
+        const expectedStrings = ["_setupTextSelectionHack() { return;"];
+        testPatch(filePath, applySetupTextSelectionPatch, expectedStrings);
     });
 
     it("applySetupTextSelectionPatch ignores other text", async () => {
-        const apply = await import("./textSelection");
         const expectedText = "hello world";
-        const result = apply.default(expectedText);
+        const result = applySetupTextSelectionPatch(expectedText);
         expect(result).toEqual(null);
     });
 });

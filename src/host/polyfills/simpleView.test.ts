@@ -1,35 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { getTextFromFile } from "../../test/helpers";
+import { testPatch } from "../../test/helpers";
 import * as SimpleView from "./simpleView"
-
-/**
- * This helper test function grabs the source code, applies the given patch, checks to see if the patch is applied, and checks for expected and unexpected strings.
- * @param filename
- * @param patchFunction
- * @param expectedStrings
- * @param unexpectedStrings
- * @return
- */
-async function testPatch(filename: string, patch: (content:string)=>string|null, expectedStrings?: string[], unexpectedStrings?: string[]) {
-    const fileContents = getTextFromFile(filename);
-    if (!fileContents) {
-        throw new Error(`Could not find file: ${filename}`);
-    }
-
-    const result = patch(fileContents);
-    expect(result).not.toEqual(null);
-    if (expectedStrings) {
-        for (const expectedString of expectedStrings) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
-    }
-    if (unexpectedStrings) {
-        for (const unexpectedString of unexpectedStrings) {
-            expect(result).not.toEqual(expect.stringContaining(unexpectedString));
-        }
-    }
-}
 
 describe("simpleView", () => {
     it("revealInVSCode calls openInEditor", async () => {
@@ -158,7 +130,7 @@ describe("simpleView", () => {
     it("applyInspectorCommonCssPatch correctly changes text", async () => {
         const filePath = "shell.js";
         const patch = SimpleView.applyInspectorCommonCssPatch;
-        const expectedStrings = [".toolbar-button[aria-label='Toggle screencast'] {\\n            visibility: visible !important;"];
+        const expectedStrings = [".toolbar-button[aria-label='Toggle screencast']", ".toolbar-button[aria-label='More Tools']"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -166,7 +138,7 @@ describe("simpleView", () => {
     it("applyInspectorCommonNetworkPatch correctly changes text", async () => {
         const filePath = "shell.js";
         const patch = SimpleView.applyInspectorCommonNetworkPatch;
-        const expectedStrings = [".toolbar-button[aria-label='Export HAR...'] {\\n            display: none !important;"];
+        const expectedStrings = [".toolbar-button[aria-label='Export HAR...']", ".toolbar-button[aria-label='Pretty print']", ".toolbar-button[aria-label='Close']"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -174,7 +146,7 @@ describe("simpleView", () => {
     it("applyInspectorCommonContextMenuPatch correctly changes text", async () => {
         const filePath = "shell.js";
         const patch = SimpleView.applyInspectorCommonContextMenuPatch;
-        const expectedStrings = [".soft-context-menu-item[aria-label='Save as...'] {\\n            display: none !important;"];
+        const expectedStrings = [".soft-context-menu-item[aria-label='Save as...']", ".soft-context-menu-item[aria-label='Open in Sources panel']", ".soft-context-menu-item[aria-label='Clear browser cookies']"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
