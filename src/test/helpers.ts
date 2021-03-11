@@ -40,6 +40,7 @@ export function createFakeVSCode() {
         },
         ViewColumn: { One: 1, Two: 2 },
         commands: {
+            executeCommand: jest.fn(),
             registerCommand: jest.fn(),
         },
         debug: {

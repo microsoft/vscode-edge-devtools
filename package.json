@@ -453,12 +453,12 @@
             "view/title": [
                 {
                     "command": "vscode-edge-devtools-view.launch",
-                    "when": "view == vscode-edge-devtools-view.targets",
+                    "when": "view == vscode-edge-devtools-view.targets && titleCommandsRegistered",
                     "group": "navigation"
                 },
                 {
                     "command": "vscode-edge-devtools-view.refresh",
-                    "when": "view == vscode-edge-devtools-view.targets",
+                    "when": "view == vscode-edge-devtools-view.targets && titleCommandsRegistered",
                     "group": "navigation"
                 },
                 {
