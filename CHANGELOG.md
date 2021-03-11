@@ -1,3 +1,9 @@
+## 1.1.5
+* **[Feature]**: Add dropdown menu in title view containing link to settings and changelog - [PR #288](https://github.com/microsoft/vscode-edge-devtools/pull/288)
+* **[Feature]**: Created setting to show/hide service and shared workers from the target list - [PR #284](https://github.com/microsoft/vscode-edge-devtools/pull/284)
+* **[Bug Fix]**: Fixed vscode-edge-devtools-view.launch/refresh not found - [PR #287](https://github.com/microsoft/vscode-edge-devtools/pull/287)
+* **[Bug Fix]**: Fixed bug where multiple DevTools console output channels would persist - [PR #292](https://github.com/microsoft/vscode-edge-devtools/pull/292)
+
 ## 1.1.4
 * **[Feature]**: DevTools Console messages now reroute to the VSCode output window - [PR #275](https://github.com/microsoft/vscode-edge-devtools/pull/275)
 * **[Feature]**: Target website favicon displays in the extension's target list - [PR #278](https://github.com/microsoft/vscode-edge-devtools/pull/278)
