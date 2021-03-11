@@ -94,6 +94,7 @@ export class DevToolsPanel {
 
         this.panel.dispose();
         this.panelSocket.dispose();
+        this.consoleOutput.dispose();
 
         this.telemetryReporter.sendTelemetryEvent("websocket/dispose");
 
