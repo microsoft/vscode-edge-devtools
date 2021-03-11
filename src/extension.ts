@@ -72,6 +72,12 @@ export function activate(context: vscode.ExtensionContext) {
             const runtimeConfig = getRuntimeConfig();
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
         }));
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openSettings`, async () => {
+        vscode.commands.executeCommand("workbench.action.openSettings", `${SETTINGS_STORE_NAME}`);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewChangelog`, async () => {
+        vscode.env.openExternal(vscode.Uri.parse("https://github.com/microsoft/vscode-edge-devtools/blob/master/CHANGELOG.md"));
+    }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
         async (target: CDPTarget) => {

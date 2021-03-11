@@ -97,6 +97,16 @@
                 "command": "vscode-edge-devtools-view.copyItem",
                 "category": "Microsoft Edge Tools",
                 "title": "Copy Value"
+            },
+            {
+                "command": "vscode-edge-devtools-view.openSettings",
+                "category": "Microsoft Edge Tools",
+                "title": "Open Settings"
+            },
+            {
+                "command": "vscode-edge-devtools-view.viewChangelog",
+                "category": "Microsoft Edge Tools",
+                "title": "View Changelog"
             }
         ],
         "configuration": {
@@ -435,6 +445,14 @@
                 {
                     "command": "vscode-edge-devtools-view.copyItem",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTargetProperty"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.openSettings",
+                    "when": "view == vscode-edge-devtools-view.targets"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.viewChangelog",
+                    "when": "view == vscode-edge-devtools-view.targets"
                 }
             ],
             "view/title": [
@@ -447,6 +465,16 @@
                     "command": "vscode-edge-devtools-view.refresh",
                     "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.openSettings",
+                    "when": "view == vscode-edge-devtools-view.targets",
+                    "group": "2_vscode-edge-devtools"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.viewChangelog",
+                    "when": "view == vscode-edge-devtools-view.targets",
+                    "group": "2_vscode-edge-devtools"
                 }
             ],
             "view/item/context": [
