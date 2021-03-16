@@ -122,7 +122,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     }
 
     public downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
-        if (!url) {
+        if (!url || !url.startsWith('https')) {
             return null;
         }
         const https = require('https');
