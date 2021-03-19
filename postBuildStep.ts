@@ -33,6 +33,7 @@ import {
     applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
+    applyScreencastAppPatch,
     applyScreencastCursorPatch,
     applySetTabIconPatch,
     applyShowDrawerTabs,
@@ -108,6 +109,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
         applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
+        applyScreencastAppPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
         applySetupTextSelectionPatch,

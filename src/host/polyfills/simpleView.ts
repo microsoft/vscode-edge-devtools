@@ -74,7 +74,7 @@ export function applyExtensionSettingsRuntimeObjectPatch(content: string){
 
 export function applyCreateExtensionSettingsLegacyPatch(content: string) {
     const pattern = /Root\.Runtime\.experiments/g;
-    const replacementText = 'Root.Runtime.vscodeSettings = RootModule.Runtime.vscodeSettings;';
+    const replacementText = 'Root.Runtime.vscodeSettings = Runtime.vscodeSettings;';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
@@ -152,8 +152,8 @@ export function applyInspectorViewShowDrawerPatch(content: string) {
 
 export function applyInspectorViewCloseDrawerPatch(content: string) {
     // this patch closes the drawer if the network tool is disabled
-    const pattern = /self\.UI\.inspectorView\.createToolbars\(\);/g;
-    const replacementText = `if (!${isDrawerEnabled}) {self.UI.InspectorView.instance()._closeDrawer();}`;
+    const pattern = /InspectorView\.InspectorView\.instance\(\)\.createToolbars\(\);/g;
+    const replacementText = `if (!${isDrawerEnabled}) {InspectorView.InspectorView.instance()._closeDrawer();}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
@@ -163,8 +163,15 @@ export function applyMainViewPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyScreencastAppPatch(content: string) {
+    // This patch fixes screencasting functionality in version 88
+    const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
+    const replacementText = "Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();";
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyRemoveBreakOnContextMenuItem(content: string) {
-    const pattern = /const breakpointsMenu=.+hasDOMBreakpoint\(.*\);}/;
+    const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
     const replacementText = "";
     return replaceInSourceCode(content, pattern, replacementText);
 }
@@ -401,7 +408,7 @@ export function applyRerouteConsoleMessagePatch(content: string) {
 
 export function applyScreencastCursorPatch(content: string) {
     // This patch removes the touch cursor from the screencast view
-    const pattern = /\('div',\s*'screencast-canvas-container'\);/g
+    const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g
     const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
