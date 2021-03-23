@@ -236,6 +236,12 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
+        browserInstance.addListener("targetcreated", () => {
+            vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
+        });
+        browserInstance.addListener("targetdestroyed", () => {
+            vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
+        });
         await attach(context, url, config);
     }
 }

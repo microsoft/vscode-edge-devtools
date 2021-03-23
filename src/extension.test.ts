@@ -363,6 +363,7 @@ describe("extension", () => {
     });
 
     describe("launch", () => {
+        const fakeBrowser = {addListener: () => null};
         let mockReporter: Mocked<Readonly<TelemetryReporter>>;
         let mockUtils: Partial<Mocked<typeof import("./utils")>>;
         let mockPanel: Partial<Mocked<typeof import("./devtoolsPanel")>>;
@@ -381,7 +382,7 @@ describe("extension", () => {
                     useHttps: false,
                 }),
                 getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),
-                launchBrowser: jest.fn(),
+                launchBrowser: jest.fn().mockResolvedValue(fakeBrowser),
                 openNewTab: jest.fn().mockResolvedValue(null),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
             };
