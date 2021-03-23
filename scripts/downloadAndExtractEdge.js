@@ -56,11 +56,11 @@ async function downloadZipFile(downloadUrl) {
   await fs.remove('out/edge');
 
   const file = fs.createWriteStream('edge.zip');
-  const request = https.get(downloadUrl, function(response) {
+  https.get(downloadUrl, function(response) {
     response.pipe(file);
-    response.on('end', ()=>{
-      fs.createReadStream('edge.zip').pipe(unzipper.Extract({path: 'out/edge/'}));
-      fs.unlink('edge.zip', () => {} );
+    response.on('end', async ()=>{
+      await fs.createReadStream('edge.zip').pipe(unzipper.Extract({path: 'out/edge/'}));
+      await fs.unlink('edge.zip', () => {} );
       let dirName = __dirname;
       if (isWindows) {
         const flipSlashDirName = dirName.replace(/\//g, '\\');
