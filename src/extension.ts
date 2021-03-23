@@ -81,6 +81,9 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
         async (target: CDPTarget) => {
+            // skip if the target has already been deleted
+            if (!target)
+                return;
 
             // update with the latest information, in case user has navigated to a different page via browser.
             cdpTargetsProvider.refresh();
