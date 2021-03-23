@@ -229,7 +229,6 @@ export function applyAppendTabConditionsPatch(content: string) {
         appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
             let patchedCondition = ${condition};
             ${applyEnableNetworkPatch()}
-            console.log(Root.Runtime.vscodeSettings.whatsNew);
             if(Root.Runtime.vscodeSettings.whatsNew) {
               patchedCondition = patchedCondition && (id !== "release-note");
             }

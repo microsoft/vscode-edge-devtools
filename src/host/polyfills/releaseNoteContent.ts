@@ -3,53 +3,46 @@
 
 export const extensionHighlights = `[
     {
-        title: ls\`DevTools Extension Console rerouting to VSCode output window\`,
+        title: ls\`New triple dot dropdown menu on extension sidebar\`,
         subtitle:
-            ls\`The console messages from the DevTools are now rerouted to the VS Code Output window for an integrated debugging experience.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/275',
+            ls\`Dropdown menu contains links to extension settings and changelog.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/288',
     },
     {
-        title: ls\`Improvements to revealing files in VSCode from the DevTools styles pane\`,
+        title: ls\`Hide and show service and shared workers\`,
         subtitle:
-            ls\`Clicking on a property will only navigate when CTRL is held and clicking the styles sheet link will open the file in VS Code.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/264',
+            ls\`Created new settings checkbox that will hide or show service and shared workers in the target list (default to hide).\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/284',
     },
     {
-        title: ls\`Introducing favicons to the extension sidebar\`,
+        title: ls\`Target list now auto refreshes\`,
         subtitle:
-            ls\`The extension's sidebar will now display the target website's favicon to help organize debugging targets.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/278',
+            ls\`Creation and deletion of targets will trigger a refresh on the target list.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/300',
     },
     {
-        title: ls\`Changing screencast view cursor from touch to default\`,
+        title: ls\`Bug fix for multiple DevTools console output channels\`,
         subtitle:
-            ls\`After receiving feedback, we have changed the type of cursor for the screencast view from a touch cursor to the default cursor to improve precision.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/279',
-    },
-    {
-        title: ls\`Network tool enabled by default\`,
-        subtitle:
-            ls\`The Network tool is now availalbe by default! If you would like to keep it off, uncheck the "Enable Network" checkbox in the VS Code extension settings.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/272',
+            ls\`Each DevTools instance will create a console output channel and delete it upon closing the DevTools window.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/300',
     },
 ],`
 
 export const devtoolsHighlights = `[
     {
-        title: ls\`CSS grid overlay improvements and new experimental grid features\`,
+        title: ls\`Use improved CSS Grid tools\`,
         subtitle:
-            ls\`Grid overlays are now enabled by default with multiple persistent and configurable overlays coming soon.\`,
-        link: 'https://go.microsoft.com/fwlink/?linkid=2142427',
-        },
-        {
-        title: ls\`Highlight all search results in Elements tool\`,
-        subtitle: ls\`Thanks to your feedback, we were able to find and fix a bug in the open-source Chromium project.\`,
-        link: 'https://go.microsoft.com/fwlink/?linkid=2142224'
-        },
-        {
-        title: ls\`Network and Elements panel updates\`,
-        subtitle:
-            ls\`Capture node screenshots shortcut, accessible color suggestion, consistent resource types, and more.\`,
-        link: 'https://go.microsoft.com/fwlink/?linkid=2142153',
-        }
+            ls\`Now you can debug and inspect CSS Grids with persistent overlays, with support for multiple grids, and the new Layout tool.\`,
+        link: 'https://go.microsoft.com/fwlink/?linkid=2146827',
+    },
+    {
+        title: ls\`Learn about updates to the Elements tool\`,
+        subtitle: ls\`View the Computed pane in the Styles pane, and more.\`,
+        link: 'https://go.microsoft.com/fwlink/?linkid=2146829',
+    },
+    {
+        title: ls\`Apply new filters in the Network tool\`,
+        subtitle: ls\`Filter network requests with the new 'resource-type' and 'url' keywords in the Network tool.\`,
+        link: 'https://go.microsoft.com/fwlink/?linkid=2147022',
+    },
 ],`
