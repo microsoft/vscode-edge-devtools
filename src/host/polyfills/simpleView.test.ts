@@ -183,6 +183,14 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
+    it("applyMoveToContextMenuPatch correctly changes text", async () => {
+        const filePath = "ui/ui.js";
+        const patch = SimpleView.applyMoveToContextMenuPatch;
+        const expectedStrings = ['const locationName = ViewManager.instance().locationNameForViewId(tabId);return;'];
+
+        await testPatch(filePath, patch, expectedStrings);
+    });
+
     it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
         const filePath = "themes/themes.js";
         const patch = SimpleView.applyThemePatch;

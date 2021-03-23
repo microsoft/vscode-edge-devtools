@@ -386,6 +386,12 @@ export function applyContextMenuRevealOption(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyMoveToContextMenuPatch(content: string) {
+    const pattern = /const locationName\s*=\s*ViewManager\.instance\(\)\.locationNameForViewId\(tabId\);/;
+    const replacementText = `return;`
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
+}
+
 export function applyThemePatch(content: string) {
     // Sets the theme of the DevTools
     const pattern = /const settingDescriptor/;
