@@ -80,14 +80,11 @@ export function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
-        async (target: CDPTarget) => {
-            // skip if the target has already been deleted
-            if (!target)
-                return;
+        async (target?: CDPTarget) => {
 
             // update with the latest information, in case user has navigated to a different page via browser.
             cdpTargetsProvider.refresh();
-            const normalizedPath = new URL(target.description).toString();
+            const normalizedPath = target ? new URL(target!.description).toString() : "";
             if (browserInstance) {
                 const browserPages = await browserInstance.pages();
                 for (const page of browserPages) {
