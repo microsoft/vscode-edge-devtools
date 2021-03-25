@@ -107,9 +107,9 @@ Attach the extension to your live reloading project
 
 ## Changing Extension Settings
 
-You can customize the extension to your needs. You can reach the settings by clicking the gear icon of the extension listing or via the settings menu.
+You can customize the extension to your needs. From version 1.1.6 onwards you can reach the Settings and read the Changelog via the `…` button of the sidebar.
 
-![The gear icon in the extension listing](img/edge-devtools-for-vscode-settings.png)
+![Accessing the extension settings and the changelog](img/settings-and-changelog.gif)
 
 ### Turning off Network Inspection
 
