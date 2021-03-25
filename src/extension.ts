@@ -88,7 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
 
             // update with the latest information, in case user has navigated to a different page via browser.
             cdpTargetsProvider.refresh();
-            const normalizedPath = new URL(target!.description).toString();
+            const normalizedPath = new URL(target.description).toString();
             if (browserInstance) {
                 const browserPages = await browserInstance.pages();
                 for (const page of browserPages) {
