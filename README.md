@@ -200,11 +200,11 @@ See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/mas
 
 ## Other information
 
-## Data and Telemetry
+### Data and Telemetry
 
 This project collects usage data and sends it to Microsoft to help improve our products and services. Read [Microsoft's privacy statement](https://privacy.microsoft.com/en-US/privacystatement) to learn more.
 
-## Reporting Security Issues
+### Reporting Security Issues
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security
 Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
