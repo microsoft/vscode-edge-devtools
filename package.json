@@ -542,7 +542,7 @@
         "build-and-lint": "npm run build && npm run lint",
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
-        "lint": "eslint -c .eslintrc.js",
+        "lint": "eslint --fix -c .eslintrc.js --ext .ts .",
         "test": "npm run lint && jest --config package.json --runInBand",
         "download-edge": "node scripts/downloadAndExtractEdge.js"
     },

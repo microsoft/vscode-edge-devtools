@@ -9,7 +9,7 @@ export interface IRuntimeResourceLoader {
 
 export default class ToolsResourceLoader {
     private originalLoadResource: (url: string) => Promise<string>;
-    private urlLoadNextId: number = 0;
+    private urlLoadNextId = 0;
     private urlLoadResolvers: Map<number, (url: string) => void> = new Map();
 
     private constructor(originalLoadResource: (url: string) => Promise<string>) {

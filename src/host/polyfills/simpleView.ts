@@ -3,7 +3,7 @@
 import { IDevToolsWindow } from "../host";
 import ToolsHost from "../toolsHost";
 
-declare var InspectorFrontendHost: ToolsHost;
+declare let InspectorFrontendHost: ToolsHost;
 
 interface IRevealable {
     lineNumber: number;
