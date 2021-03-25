@@ -111,15 +111,11 @@ You can customize the extension to your needs. You can reach the settings by cli
 
 ![The gear icon in the extension listing](img/edge-devtools-for-vscode-settings.png)
 
-### Turning on Network Inspection
+### Turning off Network Inspection
 
-You can enable the Network Pane to inspect any network request of the attached browser. To do this, change the setting and restart the extension.
+If you don't want to see the Network Pane to inspect any network request of the attached browser you can turn it off in the settings and restart the extension.
 
-![Example how to turn on the network pane](img/edge-devtools-for-vscode-settings-network.png)
-
-You can see an example of the change in the following screencast. After restart, you get an extra tab with network functionality.
-
-![Example how to turn on the network pane](img/basic_usage(network_and_headless).gif)
+![Network section in the extension settings](img/settings-network.png)
 
 ### Turning on Headless Mode
 
@@ -127,7 +123,7 @@ By default, the extension will launch the browser in its own window. This means 
 
 **Note**: In the past we had issues on Macintosh computers where the Microsoft Edge instance reported itself as "inactive" when the window wasn't visible. Using headless mode fixes that problem.
 
-![Example how to turn on the network pane](img/edge-devtools-for-vscode-settings-headless.png)
+![Example how to turn on the network pane](img/settings-headless.png)
 
 You can see an example of the change in the following screencast:
 
