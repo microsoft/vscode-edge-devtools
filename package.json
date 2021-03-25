@@ -547,7 +547,7 @@
         "download-edge": "node scripts/downloadAndExtractEdge.js"
     },
     "dependencies": {
-        "puppeteer-core": "5.2.1",
+        "puppeteer-core": "7.1.0",
         "unzipper": "0.10.11",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.6",
