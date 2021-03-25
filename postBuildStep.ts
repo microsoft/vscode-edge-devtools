@@ -28,11 +28,13 @@ import {
     applyInspectorViewCloseDrawerPatch,
     applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
+    applyMoveToContextMenuPatch,
     applyPersistDrawerTabs,
     applyRemoveBreakOnContextMenuItem,
     applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
+    applyScreencastAppPatch,
     applyScreencastCursorPatch,
     applySetTabIconPatch,
     applyShowDrawerTabs,
@@ -108,6 +110,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("main/main.js", toolsOutDir, [
         applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
+        applyScreencastAppPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
         applySetupTextSelectionPatch,
@@ -139,6 +142,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyDefaultTabPatch,
         applyDrawerTabLocationPatch,
         applyInspectorViewShowDrawerPatch,
+        applyMoveToContextMenuPatch,
         applyPersistDrawerTabs,
         applySetTabIconPatch,
         applyShowDrawerTabs,
