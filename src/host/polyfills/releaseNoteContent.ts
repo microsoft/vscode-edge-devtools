@@ -24,7 +24,13 @@ export const extensionHighlights = `[
         title: ls\`Bug fix for multiple DevTools console output channels\`,
         subtitle:
             ls\`Each DevTools instance will create a console output channel and delete it upon closing the DevTools window.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/300',
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/292',
+    },
+    {
+        title: ls\`Support for ARM devices\`,
+        subtitle:
+            ls\`The extension is now compatible with all ARM devices after an update to the puppeteer dependency.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/318',
     },
 ],`
 
