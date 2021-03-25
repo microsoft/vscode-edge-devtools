@@ -575,7 +575,7 @@
         "unzipper": "0.10.11",
         "vsce": "1.87.0",
         "vscode-test": "1.5.1",
-        "webpack": "5.0.0-rc.6",
-        "webpack-cli": "3.3.12"
+        "webpack": "5.28.0",
+        "webpack-cli": "4.5.0"
     }
 }

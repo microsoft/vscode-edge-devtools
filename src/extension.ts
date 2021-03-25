@@ -67,7 +67,9 @@ export function activate(context: vscode.ExtensionContext) {
         () => cdpTargetsProvider.refresh()));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
-        (target: CDPTarget) => {
+        (target?: CDPTarget) => {
+            if (!target)
+                return;
             telemetryReporter.sendTelemetryEvent("view/devtools");
             const runtimeConfig = getRuntimeConfig();
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
@@ -80,7 +82,9 @@ export function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
-        async (target: CDPTarget) => {
+        async (target?: CDPTarget) => {
+            if (!target)
+                return;
 
             // update with the latest information, in case user has navigated to a different page via browser.
             cdpTargetsProvider.refresh();
