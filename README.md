@@ -129,42 +129,6 @@ You can see an example of the change in the following screencast:
 
 ![Example how to turn on the headless mode](img/basic_usage(headless).gif)
 
-## Debug Configuration
-
-You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. 
-
-Microsoft Edge Tools works automatically bundled the Microsoft Edge debugger for you, which means that you can use the tools to design your frontend and debug your code using breakpoints.
-
-To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
-
-* `type` - The name of the debugger which must be `vscode-edge-devtools.debug.` **Required.**
-* `request` - `launch` to open a new browser tab or `attach` to connect to an existing tab. **Required.**
-* `name` - A friendly name to show in the Visual Studio Code UI. **Required.**
-* `url` - The url for the new tab or of the existing tab. **Optional.**
-* `file` - The local file path for the new tab or of the existing tab. **Optional.**
-* `webRoot` - The directory that files are served from. Used to resolve urls like `http://localhost:8000/app.js` to a file on disk like `/out/app.js`. **Optional.**
-
-```javascript
-{
-    "version": "0.1.0",
-    "configurations": [
-        {
-            "type": "vscode-edge-devtools.debug",
-            "request": "launch",
-            "name": "Launch Microsoft Edge and open the Edge DevTools",
-            "file": "${workspaceFolder}/index.html"
-        },
-        {
-            "type": "vscode-edge-devtools.debug",
-            "request": "attach",
-            "name": "Attach to Microsoft Edge and open the Edge DevTools",
-            "url": "http://localhost:8000/",
-            "webRoot": "${workspaceFolder}/out"
-        }
-    ]
-}
-```
-
 #### Other optional launch config fields
 
 * `browserPath`: The full path to the browser executable that will be launched. If not specified the most stable channel of Microsoft Edge will be launched from the default install location instead.
@@ -177,14 +141,6 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. 
 * `urlFilter`: A string that can contain wildcards that will be used for finding a browser target, for example, "localhost:*/app" will match either "http://localhost:123/app" or "http://localhost:456/app", but not "https://stackoverflow.com". This property will only be used if `url` and `file` are not specified.
 * `timeout`: The number of milliseconds that the Microsoft Edge Tools will keep trying to attach to the browser before timing out. Defaults to 10000ms.
-
-### Attaching automatically when launching the browser for debugging
-
-* Setup your `launch.json` configuration to launch and debug Microsoft Edge.
-  * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
-* Start Microsoft Edge for debugging.
-  * Once debugging has started, the Microsoft Edge Tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
-  * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` Visual Studio Code setting.
 
 ## Contributing
 
