@@ -4,7 +4,7 @@
 * **[Bug Fix]**: Side panel auto-refreshes when targets are created or destroyed - [PR #300](https://github.com/microsoft/vscode-edge-devtools/pull/300)
 * **[Bug Fix]**: Fixed bug where extension would be frozen loading favicons - [PR #293](https://github.com/microsoft/vscode-edge-devtools/pull/299)
 * **[Bug Fix]**: Increased stability to close target functionality - [PR #316](https://github.com/microsoft/vscode-edge-devtools/pull/316)
-* **[Bug Fix]**: Removed Debugger for Microsoft Edge as a dependency - [PR #316](https://github.com/microsoft/vscode-edge-devtools/pull/316)
+* **[Bug Fix]**: Removed Debugger for Microsoft Edge as a dependency - [PR #329](https://github.com/microsoft/vscode-edge-devtools/pull/329)
 
 ## 1.1.5
 * **[Feature]**: Add dropdown menu in title view containing link to settings and changelog - [PR #288](https://github.com/microsoft/vscode-edge-devtools/pull/288)

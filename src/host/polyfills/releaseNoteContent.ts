@@ -36,7 +36,7 @@ export const extensionHighlights = `[
         title: ls\` Removed Debugger for Microsoft Edge as a dependency\`,
         subtitle:
             ls\`T Removed Debugger for Microsoft Edge as a dependency.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/318',
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/329',
     },
 ],`
 
