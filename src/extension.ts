@@ -86,6 +86,10 @@ export function activate(context: vscode.ExtensionContext) {
             if (!target)
                 return;
 
+            // disable buttons for this target
+            target.contextValue = "cdpTargetClosing";
+            cdpTargetsProvider.changeDataEvent.fire(target);
+
             // update with the latest information, in case user has navigated to a different page via browser.
             cdpTargetsProvider.refresh();
             const normalizedPath = new URL(target.description).toString();
@@ -131,7 +135,7 @@ export async function attach(
             responseArray = await debugCore.utils.retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
-                /*intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
+                /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
         } catch {
             // Timeout so make sure we error out with no json result
             responseArray = undefined;

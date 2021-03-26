@@ -17,7 +17,7 @@ export default class ToolsHost {
     // tslint:disable-next-line:variable-name
     public InspectorFrontendHostInstance: any;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
-    private getHostCallbacksNextId: number = 0;
+    private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: object) => void> = new Map();
 
     public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {

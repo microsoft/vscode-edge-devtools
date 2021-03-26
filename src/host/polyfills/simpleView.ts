@@ -3,7 +3,7 @@
 import { IDevToolsWindow } from "../host";
 import ToolsHost from "../toolsHost";
 
-declare var InspectorFrontendHost: ToolsHost;
+declare let InspectorFrontendHost: ToolsHost;
 
 interface IRevealable {
     lineNumber: number;
@@ -167,6 +167,13 @@ export function applyScreencastAppPatch(content: string) {
     // This patch fixes screencasting functionality in version 88
     const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
     const replacementText = "Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();";
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
+export function applyScreencastRepaintPatch(content: string) {
+    // This patch removes a condition that calls repaint to restore scroll functionality
+    const pattern = /\(this._highlightNode\)/g;
+    const replacementText = "(true)";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 

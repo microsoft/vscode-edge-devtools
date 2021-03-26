@@ -61,6 +61,7 @@
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "Microsoft Edge Tools",
                 "title": "Open a new tab",
+                "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/launch.svg",
                     "dark": "resources/dark/launch.svg"
@@ -70,6 +71,7 @@
                 "command": "vscode-edge-devtools-view.refresh",
                 "category": "Microsoft Edge Tools",
                 "title": "Refresh Targets",
+                "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/refresh.svg",
                     "dark": "resources/dark/refresh.svg"
@@ -79,6 +81,7 @@
                 "command": "vscode-edge-devtools-view.attach",
                 "category": "Microsoft Edge Tools",
                 "title": "Attach and open Microsoft Edge Tools",
+                "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/attach.svg",
                     "dark": "resources/dark/attach.svg"
@@ -88,6 +91,7 @@
                 "command": "vscode-edge-devtools-view.close-instance",
                 "category": "Microsoft Edge Tools",
                 "title": "Close instance",
+                "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/close_browser_page.svg",
                     "dark": "resources/dark/close_browser_page.svg"
@@ -458,12 +462,12 @@
             "view/title": [
                 {
                     "command": "vscode-edge-devtools-view.launch",
-                    "when": "view == vscode-edge-devtools-view.targets && titleCommandsRegistered",
+                    "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },
                 {
                     "command": "vscode-edge-devtools-view.refresh",
-                    "when": "view == vscode-edge-devtools-view.targets && titleCommandsRegistered",
+                    "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },
                 {
@@ -480,12 +484,12 @@
             "view/item/context": [
                 {
                     "command": "vscode-edge-devtools-view.attach",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
                     "group": "inline"
                 },
                 {
                     "command": "vscode-edge-devtools-view.close-instance",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
                     "group": "inline"
                 },
                 {
@@ -542,36 +546,40 @@
         "build-and-lint": "npm run build && npm run lint",
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
-        "lint": "tslint -c tslint.json -p tsconfig.json",
+        "lint": "eslint -c .eslintrc.js",
         "test": "npm run lint && jest --config package.json --runInBand",
         "download-edge": "node scripts/downloadAndExtractEdge.js"
     },
     "dependencies": {
         "puppeteer-core": "7.1.0",
-        "unzipper": "0.10.11",
         "vscode-chrome-debug-core": "6.8.9",
-        "vscode-extension-telemetry": "0.1.6",
-        "ws": "7.3.1",
+        "vscode-extension-telemetry": "0.1.7",
+        "ws": "7.4.3",
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
         "@opentelemetry/tracing": "0.18.0",
-        "@types/fs-extra": "9.0.1",
+        "@types/fs-extra": "9.0.8",
         "@types/jest": "26.0.13",
         "@types/node": "14.6.3",
         "@types/puppeteer-core": "2.0.0",
         "@types/vscode": "1.48.0",
         "@types/ws": "7.2.6",
-        "fs-extra": "9.0.1",
-        "jest": "26.4.2",
-        "ts-jest": "26.3.0",
-        "ts-loader": "8.0.3",
-        "ts-node": "9.0.0",
-        "tslint": "6.1.3",
-        "typescript": "4.0.2",
-        "vsce": "1.85.1",
-        "vscode-test": "1.4.0",
-        "webpack": "5.0.0-rc.6",
-        "webpack-cli": "3.3.12"
+        "@typescript-eslint/eslint-plugin": "4.19.0",
+        "@typescript-eslint/parser": "4.19.0",
+        "eslint": "7.22.0",
+        "eslint-plugin-jsdoc": "32.3.0",
+        "eslint-plugin-prefer-arrow": "1.2.3",
+        "fs-extra": "9.1.0",
+        "jest": "26.6.3",
+        "ts-jest": "26.5.4",
+        "ts-loader": "8.0.18",
+        "ts-node": "9.1.1",
+        "typescript": "4.2.3",
+        "unzipper": "0.10.11",
+        "vsce": "1.87.0",
+        "vscode-test": "1.5.1",
+        "webpack": "5.28.0",
+        "webpack-cli": "4.5.0"
     }
 }
