@@ -35,6 +35,7 @@ import {
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applyScreencastAppPatch,
+    applyScreencastRepaintPatch,
     applyScreencastCursorPatch,
     applySetTabIconPatch,
     applyShowDrawerTabs,
@@ -135,6 +136,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper("screencast/screencast.js", toolsOutDir, [
         applyScreencastCursorPatch,
+        applyScreencastRepaintPatch,
     ]);
     await patchFileForWebViewWrapper("ui/ui.js", toolsOutDir, [
         applyAppendTabOverridePatch,

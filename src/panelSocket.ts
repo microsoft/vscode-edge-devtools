@@ -11,7 +11,7 @@ export class PanelSocket extends EventEmitter {
     private readonly targetUrl: string;
     private readonly postMessageToDevTools: IDevToolsPostMessageCallback;
     private socket: WebSocket | undefined;
-    private isConnected: boolean = false;
+    private isConnected = false;
     private messages: string[] = [];
 
     constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback) {

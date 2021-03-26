@@ -3,93 +3,89 @@
 
 **Show the browser's Elements and Network tool inside the Visual Studio Code editor and use it to fix CSS issues with your site and inspect network activity.**
 
-A Visual Studio Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, and view network requests. All without leaving Visual Studio Code.
+A Visual Studio Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, read console messages and view network requests. All without leaving Visual Studio Code.
 
 **Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
 
-![Microsoft Edge Tools - Demo](basic_usage.gif)
+You can use the extension either in an own window or embedded in your editor.
 
-# Table of Contents
+![Microsoft Edge Tools - Full window demo](img/devtools-for-code-demo-full-window.gif)
+
+![Microsoft Edge Tools - Embedded headless demo](img/devtools-for-code-demo-headless.gif)
+
+## Table of Contents
 
 * [Supported Features](#supported-features)
-* [Using the Extension](#using-the-extension)
-  * [Getting Started](#getting-started)
-  * [Changing Extension Settings](#changing-extension-settings)
-    * [Turning on Network Inspection](#turning-on-network-inspection)
-    * [Turning on Headless Mode](#turning-on-headless-mode)
-  * [Using the tools](#using-the-tools)
-    * [Setting up your project to show live changes in the extension](#setting-up-your-project-to-show-live-changes-in-the-extension)
-    * [Opening source files from the Elements tool](#opening-source-files-from-the-elements-tool)
-    * [Debug Configuration](#debug-configuration)
-    * [Other optional launch config fields](#other-optional-launch-config-fields)
-    * [Sourcemaps](#sourcemaps)
-    * [Ionic and gulp sourcemaps note](#ionic-and-gulp-sourcemaps-note)
+* [Getting Started](#getting-started)
+* [Using the tools](#using-the-tools)
   * [Launching the browser via the side bar view](#launching-the-browser-via-the-side-bar-view)
-  * [Launching the browser manually](#launching-the-browser-manually)
+  * [Opening source files from the Elements tool](#opening-source-files-from-the-elements-tool)
+  * [Getting Console information](#getting-console-information)
+  * [Setting up your project to show live changes in the extension](#setting-up-your-project-to-show-live-changes-in-the-extension)
+* [Changing Extension Settings](#changing-extension-settings)
+  * [Turning on Network Inspection](#turning-on-network-inspection)
+  * [Turning on Headless Mode](#turning-on-headless-mode)
+* [Debug Configuration](#debug-configuration)
+  * [Other optional launch config fields](#other-optional-launch-config-fields)
   * [Attaching automatically when launching the browser for debugging](#attaching-automatically-when-launching-the-browser-for-debugging)
 * [Contributing](#contributing)
 * [Other information](#other-information)
-  * [Data and Telemetry](#data-telemetry)
-  * [Reporting Security Issues](#reporting-security-issues)
+* [Data and Telemetry](#data-and-telemetry)
+* [Reporting Security Issues](#reporting-security-issues)
+
 
 ## Supported Features
 
-* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
-* Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving Visual Studio Code.
-* Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
-* Auto attach the Microsoft Edge Tools when you start debugging with the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension.
+* Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
 * Debug using a windowed or headless version of the Microsoft Edge Browser
+* Side Bar view for listing all the debuggable targets, including tabs, extensions, service workers, etc.
+* Go directly to the line/column for source files in your workspace when clicking on a link or CSS rule inside the Elements tool.
+* Read console messages logged by the Developer Tools
+* Auto attach the Microsoft Edge Tools when you start debugging with the in-built debugger.
 
-## Using the Extension
-
-### Getting Started
+## Getting Started
 
 For use inside Visual Studio Code:
 
 1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge](https://aka.ms/edgeinsider).
 1. Install the extension* [Microsoft Edge Tools](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
-1. Open the folder containing the project you want to work on.
+1. Navigate to any project or open the folder containing the project you want to work on.
 
-*[Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension will be also installed to enable debugging on VSCode.
+## Using the tools
 
-### Changing Extension Settings
-You can customize the extension to your needs. You can reach the settings by clicking the gear icon of the extension listing or via the settings menu.
+### Launching the browser via the side bar view
 
-![The gear icon in the extension listing](edge-devtools-for-vscode-settings.png)
-
-#### Turning on Network Inspection
-
-You can enable the Network Pane to inspect any network request of the attached browser. To do this, change the setting and restart the extension.
-
-![Example how to turn on the network pane](edge-devtools-for-vscode-settings-network.png)
-
-You can see an example of the change in the following screencast. After restart, you get an extra tab with network functionality.
-
-![Example how to turn on the network pane](basic_usage(network_and_headless).gif)
-
-#### Turning on Headless Mode
-
-By default, the extension will launch the browser in its own window. This means you get an extra browser icon in your task bar and you need to turn on casting to see the browser inside the editor. You can also choose "headless mode" to not have the browser open in an own window, but embed itself directly into Visual Studio Code.
-
-**Note**: In the past we had issues on Macintosh computers where the Microsoft Edge instance reported itself as "inactive" when the window wasn't visible. Using headless mode fixes that problem.
-
-![Example how to turn on the network pane](edge-devtools-for-vscode-settings-headless.png)
-
-You can see an example of the change in the following screencast:
-
-![Example how to turn on the headless mode](basic_usage(headless).gif)
-
-### Using the tools
+* Start Microsoft Edge via the side bar
+  * Click the `Microsoft Edge Tools` view in the side bar.
+  * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab.
+* Attach the Microsoft Edge Tools via the side bar view
+  * Click the `Attach` icon next to the tab to open the Microsoft Edge Tools.
 
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a Visual Studio Code task or from your command-line. Using the `url` parameter you tell Visual Studio Code which URL to either open or launch in the browser.
 
 You can now use the high-fidelity tools to tweak your CSS and inspect network calls and go directly back to your code without leaving the editor.
 
-![Microsoft Edge Tools - Demo](basic_usage.gif)
+![Microsoft Edge Tools - Demo](img/basic_usage.gif)
 
-#### Setting up your project to show live changes in the extension
+### Opening source files from the Elements tool
+
+One of the features of the Elements tool is that it can show you what file applied the styles and event handlers for a given node.
+
+The source files for these applied styles and attached event handlers appear in the form of links to a url specified by the browser. Clicking on one will attempt to open that file inside the Visual Studio Code editor window.
+
+![CSS links in the elements tab and](img/links-in-elements.png)
+
+### Getting Console information
+
+The extension automatically forwards messages from the [Developer Tools Console](https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/console/) to Visual Studio Code. You can see them in the `output` tab when you selected `Devtools Console` as the source.
+
+![CSS links in the elements tab and](img/console-output.png)
+
+Notice that this is a read-only experience. You can't use the Console like you would in the browser Developer Tools.
+
+### Setting up your project to show live changes in the extension
 
 Out of the box the extension does not track live changes to the code you write. If you want the browser to automatically refresh when you changed a file, you need to set up a live reload environment. For this you need Node.js and npm on your machine. 
 
@@ -109,45 +105,35 @@ Attach the extension to your live reloading project
 * Navigate in the browser of the extension to `localhost:8080/{file name you want to open}`	
 * All changes that are saved in this folder now trigger a refresh
 
-#### Opening source files from the Elements tool
+## Changing Extension Settings
 
-One of the features of the Elements tool is that it can show you what file applied the styles and event handlers for a given node.
+You can customize the extension to your needs. From version 1.1.6 onwards you can reach the Settings and read the Changelog via the `…` button of the sidebar.
 
-![Microsoft Edge Tools - Links](links.png)
+![Accessing the extension settings and the changelog](img/settings-and-changelog.gif)
 
-The source files for these applied styles and attached event handlers appear in the form of links to a url specified by the browser. Clicking on one will attempt to open that file inside the Visual Studio Code editor window. Correctly mapping these runtime locations to actual files on disk that are part of your current workspace, may require you to enable source maps as part of your build environment.
+### Turning off Network Inspection
 
-An example webpack configuration for sass and typescript is given below:
+If you don't want to see the Network Pane to inspect any network request of the attached browser you can turn it off in the settings and restart the extension.
 
-```javascript
-module.exports = {
-  devtool: "source-map",
-  module: {
-    rules: [
-      {
-        test: /\.ts$/,
-        loader: "ts-loader"
-      },
-      {
-        test: /\.(s*)css$/,
-        use: [
-          { loader: MiniCssExtractPlugin.loader },
-          { loader: "css-loader", options: { sourceMap: true } },
-          { loader: "sass-loader", options: { sourceMap: true } }
-        ]
-      },
-    ]
-  }
-}
-```
+![Network section in the extension settings](img/settings-network.png)
 
-With source maps enabled, you may also need to configure the extension settings/launch.json config to add customized paths between your runtime urls and your workspace paths, see [Sourcemaps](#sourcemaps) for more information.
+### Turning on Headless Mode
 
-#### Debug Configuration
+By default, the extension will launch the browser in its own window. This means you get an extra browser icon in your task bar and you need to turn on casting to see the browser inside the editor. You can also choose "headless mode" to not have the browser open in an own window, but embed itself directly into Visual Studio Code.
+
+**Note**: In the past we had issues on Macintosh computers where the Microsoft Edge instance reported itself as "inactive" when the window wasn't visible. Using headless mode fixes that problem.
+
+![Example how to turn on the network pane](img/settings-headless.png)
+
+You can see an example of the change in the following screencast:
+
+![Example how to turn on the headless mode](img/basic_usage(headless).gif)
+
+## Debug Configuration
 
 You can launch the Microsoft Edge Tools extension like you would a debugger, by using a `launch.json` config file. 
 
-Microsoft Edge Tools works great when paired with [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge), you can use the first one to design your frontend and the latter to debug your code and set breakpoints
+Microsoft Edge Tools works automatically bundled the Microsoft Edge debugger for you, which means that you can use the tools to design your frontend and debug your code using breakpoints.
 
 To add a new debug configuration, in your `launch.json` add a new debug config with the following parameters:
 
@@ -188,107 +174,33 @@ To add a new debug configuration, in your `launch.json` add a new debug config w
 * `useHttps`: By default the extension will search for attachable instances using the `http` protocol. Set this to true if you are hosting your web app over `https` instead.
 * `sourceMaps`: By default, the extension will use sourcemaps and your original sources whenever possible. You can disable this by setting `sourceMaps` to false.
 * `pathMapping`: This property takes a mapping of URL paths to local paths, to give you more flexibility in how URLs are resolved to local files. `"webRoot": "${workspaceFolder}"` is just shorthand for a pathMapping like `{ "/": "${workspaceFolder}" }`.
-* `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. See [Sourcemaps](#sourcemaps) for more information
+* `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. 
 * `urlFilter`: A string that can contain wildcards that will be used for finding a browser target, for example, "localhost:*/app" will match either "http://localhost:123/app" or "http://localhost:456/app", but not "https://stackoverflow.com". This property will only be used if `url` and `file` are not specified.
 * `timeout`: The number of milliseconds that the Microsoft Edge Tools will keep trying to attach to the browser before timing out. Defaults to 10000ms.
 
-#### Sourcemaps
-
-The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
-
-The left hand side of the mapping is a pattern that can contain a wildcard, and will be tested against the `sourceRoot` + `sources` entry in the source map. If it matches, the source file will be resolved to the path on the right hand side, which should be an absolute path to the source file on disk.
-
-A few mappings are applied by default, corresponding to some common default configs for Webpack and Meteor:
-Note: These are the mappings that are included by default out of the box, with examples of how they could be resolved in different scenarios. These are not mappings that would make sense together in one project.
-
-```javascript
-"sourceMapPathOverrides": {
-    "webpack:///./~/*": "${webRoot}/node_modules/*",
-    "webpack:///./*": "${webRoot}/*",
-    "webpack:///*": "*",
-    "webpack:///src/*": "${webRoot}/*",
-    "meteor://💻app/*": "${webRoot}/*"
-}
-```
-
-If you set `sourceMapPathOverrides` in your launch config, that will override these defaults. `${workspaceFolder}` and `${webRoot}` can be used there.
-
-See the following examples for each entry in the default mappings (`webRoot = /Users/me/project`):
-
-```javascript
-"webpack:///./~/*": "${webRoot}/node_modules/*" 
-Example:
-"webpack:///./~/querystring/index.js"
--> "/Users/me/project/node_modules/querystring/index.js"
-
-"webpack:///./*":   "${webRoot}/*" 
-Example:
-"webpack:///./src/app.js" -> "/Users/me/project/src/app.js"
-
-"webpack:///*": "*" 
-Example:
-"webpack:///project/app.ts" -> "/project/app.ts"
-
-"webpack:///src/*": "${webRoot}/*" 
-Example:
-"webpack:///src/app.js" -> "/Users/me/project/app.js"
-
-"meteor://💻app/*": "${webRoot}/*"
-Example:
-"meteor://💻app/main.ts"` -> `"/Users/me/project/main.ts"
-```
-
-#### Ionic and gulp sourcemaps note
-
-Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you can't fix this via your build config, try this setting:
-
-```javascript
-"sourceMapPathOverrides": {
-    "/source/*": "${workspaceFolder}/*"
-}
-```
-
-### Launching the browser via the side bar view
-
-* Start Microsoft Edge via the side bar
-  * Click the `Microsoft Edge Tools` view in the side bar.
-  * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab.
-* Attach the Microsoft Edge Tools via the side bar view
-  * Click the `Attach` icon next to the tab to open the Microsoft Edge Tools.
-
-### Launching the browser manually
-
-* Start Microsoft Edge with remote-debugging enabled on port 9222:
-  * `msedge.exe --remote-debugging-port=9222`
-  * Navigate the browser to the desired URL.
-* Attach the Microsoft Edge Tools via a command:
-  * Run the command `Microsoft Edge Tools: Attach to a target`
-  * Select a target from the drop down.
-
 ### Attaching automatically when launching the browser for debugging
 
-* Install the [Debugger for Microsoft Edge](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-edge) extension
 * Setup your `launch.json` configuration to launch and debug Microsoft Edge.
   * See [Debugger for Microsoft Edge Readme.md](https://github.com/microsoft/vscode-edge-debug2/blob/master/README.md).
 * Start Microsoft Edge for debugging.
   * Once debugging has started, the Microsoft Edge Tools will auto attach to the browser (it will keep retrying until the Debugger for Microsoft Edge launch.json config `timeout` value is reached).
   * This auto attach functionality can be disabled via the `vscode-edge-devtools.autoAttachViaDebuggerForEdge` Visual Studio Code setting.
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit [https://cla.microsoft.com].
+the rights to use your contribution. For details, visit https://cla.microsoft.com.
 
 See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/master/CONTRIBUTING.md) for more information.
 
-# Other information
+## Other information
 
-## Data and Telemetry
+### Data and Telemetry
 
 This project collects usage data and sends it to Microsoft to help improve our products and services. Read [Microsoft's privacy statement](https://privacy.microsoft.com/en-US/privacystatement) to learn more.
 
-## Reporting Security Issues
+### Reporting Security Issues
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security
 Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
