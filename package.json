@@ -42,9 +42,6 @@
         "onView:vscode-edge-devtools-view.targets",
         "onDebug"
     ],
-    "extensionDependencies": [
-        "msjsdiag.debugger-for-edge"
-    ],
     "contributes": {
         "commands": [
             {
