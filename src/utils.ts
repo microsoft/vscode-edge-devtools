@@ -84,11 +84,11 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
     "webpack:///./~/*": "${webRoot}/node_modules/*",
     "webpack:///src/*": "${webRoot}/*",
 };
-export const SETTINGS_DEFAULT_WEB_ROOT: string = "${workspaceFolder}";
-export const SETTINGS_DEFAULT_SOURCE_MAPS: boolean = true;
-export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT: number = 2015;
-export const SETTINGS_DEFAULT_ATTACH_TIMEOUT: number = 10000;
-export const SETTINGS_DEFAULT_ATTACH_INTERVAL: number = 200;
+export const SETTINGS_DEFAULT_WEB_ROOT = "${workspaceFolder}";
+export const SETTINGS_DEFAULT_SOURCE_MAPS = true;
+export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT = 2015;
+export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
+export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || "/";
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map();
@@ -107,6 +107,7 @@ export interface IRemoteTargetJson {
 
 /**
  * Fetch the response for the given uri.
+ *
  * @param uri The uri to request
  * @param options The options that should be used for the request
  */
@@ -144,6 +145,7 @@ export function fetchUri(uri: string, options: https.RequestOptions = {}): Promi
  * This makes sure that even on a remote machine with custom port forwarding, we will always connect to the address
  * specified in the options rather than what the remote Edge is actually using on the other machine.
  * If a websocket address is not found, the target will be returned unchanged.
+ *
  * @param remoteAddress The address of the remote instance of Edge
  * @param remotePort The port used by the remote instance of Edge
  * @param target The target object from the json/list payload
@@ -164,6 +166,7 @@ export function fixRemoteWebSocket(
 
 /**
  * Query the list endpoint and return the parsed Json result which is the list of targets
+ *
  * @param hostname The remote hostname
  * @param port The remote port
  */
@@ -197,6 +200,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
 
 /**
  * Get the remote endpoint settings from the vscode configuration
+ *
  * @param config The settings specified by a launch config, if any
  */
 export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): IDevToolsSettings {
@@ -235,6 +239,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
 
 /**
  * Create a telemetry reporter that can be used for this extension
+ *
  * @param context The vscode context
  */
 export function createTelemetryReporter(context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
@@ -259,6 +264,7 @@ export function getPlatform(): Platform {
 
 /**
  * Gets the browser path for the specified browser flavor.
+ *
  * @param config The settings specified by a launch config, if any
  */
 export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise<string> {
@@ -280,6 +286,7 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
 
 /**
  * Launch the specified browser with remote debugging enabled
+ *
  * @param browserPath The path of the browser to launch
  * @param port The port on which to enable remote debugging
  * @param targetUrl The url of the page to open
@@ -305,6 +312,7 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
 
 /**
  * Open a new tab in the browser specified via endpoint
+ *
  * @param hostname The hostname of the browser
  * @param port The port of the browser
  * @param tabUrl The url to open, if any
@@ -321,6 +329,7 @@ export async function openNewTab(hostname: string, port: number, tabUrl?: string
 
 /**
  * Remove a '/' from the end of the specified string if it exists
+ *
  * @param uri The string from which to remove the trailing slash (if any)
  */
 export function removeTrailingSlash(uri: string) {
@@ -330,6 +339,7 @@ export function removeTrailingSlash(uri: string) {
 /**
  * Get the configuration settings that should be used at runtime.
  * The order of precedence is launch.json > extension settings > default values.
+ *
  * @param config A user specified config from launch.json
  */
 export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeConfig {
@@ -381,6 +391,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
 
 /**
  * Find '${webRoot}' in a string and replace it with the specified value only if it is at the start.
+ *
  * @param webRoot The value to use for replacement.
  * @param entry The path containing the '${webRoot}' string that we will replace.
  */
@@ -398,6 +409,7 @@ export function replaceWebRootInSourceMapPathOverridesEntry(webRoot: string, ent
  * Walk through the list of mappings and find one that matches the sourcePath.
  * Once a match is found, replace the pattern in the value side of the mapping with
  * the rest of the path.
+ *
  * @param sourcePath The source path to convert
  * @param pathMapping The list of mappings from source map to authored file path
  */
@@ -459,6 +471,7 @@ function isHeadlessEnabled() {
 /**
  * Replaces the workspaceFolder placeholder in a specified path, returns the
  * given path with file disk path.
+ *
  * @param customPath The path that will be replaced.
  */
 function replaceWorkSpaceFolderPlaceholder(customPath: string) {
@@ -483,6 +496,7 @@ function replaceWorkSpaceFolderPlaceholder(customPath: string) {
  * first browser available in the following order:
  * stable > beta > dev > canary
  * For windows it will try: program files > local app data
+ *
  * @param flavor the desired browser flavor
  * @param platform the desired platform
  * @returns a promise with the path to the browser or an empty string if not found.

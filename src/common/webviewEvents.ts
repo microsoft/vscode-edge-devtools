@@ -55,6 +55,7 @@ export interface IOpenEditorData {
 
 /**
  * Parse out the WebviewEvents type from a message and call the appropriate emit event
+ *
  * @param message The message to parse
  * @param emit The emit callback to invoke with the event and args
  */
@@ -75,6 +76,7 @@ export function parseMessageFromChannel(
  * Encode an event and arguments into a string and then post that message across via the
  * supplied object containing the postMessage function.
  * The message can be parsed on the other side using parseMessageFromChannel
+ *
  * @param postMessageObject The object which contains the postMessage function
  * @param eventType The type of the message to post
  * @param args The argument object to encode and post
