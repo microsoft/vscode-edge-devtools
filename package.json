@@ -61,6 +61,7 @@
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "Microsoft Edge Tools",
                 "title": "Open a new tab",
+                "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/launch.svg",
                     "dark": "resources/dark/launch.svg"
@@ -70,6 +71,7 @@
                 "command": "vscode-edge-devtools-view.refresh",
                 "category": "Microsoft Edge Tools",
                 "title": "Refresh Targets",
+                "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/refresh.svg",
                     "dark": "resources/dark/refresh.svg"
@@ -458,12 +460,12 @@
             "view/title": [
                 {
                     "command": "vscode-edge-devtools-view.launch",
-                    "when": "view == vscode-edge-devtools-view.targets && titleCommandsRegistered",
+                    "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },
                 {
                     "command": "vscode-edge-devtools-view.refresh",
-                    "when": "view == vscode-edge-devtools-view.targets && titleCommandsRegistered",
+                    "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },
                 {
