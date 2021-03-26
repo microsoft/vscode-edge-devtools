@@ -67,7 +67,9 @@ export function activate(context: vscode.ExtensionContext) {
         () => cdpTargetsProvider.refresh()));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
-        (target: CDPTarget) => {
+        (target?: CDPTarget) => {
+            if (!target)
+                return;
             telemetryReporter.sendTelemetryEvent("view/devtools");
             const runtimeConfig = getRuntimeConfig();
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
@@ -80,7 +82,9 @@ export function activate(context: vscode.ExtensionContext) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
-        async (target: CDPTarget) => {
+        async (target?: CDPTarget) => {
+            if (!target)
+                return;
 
             // disable buttons for this target
             target.contextValue = "cdpTargetClosing";
@@ -131,7 +135,7 @@ export async function attach(
             responseArray = await debugCore.utils.retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
-                /*intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
+                /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
         } catch {
             // Timeout so make sure we error out with no json result
             responseArray = undefined;
