@@ -170,6 +170,13 @@ export function applyScreencastAppPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyScreencastRepaintPatch(content: string) {
+    // This patch removes a condition that calls repaint to restore scroll functionality
+    const pattern = /\(this._highlightNode\)/g;
+    const replacementText = "(true)";
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyRemoveBreakOnContextMenuItem(content: string) {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
     const replacementText = "";
