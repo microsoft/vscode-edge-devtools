@@ -75,7 +75,7 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
 
                 // Allow the debugger to actually launch the browser before attaching
                 setTimeout(() => {
-                    this.attach(this.context, userConfig.url, userConfig, /*useRetry=*/ true);
+                    this.attach(this.context, userConfig.url, userConfig, /* useRetry=*/ true);
                 }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
             }
             return Promise.resolve(config);

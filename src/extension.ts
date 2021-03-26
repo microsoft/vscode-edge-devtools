@@ -131,7 +131,7 @@ export async function attach(
             responseArray = await debugCore.utils.retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
-                /*intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
+                /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
         } catch {
             // Timeout so make sure we error out with no json result
             responseArray = undefined;
