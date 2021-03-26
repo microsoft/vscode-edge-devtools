@@ -86,6 +86,10 @@ export function activate(context: vscode.ExtensionContext) {
             if (!target)
                 return;
 
+            // disable buttons for this target
+            target.contextValue = "cdpTargetClosing";
+            cdpTargetsProvider.changeDataEvent.fire(target);
+
             // update with the latest information, in case user has navigated to a different page via browser.
             cdpTargetsProvider.refresh();
             const normalizedPath = new URL(target.description).toString();

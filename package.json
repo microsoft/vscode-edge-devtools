@@ -79,6 +79,7 @@
                 "command": "vscode-edge-devtools-view.attach",
                 "category": "Microsoft Edge Tools",
                 "title": "Attach and open Microsoft Edge Tools",
+                "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/attach.svg",
                     "dark": "resources/dark/attach.svg"
@@ -88,6 +89,7 @@
                 "command": "vscode-edge-devtools-view.close-instance",
                 "category": "Microsoft Edge Tools",
                 "title": "Close instance",
+                "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/close_browser_page.svg",
                     "dark": "resources/dark/close_browser_page.svg"
@@ -480,12 +482,12 @@
             "view/item/context": [
                 {
                     "command": "vscode-edge-devtools-view.attach",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
                     "group": "inline"
                 },
                 {
                     "command": "vscode-edge-devtools-view.close-instance",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
                     "group": "inline"
                 },
                 {
