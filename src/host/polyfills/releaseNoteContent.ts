@@ -32,6 +32,12 @@ export const extensionHighlights = `[
             ls\`The extension is now compatible with all ARM devices after an update to the puppeteer dependency.\`,
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/318',
     },
+    {
+        title: ls\` Removed Debugger for Microsoft Edge as a dependency\`,
+        subtitle:
+            ls\`T Removed Debugger for Microsoft Edge as a dependency.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/318',
+    },
 ],`
 
 export const devtoolsHighlights = `[
