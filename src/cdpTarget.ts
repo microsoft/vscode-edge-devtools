@@ -9,7 +9,7 @@ export default class CDPTarget extends vscode.TreeItem {
     public readonly targetJson: IRemoteTargetJson;
     public readonly propertyName: string | null = null;
     public readonly iconPath: { dark: string, light: string } | undefined;
-    public readonly contextValue: "cdpTarget" | "cdpTargetProperty";
+    public contextValue: "cdpTarget" | "cdpTargetProperty" | "cdpTargetClosing";
 
     private readonly extensionPath: string | undefined;
     private children: CDPTarget[] = [];

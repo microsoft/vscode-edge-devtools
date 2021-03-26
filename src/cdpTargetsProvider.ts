@@ -10,7 +10,7 @@ import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemot
 
 export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     public readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
-    private changeDataEvent: vscode.EventEmitter<CDPTarget | null>;
+    public readonly changeDataEvent: vscode.EventEmitter<CDPTarget | null>;
     private extensionPath: string;
     private telemetryReporter: Readonly<TelemetryReporter>;
 
