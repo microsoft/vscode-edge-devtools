@@ -57,6 +57,7 @@ export function createFakeVSCode() {
             showErrorMessage: jest.fn(),
             showQuickPick: jest.fn().mockResolvedValue(null),
             showTextDocument: jest.fn(),
+            showInformationMessage: jest.fn(),
         },
         workspace: {
             getConfiguration: jest.fn(() => {
