@@ -103,6 +103,7 @@ export function applyStylesRevealerPatch(content: string) {
 }
 
 export function applyStylesToggleFocusPatch(content: string) {
+    // Patch to fix accessibility focus issue when toggling a property with context menu option.
     const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(ls\s*`Toggle property[\s\S]+.const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
     const replacementText = `
         const sectionIndex = this._parentPane.focusedSectionIndex();
