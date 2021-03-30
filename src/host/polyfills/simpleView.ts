@@ -102,6 +102,15 @@ export function applyStylesRevealerPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyStylesToggleFocusPatch(content: string) {
+    const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(ls\s*`Toggle property[\s\S]+.const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
+    const replacementText = `
+        const sectionIndex = this._parentPane.focusedSectionIndex();
+        contextMenu.defaultSection().appendCheckboxItem(ls \`Toggle property and continue editing\`, async () => {
+    `;
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
