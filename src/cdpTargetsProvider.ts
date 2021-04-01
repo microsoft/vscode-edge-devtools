@@ -78,6 +78,9 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
                     return a.targetJson.type < b.targetJson.type ? -1 : 1;
                 }
             });
+            // Raise and quickly hide a notification so the screen reader announces the new state of the targets list
+            vscode.window.showInformationMessage(`Target list refreshed. ${targets.length} ${targets.length === 1 ? "target": "targets"} found.`);
+            setTimeout(() => vscode.commands.executeCommand("notifications.hideToasts"), 10)
         } else {
             // Just expand the element to show its properties
             targets = element.getChildren();

@@ -55,9 +55,9 @@ export function createFakeVSCode() {
             createWebviewPanel: jest.fn(),
             registerTreeDataProvider: jest.fn(),
             showErrorMessage: jest.fn(),
+            showInformationMessage: jest.fn(),
             showQuickPick: jest.fn().mockResolvedValue(null),
             showTextDocument: jest.fn(),
-            showInformationMessage: jest.fn(),
         },
         workspace: {
             getConfiguration: jest.fn(() => {

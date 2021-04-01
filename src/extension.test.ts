@@ -46,7 +46,6 @@ describe("extension", () => {
             jest.doMock("./cdpTargetsProvider", () => function CDPTargetsProvider() {
                 return {
                     refresh: mockProviderRefresh,
-                    getChildren: jest.fn(),
                 };
             });
 

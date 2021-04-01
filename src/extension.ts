@@ -27,7 +27,6 @@ import {
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
-let cdpTargetsProvider: CDPTargetsProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     if (!telemetryReporter) {
@@ -53,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
     // Register the side-panel view and its commands
-    cdpTargetsProvider = new CDPTargetsProvider(context, telemetryReporter);
+    const cdpTargetsProvider = new CDPTargetsProvider(context, telemetryReporter);
     context.subscriptions.push(vscode.window.registerTreeDataProvider(
         `${SETTINGS_VIEW_NAME}.targets`,
         cdpTargetsProvider));
@@ -65,11 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.refresh`,
-        async () => {
-            cdpTargetsProvider.refresh();
-            await cdpTargetsProvider.getChildren();
-            vscode.window.showInformationMessage("Refresh complete");
-        }));
+        async () => cdpTargetsProvider.refresh()));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
         (target?: CDPTarget) => {
@@ -249,8 +244,12 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             telemetryReporter.sendTelemetryEvent("command/launch/browser", browserProps);
         }
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
-        browserInstance.addListener("targetcreated", () => cdpTargetsProvider.refresh());
-        browserInstance.addListener("targetdestroyed", () => cdpTargetsProvider.refresh());
+        browserInstance.addListener("targetcreated", () => {
+            vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
+        });
+        browserInstance.addListener("targetdestroyed", () => {
+            vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
+        });
         await attach(context, url, config);
     }
 }
