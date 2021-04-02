@@ -516,7 +516,34 @@
                     "name": "Targets"
                 }
             ]
-        }
+        },
+        "viewsWelcome": [
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying webpages.\n[Launch Instance](command:vscode-edge-devtools-view.launch)",
+                "when": "launchJsonStatus != Supported"
+            },
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "To customize your launch experience, [open a folder](command:vscode.openFolder) and create a launch.json file.",
+                "when": "workbenchState == empty"
+            },
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "Customize your launch experience by creating a launch.json file for your project.\n[Generate launch.json](command:vscode-edge-devtools-view.launch)",
+                "when": "workbenchState != empty && launchJsonStatus == None"
+            },
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "Customize your launch experience by adding a debug configuration to your launch.json file.\n[Configure launch.json](command:vscode-edge-devtools-view.launch)",
+                "when": "launchJsonStatus == Unsupported"
+            },
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launch)",
+                "when": "launchJsonStatus == Supported"
+            }
+        ]
     },
     "jest": {
         "transform": {

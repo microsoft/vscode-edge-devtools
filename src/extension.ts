@@ -16,6 +16,7 @@ import {
     getListOfTargets,
     getRemoteEndpointSettings,
     getRuntimeConfig,
+    getLaunchJsonStatus,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
@@ -32,6 +33,9 @@ export function activate(context: vscode.ExtensionContext) {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
+
+    // Check if launch.json exists and has supported config to populate side pane welcome message
+    vscode.commands.executeCommand('setContext', 'launchJsonStatus', getLaunchJsonStatus());
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, async () => {
         attach(context);

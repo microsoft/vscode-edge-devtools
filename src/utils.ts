@@ -285,6 +285,28 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
 }
 
 /**
+ * Gets the status of the launch.json file associated with the currently opened workspace
+ * @returns {String} None | Unsupported | Supported
+ */
+ export function getLaunchJsonStatus() {
+    if (!vscode.workspace.workspaceFolders)
+        return "None";
+
+    const filePath = `${vscode.workspace.workspaceFolders[0].uri.fsPath}/.vscode/launch.json`;
+    if (fse.pathExistsSync(filePath)) {
+        const fileText = fse.readFileSync(filePath, "utf8");
+        const supportRegex = /["']type["']:\s*["']((vscode-edge-devtools.debug)|(edge)|(msedge))["']/;
+        if (fileText.match(supportRegex)) {
+            return "Supported";
+        } else {
+            return "Unsupported";
+        }
+    } else {
+        return "None";
+    }
+}
+
+/**
  * Launch the specified browser with remote debugging enabled
  *
  * @param browserPath The path of the browser to launch
