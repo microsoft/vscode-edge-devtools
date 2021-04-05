@@ -40,6 +40,7 @@ import {
     applySetTabIconPatch,
     applyShowDrawerTabs,
     applyStylesRevealerPatch,
+    applyStylesToggleFocusPatch,
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
@@ -113,9 +114,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyMainViewPatch,
         applyScreencastAppPatch,
     ]);
-    await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
-        applySetupTextSelectionPatch,
-    ]);
     await patchFileForWebViewWrapper("common/common.js", toolsOutDir, [
         applyCommonRevealerPatch,
     ]);
@@ -126,7 +124,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyPaddingInlineCssPatch,
     ]);
     await patchFileForWebViewWrapper("elements/elements.js", toolsOutDir, [
+        applySetupTextSelectionPatch,
         applyStylesRevealerPatch,
+        applyStylesToggleFocusPatch,
     ]);
     await patchFileForWebViewWrapper("host/host.js", toolsOutDir, [
         applyRemovePreferencePatch,
