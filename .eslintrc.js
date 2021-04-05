@@ -37,7 +37,7 @@ module.exports = {
     
     
         // syntax preferences
-        'quotes': [2, 'double', {'avoidEscape': true, 'allowTemplateLiterals': true}],
+        'quotes': [2, 'single', {'avoidEscape': true, 'allowTemplateLiterals': true}],
         'semi': 2,
         'no-extra-semi': 2,
         'comma-style': [2, 'last'],
@@ -108,7 +108,7 @@ module.exports = {
         'no-multiple-empty-lines': [2, {'max': 2}],
         'no-mixed-spaces-and-tabs': 2,
         'no-trailing-spaces': 2,
-        // 'linebreak-style': [2, 'unix'],
+        'linebreak-style': [2, 'unix'],
     
         /**
          * Disabled, aspirational rules
@@ -128,26 +128,11 @@ module.exports = {
         // no-implicit-globals will prevent accidental globals
         'no-implicit-globals': [0],
     
-        // forbids interfaces starting with an I prefix.
-        // '@typescript-eslint/naming-convention':
-        //     [2, {'selector': 'interface', 'format': ['PascalCase'], 'custom': {'regex': '^I[A-Z]', 'match': false}}],
         '@typescript-eslint/explicit-member-accessibility': [0],
         '@typescript-eslint/no-explicit-any': 2,
     
-        // // errors on it('test') with no body
-        // 'mocha/no-pending-tests': 2,
-        // // errors on {describe, it}.only
-        // 'mocha/no-exclusive-tests': 2,
-    
         // Closure does not properly typecheck default exports
         'import/no-default-export': 2,
-    
-        // DevTools specific rules
-        // 'rulesdir/es_modules_import': 2,
-        // 'rulesdir/check_license_header': 2,
-        // 'rulesdir/check_test_definitions': 2,
-        // 'rulesdir/avoid_assert_equal': 2,
-        // 'rulesdir/no_repeated_tests': 2,
       },
       'overrides': [{
         'files': ['*.ts'],
