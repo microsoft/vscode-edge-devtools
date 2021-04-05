@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import {devtoolsHighlights, extensionHighlights} from "./releaseNoteContent";
+import {devtoolsHighlights, extensionHighlights} from './releaseNoteContent';
 
 export function applyReleaseNotePatch(content: string) {
     const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+var ReleaseNoteText_edge\s*=/;
@@ -22,9 +22,9 @@ export function applyReleaseNotePatch(content: string) {
 
     if (content.match(releaseNoteTextPattern)) {
         return content.replace(releaseNoteTextPattern, replacementNotes);
-    } else {
-        return null;
     }
+        return null;
+
 }
 
 export function applyGithubLinksPatch(content: string) {
@@ -38,9 +38,9 @@ export function applyGithubLinksPatch(content: string) {
     `;
     if (content.match(linkPattern)) {
         return content.replace(linkPattern, linkReplacementText);
-    } else {
-        return null;
     }
+        return null;
+
 }
 
 export function applyAnnouncementNamePatch(content: string) {
@@ -49,7 +49,7 @@ export function applyAnnouncementNamePatch(content: string) {
     if (content.match(microsoftAnnouncement) && content.match(chromiumAnnouncement)) {
         content = content.replace(microsoftAnnouncement, 'New extension features');
         return content.replace(chromiumAnnouncement, 'New in Developer Tools');
-    } else {
-        return null;
     }
+        return null;
+
 }

@@ -14,9 +14,9 @@ export default function applyRuntimeImportScriptPathPrefixPatch(content: string)
 
     if (content.match(pattern) && content.match(variableDeclarationPattern)) {
         content = content.replace(pattern, importScriptReplacementPattern);
-        content = content.replace(variableDeclarationPattern, "");
+        content = content.replace(variableDeclarationPattern, '');
         return content;
-    } else {
-        return null;
     }
+        return null;
+
 }

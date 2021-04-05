@@ -8,58 +8,58 @@ import {
     ThemeString,
     WebSocketEvent,
     WebviewEvent,
-} from "../common/webviewEvents";
-import ToolsResourceLoader from "./toolsResourceLoader";
-import ToolsWebSocket from "./toolsWebSocket";
+} from '../common/webviewEvents';
+import ToolsResourceLoader from './toolsResourceLoader';
+import ToolsWebSocket from './toolsWebSocket';
 
 export default class ToolsHost {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
     // tslint:disable-next-line:variable-name
-    public InspectorFrontendHostInstance: any;
+    InspectorFrontendHostInstance: any;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: object) => void> = new Map();
 
-    public setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
+    setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>) {
         this.resourceLoader = resourceLoader;
     }
 
-    public isHostedMode() {
+    isHostedMode() {
         // DevTools will always be inside a webview
         return true;
     }
 
-    public getPreferences(callback: (preferences: any) => void) {
+    getPreferences(callback: (preferences: any) => void) {
         // Load the preference via the extension workspaceState
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getState", { id });
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'getState', { id });
     }
 
-    public setPreference(name: string, value: string) {
+    setPreference(name: string, value: string) {
         // Save the preference via the extension workspaceState
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "setState", { name, value });
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'setState', { name, value });
     }
 
-    public recordEnumeratedHistogram(actionName: string, actionCode: number, bucketSize: number) {
+    recordEnumeratedHistogram(actionName: string, actionCode: number, bucketSize: number) {
         // Inform the extension of the DevTools telemetry event
         this.sendTelemetry({
             data: actionCode,
-            event: "enumerated",
+            event: 'enumerated',
             name: actionName,
         });
     }
 
-    public recordPerformanceHistogram(histogramName: string, duration: number) {
+    recordPerformanceHistogram(histogramName: string, duration: number) {
         // Inform the extension of the DevTools telemetry event
         this.sendTelemetry({
             data: duration,
-            event: "performance",
+            event: 'performance',
             name: histogramName,
         });
     }
 
-    public reportError(
+    reportError(
         type: string,
         message: string,
         stack: string,
@@ -73,66 +73,66 @@ export default class ToolsHost {
         // Inform the extension of the DevTools telemetry event
         this.sendTelemetry({
             data,
-            event: "error",
+            event: 'error',
             name: type,
         });
     }
 
-    public openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean) {
+    openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean) {
         // Forward the data to the extension
         const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openInEditor", request);
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'openInEditor', request);
     }
 
-    public getVscodeSettings(callback: (arg0: object) => void) {
+    getVscodeSettings(callback: (arg0: object) => void) {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "getVscodeSettings", {id});
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'getVscodeSettings', {id});
     }
 
-    public sendToVscodeOutput(consoleMessage: string) {
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "consoleOutput", {consoleMessage});
+    sendToVscodeOutput(consoleMessage: string) {
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
     }
 
-    public copyText(clipboardData: string) {
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "copyText", {clipboardData});
+    copyText(clipboardData: string) {
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'copyText', {clipboardData});
     }
 
-    public openInNewTab(url: string) {
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "openUrl", {url});
+    openInNewTab(url: string) {
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'openUrl', {url});
     }
 
-    public focusEditor(next: boolean) {
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "focusEditor", {next});
+    focusEditor(next: boolean) {
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'focusEditor', {next});
     }
 
-    public focusEditorGroup(next: boolean) {
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "focusEditorGroup", {next});
+    focusEditorGroup(next: boolean) {
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'focusEditorGroup', {next});
     }
 
-    public onMessageFromChannel(e: WebviewEvent, args: string): boolean {
+    onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
-            case "getState": {
+            case 'getState': {
                 const { id, preferences } = JSON.parse(args);
                 this.fireGetHostCallback(id, preferences);
                 break;
             }
 
-            case "getUrl": {
+            case 'getUrl': {
                 const { id, content } = JSON.parse(args);
                 this.fireGetUrlCallback(id, content);
                 break;
             }
 
-            case "websocket": {
+            case 'websocket': {
                 const { event, message } = JSON.parse(args);
                 this.fireWebSocketCallback(event, message);
                 break;
             }
 
-            case "getVscodeSettings": {
+            case 'getVscodeSettings': {
                 const parsedArgs = JSON.parse(args);
-                this.parseVscodeSettingsObject(parsedArgs)
+                this.parseVscodeSettingsObject(parsedArgs);
             }
         }
         return true;
@@ -142,7 +142,7 @@ export default class ToolsHost {
         const id: number = vscodeObject.id;
         const themeString: ThemeString = vscodeObject.themeString;
         let theme;
-        switch(themeString) {
+        switch (themeString) {
             case 'System preference':
                 theme = 'systemPreferred';
                 break;
@@ -164,7 +164,7 @@ export default class ToolsHost {
 
     private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "telemetry", telemetry);
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'telemetry', telemetry);
     }
 
     private fireGetHostCallback(id: number, args: object) {

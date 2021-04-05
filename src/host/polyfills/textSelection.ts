@@ -4,8 +4,8 @@
 export default function applySetupTextSelectionPatch(content: string) {
     const pattern = /_setupTextSelectionHack\(stylePaneWrapperElement\)\s*{/g;
     if (content.match(pattern)) {
-        return content.replace(pattern, "_setupTextSelectionHack() { return;");
-    } else {
-        return null;
+        return content.replace(pattern, '_setupTextSelectionHack() { return;');
     }
+        return null;
+
 }
