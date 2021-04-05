@@ -530,7 +530,7 @@
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Customize your launch experience by creating a launch.json file for your project.\n[Generate launch.json](command:vscode-edge-devtools-view.launch)",
+                "contents": "Customize your launch experience by adding a launch.json file to your project.\n[Generate launch.json](command:vscode-edge-devtools-view.launch)",
                 "when": "workbenchState != empty && launchJsonStatus == None"
             },
             {
