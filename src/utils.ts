@@ -91,7 +91,7 @@ export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
 export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
-const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map();
+const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
 
 export interface IRemoteTargetJson {
     [index: string]: string;
@@ -124,7 +124,7 @@ export function fetchUri(uri: string, options: https.RequestOptions = {}): Promi
         get(options, response => {
             let responseData = '';
             response.on('data', chunk => {
-                responseData += chunk.toString();
+                responseData += chunk;
             });
             response.on('end', () => {
                 // Sometimes the 'error' event is not fired. Double check here.
@@ -155,7 +155,8 @@ export function fixRemoteWebSocket(
     remotePort: number,
     target: IRemoteTargetJson): IRemoteTargetJson {
     if (target.webSocketDebuggerUrl) {
-        const addressMatch = target.webSocketDebuggerUrl.match(/ws:\/\/([^/]+)\/?/);
+        const re = /ws:\/\/([^/]+)\/?/;
+        const addressMatch = re.exec(target.webSocketDebuggerUrl);
         if (addressMatch) {
             const replaceAddress = `${remoteAddress}:${remotePort}`;
             target.webSocketDebuggerUrl = target.webSocketDebuggerUrl.replace(addressMatch[1], replaceAddress);
@@ -170,7 +171,7 @@ export function fixRemoteWebSocket(
  * @param hostname The remote hostname
  * @param port The remote port
  */
-export async function getListOfTargets(hostname: string, port: number, useHttps: boolean): Promise<any[]> {
+export async function getListOfTargets(hostname: string, port: number, useHttps: boolean): Promise<IRemoteTargetJson[]> {
     const checkDiscoveryEndpoint = (uri: string) => {
         return fetchUri(uri, { headers: { Host: 'localhost' } });
     };
@@ -191,7 +192,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
 
     let result: IRemoteTargetJson[];
     try {
-        result = JSON.parse(jsonResponse);
+        result = JSON.parse(jsonResponse) as IRemoteTargetJson[];
     } catch {
         result = [];
     }
@@ -242,7 +243,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
  *
  * @param context The vscode context
  */
-export function createTelemetryReporter(context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
+export function createTelemetryReporter(_context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
     if (packageJson && vscode.env.machineId !== 'someValue.machineId') {
         // Use the real telemetry reporter
         return new TelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
@@ -292,7 +293,7 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @param targetUrl The url of the page to open
  * @param userDataDir The user data directory for the launched instance
  */
-export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string) {
+export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string): Promise<puppeteer.Browser> {
     const args = [
         '--no-first-run',
         '--no-default-browser-check',
@@ -317,10 +318,10 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
  * @param port The port of the browser
  * @param tabUrl The url to open, if any
  */
-export async function openNewTab(hostname: string, port: number, tabUrl?: string) {
+export async function openNewTab(hostname: string, port: number, tabUrl?: string): Promise<IRemoteTargetJson | undefined> {
     try {
-        const json = await fetchUri(`http://${hostname}:${port}/json/new?${tabUrl}`);
-        const target: IRemoteTargetJson | undefined = JSON.parse(json);
+        const json = await fetchUri(`http://${hostname}:${port}/json/new?${tabUrl ? tabUrl : ''}`);
+        const target: IRemoteTargetJson | undefined = JSON.parse(json) as IRemoteTargetJson | undefined;
         return target;
     } catch {
         return undefined;
@@ -332,7 +333,7 @@ export async function openNewTab(hostname: string, port: number, tabUrl?: string
  *
  * @param uri The string from which to remove the trailing slash (if any)
  */
-export function removeTrailingSlash(uri: string) {
+export function removeTrailingSlash(uri: string): string {
     return (uri.endsWith('/') ? uri.slice(0, -1) : uri);
 }
 
@@ -395,7 +396,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
  * @param webRoot The value to use for replacement.
  * @param entry The path containing the '${webRoot}' string that we will replace.
  */
-export function replaceWebRootInSourceMapPathOverridesEntry(webRoot: string, entry: string) {
+export function replaceWebRootInSourceMapPathOverridesEntry(webRoot: string, entry: string): string {
     if (webRoot) {
         const webRootIndex = entry.indexOf('${webRoot}');
         if (webRootIndex === 0) {
@@ -442,7 +443,7 @@ export function applyPathMapping(
             .replace(/\*/g, '(.*)')
             .replace(/\\\\/g, '/');
         const leftRegex = new RegExp(`^${leftRegexSegment}$`, 'i');
-        const overridePatternMatches = forwardSlashSourcePath.match(leftRegex);
+        const overridePatternMatches = leftRegex.exec(forwardSlashSourcePath);
         if (!overridePatternMatches) {
             continue;
         }
