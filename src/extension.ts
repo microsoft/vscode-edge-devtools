@@ -8,7 +8,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import CDPTarget from './cdpTarget';
 import CDPTargetsProvider from './cdpTargetsProvider';
 import { DevToolsPanel } from './devtoolsPanel';
-import LaunchDebugProvider from './launchDebugProvider';
+import { LaunchDebugProvider } from './launchDebugProvider';
 import {
     createTelemetryReporter,
     fixRemoteWebSocket,

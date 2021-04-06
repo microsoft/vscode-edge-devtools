@@ -20,7 +20,7 @@ type LaunchCallback = (
     launchUrl?: string,
     config?: Partial<IUserConfig>) => void;
 
-export default class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
+export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
     private readonly context: vscode.ExtensionContext;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly attach: AttachCallback;
@@ -38,8 +38,8 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
     }
 
     provideDebugConfigurations(
-        folder: vscode.WorkspaceFolder | undefined,
-        token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
+        _folder: vscode.WorkspaceFolder | undefined,
+        _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([{
             name: 'Launch Microsoft Edge and open the Edge DevTools',
             request: 'launch',
@@ -50,7 +50,7 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
 
     resolveDebugConfiguration(
         folder: vscode.WorkspaceFolder | undefined,
-        config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
+        config: vscode.DebugConfiguration, _token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration> {
         const userConfig = config as Partial<IUserConfig>;
 
@@ -81,7 +81,7 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
             return Promise.resolve(config);
         } else {
             this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
-            vscode.window.showErrorMessage('No supported launch config was found.');
+            vscode.window.showErrorMessage('No supported launch config was found.') as Promise<void>;
         }
 
         return undefined;
@@ -91,15 +91,15 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         let outUrlString = '';
 
         if (config.file) {
-            outUrlString = config.file;
+            outUrlString = config.file as string;
             if (folder) {
                 outUrlString = outUrlString.replace('${workspaceFolder}', folder.uri.path);
             }
             outUrlString = (outUrlString.startsWith('/') ? 'file://' : 'file:///') + outUrlString;
         } else if (config.url) {
-            outUrlString = config.url;
+            outUrlString = config.url as string;
         } else if (config.urlFilter) {
-            outUrlString = config.urlFilter;
+            outUrlString = config.urlFilter as string;
         }
 
         return outUrlString;
