@@ -42,7 +42,7 @@ import {
     applyStylesRevealerPatch,
     applyThemePatch,
 } from './src/host/polyfills/simpleView';
-import applySetupTextSelectionPatch from './src/host/polyfills/textSelection';
+import { applySetupTextSelectionPatch } from './src/host/polyfills/textSelection';
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
