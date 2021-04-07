@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { IDevToolsWindow } from '../host';
-import ToolsHost from '../toolsHost';
+import { ToolsHost } from '../toolsHost';
 
 declare let InspectorFrontendHost: ToolsHost;
 
