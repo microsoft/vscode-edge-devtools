@@ -179,7 +179,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyRerouteConsoleMessagePatch,
     ]);
 
-    // #341: Devtools should be localized as in the browser.
     await patchFileForWebViewWrapper("i18n/i18n.js", toolsOutDir, [
         applyThirdPartyI18nLocalesPatch,
     ]);
