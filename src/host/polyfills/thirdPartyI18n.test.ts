@@ -4,7 +4,7 @@ import { testPatch } from "../../test/helpers";
 import applyThirdPartyI18nLocalesPatch from "./thirdPartyI18n";
 
 describe("override i18n locales", () => {
-    it("applySetupTextSelectionPatch correctly changes text", async () => {
+    it("applyThirdPartyI18nLocalesPatch correctly changes text", async () => {
         const filePath = "i18n/i18n.js";
         const expectedStrings = ["const locales = {'en-US': {'title': 'value'},};"];
         testPatch(filePath, applyThirdPartyI18nLocalesPatch, expectedStrings);
