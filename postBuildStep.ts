@@ -3,7 +3,7 @@
 import * as fse from 'fs-extra';
 import path from 'path';
 
-import applyPaddingInlineCssPatch from './src/host/polyfills/cssPaddingInline';
+import { applyPaddingInlineCssPatch } from './src/host/polyfills/cssPaddingInline';
 import { applyContentSecurityPolicyPatch } from './src/host/polyfills/inspectorContentPolicy';
 import { applyRuntimeImportScriptPathPrefixPatch } from './src/host/polyfills/runtime';
 import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from './src/host/polyfills/releaseNote';
