@@ -178,7 +178,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper("sdk/sdk.js", toolsOutDir, [
         applyRerouteConsoleMessagePatch,
     ]);
-
     await patchFileForWebViewWrapper("i18n/i18n.js", toolsOutDir, [
         applyThirdPartyI18nLocalesPatch,
     ]);
