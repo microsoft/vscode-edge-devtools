@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-declare const acquireVsCodeApi: () => any;
+declare const acquireVsCodeApi: () => {postMessage(message: unknown): void};
 
-export function initializeMessaging() {
+export function initializeMessaging(): void {
     const vscode = acquireVsCodeApi();
 
     let toolsWindow: Window | null;
