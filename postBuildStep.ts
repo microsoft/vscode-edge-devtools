@@ -44,6 +44,7 @@ import {
     applyThemePatch,
 } from "./src/host/polyfills/simpleView";
 import applySetupTextSelectionPatch from "./src/host/polyfills/textSelection";
+import applyThirdPartyI18nLocalesPatch from "./src/host/polyfills/thirdPartyI18n";
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
@@ -176,6 +177,11 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ])
     await patchFileForWebViewWrapper("sdk/sdk.js", toolsOutDir, [
         applyRerouteConsoleMessagePatch,
+    ]);
+
+    // #341: Devtools should be localized as in the browser.
+    await patchFileForWebViewWrapper("i18n/i18n.js", toolsOutDir, [
+        applyThirdPartyI18nLocalesPatch,
     ]);
 }
 
