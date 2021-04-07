@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { getFirstCallback, Mocked } from "../test/helpers";
-import ToolsResourceLoader from "./toolsResourceLoader";
+import { ToolsResourceLoader } from "./toolsResourceLoader";
 
 describe("toolsHost", () => {
     let mockResourceLoader: Mocked<ToolsResourceLoader>;
@@ -239,8 +239,10 @@ describe("toolsHost", () => {
 
         it("calls onMessageFromChannel on websocket message", async () => {
             const mockToolsWS = {
-                instance: {
-                    onMessageFromChannel: jest.fn(),
+                ToolsWebSocket: {
+                    instance: {
+                        onMessageFromChannel: jest.fn(),
+                    },
                 },
             };
             jest.doMock("./toolsWebSocket", () => mockToolsWS);
@@ -251,7 +253,7 @@ describe("toolsHost", () => {
             const expectedArgs = { event: "message", message: "some websocket message" };
             host.onMessageFromChannel("websocket", JSON.stringify(expectedArgs));
 
-            expect(mockToolsWS.instance.onMessageFromChannel).toHaveBeenCalledWith(
+            expect(mockToolsWS.ToolsWebSocket.instance.onMessageFromChannel).toHaveBeenCalledWith(
                 expectedArgs.event,
                 expectedArgs.message,
             );

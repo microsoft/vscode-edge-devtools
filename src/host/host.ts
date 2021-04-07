@@ -3,7 +3,7 @@
 
 import { parseMessageFromChannel } from '../common/webviewEvents';
 import ToolsHost from './toolsHost';
-import ToolsResourceLoader, { IRuntimeResourceLoader } from './toolsResourceLoader';
+import { ToolsResourceLoader, IRuntimeResourceLoader } from './toolsResourceLoader';
 import { ToolsWebSocket } from './toolsWebSocket';
 
 let listenForSecondKeyChord = false;

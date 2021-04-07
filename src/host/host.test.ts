@@ -66,7 +66,9 @@ describe("host", () => {
         it("sets resource loader", async () => {
             const mockOverride = jest.fn();
             jest.doMock("./toolsResourceLoader", () => ({
-                overrideResourceLoading: mockOverride,
+                ToolsResourceLoader: {
+                    overrideResourceLoading: mockOverride,
+                },
             }));
             jest.resetModules();
 

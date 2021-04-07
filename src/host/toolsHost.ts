@@ -9,8 +9,8 @@ import {
     WebSocketEvent,
     WebviewEvent,
 } from '../common/webviewEvents';
-import ToolsResourceLoader from './toolsResourceLoader';
-import ToolsWebSocket from './toolsWebSocket';
+import { ToolsResourceLoader } from './toolsResourceLoader';
+import { ToolsWebSocket } from './toolsWebSocket';
 
 export default class ToolsHost {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
