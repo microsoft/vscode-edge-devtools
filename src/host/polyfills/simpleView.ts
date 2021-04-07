@@ -57,7 +57,7 @@ export function getVscodeSettings(callback: (arg0: Record<string, unknown>) => v
 
 export function sendToVscodeOutput(message: string): void {
     // Since we are calling InspectorFrontendHost outside of root.js, we need to use InspectorFrontendHost.InspectorFrontendHostInstance
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
 }
 

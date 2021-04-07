@@ -19,7 +19,7 @@ export interface IRoot {
     Runtime: IRuntimeResourceLoader;
 }
 
-export function initialize(dtWindow: IDevToolsWindow) {
+export function initialize(dtWindow: IDevToolsWindow): void {
     if (!dtWindow) {
         return;
     }
