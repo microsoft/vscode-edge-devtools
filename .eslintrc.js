@@ -130,6 +130,7 @@ module.exports = {
     
         '@typescript-eslint/explicit-member-accessibility': [0],
         '@typescript-eslint/no-explicit-any': 2,
+        '@typescript-eslint/restrict-template-expressions': 0,
     
         // Closure does not properly typecheck default exports
         'import/no-default-export': 2,

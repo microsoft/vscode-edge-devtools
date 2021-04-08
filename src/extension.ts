@@ -28,17 +28,17 @@ import {
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, async () => {
-        attach(context);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, (): void => {
+        void attach(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, async () => {
-        launch(context);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, (): void => {
+        void launch(context);
     }));
 
     // Register the launch provider
@@ -74,11 +74,11 @@ export function activate(context: vscode.ExtensionContext) {
             const runtimeConfig = getRuntimeConfig();
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
         }));
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openSettings`, async () => {
-        vscode.commands.executeCommand('workbench.action.openSettings', `${SETTINGS_STORE_NAME}`);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openSettings`, () => {
+        void vscode.commands.executeCommand('workbench.action.openSettings', `${SETTINGS_STORE_NAME}`);
     }));
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewChangelog`, async () => {
-        vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/CHANGELOG.md'));
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewChangelog`, () => {
+        void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/CHANGELOG.md'));
     }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
@@ -100,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
                     // e.g redirecting to chrome-error: protocol
                     if (!page.isClosed() && (normalizedPath === page.target().url())) {
                         // fire and forget
-                        page.close();
+                        void page.close();
                         break;
                     }
                 }
@@ -112,11 +112,11 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.copyItem`,
         (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
-    vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
+    void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
 }
 
 export async function attach(
-    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean) {
+    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
@@ -129,13 +129,13 @@ export async function attach(
     // Get the attach target and keep trying until reaching timeout
     const startTime = Date.now();
     do {
-        let responseArray: any[] | undefined;
+        let responseArray: IRemoteTargetJson[] | undefined;
         try {
             // Keep trying to attach to the list endpoint until timeout
             responseArray = await debugCore.utils.retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
-                /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL);
+                /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL) as IRemoteTargetJson[];
         } catch {
             // Timeout so make sure we error out with no json result
             responseArray = undefined;
@@ -154,16 +154,16 @@ export async function attach(
                 // Match the targets using the edge debug adapter logic
                 let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
                 try {
-                    matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray, attachUrl);
+                    matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray as unknown as debugCore.chromeConnection.ITarget[], attachUrl);
                 } catch {
                     matchedTargets = undefined;
                 }
 
                 if (matchedTargets && matchedTargets.length > 0 && matchedTargets[0].webSocketDebuggerUrl) {
-                    const actualTarget = fixRemoteWebSocket(hostname, port, matchedTargets[0] as any);
+                    const actualTarget = fixRemoteWebSocket(hostname, port, matchedTargets[0] as unknown as IRemoteTargetJson);
                     targetWebsocketUrl = actualTarget.webSocketDebuggerUrl;
                 } else if (!useRetry) {
-                    vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
+                    void vscode.window.showErrorMessage(`Couldn't attach to ${attachUrl}.`);
                 }
             }
 
@@ -205,7 +205,7 @@ export async function attach(
     } while (useRetry && Date.now() - startTime < timeout);
 }
 
-export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>) {
+export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
@@ -226,7 +226,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         const browserPath = await getBrowserPath(config);
         if (!browserPath) {
             telemetryReporter.sendTelemetryEvent('command/launch/error/browser_not_found', telemetryProps);
-            vscode.window.showErrorMessage(
+            void vscode.window.showErrorMessage(
                 'Microsoft Edge could not be found. ' +
                 'Ensure you have installed Microsoft Edge ' +
                 "and that you have selected 'default' or the appropriate version of Microsoft Edge " +
@@ -238,17 +238,18 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             // If it is one of those names we use that, otherwise we default it to "other".
             // Then we upload just one of those 3 names to telemetry.
             const exeName = browserPath.split(/\\|\//).pop();
-            const match = exeName!.match(/(chrome|edge)/gi) || [];
+            if (!exeName) { return; }
+            const match = exeName.match(/(chrome|edge)/gi) || [];
             const knownBrowser = match.length > 0 ? match[0] : 'other';
             const browserProps = { exe: `${knownBrowser.toLowerCase()}` };
             telemetryReporter.sendTelemetryEvent('command/launch/browser', browserProps);
 
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
         browserInstance.addListener('targetcreated', () => {
-            vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
+            void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
         });
         browserInstance.addListener('targetdestroyed', () => {
-            vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
+            void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.refresh`);
         });
         await attach(context, url, config);
     }
