@@ -14,11 +14,11 @@ type AttachCallback = (
     context: vscode.ExtensionContext,
     targetUrl?: string,
     config?: Partial<IUserConfig>,
-    useRetry?: boolean) => Promise<void>;
+    useRetry?: boolean) => void | Promise<void>;
 type LaunchCallback = (
     context: vscode.ExtensionContext,
     launchUrl?: string,
-    config?: Partial<IUserConfig>) => Promise<void>;
+    config?: Partial<IUserConfig>) => void | Promise<void>;
 
 export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
     private readonly context: vscode.ExtensionContext;

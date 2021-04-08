@@ -62,9 +62,9 @@ export class DevToolsPanel {
         this.panelSocket.on('getState', msg => this.onSocketGetState(msg));
         this.panelSocket.on('getVscodeSettings', msg => this.onSocketGetVscodeSettings(msg));
         this.panelSocket.on('setState', msg => this.onSocketSetState(msg));
-        this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg));
-        this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg));
-        this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg));
+        this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg) as unknown as void);
+        this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg) as unknown as void);
+        this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
@@ -77,7 +77,7 @@ export class DevToolsPanel {
         }, this, this.disposables);
 
         // Handle view change
-        this.panel.onDidChangeViewState(e => {
+        this.panel.onDidChangeViewState(_e => {
             if (this.panel.visible) {
                 this.update();
             }
@@ -89,7 +89,7 @@ export class DevToolsPanel {
         }, this, this.disposables);
     }
 
-    dispose() {
+    dispose(): void {
         DevToolsPanel.instance = undefined;
 
         this.panel.dispose();
@@ -114,7 +114,7 @@ export class DevToolsPanel {
                 this.telemetryReporter.sendTelemetryEvent(`websocket/${e}`);
                 break;
         }
-        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'websocket', { event: e, message });
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
     }
 
     private onSocketReady() {
@@ -133,24 +133,24 @@ export class DevToolsPanel {
 
     private onSocketCopyText(message: string) {
         const { clipboardData } = JSON.parse(message) as { clipboardData: string };
-        vscode.env.clipboard.writeText(clipboardData);
+        void vscode.env.clipboard.writeText(clipboardData);
     }
 
     private onSocketFocusEditor(message: string) {
         const { next } = JSON.parse(message) as { next: boolean };
         if (next) {
-            vscode.commands.executeCommand('workbench.action.nextEditor');
+            void vscode.commands.executeCommand('workbench.action.nextEditor');
         } else {
-            vscode.commands.executeCommand('workbench.action.previousEditor');
+            void vscode.commands.executeCommand('workbench.action.previousEditor');
         }
     }
 
     private onSocketFocusEditorGroup(message: string) {
         const { next } = JSON.parse(message) as { next: boolean };
         if (next) {
-            vscode.commands.executeCommand('workbench.action.focusNextGroup');
+            void vscode.commands.executeCommand('workbench.action.focusNextGroup');
         } else {
-            vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
+            void vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
     }
 
@@ -160,7 +160,7 @@ export class DevToolsPanel {
     }
 
     private onSocketTelemetry(message: string) {
-        const telemetry: TelemetryData = JSON.parse(message);
+        const telemetry: TelemetryData = JSON.parse(message) as TelemetryData;
 
         // Fire telemetry
         switch (telemetry.event) {
@@ -196,13 +196,13 @@ export class DevToolsPanel {
 
     private onSocketGetState(message: string) {
         const { id } = JSON.parse(message) as { id: number };
-        const preferences: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
-        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'getState', { id, preferences });
+        const preferences: Record<string, unknown> = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getState', { id, preferences });
     }
 
     private onSocketGetVscodeSettings(message: string) {
         const { id } = JSON.parse(message) as { id: number };
-        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'getVscodeSettings', {
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
             whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
@@ -212,9 +212,9 @@ export class DevToolsPanel {
     private onSocketSetState(message: string) {
         // Parse the preference from the message and store it
         const { name, value } = JSON.parse(message) as { name: string, value: string };
-        const allPref: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || {};
+        const allPref: Record<string, unknown> = this.context.workspaceState.get(SETTINGS_PREF_NAME) || {};
         allPref[name] = value;
-        this.context.workspaceState.update(SETTINGS_PREF_NAME, allPref);
+        void this.context.workspaceState.update(SETTINGS_PREF_NAME, allPref);
     }
 
     private async onSocketGetUrl(message: string) {
@@ -228,12 +228,12 @@ export class DevToolsPanel {
             // Response will not have content
         }
 
-        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'getUrl', { id: request.id, content });
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getUrl', { id: request.id, content });
     }
 
-    private async onSocketOpenUrl(message: string) {
+    private onSocketOpenUrl(message: string) {
       const { url } = JSON.parse(message) as { url: string };
-      vscode.env.openExternal(vscode.Uri.parse(url));
+      void vscode.env.openExternal(vscode.Uri.parse(url));
     }
 
     private async onSocketOpenInEditor(message: string) {
@@ -260,7 +260,7 @@ export class DevToolsPanel {
 
         // Convert the local url to a workspace path
         const transformer = new debugCore.UrlPathTransformer();
-        transformer.launch({ pathMapping: this.config.pathMapping });
+        void transformer.launch({ pathMapping: this.config.pathMapping });
         const localSource = { path: sourcePath };
         await transformer.fixSource(localSource);
 
@@ -281,7 +281,7 @@ export class DevToolsPanel {
         // Finally open the document if it exists
         if (uri) {
             const doc = await vscode.workspace.openTextDocument(uri);
-            vscode.window.showTextDocument(
+            void vscode.window.showTextDocument(
                 doc,
                 {
                     preserveFocus: true,
@@ -289,7 +289,7 @@ export class DevToolsPanel {
                     viewColumn: vscode.ViewColumn.One,
                 });
         } else {
-            vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
+            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
         }
     }
 
@@ -332,7 +332,7 @@ export class DevToolsPanel {
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,
-        config: IRuntimeConfig) {
+        config: IRuntimeConfig): void {
         const column = vscode.ViewColumn.Beside;
 
         if (DevToolsPanel.instance) {
