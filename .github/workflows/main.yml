@@ -23,7 +23,7 @@ jobs:
         ado_token: '${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}'
         ado_organization: 'microsoft'
         ado_project: 'Edge'
-        ado_area_path: 'Edge\Dev Experience\DevTools'
+        ado_area_path: 'Edge\Dev Experience\Developer Tools\F12 Tools\VSCode Extension'
         ado_tags: 'DevToolsVSCodeExtension_GitHub'
         ado_tag_on_close: 'DevToolsVSCodeExtension_GitHub_Closed'
         ado_bypassrules: false
