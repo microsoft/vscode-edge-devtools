@@ -99,7 +99,7 @@ async function copyStaticFiles() {
 }
 
 async function patchFilesForWebView(toolsOutDir: string) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.log('Patching files.');
     await patchFileForWebViewWrapper('shell.js', toolsOutDir, [
         applyInspectorCommonContextMenuPatch,
