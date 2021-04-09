@@ -103,7 +103,7 @@ export function applyStylesRevealerPatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyStylesToggleFocusPatch(content: string) {
+export function applyStylesToggleFocusPatch(content: string): string | null {
     // Patch to fix accessibility focus issue when toggling a property with context menu option.
     const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(ls\s*`Toggle property[\s\S]+.const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
     const replacementText = `
@@ -113,7 +113,7 @@ export function applyStylesToggleFocusPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyQuickOpenPatch(content: string) {
+export function applyQuickOpenPatch(content: string): string | null {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
     const replacementText = 'handleAction(context, actionId) { actionId = null; switch(actionId)';
