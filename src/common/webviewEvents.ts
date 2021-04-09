@@ -42,7 +42,7 @@ export interface ITelemetryDataNumber {
 export interface ITelemetryDataObject {
     event: 'error';
     name: string;
-    data: object;
+    data: Record<string, unknown>;
 }
 export type TelemetryData = ITelemetryDataNumber | ITelemetryDataObject;
 
@@ -85,7 +85,7 @@ export function parseMessageFromChannel(
 export function encodeMessageForChannel(
     postMessageCallback: (message: string) => void,
     eventType: WebviewEvent,
-    args?: object) {
+    args?: Record<string, unknown>): void {
     const message = `${eventType}:${JSON.stringify(args)}`;
     postMessageCallback(message);
 }
