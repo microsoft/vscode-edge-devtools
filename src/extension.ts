@@ -5,7 +5,7 @@ import { Browser } from 'puppeteer-core';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
-import CDPTarget from './cdpTarget';
+import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
 import { DevToolsPanel } from './devtoolsPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';

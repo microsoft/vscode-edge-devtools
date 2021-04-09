@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { IRemoteTargetJson } from './utils';
 
-export default class CDPTarget extends vscode.TreeItem {
+export class CDPTarget extends vscode.TreeItem {
     readonly targetJson: IRemoteTargetJson;
     readonly propertyName: string | null = null;
     readonly iconPath: { dark: string, light: string } | undefined;
@@ -42,11 +42,13 @@ export default class CDPTarget extends vscode.TreeItem {
     /**
      * Issue: https://github.com/microsoft/vscode-edge-devtools/issues/199
      */
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     get description(): string {
         return (this.propertyName ? this.targetJson[this.propertyName] : this.targetJson.url);
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     get tooltip(): string {
         return `${this.label} - ${this.description}`;
@@ -56,7 +58,7 @@ export default class CDPTarget extends vscode.TreeItem {
         return this.targetJson.webSocketDebuggerUrl;
     }
 
-    getChildren() {
+    getChildren(): CDPTarget[] {
         // Populate the child nodes if we don't have any yet
         if (!this.propertyName && this.children.length === 0) {
             this.children = [];

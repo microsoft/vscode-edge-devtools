@@ -6,7 +6,7 @@
 
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import CDPTarget from "./cdpTarget";
+import { CDPTarget } from "./cdpTarget";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
 import { IRemoteTargetJson } from "./utils";
 
@@ -20,7 +20,7 @@ describe("CDPTargetsProvider", () => {
         mockVSCode = createFakeVSCode() as any;
         mockReporter = createFakeTelemetryReporter();
 
-        jest.doMock("./cdpTarget", () => jest.fn());
+        jest.doMock("./cdpTarget", () => ({ CDPTarget: jest.fn() }));
         jest.doMock("vscode", () => mockVSCode, { virtual: true });
         jest.resetModules();
     });
@@ -87,9 +87,9 @@ describe("CDPTargetsProvider", () => {
             }),
         };
         jest.doMock("./utils", () => mockUtils);
-        jest.doMock("./cdpTarget", () => function CDPTargetInstance(json: IRemoteTargetJson) {
-            return { targetJson: json };
-        });
+        jest.doMock("./cdpTarget", () => ({
+            CDPTarget: jest.fn((json: IRemoteTargetJson) => ({ targetJson: json }))
+        }));
         jest.resetModules();
 
         const ctp = await import("./cdpTargetsProvider");
