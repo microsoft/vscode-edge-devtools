@@ -1,3 +1,8 @@
+## 1.1.7
+* **[Bug Fix]**: Retain focus on property after toggling with context menu
+ [PR #332](https://github.com/microsoft/vscode-edge-devtools/pull/332)
+* **[Bug Fix]**: Extension does not work and panel is blank - [PR #342](https://github.com/microsoft/vscode-edge-devtools/pull/342)
+
 ## 1.1.6
 * **[Feature]**: Update Edge version to 88.0.705.9 - [PR #302](https://github.com/microsoft/vscode-edge-devtools/pull/302)
 * **[Bug Fix]**: Support for ARM devices [PR #293](https://github.com/microsoft/vscode-edge-devtools/pull/318)
