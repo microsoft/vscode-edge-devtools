@@ -7,8 +7,10 @@ import * as path from 'path';
 import * as fs from 'fs';
 import CDPTarget from './cdpTarget';
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from './utils';
+import https = require('https');
+import { IncomingMessage } from 'http';
 
-export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
+export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
     readonly changeDataEvent: vscode.EventEmitter<CDPTarget | null>;
     private extensionPath: string;
@@ -43,6 +45,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
                 if (responseArray.length) {
                     await new Promise<void>(resolve => {
                         let targetsProcessed = 0;
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         responseArray.forEach(async (target: IRemoteTargetJson) => {
                             const actualTarget = fixRemoteWebSocket(hostname, port, target);
                             if (actualTarget.type === 'page' || actualTarget.type === 'iframe') {
@@ -89,7 +92,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
     refresh(): void {
         this.telemetryReporter.sendTelemetryEvent('view/refresh');
         this.changeDataEvent.fire(null);
-        this.clearFaviconResourceDirectory();
+        void this.clearFaviconResourceDirectory();
     }
 
     async clearFaviconResourceDirectory(): Promise<void> {
@@ -125,14 +128,14 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         if (!url || !url.startsWith('https')) {
             return null;
         }
-        const https = require('https');
+        // const https = require('https');
         const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
 
         // Example regex match: https://docs.microsoft.com/en-us/microsoft-edge/
         // urlMatch[0] = .microsoft.com/en-us/microsoft-edge/
         // urlMatch[1] = .microsoft.com/
         // urlMatch[2] = microsoft
-        const urlMatch = url.match(faviconRegex);
+        const urlMatch = faviconRegex.exec(url);
         let filename;
         if (urlMatch) {
             filename = `${urlMatch[2]}Favicon.ico`;
@@ -147,8 +150,8 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
 
         const file = fs.createWriteStream(filePath);
         const promise = new Promise<string | null>(resolve => {
-            https.get(faviconUrl, (response: any) => {
-                if (response.headers['content-type'].includes('icon')) {
+            https.get(faviconUrl, (response: IncomingMessage) => {
+                if (response.headers['content-type'] && response.headers['content-type'].includes('icon')) {
                   response.pipe(file);
                   file.on('error', () => {
                       resolve(null);

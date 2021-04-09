@@ -26,14 +26,14 @@ describe("CDPTargetsProvider", () => {
     });
 
     it("gets created successfully", async () => {
-        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const ctp = await import("./cdpTargetsProvider");
+        const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         expect(provider).toBeDefined();
     });
 
     it("returns the element from getTreeItem", async () => {
-        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const ctp = await import("./cdpTargetsProvider");
+        const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const expectedElement = {} as CDPTarget;
         expect(provider.getTreeItem(expectedElement)).toEqual(expectedElement);
     });
@@ -46,16 +46,16 @@ describe("CDPTargetsProvider", () => {
             };
         } as any;
 
-        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const ctp = await import("./cdpTargetsProvider");
+        const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         provider.refresh();
         expect(mockFire).toHaveBeenCalled();
         expect(mockReporter.sendTelemetryEvent).toHaveBeenCalled();
     });
 
     it("calls getChildren on the element", async () => {
-        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const ctp = await import("./cdpTargetsProvider");
+        const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const expectedChildren = [1, 2, 3];
         const mockElement = {
             getChildren: jest.fn(() => expectedChildren),
@@ -92,8 +92,8 @@ describe("CDPTargetsProvider", () => {
         });
         jest.resetModules();
 
-        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
-        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const ctp = await import("./cdpTargetsProvider");
+        const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const result = await provider.getChildren();
         expect(result.length).toEqual(allTargets.length);
 
@@ -105,11 +105,11 @@ describe("CDPTargetsProvider", () => {
     });
 
     it("check if favicons are downloaded and cleared correctly", async () => {
-        const { default: cdpTargetsProvider } = await import("./cdpTargetsProvider");
+        const ctp = await import("./cdpTargetsProvider");
         const fs = require('fs');
         const dir = './resources/favicons/';
 
-        const provider = new cdpTargetsProvider(mockContext, mockReporter);
+        const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const microsoftIcon = await provider.downloadFaviconFromSitePromise("https://docs.microsoft.com/en-us/microsoft-edge/");
         const bingIcon = await provider.downloadFaviconFromSitePromise("https://www.bing.com/");
         expect(microsoftIcon).not.toEqual(null);

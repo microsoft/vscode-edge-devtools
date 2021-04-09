@@ -85,7 +85,7 @@ export function parseMessageFromChannel(
 export function encodeMessageForChannel(
     postMessageCallback: (message: string) => void,
     eventType: WebviewEvent,
-    args?: Record<string, unknown>): void {
+    args?: unknown): void {
     const message = `${eventType}:${JSON.stringify(args)}`;
     postMessageCallback(message);
 }

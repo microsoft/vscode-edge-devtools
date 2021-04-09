@@ -23,6 +23,7 @@ describe("extension", () => {
         let mockUtils: Partial<Mocked<typeof import("./utils")>>;
         let mockRegisterTree: jest.Mock;
         let mockProviderRefresh: jest.Mock;
+        let mockProviderConstructor: jest.Mock;
         let mockClipboard: jest.Mock;
 
         beforeEach(() => {
@@ -43,9 +44,10 @@ describe("extension", () => {
             jest.doMock("./launchDebugProvider");
 
             mockProviderRefresh = jest.fn();
-            jest.doMock("./cdpTargetsProvider", () => function CDPTargetsProvider() {
+            mockProviderConstructor = jest.fn(() => ({refresh: mockProviderRefresh}));
+            jest.doMock("./cdpTargetsProvider", () => {
                 return {
-                    refresh: mockProviderRefresh,
+                    CDPTargetsProvider: mockProviderConstructor,
                 };
             });
 
