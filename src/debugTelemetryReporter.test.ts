@@ -4,21 +4,21 @@
 import { createFakeVSCode } from "./test/helpers";
 
 // Allow us to mock the console object for testing
-// tslint:disable: no-console
+// eslint-disable no-console
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 jest.mock("vscode-extension-telemetry");
 
 describe("debugTelemetryReporter", () => {
     it("gets created successfully", async () => {
-        const { default: telemetryReporter } = await import("./debugTelemetryReporter");
-        const reporter = new telemetryReporter();
+        const dtr = await import("./debugTelemetryReporter");
+        const reporter = new dtr.DebugTelemetryReporter();
         expect(reporter).toBeDefined();
     });
 
     it("sendTelemetryEvent writes to the console", async () => {
-        const { default: telemetryReporter } = await import("./debugTelemetryReporter");
-        const reporter = new telemetryReporter();
+        const dtr = await import("./debugTelemetryReporter");
+        const reporter = new dtr.DebugTelemetryReporter();
 
         global.console.log = jest.fn();
         const expectedName = "event";
@@ -32,8 +32,8 @@ describe("debugTelemetryReporter", () => {
     });
 
     it("dispose completes", async () => {
-        const { default: telemetryReporter } = await import("./debugTelemetryReporter");
-        const reporter = new telemetryReporter();
+        const dtr = await import("./debugTelemetryReporter");
+        const reporter = new dtr.DebugTelemetryReporter();
         await reporter.dispose();
     });
 });
