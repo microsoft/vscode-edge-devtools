@@ -271,6 +271,15 @@ describe("simpleView", () => {
         testPatch(filePath, patch, [], unexpectedStrings);
     });
 
+    it("applyStylesToggleFocusPatch correctly changes root.js to set extensionSettings map", async () => {
+        const filePath = "elements/elements.js";
+        const patch = SimpleView.applyStylesToggleFocusPatch;
+        const expectedStrings = [`const sectionIndex = this._parentPane.focusedSectionIndex();
+        contextMenu.defaultSection()`];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
     it("applyRerouteConsoleMessagePatch correctly changes root.js to set extensionSettings map", async () => {
         const filePath = "sdk/sdk.js";
         const patch = SimpleView.applyRerouteConsoleMessagePatch;

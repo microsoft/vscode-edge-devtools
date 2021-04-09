@@ -40,9 +40,11 @@ import {
     applySetTabIconPatch,
     applyShowDrawerTabs,
     applyStylesRevealerPatch,
+    applyStylesToggleFocusPatch,
     applyThemePatch,
 } from './src/host/polyfills/simpleView';
 import { applySetupTextSelectionPatch } from './src/host/polyfills/textSelection';
+import applyThirdPartyI18nLocalesPatch from './src/host/polyfills/thirdPartyI18n';
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
@@ -113,9 +115,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyMainViewPatch,
         applyScreencastAppPatch,
     ]);
-    await patchFileForWebViewWrapper('elements/elements.js', toolsOutDir, [
-        applySetupTextSelectionPatch,
-    ]);
     await patchFileForWebViewWrapper('common/common.js', toolsOutDir, [
         applyCommonRevealerPatch,
     ]);
@@ -126,7 +125,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyPaddingInlineCssPatch,
     ]);
     await patchFileForWebViewWrapper('elements/elements.js', toolsOutDir, [
+        applySetupTextSelectionPatch,
         applyStylesRevealerPatch,
+        applyStylesToggleFocusPatch,
     ]);
     await patchFileForWebViewWrapper('host/host.js', toolsOutDir, [
         applyRemovePreferencePatch,
@@ -176,6 +177,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper('sdk/sdk.js', toolsOutDir, [
         applyRerouteConsoleMessagePatch,
+    ]);
+    await patchFileForWebViewWrapper('i18n/i18n.js', toolsOutDir, [
+        applyThirdPartyI18nLocalesPatch,
     ]);
 }
 
