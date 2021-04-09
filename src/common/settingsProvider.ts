@@ -26,7 +26,7 @@ export class SettingsProvider {
     return whatsNewEnabled;
   }
 
-  static get instance() {
+  static get instance(): SettingsProvider {
     if (!SettingsProvider.singletonInstance) {
       SettingsProvider.singletonInstance = new SettingsProvider();
     }
