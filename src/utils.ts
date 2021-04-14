@@ -89,6 +89,12 @@ export const SETTINGS_DEFAULT_SOURCE_MAPS = true;
 export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT = 2015;
 export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
 export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
+export const providedDebugConfig: vscode.DebugConfiguration = {
+    name: "Launch Microsoft Edge and open the Edge DevTools",
+    request: "launch",
+    type: `${SETTINGS_STORE_NAME}.debug`,
+    url: "http://localhost:8080",
+};
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || "/";
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map();
@@ -285,25 +291,58 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
 }
 
 /**
- * Gets the status of the launch.json file associated with the currently opened workspace
- * @returns {String} None | Unsupported | Supported
+ * Gets a supported debug config and updates the status of the launch.json file associated with the current workspace
+ * @returns {vscode.DebugConfiguration | null}
  */
- export function getLaunchJsonStatus() {
-    if (!vscode.workspace.workspaceFolders)
-        return "None";
-
-    const filePath = `${vscode.workspace.workspaceFolders[0].uri.fsPath}/.vscode/launch.json`;
-    if (fse.pathExistsSync(filePath)) {
-        const fileText = fse.readFileSync(filePath, "utf8");
-        const supportRegex = /["']type["']:\s*["']((vscode-edge-devtools.debug)|(edge)|(msedge))["']/;
-        if (fileText.match(supportRegex)) {
-            return "Supported";
-        } else {
-            return "Unsupported";
-        }
-    } else {
-        return "None";
+ export function getLaunchJson(): vscode.DebugConfiguration | null {
+    // Check if there is a folder open
+    if (!vscode.workspace.workspaceFolders) {
+        vscode.commands.executeCommand('setContext', 'launchJsonStatus', "None");
+        return null;
     }
+
+    // Check if there's a launch.json file
+    const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
+    const filePath = `${workspaceUri.fsPath}/.vscode/launch.json`;
+    if (fse.pathExistsSync(filePath)) {
+        // Check if there is a supported debug config
+        const configs = vscode.workspace.getConfiguration('launch', workspaceUri).get('configurations') as vscode.DebugConfiguration[];
+        for (const config of configs) {
+            if (config.type === 'vscode-edge-devtools.debug' || config.type === 'msedge' || config.type === 'edge') {
+                vscode.commands.executeCommand('setContext', 'launchJsonStatus', "Supported");
+                return config;
+            }
+        }
+        vscode.commands.executeCommand('setContext', 'launchJsonStatus', "Unsupported");
+        return null;
+    } else {
+        vscode.commands.executeCommand('setContext', 'launchJsonStatus', "None");
+        return null;
+    }
+}
+
+/**
+ * Add a template for a supported debug configuration to launch.json
+ * @returns {void}
+ */
+export function configureLaunchJson(): void {
+    if (!vscode.workspace.workspaceFolders)
+        return;
+    
+    // Create ./.vscode/launch.json if it doesn't already exist
+    const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
+    fse.ensureFileSync(`${workspaceUri.fsPath}/.vscode/launch.json`);
+
+    // Append a supported debug config to their list of configurations
+    const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
+    let configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
+    let configWithInstruction = {...providedDebugConfig};
+    configWithInstruction.url += ' **Replace with your website url before launching**';
+    configs.push(configWithInstruction);
+
+    // Update launch.json with new configuration list and open in editor
+    launchJson.update('configurations', configs);
+    vscode.commands.executeCommand('vscode.open', vscode.Uri.joinPath(workspaceUri, '/.vscode/launch.json'));
 }
 
 /**
