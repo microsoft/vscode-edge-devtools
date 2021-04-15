@@ -14,7 +14,6 @@ type AttachCallback = (
     context: vscode.ExtensionContext,
     targetUrl?: string,
     config?: Partial<IUserConfig>,
-<<<<<<< HEAD
     useRetry?: boolean) => void | Promise<void>;
 type LaunchCallback = (
     context: vscode.ExtensionContext,
@@ -22,15 +21,6 @@ type LaunchCallback = (
     config?: Partial<IUserConfig>) => void | Promise<void>;
 
 export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
-=======
-    useRetry?: boolean) => void;
-type LaunchCallback = (
-    context: vscode.ExtensionContext,
-    launchUrl?: string,
-    config?: Partial<IUserConfig>) => void;
-
-export default class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
->>>>>>> master
     private readonly context: vscode.ExtensionContext;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly attach: AttachCallback;
@@ -48,13 +38,8 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
     }
 
     provideDebugConfigurations(
-<<<<<<< HEAD
         _folder: vscode.WorkspaceFolder | undefined,
         _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
-=======
-        folder: vscode.WorkspaceFolder | undefined,
-        token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
->>>>>>> master
         return Promise.resolve([{
             name: 'Launch Microsoft Edge and open the Edge DevTools',
             request: 'launch',
@@ -65,11 +50,7 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
 
     resolveDebugConfiguration(
         folder: vscode.WorkspaceFolder | undefined,
-<<<<<<< HEAD
         config: vscode.DebugConfiguration, _token?: vscode.CancellationToken):
-=======
-        config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
->>>>>>> master
         vscode.ProviderResult<vscode.DebugConfiguration> {
         const userConfig = config as Partial<IUserConfig>;
 
@@ -77,17 +58,10 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
             const targetUri: string = this.getUrlFromConfig(folder, config);
             if (config.request && config.request === 'attach') {
                 this.telemetryReporter.sendTelemetryEvent('debug/attach');
-<<<<<<< HEAD
                 void this.attach(this.context, targetUri, userConfig);
             } else if (config.request && config.request === 'launch') {
                 this.telemetryReporter.sendTelemetryEvent('debug/launch');
                 void this.launch(this.context, targetUri, userConfig);
-=======
-                this.attach(this.context, targetUri, userConfig);
-            } else if (config.request && config.request === 'launch') {
-                this.telemetryReporter.sendTelemetryEvent('debug/launch');
-                this.launch(this.context, targetUri, userConfig);
->>>>>>> master
             }
         } else if (config && (config.type === 'edge' || config.type === 'msedge')) {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
@@ -101,21 +75,13 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
 
                 // Allow the debugger to actually launch the browser before attaching
                 setTimeout(() => {
-<<<<<<< HEAD
                     void this.attach(this.context, userConfig.url, userConfig, /* useRetry=*/ true);
-=======
-                    this.attach(this.context, userConfig.url, userConfig, /* useRetry=*/ true);
->>>>>>> master
                 }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
             }
             return Promise.resolve(config);
         } else {
             this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
-<<<<<<< HEAD
             vscode.window.showErrorMessage('No supported launch config was found.') as Promise<void>;
-=======
-            vscode.window.showErrorMessage('No supported launch config was found.');
->>>>>>> master
         }
 
         return undefined;
@@ -125,25 +91,15 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         let outUrlString = '';
 
         if (config.file) {
-<<<<<<< HEAD
             outUrlString = config.file as string;
-=======
-            outUrlString = config.file;
->>>>>>> master
             if (folder) {
                 outUrlString = outUrlString.replace('${workspaceFolder}', folder.uri.path);
             }
             outUrlString = (outUrlString.startsWith('/') ? 'file://' : 'file:///') + outUrlString;
         } else if (config.url) {
-<<<<<<< HEAD
             outUrlString = config.url as string;
         } else if (config.urlFilter) {
             outUrlString = config.urlFilter as string;
-=======
-            outUrlString = config.url;
-        } else if (config.urlFilter) {
-            outUrlString = config.urlFilter;
->>>>>>> master
         }
 
         return outUrlString;
