@@ -384,7 +384,7 @@ describe("utils", () => {
         const mockReporter = {};
         beforeEach(async () => {
             jest.doMock("../package.json", () => ({}), { virtual: true });
-            jest.doMock("./debugTelemetryReporter", () => function debug() { return mockReporter; });
+            jest.doMock("./debugTelemetryReporter", () => ({DebugTelemetryReporter: jest.fn()}));
             jest.resetModules();
 
             utils = await import("./utils");

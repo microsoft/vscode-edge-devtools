@@ -3,7 +3,7 @@
 
 import TelemetryReporter from 'vscode-extension-telemetry';
 
-export default class DebugTelemetryReporter extends TelemetryReporter {
+export class DebugTelemetryReporter extends TelemetryReporter {
     constructor() {
         super('extensionId', 'extensionVersion', 'key');
     }
@@ -11,13 +11,13 @@ export default class DebugTelemetryReporter extends TelemetryReporter {
     sendTelemetryEvent(
         eventName: string,
         properties?: { [key: string]: string; },
-        measurements?: { [key: string]: number; }) {
-        // tslint:disable-next-line: no-console
+        measurements?: { [key: string]: number; }): void {
+        // eslint-disable-next-line no-console
         console.log(
             `${eventName}: ${JSON.stringify(properties)}, ${JSON.stringify(measurements)}`);
     }
 
-    dispose(): Promise<any> {
+    dispose(): Promise<void> {
         return Promise.resolve();
     }
 }

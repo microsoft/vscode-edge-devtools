@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export default function applyRuntimeImportScriptPathPrefixPatch(content: string) {
+export function applyRuntimeImportScriptPathPrefixPatch(content: string): string | null {
 
     // ImportScript is exposed as a module variable, this patch:
     // Exposes it again as a global and remove the local declaration.

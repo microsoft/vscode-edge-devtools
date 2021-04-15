@@ -7,16 +7,16 @@ export interface IRuntimeResourceLoader {
     loadResourcePromise: (url: string) => Promise<string>;
 }
 
-export default class ToolsResourceLoader {
+export class ToolsResourceLoader {
     private originalLoadResource: (url: string) => Promise<string>;
     private urlLoadNextId = 0;
-    private urlLoadResolvers: Map<number, (url: string) => void> = new Map();
+    private urlLoadResolvers: Map<number, (url: string) => void> = new Map<number,(url: string) => void>();
 
     private constructor(originalLoadResource: (url: string) => Promise<string>) {
         this.originalLoadResource = originalLoadResource;
     }
 
-    onResolvedUrlFromChannel(id: number, content: string) {
+    onResolvedUrlFromChannel(id: number, content: string): void {
         if (this.urlLoadResolvers.has(id)) {
             const resolve = this.urlLoadResolvers.get(id);
             if (resolve) {
@@ -39,7 +39,7 @@ export default class ToolsResourceLoader {
         return this.originalLoadResource(url);
     }
 
-    static overrideResourceLoading(loaderObject: IRuntimeResourceLoader) {
+    static overrideResourceLoading(loaderObject: IRuntimeResourceLoader): ToolsResourceLoader {
         const originalLoadResource = loaderObject.loadResourcePromise;
 
         // Replace the loader promise with our override version so we can control cross domain requests

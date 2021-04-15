@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 import { parseMessageFromChannel } from '../common/webviewEvents';
-import ToolsHost from './toolsHost';
-import ToolsResourceLoader, { IRuntimeResourceLoader } from './toolsResourceLoader';
-import ToolsWebSocket from './toolsWebSocket';
+import { ToolsHost } from './toolsHost';
+import { ToolsResourceLoader, IRuntimeResourceLoader } from './toolsResourceLoader';
+import { ToolsWebSocket } from './toolsWebSocket';
 
 let listenForSecondKeyChord = false;
 
@@ -19,7 +19,7 @@ export interface IRoot {
     Runtime: IRuntimeResourceLoader;
 }
 
-export function initialize(dtWindow: IDevToolsWindow) {
+export function initialize(dtWindow: IDevToolsWindow): void {
     if (!dtWindow) {
         return;
     }

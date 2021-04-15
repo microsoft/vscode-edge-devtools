@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { testPatch } from "../../test/helpers";
-import applySetupTextSelectionPatch from "./textSelection";
+import { applySetupTextSelectionPatch } from "./textSelection";
 
 describe("textSelection", () => {
     it("applySetupTextSelectionPatch correctly changes text", async () => {

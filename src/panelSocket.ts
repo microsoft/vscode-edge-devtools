@@ -20,15 +20,15 @@ export class PanelSocket extends EventEmitter {
         this.postMessageToDevTools = postMessageToDevTools;
     }
 
-    get isConnectedToTarget() {
+    get isConnectedToTarget(): boolean {
         return this.isConnected;
     }
 
-    onMessageFromWebview(message: string) {
+    onMessageFromWebview(message: string): void {
         parseMessageFromChannel(message, (eventName, args) => this.onMessageParsed(eventName, args));
     }
 
-    dispose() {
+    dispose(): void {
         if (this.socket) {
             this.isConnected = false;
             this.socket.close();
@@ -50,14 +50,16 @@ export class PanelSocket extends EventEmitter {
                 this.connectToTarget();
             }
 
-            const { message } = JSON.parse(args);
+            const { message } = JSON.parse(args) as {message: string};
             if (message && message[0] === '{') {
                 if (!this.isConnected) {
                     // DevTools are sending a message before the real websocket has finished opening so cache it
                     this.messages.push(message);
                 } else {
                     // Websocket ready so send the message directly
-                    this.socket!.send(message);
+                    if (this.socket) {
+                        this.socket.send(message);
+                    }
                 }
             }
         }

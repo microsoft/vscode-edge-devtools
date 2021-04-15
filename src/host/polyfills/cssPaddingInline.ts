@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export default function applyPaddingInlineCssPatch(content: string) {
+export function applyPaddingInlineCssPatch(content: string): string | null {
     const separator = '\\n';
     const cssHeaderContents =
     `.elements-disclosure .gutter-container {

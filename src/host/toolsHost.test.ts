@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { getFirstCallback, Mocked } from "../test/helpers";
-import ToolsResourceLoader from "./toolsResourceLoader";
+import { ToolsResourceLoader } from "./toolsResourceLoader";
 
 describe("toolsHost", () => {
     let mockResourceLoader: Mocked<ToolsResourceLoader>;
@@ -24,8 +24,8 @@ describe("toolsHost", () => {
 
     describe("isHostedMode", () => {
         it("returns true", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             expect(host.isHostedMode()).toEqual(true);
         });
@@ -33,8 +33,8 @@ describe("toolsHost", () => {
 
     describe("getPreferences", () => {
         it("calls across to webview", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const mockCallback = jest.fn();
             host.getPreferences(mockCallback);
@@ -53,8 +53,8 @@ describe("toolsHost", () => {
         });
 
         it("fires callbacks on response from extension", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const mockCallback = jest.fn();
             host.getPreferences(mockCallback);
@@ -76,8 +76,8 @@ describe("toolsHost", () => {
 
     describe("setPreferences", () => {
         it("calls across to webview", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const expectedPref = {
                 name: "myPreference",
@@ -101,8 +101,8 @@ describe("toolsHost", () => {
 
     describe("recordEnumeratedHistogram", () => {
         it("calls across to extension", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const expectedTelemetry = {
                 data: 1000,
@@ -127,8 +127,8 @@ describe("toolsHost", () => {
 
     describe("recordPerformanceHistogram", () => {
         it("calls across to extension", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const expectedTelemetry = {
                 data: 500,
@@ -153,8 +153,8 @@ describe("toolsHost", () => {
 
     describe("reportError", () => {
         it("calls across to extension", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const expectedTelemetry = {
                 data: {
@@ -193,8 +193,8 @@ describe("toolsHost", () => {
 
     describe("openInEditor", () => {
         it("calls across to extension", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const expectedRequest = {
                 column: 500,
@@ -224,8 +224,8 @@ describe("toolsHost", () => {
 
     describe("onMessageFromChannel", () => {
         it("calls onResolvedUrlFromChannel on getUrl message", async () => {
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
             host.setResourceLoader(mockResourceLoader);
 
             const expectedArgs = { id: 0, content: "some content" };
@@ -239,19 +239,21 @@ describe("toolsHost", () => {
 
         it("calls onMessageFromChannel on websocket message", async () => {
             const mockToolsWS = {
-                instance: {
-                    onMessageFromChannel: jest.fn(),
+                ToolsWebSocket: {
+                    instance: {
+                        onMessageFromChannel: jest.fn(),
+                    },
                 },
             };
             jest.doMock("./toolsWebSocket", () => mockToolsWS);
 
-            const { default: toolsHost } = await import("./toolsHost");
-            const host = new toolsHost();
+            const th = await import("./toolsHost");
+            const host = new th.ToolsHost();
 
             const expectedArgs = { event: "message", message: "some websocket message" };
             host.onMessageFromChannel("websocket", JSON.stringify(expectedArgs));
 
-            expect(mockToolsWS.instance.onMessageFromChannel).toHaveBeenCalledWith(
+            expect(mockToolsWS.ToolsWebSocket.instance.onMessageFromChannel).toHaveBeenCalledWith(
                 expectedArgs.event,
                 expectedArgs.message,
             );

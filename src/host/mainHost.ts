@@ -3,4 +3,4 @@
 
 import { IDevToolsWindow, initialize } from './host';
 
-initialize(window as any as IDevToolsWindow);
+initialize(window as unknown as IDevToolsWindow);

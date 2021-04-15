@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { IDevToolsWindow } from '../host';
-import ToolsHost from '../toolsHost';
+import { ToolsHost } from '../toolsHost';
 
 declare let InspectorFrontendHost: ToolsHost;
 
@@ -20,8 +20,8 @@ const enum KeepMatchedText {
 
 const isDrawerEnabled = '(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)';
 
-function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText) {
-    const match = content.match(pattern);
+function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText): string | null {
+    const match = pattern.exec(content);
     if (match) {
         if (keepMatchedText) {
             const matchedText = match[0];
@@ -37,10 +37,10 @@ function replaceInSourceCode(content: string, pattern: RegExp, replacementText: 
 
 }
 
-export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
+export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean): Promise<void> {
     if (revealable && revealable.uiSourceCode && revealable.uiSourceCode._url) {
         // using Devtools legacy mode.
-        (self as any as IDevToolsWindow).InspectorFrontendHost.openInEditor(
+        (self as unknown as IDevToolsWindow).InspectorFrontendHost.openInEditor(
             revealable.uiSourceCode._url,
             revealable.lineNumber,
             revealable.columnNumber,
@@ -51,58 +51,59 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
     return Promise.resolve();
 }
 
-export function getVscodeSettings(callback: (arg0: object) => void) {
+export function getVscodeSettings(callback: (arg0: Record<string, unknown>) => void): void {
     InspectorFrontendHost.getVscodeSettings(callback);
 }
 
-export function sendToVscodeOutput(message: string) {
+export function sendToVscodeOutput(message: string): void {
     // Since we are calling InspectorFrontendHost outside of root.js, we need to use InspectorFrontendHost.InspectorFrontendHostInstance
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
 }
 
-export function applyExtensionSettingsInstantiatePatch(content: string) {
+export function applyExtensionSettingsInstantiatePatch(content: string): string | null {
     const pattern = /const experiments\s*=\s*new ExperimentsSupport\(\);/;
     const replacementText = `const vscodeSettings={};`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
-export function applyExtensionSettingsRuntimeObjectPatch(content: string){
+export function applyExtensionSettingsRuntimeObjectPatch(content: string): string | null {
     const pattern = /experiments:\s*experiments/;
     const replacementText = ', vscodeSettings:vscodeSettings';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
-export function applyCreateExtensionSettingsLegacyPatch(content: string) {
+export function applyCreateExtensionSettingsLegacyPatch(content: string): string | null {
     const pattern = /Root\.Runtime\.experiments/g;
     const replacementText = 'Root.Runtime.vscodeSettings = Runtime.vscodeSettings;';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
-export function applyPortSettingsFunctionCreationPatch(content: string) {
+export function applyPortSettingsFunctionCreationPatch(content: string): string | null {
     const pattern = /static instance/g;
     const replacementText = getVscodeSettings.toString().slice(9);
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
-export function applyPortSettingsFunctionCallPatch(content: string) {
+export function applyPortSettingsFunctionCallPatch(content: string): string | null {
     const pattern = /this._descriptorsMap\s*=\s*{};/g;
     const replacementText = 'this.getVscodeSettings((vscodeSettingsObject) => {Object.assign(vscodeSettings, vscodeSettingsObject);});';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
-export function applyCommonRevealerPatch(content: string) {
+export function applyCommonRevealerPatch(content: string): string | null {
     const pattern = /let reveal\s*=\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
     const replacementText = `let reveal = ${revealInVSCode.toString().slice(0, -1)}`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyStylesRevealerPatch(content: string) {
+export function applyStylesRevealerPatch(content: string): string | null {
     const pattern = /this\._navigateToSource\(selectElement,\s*true\);/g;
     const replacementText = '';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyStylesToggleFocusPatch(content: string) {
+export function applyStylesToggleFocusPatch(content: string): string | null {
     // Patch to fix accessibility focus issue when toggling a property with context menu option.
     const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(ls\s*`Toggle property[\s\S]+.const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
     const replacementText = `
@@ -112,14 +113,14 @@ export function applyStylesToggleFocusPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyQuickOpenPatch(content: string) {
+export function applyQuickOpenPatch(content: string): string | null {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
     const replacementText = 'handleAction(context, actionId) { actionId = null; switch(actionId)';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyCommandMenuPatch(content: string) {
+export function applyCommandMenuPatch(content: string): string | null {
     // pattern intended to match logic of CommandMenu.attach()
     const pattern = /for\s*\(const action of actions\)\s*{\s*const category\s*=\s*action[\s\S]+this\._commands\.sort\(commandComparator\);/;
     const replacementText =
@@ -153,61 +154,61 @@ export function applyCommandMenuPatch(content: string) {
 
 // This function is needed for Elements-only version, but we need the drawer
 // for the Request Blocking tool when enabling the Network Panel.
-export function applyInspectorViewShowDrawerPatch(content: string) {
+export function applyInspectorViewShowDrawerPatch(content: string): string | null {
     // This patch hides the drawer.
     const pattern = /_showDrawer\(focus\)\s*{/g;
     const replacementText = `_showDrawer(focus) { if (!${isDrawerEnabled}) {return false;}`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyInspectorViewCloseDrawerPatch(content: string) {
+export function applyInspectorViewCloseDrawerPatch(content: string): string | null {
     // this patch closes the drawer if the network tool is disabled
     const pattern = /InspectorView\.InspectorView\.instance\(\)\.createToolbars\(\);/g;
     const replacementText = `if (!${isDrawerEnabled}) {InspectorView.InspectorView.instance()._closeDrawer();}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
-export function applyMainViewPatch(content: string) {
+export function applyMainViewPatch(content: string): string | null {
     const pattern = /const moreTools\s*=\s*[^;]+;/g;
     const replacementText = 'const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyScreencastAppPatch(content: string) {
+export function applyScreencastAppPatch(content: string): string | null {
     // This patch fixes screencasting functionality in version 88
     const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
     const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyScreencastRepaintPatch(content: string) {
+export function applyScreencastRepaintPatch(content: string): string | null {
     // This patch removes a condition that calls repaint to restore scroll functionality
     const pattern = /\(this._highlightNode\)/g;
     const replacementText = '(true)';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyRemoveBreakOnContextMenuItem(content: string) {
+export function applyRemoveBreakOnContextMenuItem(content: string): string | null {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
     const replacementText = '';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyShowDrawerTabs(content: string) {
+export function applyShowDrawerTabs(content: string): string | null {
     // Appends the Request Blocking tab or Whats New tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
     const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyPersistDrawerTabs(content: string) {
+export function applyPersistDrawerTabs(content: string): string | null {
     // Removes the close button from the Request blocking and Whats New tab tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
     const replacementText = "this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applySetTabIconPatch(content: string) {
+export function applySetTabIconPatch(content: string): string | null {
     // Adding undefined check in SetTabIcon so it doesn't throw an error trying to access disabled tabs.
     // This is needed due to applyAppendTabPatch which removes unused tabs from the tablist.
     const pattern = /setTabIcon\(id,\s*icon\)\s*{\s*const tab\s*=\s*this\._tabsById\.get\(id\);/;
@@ -215,7 +216,7 @@ export function applySetTabIconPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyAppendTabOverridePatch(content: string) {
+export function applyAppendTabOverridePatch(content: string): string | null {
     // The appendTab function chooses which tabs to put in the tabbed pane header section
     // showTabElement and selectTab are only called by tabs that have already been appended via appendTab.
     // Injecting our verifications by redirecting appendTab to appendTabOverride
@@ -225,7 +226,7 @@ export function applyAppendTabOverridePatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyAppendTabConditionsPatch(content: string) {
+export function applyAppendTabConditionsPatch(content: string): string | null {
     const elementsTabs = [
         'elements',
         'Styles',
@@ -287,21 +288,21 @@ export function applyEnableNetworkPatch(): string {
     }`;
 }
 
-export function applyDefaultTabPatch(content: string) {
+export function applyDefaultTabPatch(content: string): string | null {
     // This patches removes the _defaultTab property
     const pattern = /this\._defaultTab\s*=\s*[^;]+;/g;
     const replacementText = 'this._defaultTab=undefined;';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyDrawerTabLocationPatch(content: string) {
+export function applyDrawerTabLocationPatch(content: string): string | null {
     // This shows the drawer with the network.blocked-urls tab open.
     const pattern = /this._showDrawer.bind\s*\(this,\s*false\),\s*'drawer-view',\s*true,\s*true/g;
     const replacementText = "this._showDrawer.bind\(this, false\), 'drawer-view', true, true, 'network.blocked-urls'";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyInspectorCommonCssPatch(content: string) {
+export function applyInspectorCommonCssPatch(content: string): string | null {
     // Hides the more tools button in the drawer and reveals the screen cast button.
     const separator = '\\n';
 
@@ -324,7 +325,7 @@ export function applyInspectorCommonCssPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyInspectorCommonNetworkPatch(content: string) {
+export function applyInspectorCommonNetworkPatch(content: string): string | null {
     // Hides export HAR button and pretty print button and reveals the Network search close button in the Network Panel.
     const separator = '\\n';
 
@@ -354,7 +355,7 @@ export function applyInspectorCommonNetworkPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyInspectorCommonContextMenuPatch(content: string) {
+export function applyInspectorCommonContextMenuPatch(content: string): string | null {
     // Hides certain context menu items from elements in the Network Panel.
     const separator = '\\n';
 
@@ -374,7 +375,7 @@ export function applyInspectorCommonContextMenuPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyInspectorCommonCssRightToolbarPatch(content: string) {
+export function applyInspectorCommonCssRightToolbarPatch(content: string): string | null {
     const pattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
     const replacementText =
         `.tabbed-pane-right-toolbar {
@@ -383,7 +384,7 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyInspectorCommonCssTabSliderPatch(content: string) {
+export function applyInspectorCommonCssTabSliderPatch(content: string): string | null {
     const pattern = /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g;
     const replacementText =
         `.tabbed-pane-tab-slider {
@@ -392,7 +393,7 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyContextMenuRevealOption(content: string) {
+export function applyContextMenuRevealOption(content: string): string | null {
     const pattern = /const destination\s*=\s*Revealer\.revealDestination\(revealable\);/;
     const replacementText = `
         let destination = Revealer.revealDestination(revealable);
@@ -402,33 +403,33 @@ export function applyContextMenuRevealOption(content: string) {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyMoveToContextMenuPatch(content: string) {
+export function applyMoveToContextMenuPatch(content: string): string | null {
     const pattern = /const locationName\s*=\s*ViewManager\.instance\(\)\.locationNameForViewId\(tabId\);/;
     const replacementText = `return;`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
-export function applyThemePatch(content: string) {
+export function applyThemePatch(content: string): string | null {
     // Sets the theme of the DevTools
     const pattern = /const settingDescriptor/;
     const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyRemovePreferencePatch(content: string) {
+export function applyRemovePreferencePatch(content: string): string | null {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
     const replacementText = 'removePreference(name){return;}';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyRerouteConsoleMessagePatch(content: string) {
+export function applyRerouteConsoleMessagePatch(content: string): string | null {
     const pattern = /this\.dispatchEventToListeners\(Events\$h\.MessageAdded,\s*msg\);/g;
     const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
-export function applyScreencastCursorPatch(content: string) {
+export function applyScreencastCursorPatch(content: string): string | null {
     // This patch removes the touch cursor from the screencast view
     const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g;
     const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";

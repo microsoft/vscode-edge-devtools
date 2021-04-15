@@ -3,9 +3,9 @@
 import * as fse from 'fs-extra';
 import path from 'path';
 
-import applyPaddingInlineCssPatch from './src/host/polyfills/cssPaddingInline';
+import { applyPaddingInlineCssPatch } from './src/host/polyfills/cssPaddingInline';
 import { applyContentSecurityPolicyPatch } from './src/host/polyfills/inspectorContentPolicy';
-import applyRuntimeImportScriptPathPrefixPatch from './src/host/polyfills/runtime';
+import { applyRuntimeImportScriptPathPrefixPatch } from './src/host/polyfills/runtime';
 import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from './src/host/polyfills/releaseNote';
 import {
     applyAppendTabOverridePatch,
@@ -43,8 +43,8 @@ import {
     applyStylesToggleFocusPatch,
     applyThemePatch,
 } from './src/host/polyfills/simpleView';
-import applySetupTextSelectionPatch from './src/host/polyfills/textSelection';
-import applyThirdPartyI18nLocalesPatch from './src/host/polyfills/thirdPartyI18n';
+import { applySetupTextSelectionPatch } from './src/host/polyfills/textSelection';
+import { applyThirdPartyI18nLocalesPatch } from './src/host/polyfills/thirdPartyI18n';
 
 async function copyFile(srcDir: string, outDir: string, name: string) {
     await fse.copy(
@@ -101,7 +101,7 @@ async function copyStaticFiles() {
 }
 
 async function patchFilesForWebView(toolsOutDir: string) {
-    // tslint:disable-next-line:no-console
+    // eslint-disable-next-line no-console
     console.log('Patching files.');
     await patchFileForWebViewWrapper('shell.js', toolsOutDir, [
         applyInspectorCommonContextMenuPatch,

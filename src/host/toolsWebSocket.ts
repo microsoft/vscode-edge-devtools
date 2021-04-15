@@ -13,7 +13,7 @@ interface IMessageEvent {
  * so instead we replace it and forward all messages to/from the extension
  * which is able to create the real websocket connection to the target page.
  */
-export default class ToolsWebSocket {
+export class ToolsWebSocket {
     private static devtoolsWebSocket: ToolsWebSocket;
 
     onopen: (() => void) | undefined;
@@ -21,18 +21,18 @@ export default class ToolsWebSocket {
     onerror: (() => void) | undefined;
     onmessage: ((e: IMessageEvent) => void) | undefined;
 
-    constructor(url: string) {
+    constructor(_url: string) {
         ToolsWebSocket.devtoolsWebSocket = this;
         // Inform the extension that we are ready to receive messages
         encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'ready');
     }
 
-    send(message: string) {
+    send(message: string): void {
         // Forward the message to the extension
         encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'websocket', { message });
     }
 
-    onMessageFromChannel(e: WebSocketEvent, message?: string) {
+    onMessageFromChannel(e: WebSocketEvent, message?: string): void {
         switch (e) {
             case 'open':
                 if (this.onopen) {
@@ -61,7 +61,7 @@ export default class ToolsWebSocket {
         }
     }
 
-    static get instance() {
+    static get instance(): ToolsWebSocket {
         return ToolsWebSocket.devtoolsWebSocket;
     }
 }

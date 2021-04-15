@@ -66,7 +66,9 @@ describe("host", () => {
         it("sets resource loader", async () => {
             const mockOverride = jest.fn();
             jest.doMock("./toolsResourceLoader", () => ({
-                overrideResourceLoading: mockOverride,
+                ToolsResourceLoader: {
+                    overrideResourceLoading: mockOverride,
+                },
             }));
             jest.resetModules();
 
@@ -96,11 +98,12 @@ describe("host", () => {
                 parseMessageFromChannel: jest.fn(),
             };
             jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
-            jest.doMock("./toolsHost", () => (function toolsHost() {
-                return {
-                    onMessageFromChannel: jest.fn(),
-                };
-            }));
+            jest.doMock("./toolsHost", () => ({
+                ToolsHost: function toolsHost() {
+                    return {
+                        onMessageFromChannel: jest.fn(),
+                    };
+            }}));
             jest.resetModules();
 
             const host = await import("./host");
