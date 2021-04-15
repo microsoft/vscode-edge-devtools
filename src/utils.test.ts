@@ -616,7 +616,7 @@ describe("utils", () => {
                 }
             });
             utils.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]))
+            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]));
         });
     });
 

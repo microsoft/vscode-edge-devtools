@@ -130,6 +130,7 @@ export function activate(context: vscode.ExtensionContext) {
             launchConfig = getLaunchJson();
             if (vscode.workspace.workspaceFolders && launchConfig) {
                 vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
+                cdpTargetsProvider.refresh();
             }
         }));
     vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
