@@ -131,7 +131,7 @@
                 },
                 "vscode-edge-devtools.defaultUrl": {
                     "type": "string",
-                    "default": "about:blank",
+                    "default": "",
                     "description": "The default url to open when launching the browser without a target"
                 },
                 "vscode-edge-devtools.userDataDir": {
@@ -556,6 +556,7 @@
     },
     "devDependencies": {
         "@opentelemetry/tracing": "0.18.0",
+        "@types/copy-webpack-plugin": "^6.4.1",
         "@types/fs-extra": "9.0.8",
         "@types/jest": "26.0.13",
         "@types/node": "14.6.3",
@@ -564,8 +565,9 @@
         "@types/ws": "7.2.6",
         "@typescript-eslint/eslint-plugin": "4.19.0",
         "@typescript-eslint/parser": "4.19.0",
+        "copy-webpack-plugin": "8.1.1",
         "eslint": "7.22.0",
-        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-import": "2.22.1",
         "eslint-plugin-jsdoc": "32.3.0",
         "eslint-plugin-prefer-arrow": "1.2.3",
         "fs-extra": "9.1.0",
