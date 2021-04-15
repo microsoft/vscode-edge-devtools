@@ -547,6 +547,79 @@ describe("utils", () => {
         });
     });
 
+    describe('getLaunchJson', () => {
+        let fse: Mocked<typeof import("fs-extra")>;
+
+        beforeEach(async () => {
+            jest.doMock("fs-extra");
+            jest.resetModules();
+            utils = await import("./utils");
+            fse = jest.requireMock("fs-extra");
+        });
+
+        it('updates launchJsonStatus with "None" when there is no folder open', async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.workspaceFolders = null;
+            utils.getLaunchJson();
+            expect(utils.getLaunchJson()).toEqual(null);
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
+        });
+
+        it('updates launchJsonStatus with "None" when launch.json does not exist', async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            fse.pathExistsSync.mockImplementation(() => false);
+            utils.getLaunchJson();
+            expect(utils.getLaunchJson()).toEqual(null);
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
+        });
+
+        it('updates launchJsonStatus with "Unsupported" when there is no supported debug config', async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            fse.pathExistsSync.mockImplementation(() => true);
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return { 
+                    get: (name: string) => [{type: ''}]
+                }
+            });
+            expect(utils.getLaunchJson()).toEqual(null);
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Unsupported');
+        });
+
+        it('returns a supported debug config when one exists', async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            fse.pathExistsSync.mockImplementation(() => true);
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return { 
+                    get: (name: string) => [{type: 'vscode-edge-devtools.debug'}]
+                }
+            });
+            expect(utils.getLaunchJson()).toEqual({type: 'vscode-edge-devtools.debug'});
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
+        });
+    });
+
+    describe('configureLaunchJson', () => {
+        jest.resetModules();
+
+        it('adds a debug config to launch.json', async () => {
+            utils = await import("./utils");
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.Uri.joinPath = jest.fn();
+            vscodeMock.WorkspaceConfiguration = {
+                update: jest.fn((name: string, value: any) => {}),
+            };
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return { 
+                        get: jest.fn((name: string) => []),
+                        update: vscodeMock.WorkspaceConfiguration.update,
+                    
+                }
+            });
+            utils.configureLaunchJson();
+            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]))
+        });
+    });
+
     describe("launchBrowser", () => {
         beforeEach(async () => {
             jest.mock("puppeteer-core", () => {
