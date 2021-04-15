@@ -554,6 +554,11 @@
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launchProject)",
                 "when": "titleCommandsRegistered && launchJsonStatus == Supported"
+            },
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "If you have any questions or want to learn more, check the [docs on GitHub](https://github.com/microsoft/vscode-edge-devtools/blob/master/README.md)",
+                "when": "titleCommandsRegistered"
             }
         ]
     },
