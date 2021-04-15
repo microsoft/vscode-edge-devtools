@@ -1,3 +1,4 @@
+import copyPlugin from 'copy-webpack-plugin';
 import path from 'path';
 
 const commonConfig = {
@@ -47,5 +48,14 @@ module.exports = [
         },
         stats: 'errors-only', // Bug ws package includes dev-dependencies which webpack will report as warnings
         target: 'node',
+        // Copy startpage html to output bundle
+        plugins: [
+            new copyPlugin({
+                patterns: [
+                  { from: 'startpage', to: 'startpage'},
+                  { from: 'icon.png', to: 'icon.png'},
+                ],
+            }),
+        ],
     },
 ];
