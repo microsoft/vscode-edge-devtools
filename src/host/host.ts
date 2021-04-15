@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { parseMessageFromChannel } from "../common/webviewEvents";
-import ToolsHost from "./toolsHost";
-import ToolsResourceLoader, { IRuntimeResourceLoader } from "./toolsResourceLoader";
-import ToolsWebSocket from "./toolsWebSocket";
+import { parseMessageFromChannel } from '../common/webviewEvents';
+import ToolsHost from './toolsHost';
+import ToolsResourceLoader, { IRuntimeResourceLoader } from './toolsResourceLoader';
+import ToolsWebSocket from './toolsWebSocket';
 
 let listenForSecondKeyChord = false;
 
@@ -26,13 +26,13 @@ export function initialize(dtWindow: IDevToolsWindow) {
 
     // Create a mock sessionStorage since it doesn't exist in data url but the devtools use it
     const sessionStorage = {};
-    Object.defineProperty(dtWindow, "sessionStorage", {
+    Object.defineProperty(dtWindow, 'sessionStorage', {
         get() { return sessionStorage; },
         set() { /* NO-OP */ },
     });
 
     // Prevent the devtools from using localStorage since it doesn't exist in data uris
-    Object.defineProperty(dtWindow, "localStorage", {
+    Object.defineProperty(dtWindow, 'localStorage', {
         get() { return undefined; },
         set() { /* NO-OP */ },
     });
@@ -44,7 +44,7 @@ export function initialize(dtWindow: IDevToolsWindow) {
     // Listen for messages from the extension and forward to the tools
     const messageCallback =
         dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
-    dtWindow.addEventListener("message", (e) => {
+    dtWindow.addEventListener('message', e => {
         parseMessageFromChannel(
             e.data,
             messageCallback,
@@ -54,33 +54,33 @@ export function initialize(dtWindow: IDevToolsWindow) {
         return false;
     }, true);
 
-    dtWindow.addEventListener("DOMContentLoaded", () => {
+    dtWindow.addEventListener('DOMContentLoaded', () => {
         // Override the resource loading once the window has loaded so that we can control it
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
 
-        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace("null", "vscode-webview-resource:");
+        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace('null', 'vscode-webview-resource:');
     });
 
-    dtWindow.addEventListener("keydown", (e) => {
+    dtWindow.addEventListener('keydown', e => {
         if (e.metaKey) {
-            if (e.code === "KeyC") {
-                dtWindow.document.execCommand("copy");
+            if (e.code === 'KeyC') {
+                dtWindow.document.execCommand('copy');
             }
-            if (e.code === "KeyX") {
-                dtWindow.document.execCommand("cut");
+            if (e.code === 'KeyX') {
+                dtWindow.document.execCommand('cut');
             }
-            if (e.code === "KeyV") {
-                dtWindow.document.execCommand("paste");
+            if (e.code === 'KeyV') {
+                dtWindow.document.execCommand('paste');
             }
-            if (e.code === "KeyA") {
-                dtWindow.document.execCommand("selectAll");
+            if (e.code === 'KeyA') {
+                dtWindow.document.execCommand('selectAll');
             }
-            if (e.code === "KeyZ") {
-                dtWindow.document.execCommand("undo");
+            if (e.code === 'KeyZ') {
+                dtWindow.document.execCommand('undo');
             }
-            if (e.code === "KeyY") {
-                dtWindow.document.execCommand("redo");
+            if (e.code === 'KeyY') {
+                dtWindow.document.execCommand('redo');
             }
         }
         const isCtrlOrCmdKey = (e.ctrlKey || e.metaKey);
@@ -88,21 +88,21 @@ export function initialize(dtWindow: IDevToolsWindow) {
             listenForSecondKeyChord = false;
         }
 
-        if (isCtrlOrCmdKey && e.code === "PageDown") {
+        if (isCtrlOrCmdKey && e.code === 'PageDown') {
             dtWindow.InspectorFrontendHost.focusEditor(/** next= */ true);
         }
-        if (isCtrlOrCmdKey && e.code === "PageUp") {
+        if (isCtrlOrCmdKey && e.code === 'PageUp') {
             dtWindow.InspectorFrontendHost.focusEditor(/** next= */ false);
         }
-        if (isCtrlOrCmdKey && e.code === "KeyK") {
+        if (isCtrlOrCmdKey && e.code === 'KeyK') {
             listenForSecondKeyChord = true;
         }
         if (listenForSecondKeyChord) {
-            if (isCtrlOrCmdKey  && e.code === "ArrowRight"){
+            if (isCtrlOrCmdKey  && e.code === 'ArrowRight'){
                 dtWindow.InspectorFrontendHost.focusEditorGroup(/** next= */ true);
                 listenForSecondKeyChord = false;
             }
-            if (isCtrlOrCmdKey && e.code === "ArrowLeft") {
+            if (isCtrlOrCmdKey && e.code === 'ArrowLeft') {
                 dtWindow.InspectorFrontendHost.focusEditorGroup(/** next= */ false);
                 listenForSecondKeyChord = false;
             }

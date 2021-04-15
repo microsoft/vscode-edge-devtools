@@ -13,7 +13,7 @@ export function applyContentSecurityPolicyPatch(content: string) {
     const metaString = `<meta name="referrer" content="no-referrer">`;
     if (result.match(metaString)) {
         return result.replace(metaString, `<script src="../../host/host.bundle.js"></script>`);
-    } else {
-        return null;
     }
+        return null;
+
 }

@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as vscode from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import * as vscode from 'vscode';
+import TelemetryReporter from 'vscode-extension-telemetry';
 import {
     IUserConfig,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
     SETTINGS_STORE_NAME,
-} from "./utils";
+} from './utils';
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
@@ -37,18 +37,18 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         this.launch = launch;
     }
 
-    public provideDebugConfigurations(
+    provideDebugConfigurations(
         folder: vscode.WorkspaceFolder | undefined,
         token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([{
-            name: "Launch Microsoft Edge and open the Edge DevTools",
-            request: "launch",
+            name: 'Launch Microsoft Edge and open the Edge DevTools',
+            request: 'launch',
             type: `${SETTINGS_STORE_NAME}.debug`,
-            url: "http://localhost:8080",
+            url: 'http://localhost:8080',
         }]);
     }
 
-    public resolveDebugConfiguration(
+    resolveDebugConfiguration(
         folder: vscode.WorkspaceFolder | undefined,
         config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration> {
@@ -56,16 +56,16 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
 
         if (config && config.type === `${SETTINGS_STORE_NAME}.debug`) {
             const targetUri: string = this.getUrlFromConfig(folder, config);
-            if (config.request && config.request === "attach") {
-                this.telemetryReporter.sendTelemetryEvent("debug/attach");
+            if (config.request && config.request === 'attach') {
+                this.telemetryReporter.sendTelemetryEvent('debug/attach');
                 this.attach(this.context, targetUri, userConfig);
-            } else if (config.request && config.request === "launch") {
-                this.telemetryReporter.sendTelemetryEvent("debug/launch");
+            } else if (config.request && config.request === 'launch') {
+                this.telemetryReporter.sendTelemetryEvent('debug/launch');
                 this.launch(this.context, targetUri, userConfig);
             }
-        } else if (config && (config.type === "edge" || config.type === "msedge")) {
+        } else if (config && (config.type === 'edge' || config.type === 'msedge')) {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-            if (settings.get("autoAttachViaDebuggerForEdge")) {
+            if (settings.get('autoAttachViaDebuggerForEdge')) {
                 if (!userConfig.port) {
                     userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
                 }
@@ -80,22 +80,22 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
             }
             return Promise.resolve(config);
         } else {
-            this.telemetryReporter.sendTelemetryEvent("debug/error/config_not_found");
-            vscode.window.showErrorMessage("No supported launch config was found.");
+            this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
+            vscode.window.showErrorMessage('No supported launch config was found.');
         }
 
         return undefined;
     }
 
     private getUrlFromConfig(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration) {
-        let outUrlString = "";
+        let outUrlString = '';
 
         if (config.file) {
             outUrlString = config.file;
             if (folder) {
-                outUrlString = outUrlString.replace("${workspaceFolder}", folder.uri.path);
+                outUrlString = outUrlString.replace('${workspaceFolder}', folder.uri.path);
             }
-            outUrlString = (outUrlString.startsWith("/") ? "file://" : "file:///") + outUrlString;
+            outUrlString = (outUrlString.startsWith('/') ? 'file://' : 'file:///') + outUrlString;
         } else if (config.url) {
             outUrlString = config.url;
         } else if (config.urlFilter) {

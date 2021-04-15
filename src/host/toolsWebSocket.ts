@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, WebSocketEvent } from "../common/webviewEvents";
+import { encodeMessageForChannel, WebSocketEvent } from '../common/webviewEvents';
 
 interface IMessageEvent {
     data: string;
@@ -16,37 +16,37 @@ interface IMessageEvent {
 export default class ToolsWebSocket {
     private static devtoolsWebSocket: ToolsWebSocket;
 
-    public onopen: (() => void) | undefined;
-    public onclose: (() => void) | undefined;
-    public onerror: (() => void) | undefined;
-    public onmessage: ((e: IMessageEvent) => void) | undefined;
+    onopen: (() => void) | undefined;
+    onclose: (() => void) | undefined;
+    onerror: (() => void) | undefined;
+    onmessage: ((e: IMessageEvent) => void) | undefined;
 
     constructor(url: string) {
         ToolsWebSocket.devtoolsWebSocket = this;
         // Inform the extension that we are ready to receive messages
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "ready");
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'ready');
     }
 
-    public send(message: string) {
+    send(message: string) {
         // Forward the message to the extension
-        encodeMessageForChannel((msg) => window.parent.postMessage(msg, "*"), "websocket", { message });
+        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'websocket', { message });
     }
 
-    public onMessageFromChannel(e: WebSocketEvent, message?: string) {
+    onMessageFromChannel(e: WebSocketEvent, message?: string) {
         switch (e) {
-            case "open":
+            case 'open':
                 if (this.onopen) {
                     this.onopen();
                 }
                 break;
 
-            case "close":
+            case 'close':
                 if (this.onclose) {
                     this.onclose();
                 }
                 break;
 
-            case "error":
+            case 'error':
                 if (this.onerror) {
                     this.onerror();
                 }
@@ -61,7 +61,7 @@ export default class ToolsWebSocket {
         }
     }
 
-    public static get instance() {
+    static get instance() {
         return ToolsWebSocket.devtoolsWebSocket;
     }
 }

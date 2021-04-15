@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as path from "path";
-import * as vscode from "vscode";
-import * as debugCore from "vscode-chrome-debug-core";
-import TelemetryReporter from "vscode-extension-telemetry";
+import * as path from 'path';
+import * as vscode from 'vscode';
+import * as debugCore from 'vscode-chrome-debug-core';
+import TelemetryReporter from 'vscode-extension-telemetry';
 
-import { SettingsProvider } from "./common/settingsProvider";
+import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
     IOpenEditorData,
@@ -13,8 +13,8 @@ import {
     ITelemetryProps,
     TelemetryData,
     WebSocketEvent,
-} from "./common/webviewEvents";
-import { PanelSocket } from "./panelSocket";
+} from './common/webviewEvents';
+import { PanelSocket } from './panelSocket';
 import {
     applyPathMapping,
     fetchUri,
@@ -23,7 +23,7 @@ import {
     SETTINGS_PREF_NAME,
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
-} from "./utils";
+} from './utils';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -49,27 +49,27 @@ export class DevToolsPanel {
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
         this.config = config;
-        this.consoleOutput = vscode.window.createOutputChannel("DevTools Console");
+        this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
         this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
         this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
         this.consoleOutput.appendLine('');
 
         // Hook up the socket events
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
-        this.panelSocket.on("ready", () => this.onSocketReady());
-        this.panelSocket.on("websocket", () => this.onSocketMessage());
-        this.panelSocket.on("telemetry", (msg) => this.onSocketTelemetry(msg));
-        this.panelSocket.on("getState", (msg) => this.onSocketGetState(msg));
-        this.panelSocket.on("getVscodeSettings", (msg) => this.onSocketGetVscodeSettings(msg));
-        this.panelSocket.on("setState", (msg) => this.onSocketSetState(msg));
-        this.panelSocket.on("getUrl", (msg) => this.onSocketGetUrl(msg));
-        this.panelSocket.on("openUrl", (msg) => this.onSocketOpenUrl(msg));
-        this.panelSocket.on("openInEditor", (msg) => this.onSocketOpenInEditor(msg));
-        this.panelSocket.on("close", () => this.onSocketClose());
-        this.panelSocket.on("copyText", (msg) => this.onSocketCopyText(msg));
-        this.panelSocket.on("focusEditor", (msg) => this.onSocketFocusEditor(msg));
-        this.panelSocket.on("focusEditorGroup", (msg) => this.onSocketFocusEditorGroup(msg));
-        this.panelSocket.on("consoleOutput", (msg) => this.onSocketConsoleOutput(msg));
+        this.panelSocket.on('ready', () => this.onSocketReady());
+        this.panelSocket.on('websocket', () => this.onSocketMessage());
+        this.panelSocket.on('telemetry', msg => this.onSocketTelemetry(msg));
+        this.panelSocket.on('getState', msg => this.onSocketGetState(msg));
+        this.panelSocket.on('getVscodeSettings', msg => this.onSocketGetVscodeSettings(msg));
+        this.panelSocket.on('setState', msg => this.onSocketSetState(msg));
+        this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg));
+        this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg));
+        this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg));
+        this.panelSocket.on('close', () => this.onSocketClose());
+        this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
+        this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
+        this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
+        this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -77,26 +77,26 @@ export class DevToolsPanel {
         }, this, this.disposables);
 
         // Handle view change
-        this.panel.onDidChangeViewState((e) => {
+        this.panel.onDidChangeViewState(e => {
             if (this.panel.visible) {
                 this.update();
             }
         }, this, this.disposables);
 
         // Handle messages from the webview
-        this.panel.webview.onDidReceiveMessage((message) => {
+        this.panel.webview.onDidReceiveMessage(message => {
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
     }
 
-    public dispose() {
+    dispose() {
         DevToolsPanel.instance = undefined;
 
         this.panel.dispose();
         this.panelSocket.dispose();
         this.consoleOutput.dispose();
 
-        this.telemetryReporter.sendTelemetryEvent("websocket/dispose");
+        this.telemetryReporter.sendTelemetryEvent('websocket/dispose');
 
         while (this.disposables.length) {
             const d = this.disposables.pop();
@@ -108,19 +108,19 @@ export class DevToolsPanel {
 
     private postToDevTools(e: WebSocketEvent, message?: string) {
         switch (e) {
-            case "open":
-            case "close":
-            case "error":
+            case 'open':
+            case 'close':
+            case 'error':
                 this.telemetryReporter.sendTelemetryEvent(`websocket/${e}`);
                 break;
         }
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "websocket", { event: e, message });
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'websocket', { event: e, message });
     }
 
     private onSocketReady() {
         // Report success telemetry
         this.telemetryReporter.sendTelemetryEvent(
-            this.panelSocket.isConnectedToTarget ? "websocket/reconnect" : "websocket/connect");
+            this.panelSocket.isConnectedToTarget ? 'websocket/reconnect' : 'websocket/connect');
     }
 
     private onSocketMessage() {
@@ -139,18 +139,18 @@ export class DevToolsPanel {
     private onSocketFocusEditor(message: string) {
         const { next } = JSON.parse(message) as { next: boolean };
         if (next) {
-            vscode.commands.executeCommand("workbench.action.nextEditor");
+            vscode.commands.executeCommand('workbench.action.nextEditor');
         } else {
-            vscode.commands.executeCommand("workbench.action.previousEditor");
+            vscode.commands.executeCommand('workbench.action.previousEditor');
         }
     }
 
     private onSocketFocusEditorGroup(message: string) {
         const { next } = JSON.parse(message) as { next: boolean };
         if (next) {
-            vscode.commands.executeCommand("workbench.action.focusNextGroup");
+            vscode.commands.executeCommand('workbench.action.focusNextGroup');
         } else {
-            vscode.commands.executeCommand("workbench.action.focusPreviousGroup");
+            vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
     }
 
@@ -164,7 +164,7 @@ export class DevToolsPanel {
 
         // Fire telemetry
         switch (telemetry.event) {
-            case "performance": {
+            case 'performance': {
                 const measures: ITelemetryMeasures = {};
                 measures[`${telemetry.name}.duration`] = telemetry.data;
                 this.telemetryReporter.sendTelemetryEvent(
@@ -174,7 +174,7 @@ export class DevToolsPanel {
                 break;
             }
 
-            case "enumerated": {
+            case 'enumerated': {
                 const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.actionCode`] = telemetry.data.toString();
                 this.telemetryReporter.sendTelemetryEvent(
@@ -183,7 +183,7 @@ export class DevToolsPanel {
                 break;
             }
 
-            case "error": {
+            case 'error': {
                 const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.info`] = JSON.stringify(telemetry.data);
                 this.telemetryReporter.sendTelemetryErrorEvent(
@@ -197,12 +197,12 @@ export class DevToolsPanel {
     private onSocketGetState(message: string) {
         const { id } = JSON.parse(message) as { id: number };
         const preferences: any = this.context.workspaceState.get(SETTINGS_PREF_NAME) || SETTINGS_PREF_DEFAULTS;
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getState", { id, preferences });
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'getState', { id, preferences });
     }
 
     private onSocketGetVscodeSettings(message: string) {
         const { id } = JSON.parse(message) as { id: number };
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getVscodeSettings", {
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'getVscodeSettings', {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
             whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
@@ -221,14 +221,14 @@ export class DevToolsPanel {
         // Parse the request from the message and store it
         const request = JSON.parse(message) as { id: number, url: string };
 
-        let content = "";
+        let content = '';
         try {
             content = await fetchUri(request.url);
         } catch {
             // Response will not have content
         }
 
-        encodeMessageForChannel((msg) => this.panel.webview.postMessage(msg), "getUrl", { id: request.id, content });
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg), 'getUrl', { id: request.id, content });
     }
 
     private async onSocketOpenUrl(message: string) {
@@ -238,7 +238,7 @@ export class DevToolsPanel {
 
     private async onSocketOpenInEditor(message: string) {
         // Report usage telemetry
-        this.telemetryReporter.sendTelemetryEvent("extension/openInEditor", {
+        this.telemetryReporter.sendTelemetryEvent('extension/openInEditor', {
             sourceMaps: `${this.config.sourceMaps}`,
         });
 
@@ -298,13 +298,13 @@ export class DevToolsPanel {
     }
 
     private getHtmlForWebview() {
-        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, "out/tools/front_end", "inspector.html"));
+        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.html'));
         const htmlUri = this.panel.webview.asWebviewUri(htmlPath);
 
-        const scriptPath = vscode.Uri.file(path.join(this.extensionPath, "out", "host", "messaging.bundle.js"));
+        const scriptPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'messaging.bundle.js'));
         const scriptUri = this.panel.webview.asWebviewUri(scriptPath);
 
-        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, "out", "common", "styles.css"));
+        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
         return `
@@ -328,7 +328,7 @@ export class DevToolsPanel {
             `;
     }
 
-    public static createOrShow(
+    static createOrShow(
         context: vscode.ExtensionContext,
         telemetryReporter: Readonly<TelemetryReporter>,
         targetUrl: string,

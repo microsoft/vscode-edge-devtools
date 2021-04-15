@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { IDevToolsWindow } from "../host";
-import ToolsHost from "../toolsHost";
+import { IDevToolsWindow } from '../host';
+import ToolsHost from '../toolsHost';
 
 declare let InspectorFrontendHost: ToolsHost;
 
@@ -18,7 +18,7 @@ const enum KeepMatchedText {
     AtEnd = 2
 }
 
-const isDrawerEnabled = "(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)";
+const isDrawerEnabled = '(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)';
 
 function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText) {
     const match = content.match(pattern);
@@ -32,9 +32,9 @@ function replaceInSourceCode(content: string, pattern: RegExp, replacementText: 
             }
         }
         return content.replace(pattern, replacementText);
-    } else {
-        return null;
     }
+        return null;
+
 }
 
 export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: boolean) {
@@ -62,7 +62,7 @@ export function sendToVscodeOutput(message: string) {
 
 export function applyExtensionSettingsInstantiatePatch(content: string) {
     const pattern = /const experiments\s*=\s*new ExperimentsSupport\(\);/;
-    const replacementText = `const vscodeSettings={};`
+    const replacementText = `const vscodeSettings={};`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
@@ -115,7 +115,7 @@ export function applyStylesToggleFocusPatch(content: string) {
 export function applyQuickOpenPatch(content: string) {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
-    const replacementText = "handleAction(context, actionId) { actionId = null; switch(actionId)";
+    const replacementText = 'handleAction(context, actionId) { actionId = null; switch(actionId)';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -147,7 +147,7 @@ export function applyCommandMenuPatch(content: string) {
             this._commands.push(command);
         }
         }
-        this._commands = this._commands.sort(commandComparator);`
+        this._commands = this._commands.sort(commandComparator);`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -169,27 +169,27 @@ export function applyInspectorViewCloseDrawerPatch(content: string) {
 
 export function applyMainViewPatch(content: string) {
     const pattern = /const moreTools\s*=\s*[^;]+;/g;
-    const replacementText = "const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };";
+    const replacementText = 'const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyScreencastAppPatch(content: string) {
     // This patch fixes screencasting functionality in version 88
     const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
-    const replacementText = "Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();";
+    const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyScreencastRepaintPatch(content: string) {
     // This patch removes a condition that calls repaint to restore scroll functionality
     const pattern = /\(this._highlightNode\)/g;
-    const replacementText = "(true)";
+    const replacementText = '(true)';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemoveBreakOnContextMenuItem(content: string) {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
-    const replacementText = "";
+    const replacementText = '';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -211,7 +211,7 @@ export function applySetTabIconPatch(content: string) {
     // Adding undefined check in SetTabIcon so it doesn't throw an error trying to access disabled tabs.
     // This is needed due to applyAppendTabPatch which removes unused tabs from the tablist.
     const pattern = /setTabIcon\(id,\s*icon\)\s*{\s*const tab\s*=\s*this\._tabsById\.get\(id\);/;
-    const replacementText = "setTabIcon(id,icon){const tab=this._tabsById.get(id); if(!tab){return;}";
+    const replacementText = 'setTabIcon(id,icon){const tab=this._tabsById.get(id); if(!tab){return;}';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -227,17 +227,17 @@ export function applyAppendTabOverridePatch(content: string) {
 
 export function applyAppendTabConditionsPatch(content: string) {
     const elementsTabs = [
-        "elements",
-        "Styles",
-        "Computed",
-        "accessibility.view",
-        "elements.domProperties",
-        "elements.eventListeners",
+        'elements',
+        'Styles',
+        'Computed',
+        'accessibility.view',
+        'elements.domProperties',
+        'elements.eventListeners',
     ];
 
-    const condition = elementsTabs.map((tab) => {
+    const condition = elementsTabs.map(tab => {
         return `id !== '${tab}'`;
-    }).join(" && ");
+    }).join(' && ');
 
     // We then replace with the verifications itself.
     const pattern = /return\s*tab\s*\?\s*tab\.isCloseable\(\)\s*:\s*false;\s*}/;
@@ -258,29 +258,29 @@ export function applyAppendTabConditionsPatch(content: string) {
 
 export function applyEnableNetworkPatch(): string {
     // Creates the condition to display or hide the network panel.
-    const networkTabs = ["network",
-        "network.blocked-urls",
-        "network.search-network-tab",
-        "headers",
-        "preview",
-        "response",
-        "timing",
-        "initiator",
-        "cookies",
-        "eventSource",
-        "webSocketFrames",
-        "preferences",
-        "workspace",
-        "experiments",
-        "blackbox",
-        "devices",
-        "throttling-conditions",
-        "emulation-geolocations",
-        "Shortcuts"];
+    const networkTabs = ['network',
+        'network.blocked-urls',
+        'network.search-network-tab',
+        'headers',
+        'preview',
+        'response',
+        'timing',
+        'initiator',
+        'cookies',
+        'eventSource',
+        'webSocketFrames',
+        'preferences',
+        'workspace',
+        'experiments',
+        'blackbox',
+        'devices',
+        'throttling-conditions',
+        'emulation-geolocations',
+        'Shortcuts'];
 
-    const networkCondition = networkTabs.map((tab) => {
+    const networkCondition = networkTabs.map(tab => {
         return `id !== '${tab}'`;
-    }).join(" && ");
+    }).join(' && ');
 
     return `if(Root.Runtime.vscodeSettings.enableNetwork) {
         patchedCondition = patchedCondition && (${networkCondition});
@@ -290,7 +290,7 @@ export function applyEnableNetworkPatch(): string {
 export function applyDefaultTabPatch(content: string) {
     // This patches removes the _defaultTab property
     const pattern = /this\._defaultTab\s*=\s*[^;]+;/g;
-    const replacementText = "this._defaultTab=undefined;";
+    const replacementText = 'this._defaultTab=undefined;';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -303,7 +303,7 @@ export function applyDrawerTabLocationPatch(content: string) {
 
 export function applyInspectorCommonCssPatch(content: string) {
     // Hides the more tools button in the drawer and reveals the screen cast button.
-    const separator = "\\n";
+    const separator = '\\n';
 
     const hideMoreToolsBtn =
         `.toolbar-button[aria-label='More Tools'] {
@@ -326,7 +326,7 @@ export function applyInspectorCommonCssPatch(content: string) {
 
 export function applyInspectorCommonNetworkPatch(content: string) {
     // Hides export HAR button and pretty print button and reveals the Network search close button in the Network Panel.
-    const separator = "\\n";
+    const separator = '\\n';
 
     const hideExportHarBtn =
         `.toolbar-button[aria-label='Export HAR...'] {
@@ -356,7 +356,7 @@ export function applyInspectorCommonNetworkPatch(content: string) {
 
 export function applyInspectorCommonContextMenuPatch(content: string) {
     // Hides certain context menu items from elements in the Network Panel.
-    const separator = "\\n";
+    const separator = '\\n';
 
     const hideContextMenuItems =
         `.soft-context-menu-separator,
@@ -379,7 +379,7 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string) {
     const replacementText =
         `.tabbed-pane-right-toolbar {
             visibility: hidden !important;
-        }`.replace(/\n/g, "\\n");
+        }`.replace(/\n/g, '\\n');
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -388,7 +388,7 @@ export function applyInspectorCommonCssTabSliderPatch(content: string) {
     const replacementText =
         `.tabbed-pane-tab-slider {
             display: none !important;
-        }`.replace(/\n/g, "\\n");
+        }`.replace(/\n/g, '\\n');
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -398,27 +398,27 @@ export function applyContextMenuRevealOption(content: string) {
         let destination = Revealer.revealDestination(revealable);
         if (destination==="Sources panel") {
             destination = "Visual Studio Code";
-        };`
+        };`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyMoveToContextMenuPatch(content: string) {
     const pattern = /const locationName\s*=\s*ViewManager\.instance\(\)\.locationNameForViewId\(tabId\);/;
-    const replacementText = `return;`
+    const replacementText = `return;`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyThemePatch(content: string) {
     // Sets the theme of the DevTools
     const pattern = /const settingDescriptor/;
-    const replacementText = "const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor";
+    const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyRemovePreferencePatch(content: string) {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
-    const replacementText = "removePreference(name){return;}";
+    const replacementText = 'removePreference(name){return;}';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -430,7 +430,7 @@ export function applyRerouteConsoleMessagePatch(content: string) {
 
 export function applyScreencastCursorPatch(content: string) {
     // This patch removes the touch cursor from the screencast view
-    const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g
+    const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g;
     const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
