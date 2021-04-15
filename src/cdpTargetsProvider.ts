@@ -7,8 +7,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CDPTarget } from './cdpTarget';
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from './utils';
-import https = require('https');
 import { IncomingMessage } from 'http';
+import https = require('https');
 
 export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
@@ -128,7 +128,6 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
         if (!url || !url.startsWith('https')) {
             return null;
         }
-        // const https = require('https');
         const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
 
         // Example regex match: https://docs.microsoft.com/en-us/microsoft-edge/
