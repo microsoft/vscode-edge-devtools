@@ -55,3 +55,36 @@
         }
     ]
 }
+
+// {
+//     "configurations": [
+//         {
+//             "name": "Launch Microsoft Edge and open the Edge DevTools",
+//             "request": "launch",
+//             "type": "vscode-edge-devtools.debug",
+//             "url": "" // Provide your project's url to finish configuring
+//         },
+//         {
+//             "name": "Start localhost server",
+//             "type": "node",
+//             "request": "launch",
+//             "runtimeExecutable": "reload",
+//             "port": 8080
+//         },
+//         {
+//             "name": "Launch Localhost",
+//             "request": "launch",
+//             "type": "vscode-edge-devtools.debug",
+//             "url": "http://localhost:8080" // Provide your project's url to finish configuring
+//         }
+//     ],
+//     "compounds": [
+//         {
+//             "name": "Launch Watch Server and Launch and Attach Edge",
+//             "configurations": [
+//                 "Start localhost server",
+//                 "Launch Localhost"
+//             ]
+//         }
+//     ]
+// }
