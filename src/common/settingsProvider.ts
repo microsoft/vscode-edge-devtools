@@ -1,32 +1,32 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as vscode from "vscode";
-import { SETTINGS_STORE_NAME } from "../utils";
-import { ThemeString } from "./webviewEvents";
+import * as vscode from 'vscode';
+import { SETTINGS_STORE_NAME } from '../utils';
+import { ThemeString } from './webviewEvents';
 
 export class SettingsProvider {
 
   private static singletonInstance: SettingsProvider;
 
-  public isNetworkEnabled(): boolean {
+  isNetworkEnabled(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const networkEnabled: boolean = settings.get("enableNetwork") || false;
+    const networkEnabled: boolean = settings.get('enableNetwork') || false;
     return networkEnabled;
   }
 
-  public getThemeSettings(): ThemeString {
+  getThemeSettings(): ThemeString {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const themeString: ThemeString = settings.get("themes") || "System preference";
+    const themeString: ThemeString = settings.get('themes') || 'System preference';
     return themeString;
   }
 
-  public getWhatsNewSettings(): boolean {
+  getWhatsNewSettings(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const whatsNewEnabled: boolean = settings.get("whatsNew") || false;
+    const whatsNewEnabled: boolean = settings.get('whatsNew') || false;
     return whatsNewEnabled;
   }
 
-  public static get instance() {
+  static get instance(): SettingsProvider {
     if (!SettingsProvider.singletonInstance) {
       SettingsProvider.singletonInstance = new SettingsProvider();
     }

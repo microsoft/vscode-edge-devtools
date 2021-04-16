@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { EventEmitter } from "events";
-import WebSocket from "ws";
-import { parseMessageFromChannel, WebSocketEvent, WebviewEvent } from "./common/webviewEvents";
+import { EventEmitter } from 'events';
+import WebSocket from 'ws';
+import { parseMessageFromChannel, WebSocketEvent, WebviewEvent } from './common/webviewEvents';
 
 export type IDevToolsPostMessageCallback = (e: WebSocketEvent, message?: string) => void;
 
@@ -20,15 +20,15 @@ export class PanelSocket extends EventEmitter {
         this.postMessageToDevTools = postMessageToDevTools;
     }
 
-    public get isConnectedToTarget() {
+    get isConnectedToTarget(): boolean {
         return this.isConnected;
     }
 
-    public onMessageFromWebview(message: string) {
+    onMessageFromWebview(message: string): void {
         parseMessageFromChannel(message, (eventName, args) => this.onMessageParsed(eventName, args));
     }
 
-    public dispose() {
+    dispose(): void {
         if (this.socket) {
             this.isConnected = false;
             this.socket.close();
@@ -37,27 +37,29 @@ export class PanelSocket extends EventEmitter {
     }
 
     private onMessageParsed(eventName: WebviewEvent, args: string): boolean {
-        if (eventName === "ready") {
+        if (eventName === 'ready') {
             this.dispose();
 
             // First message, so connect a real websocket to the target
             this.connectToTarget();
         }
 
-        if (eventName === "websocket") {
+        if (eventName === 'websocket') {
             if (!this.socket) {
                 // Reconnect if we no longer have a websocket
                 this.connectToTarget();
             }
 
-            const { message } = JSON.parse(args);
-            if (message && message[0] === "{") {
+            const { message } = JSON.parse(args) as {message: string};
+            if (message && message[0] === '{') {
                 if (!this.isConnected) {
                     // DevTools are sending a message before the real websocket has finished opening so cache it
                     this.messages.push(message);
                 } else {
                     // Websocket ready so send the message directly
-                    this.socket!.send(message);
+                    if (this.socket) {
+                        this.socket.send(message);
+                    }
                 }
             }
         }
@@ -69,7 +71,7 @@ export class PanelSocket extends EventEmitter {
         // Create the websocket
         this.socket = new WebSocket(this.targetUrl);
         this.socket.onopen = () => this.onOpen();
-        this.socket.onmessage = (ev) => this.onMessage(ev);
+        this.socket.onmessage = ev => this.onMessage(ev);
         this.socket.onerror = () => this.onError();
         this.socket.onclose = () => this.onClose();
     }
@@ -77,7 +79,7 @@ export class PanelSocket extends EventEmitter {
     private onOpen() {
         this.isConnected = true;
 
-        this.postMessageToDevTools("open");
+        this.postMessageToDevTools('open');
 
         if (this.socket) {
             // Forward any cached messages onto the real websocket
@@ -91,22 +93,22 @@ export class PanelSocket extends EventEmitter {
     private onMessage(message: { data: WebSocket.Data }) {
         if (this.isConnected) {
             // Forward the message onto the devtools
-            this.postMessageToDevTools("message", message.data.toString());
+            this.postMessageToDevTools('message', message.data.toString());
         }
     }
 
     private onError() {
         if (this.isConnected) {
             // Tell the devtools that there was a connection error
-            this.postMessageToDevTools("error");
+            this.postMessageToDevTools('error');
         }
     }
 
     private onClose() {
         if (this.isConnected) {
             // Tell the devtools that the real websocket was closed
-            this.postMessageToDevTools("close");
-            this.emit("close");
+            this.postMessageToDevTools('close');
+            this.emit('close');
         }
 
         this.isConnected = false;

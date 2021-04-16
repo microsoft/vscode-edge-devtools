@@ -384,7 +384,7 @@ describe("utils", () => {
         const mockReporter = {};
         beforeEach(async () => {
             jest.doMock("../package.json", () => ({}), { virtual: true });
-            jest.doMock("./debugTelemetryReporter", () => function debug() { return mockReporter; });
+            jest.doMock("./debugTelemetryReporter", () => ({DebugTelemetryReporter: jest.fn()}));
             jest.resetModules();
 
             utils = await import("./utils");
@@ -599,10 +599,16 @@ describe("utils", () => {
     });
 
     describe('configureLaunchJson', () => {
-        jest.resetModules();
+        let fse: Mocked<typeof import("fs-extra")>;
 
-        it('adds a debug config to launch.json', async () => {
+        beforeEach(async () => {
+            jest.doMock("fs-extra");
+            jest.resetModules();
             utils = await import("./utils");
+
+            fse = jest.requireMock("fs-extra");
+            fse.readFileSync.mockImplementation((() => ''));
+
             const vscodeMock = await jest.requireMock("vscode");
             vscodeMock.Uri.joinPath = jest.fn();
             vscodeMock.WorkspaceConfiguration = {
@@ -615,8 +621,21 @@ describe("utils", () => {
                     
                 }
             });
+        });
+
+        it('adds a debug config to launch.json', async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            
             utils.configureLaunchJson();
             expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]));
+        });
+
+        it('inserts a comment after the url property', async () => {
+            const expectedText = '\"url\":\"' + utils.providedDebugConfig.url + '\" // Provide your project\'s url to finish configuring';
+            fse.readFileSync.mockImplementation(() => JSON.stringify(utils.providedDebugConfig));
+
+            await utils.configureLaunchJson();
+            expect(fse.writeFileSync).toHaveBeenCalledWith(expect.any(String), expect.stringContaining(expectedText));
         });
     });
 

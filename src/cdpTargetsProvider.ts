@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as vscode from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
-import * as path from "path";
-import * as fs from "fs";
-import CDPTarget from "./cdpTarget";
-import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from "./utils";
+import * as vscode from 'vscode';
+import TelemetryReporter from 'vscode-extension-telemetry';
+import * as path from 'path';
+import * as fs from 'fs';
+import { CDPTarget } from './cdpTarget';
+import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from './utils';
+import { IncomingMessage } from 'http';
+import https = require('https');
 
-export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
-    public readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
-    public readonly changeDataEvent: vscode.EventEmitter<CDPTarget | null>;
+export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
+    readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
+    readonly changeDataEvent: vscode.EventEmitter<CDPTarget | null>;
     private extensionPath: string;
     private telemetryReporter: Readonly<TelemetryReporter>;
 
@@ -21,11 +23,11 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         this.telemetryReporter = telemetryReporter;
     }
 
-    public getTreeItem(element: CDPTarget): vscode.TreeItem {
+    getTreeItem(element: CDPTarget): vscode.TreeItem {
         return element;
     }
 
-    public async getChildren(element?: CDPTarget): Promise<CDPTarget[]> {
+    async getChildren(element?: CDPTarget): Promise<CDPTarget[]> {
         let targets: CDPTarget[] = [];
 
         const willShowWorkers = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('showWorkers');
@@ -36,24 +38,25 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
             const responseArray = await getListOfTargets(hostname, port, useHttps);
             if (Array.isArray(responseArray)) {
                 this.telemetryReporter.sendTelemetryEvent(
-                    "view/list",
+                    'view/list',
                     undefined,
                     { targetCount: responseArray.length },
                 );
                 if (responseArray.length) {
-                    await new Promise<void>((resolve) => {
+                    await new Promise<void>(resolve => {
                         let targetsProcessed = 0;
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         responseArray.forEach(async (target: IRemoteTargetJson) => {
                             const actualTarget = fixRemoteWebSocket(hostname, port, target);
                             if (actualTarget.type === 'page' || actualTarget.type === 'iframe') {
                                 const iconPath = await this.downloadFaviconFromSitePromise(actualTarget.url);
                                 if (iconPath) {
-                                    targets.push(new CDPTarget(actualTarget, "", this.extensionPath, iconPath));
+                                    targets.push(new CDPTarget(actualTarget, '', this.extensionPath, iconPath));
                                 } else {
-                                    targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
+                                    targets.push(new CDPTarget(actualTarget, '', this.extensionPath));
                                 }
                             } else if ((actualTarget.type !== 'service_worker' && actualTarget.type !== 'shared_worker') || willShowWorkers) {
-                                targets.push(new CDPTarget(actualTarget, "", this.extensionPath));
+                                targets.push(new CDPTarget(actualTarget, '', this.extensionPath));
                             }
                             targetsProcessed++;
                             if (targetsProcessed === responseArray.length) {
@@ -63,20 +66,20 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
                     });
                 }
             } else {
-                this.telemetryReporter.sendTelemetryEvent("view/error/no_json_array");
+                this.telemetryReporter.sendTelemetryEvent('view/error/no_json_array');
             }
             // Sort the targets by type and then title, but keep 'page' types at the top
             // since those are the ones most likely to be the ones the user wants.
             targets.sort((a: CDPTarget, b: CDPTarget) => {
                 if (a.targetJson.type === b.targetJson.type) {
                     return a.targetJson.title < b.targetJson.title ? -1 : 1;
-                } else if (a.targetJson.type === "page") {
+                } if (a.targetJson.type === 'page') {
                     return -1;
-                } else if (b.targetJson.type === "page") {
+                } if (b.targetJson.type === 'page') {
                     return 1;
-                } else {
-                    return a.targetJson.type < b.targetJson.type ? -1 : 1;
                 }
+                    return a.targetJson.type < b.targetJson.type ? -1 : 1;
+
             });
         } else {
             // Just expand the element to show its properties
@@ -86,28 +89,28 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         return targets;
     }
 
-    public refresh(): void {
-        this.telemetryReporter.sendTelemetryEvent("view/refresh");
+    refresh(): void {
+        this.telemetryReporter.sendTelemetryEvent('view/refresh');
         this.changeDataEvent.fire(null);
-        this.clearFaviconResourceDirectory();
+        void this.clearFaviconResourceDirectory();
     }
 
-    public async clearFaviconResourceDirectory(): Promise<void> {
-      const directory = path.join(this.extensionPath, "resources", "favicons");
+    async clearFaviconResourceDirectory(): Promise<void> {
+      const directory = path.join(this.extensionPath, 'resources', 'favicons');
       let finalFile = false;
 
-      const promise = new Promise<void>((resolve) => {
+      const promise = new Promise<void>(resolve => {
         fs.readdir(directory, (readdirError: Error | null, files: string[]) => {
-            if (readdirError) throw readdirError;
+            if (readdirError) {throw readdirError;}
             for (let i = 0; i < files.length; i++) {
               if (i === files.length - 1) {
                   finalFile = true;
               }
               const file = files[i];
               const fileString = file.toString();
-              if (fileString !== ".gitkeep") {
-                fs.unlink(path.join(directory, fileString), (unlinkError) => {
-                  if (unlinkError) throw unlinkError;
+              if (fileString !== '.gitkeep') {
+                fs.unlink(path.join(directory, fileString), unlinkError => {
+                  if (unlinkError) {throw unlinkError;}
                   if (finalFile) {
                       resolve();
                   }
@@ -121,18 +124,17 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
       await promise;
     }
 
-    public downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
+    downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
         if (!url || !url.startsWith('https')) {
             return null;
         }
-        const https = require('https');
         const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
 
         // Example regex match: https://docs.microsoft.com/en-us/microsoft-edge/
         // urlMatch[0] = .microsoft.com/en-us/microsoft-edge/
         // urlMatch[1] = .microsoft.com/
         // urlMatch[2] = microsoft
-        const urlMatch = url.match(faviconRegex);
+        const urlMatch = faviconRegex.exec(url);
         let filename;
         if (urlMatch) {
             filename = `${urlMatch[2]}Favicon.ico`;
@@ -141,14 +143,14 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
         }
 
         // Replacing ".microsoft.com/en-us/microsoft-edge/" with ".microsoft.com/favicon.ico"
-        const faviconUrl = url.replace(faviconRegex, "$1favicon.ico");
+        const faviconUrl = url.replace(faviconRegex, '$1favicon.ico');
 
-        const filePath = path.join(this.extensionPath, "resources", "favicons", filename);
+        const filePath = path.join(this.extensionPath, 'resources', 'favicons', filename);
 
         const file = fs.createWriteStream(filePath);
-        const promise = new Promise<string | null>((resolve) => {
-            https.get(faviconUrl, (response: any) => {
-                if (response.headers["content-type"].includes('icon')) {
+        const promise = new Promise<string | null>(resolve => {
+            https.get(faviconUrl, (response: IncomingMessage) => {
+                if (response.headers['content-type'] && response.headers['content-type'].includes('icon')) {
                   response.pipe(file);
                   file.on('error', () => {
                       resolve(null);
@@ -166,7 +168,7 @@ export default class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTa
             });
         });
 
-        const timeout = new Promise<null>((resolve) => {
+        const timeout = new Promise<null>(resolve => {
             const id = setTimeout(() => {
               clearTimeout(id);
               resolve(null);

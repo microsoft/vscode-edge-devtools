@@ -1,48 +1,48 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export type WebviewEvent = "getState" | "getUrl" | "openInEditor" | "ready" | "setState" | "telemetry" | "websocket"
-| "getVscodeSettings" | "copyText" | "focusEditor" | "focusEditorGroup" | "openUrl" | "consoleOutput";
+export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'ready' | 'setState' | 'telemetry' | 'websocket'
+| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'consoleOutput';
 export const webviewEventNames: WebviewEvent[] = [
-    "getState",
-    "getUrl",
-    "openInEditor",
-    "ready",
-    "setState",
-    "telemetry",
-    "websocket",
-    "getVscodeSettings",
-    "copyText",
-    "focusEditor",
-    "focusEditorGroup",
-    "openUrl",
-    "consoleOutput",
+    'getState',
+    'getUrl',
+    'openInEditor',
+    'ready',
+    'setState',
+    'telemetry',
+    'websocket',
+    'getVscodeSettings',
+    'copyText',
+    'focusEditor',
+    'focusEditorGroup',
+    'openUrl',
+    'consoleOutput',
 ];
 
-export type WebSocketEvent = "open" | "close" | "error" | "message";
+export type WebSocketEvent = 'open' | 'close' | 'error' | 'message';
 export const webSocketEventNames: WebSocketEvent[] = [
-    "open",
-    "close",
-    "error",
-    "message",
+    'open',
+    'close',
+    'error',
+    'message',
 ];
 
-export type ThemeString = "System preference" | "Light" | "Dark";
+export type ThemeString = 'System preference' | 'Light' | 'Dark';
 
-export type TelemetryEvent = "enumerated" | "performance" | "error";
+export type TelemetryEvent = 'enumerated' | 'performance' | 'error';
 
 export interface ITelemetryMeasures { [key: string]: number; }
 export interface ITelemetryProps { [key: string]: string; }
 
 export interface ITelemetryDataNumber {
-    event: "enumerated" | "performance";
+    event: 'enumerated' | 'performance';
     name: string;
     data: number;
 }
 export interface ITelemetryDataObject {
-    event: "error";
+    event: 'error';
     name: string;
-    data: object;
+    data: Record<string, unknown>;
 }
 export type TelemetryData = ITelemetryDataNumber | ITelemetryDataObject;
 
@@ -63,7 +63,7 @@ export function parseMessageFromChannel(
     message: string,
     emit: (eventName: WebviewEvent, args: string) => boolean): boolean {
     for (const e of webviewEventNames) {
-        if (message.substr(0, e.length) === e && message[e.length] === ":") {
+        if (message.substr(0, e.length) === e && message[e.length] === ':') {
             emit(e, message.substr(e.length + 1));
             return true;
         }
@@ -85,7 +85,7 @@ export function parseMessageFromChannel(
 export function encodeMessageForChannel(
     postMessageCallback: (message: string) => void,
     eventType: WebviewEvent,
-    args?: object) {
+    args?: unknown): void {
     const message = `${eventType}:${JSON.stringify(args)}`;
     postMessageCallback(message);
 }

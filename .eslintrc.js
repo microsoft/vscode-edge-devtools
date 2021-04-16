@@ -108,7 +108,7 @@ module.exports = {
         'no-multiple-empty-lines': [2, {'max': 2}],
         'no-mixed-spaces-and-tabs': 2,
         'no-trailing-spaces': 2,
-        'linebreak-style': [2, 'unix'],
+        //'linebreak-style': [2, 'unix'],
     
         /**
          * Disabled, aspirational rules
@@ -130,6 +130,7 @@ module.exports = {
     
         '@typescript-eslint/explicit-member-accessibility': [0],
         '@typescript-eslint/no-explicit-any': 2,
+        '@typescript-eslint/restrict-template-expressions': 0,
     
         // Closure does not properly typecheck default exports
         'import/no-default-export': 2,

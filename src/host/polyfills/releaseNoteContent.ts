@@ -38,7 +38,7 @@ export const extensionHighlights = `[
             ls\`Removed Debugger for Microsoft Edge as a dependency.\`,
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/329',
     },
-],`
+],`;
 
 export const devtoolsHighlights = `[
     {
@@ -57,4 +57,4 @@ export const devtoolsHighlights = `[
         subtitle: ls\`Filter network requests with the new 'resource-type' and 'url' keywords in the Network tool.\`,
         link: 'https://go.microsoft.com/fwlink/?linkid=2147022',
     },
-],`
+],`;

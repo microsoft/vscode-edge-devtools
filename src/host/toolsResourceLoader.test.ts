@@ -26,8 +26,8 @@ describe("toolsResourceLoader", () => {
         it("overrides load resource promise correctly", async () => {
             const originalLoader = mockLoader.loadResourcePromise;
 
-            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
-            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+            const trl = await import("./toolsResourceLoader");
+            const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
 
             expect(resourceLoader).toBeDefined();
             expect(mockLoader.loadResourcePromise).not.toEqual(originalLoader);
@@ -36,8 +36,8 @@ describe("toolsResourceLoader", () => {
 
     describe("loadResource", () => {
         it("uses channel to request http url", async () => {
-            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
-            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+            const trl = await import("./toolsResourceLoader");
+            const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
 
             const expectedUrl = "http://file.url";
             const contentPromise = mockLoader.loadResourcePromise(expectedUrl);
@@ -62,8 +62,8 @@ describe("toolsResourceLoader", () => {
         });
 
         it("uses channel to request https url", async () => {
-            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
-            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+            const trl = await import("./toolsResourceLoader");
+            const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
 
             const expectedUrl = "https://file.url";
             const contentPromise = mockLoader.loadResourcePromise(expectedUrl);
@@ -90,8 +90,8 @@ describe("toolsResourceLoader", () => {
         it("uses real loader for packaged files", async () => {
             const originalLoader = mockLoader.loadResourcePromise;
 
-            const { default: toolsResourceLoader } = await import("./toolsResourceLoader");
-            const resourceLoader = toolsResourceLoader.overrideResourceLoading(mockLoader);
+            const trl = await import("./toolsResourceLoader");
+            const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
             expect(resourceLoader).toBeDefined();
 
             const expectedUrl = "elements.js";

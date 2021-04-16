@@ -1,27 +1,27 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as vscode from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import * as vscode from 'vscode';
+import TelemetryReporter from 'vscode-extension-telemetry';
 import {
     IUserConfig,
     providedDebugConfig,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
     SETTINGS_STORE_NAME,
-} from "./utils";
+} from './utils';
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
     targetUrl?: string,
     config?: Partial<IUserConfig>,
-    useRetry?: boolean) => void;
+    useRetry?: boolean) => void | Promise<void>;
 type LaunchCallback = (
     context: vscode.ExtensionContext,
     launchUrl?: string,
-    config?: Partial<IUserConfig>) => void;
+    config?: Partial<IUserConfig>) => void | Promise<void>;
 
-export default class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
+export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
     private readonly context: vscode.ExtensionContext;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly attach: AttachCallback;
@@ -38,30 +38,30 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
         this.launch = launch;
     }
 
-    public provideDebugConfigurations(
-        folder: vscode.WorkspaceFolder | undefined,
-        token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
+    provideDebugConfigurations(
+        _folder: vscode.WorkspaceFolder | undefined,
+        _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
         return Promise.resolve([providedDebugConfig]);
     }
 
-    public resolveDebugConfiguration(
+    resolveDebugConfiguration(
         folder: vscode.WorkspaceFolder | undefined,
-        config: vscode.DebugConfiguration, token?: vscode.CancellationToken):
+        config: vscode.DebugConfiguration, _token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration> {
         const userConfig = config as Partial<IUserConfig>;
 
         if (config && config.type === `${SETTINGS_STORE_NAME}.debug`) {
             const targetUri: string = this.getUrlFromConfig(folder, config);
-            if (config.request && config.request === "attach") {
-                this.telemetryReporter.sendTelemetryEvent("debug/attach");
-                this.attach(this.context, targetUri, userConfig);
-            } else if (config.request && config.request === "launch") {
-                this.telemetryReporter.sendTelemetryEvent("debug/launch");
-                this.launch(this.context, targetUri, userConfig);
+            if (config.request && config.request === 'attach') {
+                this.telemetryReporter.sendTelemetryEvent('debug/attach');
+                void this.attach(this.context, targetUri, userConfig);
+            } else if (config.request && config.request === 'launch') {
+                this.telemetryReporter.sendTelemetryEvent('debug/launch');
+                void this.launch(this.context, targetUri, userConfig);
             }
-        } else if (config && (config.type === "edge" || config.type === "msedge")) {
+        } else if (config && (config.type === 'edge' || config.type === 'msedge')) {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-            if (settings.get("autoAttachViaDebuggerForEdge")) {
+            if (settings.get('autoAttachViaDebuggerForEdge')) {
                 if (!userConfig.port) {
                     userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
                 }
@@ -71,31 +71,31 @@ export default class LaunchDebugProvider implements vscode.DebugConfigurationPro
 
                 // Allow the debugger to actually launch the browser before attaching
                 setTimeout(() => {
-                    this.attach(this.context, userConfig.url, userConfig, /* useRetry=*/ true);
+                    void this.attach(this.context, userConfig.url, userConfig, /* useRetry=*/ true);
                 }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
             }
             return Promise.resolve(config);
         } else {
-            this.telemetryReporter.sendTelemetryEvent("debug/error/config_not_found");
-            vscode.window.showErrorMessage("No supported launch config was found.");
+            this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
+            vscode.window.showErrorMessage('No supported launch config was found.') as Promise<void>;
         }
 
         return undefined;
     }
 
     private getUrlFromConfig(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration) {
-        let outUrlString = "";
+        let outUrlString = '';
 
         if (config.file) {
-            outUrlString = config.file;
+            outUrlString = config.file as string;
             if (folder) {
-                outUrlString = outUrlString.replace("${workspaceFolder}", folder.uri.path);
+                outUrlString = outUrlString.replace('${workspaceFolder}', folder.uri.path);
             }
-            outUrlString = (outUrlString.startsWith("/") ? "file://" : "file:///") + outUrlString;
+            outUrlString = (outUrlString.startsWith('/') ? 'file://' : 'file:///') + outUrlString;
         } else if (config.url) {
-            outUrlString = config.url;
+            outUrlString = config.url as string;
         } else if (config.urlFilter) {
-            outUrlString = config.urlFilter;
+            outUrlString = config.urlFilter as string;
         }
 
         return outUrlString;

@@ -22,8 +22,8 @@ describe("CDPTarget", () => {
             url: "url",
         } as IRemoteTargetJson;
 
-        const { default: cdpTarget } = await import("./cdpTarget");
-        const target = new cdpTarget(json, "");
+        const ct = await import("./cdpTarget");
+        const target = new ct.CDPTarget(json, "");
         expect(target).toBeDefined();
     });
 
@@ -34,8 +34,8 @@ describe("CDPTarget", () => {
             url: "url",
         } as IRemoteTargetJson;
 
-        const { default: cdpTarget } = await import("./cdpTarget");
-        const target = new cdpTarget(json, "", "path");
+        const ct = await import("./cdpTarget");
+        const target = new ct.CDPTarget(json, "", "path");
         expect(target.iconPath).toBeDefined();
         expect(target.iconPath!.dark).toEqual(
             expect.stringMatching(/path(\\|\/)resources(\\|\/)dark(\\|\/)extension.svg/g));
@@ -51,14 +51,14 @@ describe("CDPTarget", () => {
             webSocketDebuggerUrl: "webSocketDebuggerUrl",
         } as IRemoteTargetJson;
 
-        const { default: cdpTarget } = await import("./cdpTarget");
-        const target = new cdpTarget(json, "");
+        const ct = await import("./cdpTarget");
+        const target = new ct.CDPTarget(json, "");
         target.label = "label";
         expect(target.websocketUrl).toEqual(json.webSocketDebuggerUrl);
         expect(target.description).toEqual(json.url);
         expect(target.tooltip).toEqual(`label - ${json.url}`);
 
-        const target2 = new cdpTarget(json, "type");
+        const target2 = new ct.CDPTarget(json, "type");
         target2.label = "label";
         expect(target2.description).toEqual(json.type);
         expect(target2.tooltip).toEqual(`label - ${json.type}`);
@@ -72,8 +72,8 @@ describe("CDPTarget", () => {
             webSocketDebuggerUrl: "webSocketDebuggerUrl",
         } as IRemoteTargetJson;
 
-        const { default: cdpTarget } = await import("./cdpTarget");
-        const target = new cdpTarget(json, "");
+        const ct = await import("./cdpTarget");
+        const target = new ct.CDPTarget(json, "");
         expect(target.getChildren().length).toEqual(4);
     });
 });

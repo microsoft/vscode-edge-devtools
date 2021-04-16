@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import {devtoolsHighlights, extensionHighlights} from "./releaseNoteContent";
+import {devtoolsHighlights, extensionHighlights} from './releaseNoteContent';
 
-export function applyReleaseNotePatch(content: string) {
+export function applyReleaseNotePatch(content: string): string | null {
     const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+var ReleaseNoteText_edge\s*=/;
     const replacementNotes = `
         export const releaseNoteText = [
@@ -20,14 +20,14 @@ export function applyReleaseNotePatch(content: string) {
         var ReleaseNoteText_edge =
     `;
 
-    if (content.match(releaseNoteTextPattern)) {
+    if (releaseNoteTextPattern.exec(content)) {
         return content.replace(releaseNoteTextPattern, replacementNotes);
-    } else {
-        return null;
     }
+        return null;
+
 }
 
-export function applyGithubLinksPatch(content: string) {
+export function applyGithubLinksPatch(content: string): string | null {
     const linkPattern = /const learnMore\s*=[\s\S]+learnMore\);/g;
     const linkReplacementText = `
         const githubLink = XLink.XLink.create(releaseNote.githubLink, ls \`Visit our Github Page\`, 'release-note-link-learn-more');
@@ -36,20 +36,20 @@ export function applyGithubLinksPatch(content: string) {
         const issuesLink = XLink.XLink.create(releaseNote.issuesLink, ls \`Send us feedback\`, 'release-note-link-learn-more');
         issuesContainer.appendChild(issuesLink);
     `;
-    if (content.match(linkPattern)) {
+    if (linkPattern.exec(content)) {
         return content.replace(linkPattern, linkReplacementText);
-    } else {
-        return null;
     }
+        return null;
+
 }
 
-export function applyAnnouncementNamePatch(content: string) {
+export function applyAnnouncementNamePatch(content: string): string | null {
     const microsoftAnnouncement = /Announcements from the Microsoft Edge DevTools team/;
     const chromiumAnnouncement = /Announcements from the Chromium project/;
-    if (content.match(microsoftAnnouncement) && content.match(chromiumAnnouncement)) {
+    if (microsoftAnnouncement.exec(content) && chromiumAnnouncement.exec(content)) {
         content = content.replace(microsoftAnnouncement, 'New extension features');
         return content.replace(chromiumAnnouncement, 'New in Developer Tools');
-    } else {
-        return null;
     }
+        return null;
+
 }

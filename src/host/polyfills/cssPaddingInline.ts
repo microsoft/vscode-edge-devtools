@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export default function applyPaddingInlineCssPatch(content: string) {
-    const separator = "\\n";
+export function applyPaddingInlineCssPatch(content: string): string | null {
+    const separator = '\\n';
     const cssHeaderContents =
     `.elements-disclosure .gutter-container {
         display: none !important;
@@ -17,8 +17,8 @@ export default function applyPaddingInlineCssPatch(content: string) {
 
     const paddingPattern = /([^-])padding-inline-start:/g;
     if (result.match(paddingPattern)) {
-        return result.replace(paddingPattern, "$1-webkit-padding-start:");
-    } else {
-        return null;
+        return result.replace(paddingPattern, '$1-webkit-padding-start:');
     }
+        return null;
+
 }
