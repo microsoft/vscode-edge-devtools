@@ -16,6 +16,8 @@ import {
     getListOfTargets,
     getRemoteEndpointSettings,
     getRuntimeConfig,
+    getLaunchJson,
+    configureLaunchJson,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
@@ -27,11 +29,15 @@ import {
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
+let launchConfig: vscode.DebugConfiguration | null;
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
+
+    // Check if launch.json exists and has supported config to populate side pane welcome message
+    launchConfig = getLaunchJson();
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, (): void => {
         void attach(context);
@@ -112,6 +118,20 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.copyItem`,
         (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
+        () => {
+            void configureLaunchJson();
+            launchConfig = getLaunchJson();
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.launchProject`,
+        () => {
+            launchConfig = getLaunchJson();
+            if (vscode.workspace.workspaceFolders && launchConfig) {
+                void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
+            }
+        }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
 }
 

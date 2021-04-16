@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import {
     IUserConfig,
+    providedDebugConfig,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
     SETTINGS_STORE_NAME,
@@ -40,12 +41,7 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
     provideDebugConfigurations(
         _folder: vscode.WorkspaceFolder | undefined,
         _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
-        return Promise.resolve([{
-            name: 'Launch Microsoft Edge and open the Edge DevTools',
-            request: 'launch',
-            type: `${SETTINGS_STORE_NAME}.debug`,
-            url: 'http://localhost:8080',
-        }]);
+        return Promise.resolve([providedDebugConfig]);
     }
 
     resolveDebugConfiguration(

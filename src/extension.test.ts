@@ -39,6 +39,7 @@ describe("extension", () => {
                 getRemoteEndpointSettings: jest.fn(),
                 getRuntimeConfig: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
+                getLaunchJson: jest.fn(),
             };
             jest.doMock("./utils", () => mockUtils);
             jest.doMock("./launchDebugProvider");
@@ -74,8 +75,8 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(10);
-            expect(commandMock).toHaveBeenCalledTimes(9);
+            expect(context.subscriptions.length).toBe(12);
+            expect(commandMock).toHaveBeenCalledTimes(11);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
@@ -94,6 +95,10 @@ describe("extension", () => {
                 .toHaveBeenNthCalledWith(8, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
             expect(commandMock)
                 .toHaveBeenNthCalledWith(9, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(10, `${SETTINGS_VIEW_NAME}.configureLaunchJson`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(11, `${SETTINGS_VIEW_NAME}.launchProject`, expect.any(Function));
             expect(mockRegisterTree)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
@@ -387,6 +392,7 @@ describe("extension", () => {
                 launchBrowser: jest.fn().mockResolvedValue(fakeBrowser),
                 openNewTab: jest.fn().mockResolvedValue(null),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
+                getLaunchJson: jest.fn(),
             };
 
             mockPanel = {
