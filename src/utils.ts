@@ -353,7 +353,6 @@ export async function configureLaunchJson(): Promise<void> {
     void vscode.commands.executeCommand('vscode.open', vscode.Uri.joinPath(workspaceUri, relativePath));
 }
 
-
 /**
  * Launch the specified browser with remote debugging enabled
  *

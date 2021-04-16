@@ -116,8 +116,8 @@ export function activate(context: vscode.ExtensionContext): void {
             }
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
-    `${SETTINGS_VIEW_NAME}.copyItem`,
-    (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
+        `${SETTINGS_VIEW_NAME}.copyItem`,
+        (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
         () => {
