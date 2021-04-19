@@ -8,9 +8,6 @@ on:
   issues:
     types: [labeled]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   alert:
@@ -26,6 +23,7 @@ jobs:
         ado_area_path: 'Edge\Dev Experience\Developer Tools\F12 Tools\VSCode Extension'
         ado_tags: 'DevToolsVSCodeExtension_GitHub'
         ado_tag_on_close: 'DevToolsVSCodeExtension_GitHub_Closed'
+        ado_wit: "Scenario"
         ado_bypassrules: false
         ado_set_labels: false
         create_on_tag: 'tracked'
