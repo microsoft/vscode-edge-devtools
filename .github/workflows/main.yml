@@ -28,3 +28,4 @@ jobs:
         ado_tag_on_close: 'DevToolsVSCodeExtension_GitHub_Closed'
         ado_bypassrules: false
         ado_set_labels: false
+        create_on_tag: 'tracked'
