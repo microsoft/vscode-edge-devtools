@@ -23,6 +23,7 @@ jobs:
         ado_area_path: 'Edge\Dev Experience\Developer Tools\F12 Tools\VSCode Extension'
         ado_tags: 'DevToolsVSCodeExtension_GitHub'
         ado_tag_on_close: 'DevToolsVSCodeExtension_GitHub_Closed'
+        ado_wit: "Scenario"
         ado_bypassrules: false
         ado_set_labels: false
         create_on_tag: 'tracked'
