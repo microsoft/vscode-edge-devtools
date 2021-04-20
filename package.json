@@ -65,6 +65,16 @@
                 }
             },
             {
+                "command": "vscode-edge-devtools-view.attachShare",
+                "category": "Microsoft Edge Tools",
+                "title": "Attach to active debug target",
+                "enablement": "titleCommandsRegistered",
+                "icon": {
+                    "light": "resources/light/launch.svg",
+                    "dark": "resources/dark/launch.svg"
+                }
+            },
+            {
                 "command": "vscode-edge-devtools-view.refresh",
                 "category": "Microsoft Edge Tools",
                 "title": "Refresh Targets",
@@ -452,6 +462,10 @@
                     "when": "view == vscode-edge-devtools-view.targets"
                 },
                 {
+                    "command": "vscode-edge-devtools-view.attachShare",
+                    "when": "view == vscode-edge-devtools-view.targets"
+                },
+                {
                     "command": "vscode-edge-devtools-view.refresh",
                     "when": "view == vscode-edge-devtools-view.targets"
                 },
@@ -471,6 +485,11 @@
             "view/title": [
                 {
                     "command": "vscode-edge-devtools-view.launch",
+                    "when": "view == vscode-edge-devtools-view.targets",
+                    "group": "navigation"
+                },
+                {
+                    "command": "vscode-edge-devtools-view.attachShare",
                     "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },
