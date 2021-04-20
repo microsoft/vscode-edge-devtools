@@ -57,7 +57,6 @@ export class PanelSocket extends EventEmitter {
                     this.messages.push(message);
                 } else {
                     // Websocket ready so send the message directly
-                    console.log(message)
                     if (this.socket) {
                         this.socket.send(message);
                     }
