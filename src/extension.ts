@@ -50,6 +50,10 @@ export function activate(context: vscode.ExtensionContext): void {
         void launch(context);
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachShare`, (): void => {
+        void attach(context);
+    }));
+
     // Register the launch provider
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
@@ -70,6 +74,12 @@ export function activate(context: vscode.ExtensionContext): void {
         async () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
             await launch(context);
+            cdpTargetsProvider.refresh();
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.attachShare`,
+        async () => {
+            await attachShare(context);
             cdpTargetsProvider.refresh();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -157,6 +167,59 @@ export function activate(context: vscode.ExtensionContext): void {
             void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/README.md'));
         }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
+}
+
+export async function attachShare(
+    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
+    if (!telemetryReporter) {
+        telemetryReporter = createTelemetryReporter(context);
+    }
+
+    const telemetryProps = { viaConfig: `${!!config}`, withTargetUrl: `${!!attachUrl}` };
+    telemetryReporter.sendTelemetryEvent('command/attach', telemetryProps);
+
+    const { timeout } = getRemoteEndpointSettings(config);
+
+    // Get the attach target and keep trying until reaching timeout
+    const startTime = Date.now();
+    do {
+        // Attempt to attach to active CDP target
+        const session = vscode.debug.activeDebugSession;
+        if (!session) {
+            vscode.window.showErrorMessage('No active debug session');
+            continue;
+        }
+
+        let targetWebsocketUrl;
+        try {
+            const addr: any = await vscode.commands.executeCommand(
+            'extension.js-debug.requestCDPProxy',
+            session.id,
+            );
+            const formed = `ws://${addr.host}:${addr.port}`;
+            vscode.window.showInformationMessage(`Address copied to your clipboard (${formed})`);
+            targetWebsocketUrl = formed;
+        } catch (e) {
+            vscode.window.showErrorMessage(e.message);
+        }
+
+        if (targetWebsocketUrl) {
+            // Auto connect to found target
+            useRetry = false;
+            telemetryReporter.sendTelemetryEvent('command/attach/devtools', telemetryProps);
+            const runtimeConfig = getRuntimeConfig(config);
+            DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+        } else if (useRetry) {
+            // Wait for a little bit until we retry
+            await new Promise<void>(resolve => {
+                setTimeout(() => {
+                    resolve();
+                }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
+            });
+        } else {
+            console.error("could not connect to shared url")
+        }
+    } while (useRetry && Date.now() - startTime < timeout);
 }
 
 export async function attach(

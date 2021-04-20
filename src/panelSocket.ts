@@ -57,6 +57,7 @@ export class PanelSocket extends EventEmitter {
                     this.messages.push(message);
                 } else {
                     // Websocket ready so send the message directly
+                    console.log(message)
                     if (this.socket) {
                         this.socket.send(message);
                     }
@@ -74,9 +75,28 @@ export class PanelSocket extends EventEmitter {
         this.socket.onmessage = ev => this.onMessage(ev);
         this.socket.onerror = () => this.onError();
         this.socket.onclose = () => this.onClose();
+
     }
 
     private onOpen() {
+        // register for custom events from jsdebug:
+        const registrationMessage = {
+            method: "JsDebug.subscribe",
+            params: {
+                events: [
+                "Runtime.*",
+                "DOM.*",
+                "CSS.*",
+                "DOMDebugger.*",
+                "Network.*",
+                "Page.*",
+                "Target.*",
+                "Overlay.*"
+                ]
+            }
+        }
+        this.socket?.send(JSON.stringify(registrationMessage));
+        console.log("registered for events")
         this.isConnected = true;
 
         this.postMessageToDevTools('open');
