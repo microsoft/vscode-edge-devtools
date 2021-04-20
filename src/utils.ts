@@ -317,9 +317,8 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
         void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Unsupported');
         return null;
     }
-        void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'None');
-        return null;
-
+    void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'None');
+    return null;
 }
 
 /**
@@ -327,8 +326,10 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @returns {void}
  */
 export async function configureLaunchJson(): Promise<void> {
-    if (!vscode.workspace.workspaceFolders)
-        {return;}
+    if (!vscode.workspace.workspaceFolders) {
+        void vscode.window.showErrorMessage('Cannot configure launch.json for an empty workspace. Please open a folder in the editor.');
+        return;
+    }
 
     // Create ./.vscode/launch.json if it doesn't already exist
     const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
@@ -346,7 +347,7 @@ export async function configureLaunchJson(): Promise<void> {
     const re = new RegExp(`{(.|\\n|\\s)*(${providedDebugConfig.type})(.|\\n|\\s)*(${providedDebugConfig.url}")`, 'm');
     const match = re.exec(launchText);
     const instructions = ' // Provide your project\'s url to finish configuring';
-    launchText = launchText.replace(re,  `${match ? match[0] : ''}${instructions}`);
+    launchText = launchText.replace(re, `${match ? match[0] : ''}${instructions}`);
     fse.writeFileSync(workspaceUri.fsPath + relativePath, launchText);
 
     // Open launch.json in editor
