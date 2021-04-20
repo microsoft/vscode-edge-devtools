@@ -70,7 +70,10 @@ export function activate(context: vscode.ExtensionContext): void {
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.refresh`,
-        () => cdpTargetsProvider.refresh()));
+        () => {
+            cdpTargetsProvider.refresh();
+            launchConfig = getLaunchJson();
+        }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
         (target?: CDPTarget) => {
