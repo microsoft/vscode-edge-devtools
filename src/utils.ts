@@ -93,7 +93,7 @@ export const providedDebugConfig: vscode.DebugConfiguration = {
     name: 'Launch Microsoft Edge and open the Edge DevTools',
     request: 'launch',
     type: `${SETTINGS_STORE_NAME}.debug`,
-    url: '',
+    url: 'http://localhost:8080',
 };
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
@@ -293,9 +293,9 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
 
 /**
  * Gets a supported debug config and updates the status of the launch.json file associated with the current workspace
- * @returns {vscode.DebugConfiguration | null}
+ * @returns {vscode.DebugConfiguration | string | null}
  */
- export function getLaunchJson(): vscode.DebugConfiguration | null {
+ export function getLaunchJson(): vscode.DebugConfiguration | string | null {
     // Check if there is a folder open
     if (!vscode.workspace.workspaceFolders) {
         void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'None');
@@ -307,10 +307,21 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
     const filePath = `${workspaceUri.fsPath}/.vscode/launch.json`;
     if (fse.pathExistsSync(filePath)) {
         // Check if there is a supported debug config
-        const configs = vscode.workspace.getConfiguration('launch', workspaceUri).get('configurations') as vscode.DebugConfiguration[];
+        const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
+        const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
         for (const config of configs) {
             if (config.type === 'vscode-edge-devtools.debug' || config.type === 'msedge' || config.type === 'edge') {
                 void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Supported');
+
+                // Get the compound to start localhost+launch Edge if it exists
+                const compounds = launchJson.get('compounds') as {name: string, configurations: string[]}[] || [];
+                for (const compound of compounds) {
+                    if (compound.configurations.includes(config.name)) {
+                        void vscode.commands.executeCommand('setContext', 'watchServerStatus', 'Supported');
+                        return compound.name;
+                    }
+                }
+                void vscode.commands.executeCommand('setContext', 'watchServerStatus', 'Unsupported');
                 return config;
             }
         }
@@ -336,15 +347,18 @@ export async function configureLaunchJson(): Promise<void> {
     const relativePath = '/.vscode/launch.json';
     fse.ensureFileSync(workspaceUri.fsPath + relativePath);
 
-    // Append a supported debug config to their list of configurations and update workspace configuration
+    // Append debug config and update workspace configuration
     const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
     const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
     configs.push(providedDebugConfig);
     await launchJson.update('configurations', configs) as unknown as Promise<void>;
 
+    // Configure watch server
+    await configureWatchServer(providedDebugConfig.name);
+
     // Insert instruction comment
     let launchText = fse.readFileSync(workspaceUri.fsPath + relativePath).toString();
-    const re = new RegExp(`{(.|\\n|\\s)*(${providedDebugConfig.type})(.|\\n|\\s)*(${providedDebugConfig.url}")`, 'm');
+    const re = new RegExp(`(${providedDebugConfig.type})(.|\n|\r)*(${providedDebugConfig.url}")`, 'm');
     const match = re.exec(launchText);
     const instructions = ' // Provide your project\'s url to finish configuring';
     launchText = launchText.replace(re, `${match ? match[0] : ''}${instructions}`);
@@ -352,6 +366,42 @@ export async function configureLaunchJson(): Promise<void> {
 
     // Open launch.json in editor
     void vscode.commands.executeCommand('vscode.open', vscode.Uri.joinPath(workspaceUri, relativePath));
+}
+
+export async function configureWatchServer(debugConfigName: string): Promise<void> {
+    if (!vscode.workspace.workspaceFolders) {
+        void vscode.window.showErrorMessage('Cannot configure launch.json for an empty workspace. Please open a folder in the editor.');
+        return;
+    }
+    const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
+    if (!fse.pathExistsSync(`${workspaceUri.fsPath}/.vscode/launch.json`)) {
+        void vscode.window.showErrorMessage('launch.json does not exist.');
+        return;
+    }
+
+    // Add launch config
+    const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
+    const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
+    configs.push({
+        name: 'Start localhost server',
+        type: 'node',
+        request: 'launch',
+        runtimeExecutable: 'live-server',
+        port: 8080,
+        args: ['--no-browser'],
+    });
+    await launchJson.update('configurations', configs) as unknown as Promise<void>;
+
+    // Add compound config
+    const compounds = launchJson.get('compounds') as Record<string, unknown>[];
+    compounds.push({
+        name: 'Launch Watch Server and Launch and Attach Edge',
+        configurations: [
+            'Start localhost server',
+            debugConfigName,
+        ],
+    });
+    await launchJson.update('compounds', compounds) as unknown as Promise<void>;
 }
 
 /**

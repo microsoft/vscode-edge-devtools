@@ -25,11 +25,12 @@ import {
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
+    configureWatchServer,
 } from './utils';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
-let launchConfig: vscode.DebugConfiguration | null;
+let launchConfig: vscode.DebugConfiguration | string | null;
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -123,8 +124,8 @@ export function activate(context: vscode.ExtensionContext): void {
         (target: CDPTarget) => vscode.env.clipboard.writeText(target.tooltip)));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
-        () => {
-            void configureLaunchJson();
+        async () => {
+            await configureLaunchJson();
             launchConfig = getLaunchJson();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -134,6 +135,16 @@ export function activate(context: vscode.ExtensionContext): void {
             if (vscode.workspace.workspaceFolders && launchConfig) {
                 void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
                 cdpTargetsProvider.refresh();
+            }
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.configureWatchServer`,
+        async () => {
+            if (launchConfig instanceof Object && vscode.workspace.workspaceFolders) {
+                await configureWatchServer(launchConfig.name);
+                launchConfig = getLaunchJson();
+                const launchJsonUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, '/.vscode/launch.json');
+                void vscode.commands.executeCommand('vscode.open', launchJsonUri);
             }
         }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);

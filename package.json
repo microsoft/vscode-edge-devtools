@@ -120,6 +120,12 @@
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
                 "title": "Launch project"
+            },
+            {
+                "command": "vscode-edge-devtools-view.configureWatchServer",
+                "category": "Microsoft Edge Tools",
+                "enablement": "titleCommandsRegistered",
+                "title": "Configure launch.json file"
             }
         ],
         "configuration": {
@@ -547,13 +553,18 @@
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Customize your launch experience by adding a debug configuration to your launch.json file.\n[Configure launch.json](command:vscode-edge-devtools-view.configureLaunchJson)",
+                "contents": "Customize your launch experience by adding debug configurations to your launch.json file.\n[Configure launch.json](command:vscode-edge-devtools-view.configureLaunchJson)",
                 "when": "launchJsonStatus == Unsupported"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launchProject)",
                 "when": "launchJsonStatus == Supported"
+            },
+            {
+                "view": "vscode-edge-devtools-view.targets",
+                "contents": "Watch servers allow you to see updates to your site as you save your work, and can be configured in launch.json.\n[Configure launch.json for watch server](command:vscode-edge-devtools-view.configureWatchServer)",
+                "when": "launchJsonStatus == Supported && watchServerStatus != Supported"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",

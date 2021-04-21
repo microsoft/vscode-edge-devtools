@@ -586,15 +586,38 @@ describe("utils", () => {
         });
 
         it('returns a supported debug config when one exists', async () => {
+            const configToAdd = {
+                type: 'vscode-edge-devtools.debug',
+                configurations: [],
+            }
             const vscodeMock = await jest.requireMock("vscode");
             fse.pathExistsSync.mockImplementation(() => true);
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return { 
-                    get: (name: string) => [{type: 'vscode-edge-devtools.debug'}]
+                    get: (name: string) => [configToAdd]
                 }
             });
-            expect(utils.getLaunchJson()).toEqual({type: 'vscode-edge-devtools.debug'});
+            expect(utils.getLaunchJson()).toEqual(configToAdd);
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'watchServerStatus', 'Unsupported');
+        });
+
+        it('returns a supported compound config when one exists', async () => {
+            const configToAdd = {
+                type: 'vscode-edge-devtools.debug',
+                name: 'test config',
+                configurations: ['test config'],
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            fse.pathExistsSync.mockImplementation(() => true);
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return { 
+                    get: (name: string) => [configToAdd]
+                }
+            });
+            expect(utils.getLaunchJson()).toEqual(configToAdd.name);
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
+            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'watchServerStatus', 'Supported');
         });
     });
 
@@ -636,6 +659,34 @@ describe("utils", () => {
 
             await utils.configureLaunchJson();
             expect(fse.writeFileSync).toHaveBeenCalledWith(expect.any(String), expect.stringContaining(expectedText));
+        });
+    });
+
+    describe('configureWatchServer', () => {
+        let fse: Mocked<typeof import("fs-extra")>;
+
+        beforeEach(async () => {
+            jest.doMock("fs-extra");
+            jest.resetModules();
+            utils = await import("./utils");
+            fse = jest.requireMock("fs-extra");
+        });
+
+        it('updates the launch configurations and compounds', async () => {
+            fse.pathExistsSync.mockReturnValue(true);
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.WorkspaceConfiguration = {
+                update: jest.fn(),
+            };
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return { 
+                    get: (name: string) => [],
+                    update: vscodeMock.WorkspaceConfiguration.update,
+                }
+            });
+            
+            await utils.configureWatchServer('');
+            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledTimes(2);
         });
     });
 
