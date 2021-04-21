@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel } from '../common/webviewEvents';
+// import { encodeMessageForChannel } from '../common/webviewEvents';
 
 export interface IRuntimeResourceLoader {
     loadResourcePromise: (url: string) => Promise<string>;
@@ -32,7 +32,7 @@ export class ToolsResourceLoader {
             const id = this.urlLoadNextId++;
             return new Promise((resolve: (url: string) => void) => {
                 this.urlLoadResolvers.set(id, resolve);
-                encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'getUrl', { id, url });
+                // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'getUrl', { id, url });
             });
         }
 

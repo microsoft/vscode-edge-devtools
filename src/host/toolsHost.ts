@@ -3,7 +3,7 @@
 
 import {
     encodeMessageForChannel,
-    IOpenEditorData,
+    // IOpenEditorData,
     TelemetryData,
     ThemeString,
     WebSocketEvent,
@@ -34,12 +34,12 @@ export class ToolsHost {
         // Load the preference via the extension workspaceState
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'getState', { id });
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'getState', { id });
     }
 
     setPreference(name: string, value: string): void {
         // Save the preference via the extension workspaceState
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'setState', { name, value });
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'setState', { name, value });
     }
 
     recordEnumeratedHistogram(actionName: string, actionCode: number, _bucketSize: number): void {
@@ -81,34 +81,34 @@ export class ToolsHost {
 
     openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean): void {
         // Forward the data to the extension
-        const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'openInEditor', request);
+        // const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'openInEditor', request);
     }
 
     getVscodeSettings(callback: (arg0: Record<string, unknown>) => void): void {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'getVscodeSettings', {id});
+        encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'getVscodeSettings', {id});
     }
 
     sendToVscodeOutput(consoleMessage: string): void {
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
     }
 
     copyText(clipboardData: string): void {
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'copyText', {clipboardData});
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'copyText', {clipboardData});
     }
 
     openInNewTab(url: string): void {
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'openUrl', {url});
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'openUrl', {url});
     }
 
     focusEditor(next: boolean): void {
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'focusEditor', {next});
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'focusEditor', {next});
     }
 
     focusEditorGroup(next: boolean): void {
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'focusEditorGroup', {next});
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'focusEditorGroup', {next});
     }
 
     onMessageFromChannel(e: WebviewEvent, args: string): boolean {
@@ -165,7 +165,7 @@ export class ToolsHost {
 
     private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'telemetry', telemetry);
+        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'telemetry', telemetry);
     }
 
     private fireGetHostCallback(id: number, args: Record<string, unknown>) {

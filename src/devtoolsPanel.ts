@@ -298,31 +298,40 @@ export class DevToolsPanel {
     }
 
     private getHtmlForWebview() {
-        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.html'));
-        const htmlUri = this.panel.webview.asWebviewUri(htmlPath);
+        // stringsUri and inspectorUri are the files that used to be loaded in inspector.html, we are trying to load them directly to the webview here.
+        const stringsPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'strings.js'));
+        const stringsUri = this.panel.webview.asWebviewUri(stringsPath);
+
+        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
+        const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
 
         const scriptPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'messaging.bundle.js'));
         const scriptUri = this.panel.webview.asWebviewUri(scriptPath);
 
+        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
+        const hostUri = this.panel.webview.asWebviewUri(hostPath);
+
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
+        // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
             <!doctype html>
             <html>
-            <head>
+            <head id="host">
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
                 <meta http-equiv="Content-Security-Policy"
-                    content="default-src 'none';
-                    frame-src ${this.panel.webview.cspSource};
-                    script-src ${this.panel.webview.cspSource};
-                    style-src ${this.panel.webview.cspSource};
+                    content="default-src; img-src 'self' data: ${this.panel.webview.cspSource} 'unsafe-inline'; style-src 'self' ${this.panel.webview.cspSource} 'unsafe-inline' ; script-src 'self' 'unsafe-inline' 'unsafe-eval' ${this.panel.webview.cspSource};
+                    frame-src vscode-webview: ${this.panel.webview.cspSource}; connect-src 'self' ${this.panel.webview.cspSource} 'unsafe-inline';
                     ">
+                <meta name="referrer" content="no-referrer">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${scriptUri}"></script>
+                <script src="${hostUri}"></script>
+                <script src="${stringsUri}"></script>
+                <script type="module" src="${inspectorUri}"></script>
             </head>
             <body>
-                <iframe id="host" frameBorder="0" src="${htmlUri}?ws=trueD&experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;
