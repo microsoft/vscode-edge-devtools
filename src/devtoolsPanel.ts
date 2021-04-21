@@ -295,6 +295,7 @@ export class DevToolsPanel {
 
     private update() {
         this.panel.webview.html = this.getHtmlForWebview();
+        console.log('panel: ' + this.panel.webview);
     }
 
     private getHtmlForWebview() {

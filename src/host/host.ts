@@ -49,8 +49,8 @@ export function initialize(dtWindow: IDevToolsWindow): void {
             e.data,
             messageCallback,
         );
-        e.preventDefault();
-        e.stopImmediatePropagation();
+        // e.preventDefault();
+        // e.stopImmediatePropagation();
         return false;
     }, true);
 
@@ -59,7 +59,7 @@ export function initialize(dtWindow: IDevToolsWindow): void {
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
 
-        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace('null', 'vscode-webview-resource:');
+        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace('null', 'vscode-webview:');
     });
 
     dtWindow.addEventListener('keydown', e => {

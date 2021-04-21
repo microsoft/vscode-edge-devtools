@@ -3,14 +3,14 @@
 
 import {
     encodeMessageForChannel,
-    // IOpenEditorData,
+    IOpenEditorData,
     TelemetryData,
     ThemeString,
     WebSocketEvent,
     WebviewEvent,
 } from '../common/webviewEvents';
 import { ToolsResourceLoader } from './toolsResourceLoader';
-import { ToolsWebSocket } from './toolsWebSocket';
+import { vscode, ToolsWebSocket } from './toolsWebSocket';
 
 export class ToolsHost {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
@@ -34,12 +34,12 @@ export class ToolsHost {
         // Load the preference via the extension workspaceState
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'getState', { id });
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getState', { id });
     }
 
     setPreference(name: string, value: string): void {
         // Save the preference via the extension workspaceState
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'setState', { name, value });
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'setState', { name, value });
     }
 
     recordEnumeratedHistogram(actionName: string, actionCode: number, _bucketSize: number): void {
@@ -81,37 +81,39 @@ export class ToolsHost {
 
     openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean): void {
         // Forward the data to the extension
-        // const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'openInEditor', request);
+        const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
     }
 
     getVscodeSettings(callback: (arg0: Record<string, unknown>) => void): void {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'getVscodeSettings', {id});
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getVscodeSettings', {id});
     }
 
     sendToVscodeOutput(consoleMessage: string): void {
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
     }
 
     copyText(clipboardData: string): void {
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'copyText', {clipboardData});
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'copyText', {clipboardData});
     }
 
     openInNewTab(url: string): void {
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'openUrl', {url});
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', {url});
     }
 
     focusEditor(next: boolean): void {
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'focusEditor', {next});
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'focusEditor', {next});
     }
 
     focusEditorGroup(next: boolean): void {
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'focusEditorGroup', {next});
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'focusEditorGroup', {next});
     }
 
     onMessageFromChannel(e: WebviewEvent, args: string): boolean {
+        console.log('onMessageFromChannel: ' + e);
+        console.log('onMessageFromChannel2: ' + args);
         switch (e) {
             case 'getState': {
                 const { id, preferences } = JSON.parse(args) as {id: number, preferences: Record<string, unknown>};
@@ -165,7 +167,7 @@ export class ToolsHost {
 
     private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'telemetry', telemetry);
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', telemetry);
     }
 
     private fireGetHostCallback(id: number, args: Record<string, unknown>) {

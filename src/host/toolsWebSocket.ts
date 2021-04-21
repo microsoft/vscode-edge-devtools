@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { WebSocketEvent } from '../common/webviewEvents';
+import { encodeMessageForChannel, WebSocketEvent } from '../common/webviewEvents';
 
 interface IMessageEvent {
     data: string;
 }
+declare const acquireVsCodeApi: () => {postMessage(message: unknown, args: any): void};
+export const vscode = acquireVsCodeApi();
 
 /**
  * Class used to override the real WebSocket constructor in the webview.
@@ -24,12 +26,12 @@ export class ToolsWebSocket {
     constructor(_url: string) {
         ToolsWebSocket.devtoolsWebSocket = this;
         // Inform the extension that we are ready to receive messages
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'ready');
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
     }
 
     send(message: string): void {
         // Forward the message to the extension
-        // encodeMessageForChannel(msg => window.postMessage(msg, '*'), 'websocket', { message });
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
     }
 
     onMessageFromChannel(e: WebSocketEvent, message?: string): void {
