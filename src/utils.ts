@@ -309,12 +309,12 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
         // Check if there is a supported debug config
         const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
         const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
+        const compounds = launchJson.get('compounds') as {name: string, configurations: string[]}[] || [];
         for (const config of configs) {
             if (config.type === 'vscode-edge-devtools.debug' || config.type === 'msedge' || config.type === 'edge') {
                 void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Supported');
 
                 // Get the compound to start localhost+launch Edge if it exists
-                const compounds = launchJson.get('compounds') as {name: string, configurations: string[]}[] || [];
                 for (const compound of compounds) {
                     if (compound.configurations.includes(config.name)) {
                         void vscode.commands.executeCommand('setContext', 'watchServerStatus', 'Supported');
