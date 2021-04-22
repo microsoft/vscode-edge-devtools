@@ -7,10 +7,9 @@ import { IRuntimeResourceLoader } from "./toolsResourceLoader";
 describe("toolsResourceLoader", () => {
     let mockLoader: Mocked<IRuntimeResourceLoader>;
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
+    let mockHost: { vscode: { postMessage: jest.Mock } };
 
     beforeEach(() => {
-        window.parent.postMessage = jest.fn();
-
         mockLoader = {
             loadResourcePromise: jest.fn(),
         };
@@ -18,6 +17,14 @@ describe("toolsResourceLoader", () => {
         mockWebviewEvents = {
             encodeMessageForChannel: jest.fn(),
         };
+
+        mockHost = {
+          vscode: {
+              postMessage: jest.fn(),
+          },
+        };
+
+        jest.doMock("./host", () => mockHost);
         jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
         jest.resetModules();
     });
@@ -51,7 +58,7 @@ describe("toolsResourceLoader", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
 
             // Ensure that a message back from the extension will complete the original promise
             const expectedContent = "some http content";
@@ -77,7 +84,7 @@ describe("toolsResourceLoader", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
 
             // Ensure that a message back from the extension will complete the original promise
             const expectedContent = "some https content";
