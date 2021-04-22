@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { getTextFromFile } from "../../test/helpers";
-import * as ReleaseNotePatch from "./releaseNote";
+import { getTextFromFile } from "../../helpers/helpers";
+import * as ReleaseNotePatch from "../../../src/host/polyfills/releaseNote";
 
 describe("Release notes text replacement", () => {
     it("verifies that applyReleaseNotePatch correctly replaces what's new content", async () => {

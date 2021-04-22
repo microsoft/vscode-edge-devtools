@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { testPatch } from "../../test/helpers";
-import { applySetupTextSelectionPatch } from "./textSelection";
+import { testPatch } from "../../helpers/helpers";
+import { applySetupTextSelectionPatch } from "../../../src/host/polyfills/textSelection";
 
 describe("textSelection", () => {
     it("applySetupTextSelectionPatch correctly changes text", async () => {

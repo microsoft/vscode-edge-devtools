@@ -6,9 +6,9 @@
 
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { CDPTarget } from "./cdpTarget";
-import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./test/helpers";
-import { IRemoteTargetJson } from "./utils";
+import { CDPTarget } from "../src/cdpTarget";
+import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
+import { IRemoteTargetJson } from "../src/utils";
 
 describe("CDPTargetsProvider", () => {
     let mockContext: ExtensionContext;
@@ -20,19 +20,19 @@ describe("CDPTargetsProvider", () => {
         mockVSCode = createFakeVSCode() as any;
         mockReporter = createFakeTelemetryReporter();
 
-        jest.doMock("./cdpTarget", () => ({ CDPTarget: jest.fn() }));
+        jest.doMock("../src/cdpTarget", () => ({ CDPTarget: jest.fn() }));
         jest.doMock("vscode", () => mockVSCode, { virtual: true });
         jest.resetModules();
     });
 
     it("gets created successfully", async () => {
-        const ctp = await import("./cdpTargetsProvider");
+        const ctp = await import("../src/cdpTargetsProvider");
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         expect(provider).toBeDefined();
     });
 
     it("returns the element from getTreeItem", async () => {
-        const ctp = await import("./cdpTargetsProvider");
+        const ctp = await import("../src/cdpTargetsProvider");
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const expectedElement = {} as CDPTarget;
         expect(provider.getTreeItem(expectedElement)).toEqual(expectedElement);
@@ -46,7 +46,7 @@ describe("CDPTargetsProvider", () => {
             };
         } as any;
 
-        const ctp = await import("./cdpTargetsProvider");
+        const ctp = await import("../src/cdpTargetsProvider");
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         provider.refresh();
         expect(mockFire).toHaveBeenCalled();
@@ -54,7 +54,7 @@ describe("CDPTargetsProvider", () => {
     });
 
     it("calls getChildren on the element", async () => {
-        const ctp = await import("./cdpTargetsProvider");
+        const ctp = await import("../src/cdpTargetsProvider");
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const expectedChildren = [1, 2, 3];
         const mockElement = {
@@ -86,13 +86,13 @@ describe("CDPTargetsProvider", () => {
                 useHttps: false,
             }),
         };
-        jest.doMock("./utils", () => mockUtils);
-        jest.doMock("./cdpTarget", () => ({
+        jest.doMock("../src/utils", () => mockUtils);
+        jest.doMock("../src/cdpTarget", () => ({
             CDPTarget: jest.fn((json: IRemoteTargetJson) => ({ targetJson: json }))
         }));
         jest.resetModules();
 
-        const ctp = await import("./cdpTargetsProvider");
+        const ctp = await import("../src/cdpTargetsProvider");
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         const result = await provider.getChildren();
         expect(result.length).toEqual(allTargets.length);
@@ -105,7 +105,7 @@ describe("CDPTargetsProvider", () => {
     });
 
     it("check if favicons are downloaded and cleared correctly", async () => {
-        const ctp = await import("./cdpTargetsProvider");
+        const ctp = await import("../src/cdpTargetsProvider");
         const fs = require('fs');
         const dir = './resources/favicons/';
 

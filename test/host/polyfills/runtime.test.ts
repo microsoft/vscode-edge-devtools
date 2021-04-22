@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { testPatch } from "../../test/helpers";
-import { applyRuntimeImportScriptPathPrefixPatch } from "./runtime";
+import { testPatch } from "../../helpers/helpers";
+import { applyRuntimeImportScriptPathPrefixPatch } from "../../../src/host/polyfills/runtime";
 
 describe("importScriptPathPrefix replacement", () => {
     it("verifies that importScriptPathPrefix is exposed as a module variable", async () => {

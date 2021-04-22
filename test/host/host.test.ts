@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { getFirstCallback, Mocked } from "../test/helpers";
-import { IDevToolsWindow } from "./host";
+import { getFirstCallback, Mocked } from "../helpers/helpers";
+import { IDevToolsWindow } from "../../src/host/host";
 
 describe("host", () => {
     let mockGlobal: Mocked<IDevToolsWindow>;
@@ -19,7 +19,7 @@ describe("host", () => {
 
     describe("initialize", () => {
         it("hooks events correctly", async () => {
-            const host = await import("./host");
+            const host = await import("../../src/host/host");
             host.initialize(mockGlobal);
 
             expect(mockGlobal.addEventListener).toHaveBeenNthCalledWith(1, "message", expect.any(Function), true);
@@ -30,7 +30,7 @@ describe("host", () => {
         });
 
         it("skips events if there is no contentWindow", async () => {
-            const host = await import("./host");
+            const host = await import("../../src/host/host");
             host.initialize(null as any as IDevToolsWindow);
 
             expect(mockGlobal.addEventListener).not.toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe("host", () => {
         });
 
         it("hides local storage", async () => {
-            const host = await import("./host");
+            const host = await import("../../src/host/host");
             host.initialize(mockGlobal);
 
             expect(mockGlobal.localStorage).toBeUndefined();
@@ -51,7 +51,7 @@ describe("host", () => {
         });
 
         it("emulates session storage", async () => {
-            const host = await import("./host");
+            const host = await import("../../src/host/host");
             host.initialize(mockGlobal);
 
             expect(mockGlobal.sessionStorage).toBeDefined();
@@ -66,14 +66,14 @@ describe("host", () => {
     describe("DOMContentLoaded", () => {
         it("sets resource loader", async () => {
             const mockOverride = jest.fn();
-            jest.doMock("./toolsResourceLoader", () => ({
+            jest.doMock("../../src/host/toolsResourceLoader", () => ({
                 ToolsResourceLoader: {
                     overrideResourceLoading: mockOverride,
                 },
             }));
             jest.resetModules();
 
-            const host = await import("./host");
+            const host = await import("../../src/host/host");
             host.initialize(mockGlobal);
 
             mockGlobal.importScriptPathPrefix = "null/somepath";
@@ -97,8 +97,8 @@ describe("host", () => {
             const mockWebviewEvents = {
                 parseMessageFromChannel: jest.fn(),
             };
-            jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
-            jest.doMock("./toolsHost", () => ({
+            jest.doMock("../../src/common/webviewEvents", () => mockWebviewEvents);
+            jest.doMock("../../src/host/toolsHost", () => ({
                 ToolsHost: function toolsHost() {
                     return {
                         onMessageFromChannel: jest.fn(),
@@ -106,7 +106,7 @@ describe("host", () => {
             }}));
             jest.resetModules();
 
-            const host = await import("./host");
+            const host = await import("../../src/host/host");
             host.initialize(mockGlobal);
 
             const onMessage = getFirstCallback(mockGlobal.addEventListener, 1);

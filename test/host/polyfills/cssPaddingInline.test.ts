@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { testPatch } from "../../test/helpers";
-import { applyPaddingInlineCssPatch } from "./cssPaddingInline";
+import { testPatch } from "../../helpers/helpers";
+import { applyPaddingInlineCssPatch } from "../../../src/host/polyfills/cssPaddingInline";
 
 describe("cssPaddingInline", () => {
     it("applyPaddingInlineCssPatch correctly changes elements-disclosure text", async () => {

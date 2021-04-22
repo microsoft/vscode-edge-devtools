@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import WebSocket from "ws";
-import { webviewEventNames } from "./common/webviewEvents";
-import { Mocked } from "./test/helpers";
+import { webviewEventNames } from "../src/common/webviewEvents";
+import { Mocked } from "./helpers/helpers";
 
 describe("panelSocket", () => {
     const readyMessage = "ready:args";
@@ -32,7 +32,7 @@ describe("panelSocket", () => {
             onmessage: mockWebSocket.onmessage,
             onopen: mockWebSocket.onopen,
         };
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         panelSocket.onMessageFromWebview(`websocket:""`);
@@ -49,7 +49,7 @@ describe("panelSocket", () => {
             onmessage: mockWebSocket.onmessage,
             onopen: mockWebSocket.onopen,
         };
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         panelSocket.onMessageFromWebview(readyMessage);
@@ -71,7 +71,7 @@ describe("panelSocket", () => {
     });
 
     it("disposes websocket correctly", async () => {
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         panelSocket.onMessageFromWebview(readyMessage);
@@ -89,7 +89,7 @@ describe("panelSocket", () => {
             "{there}",
             "{world}",
         ];
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         // Create the websocket
@@ -117,7 +117,7 @@ describe("panelSocket", () => {
     it("posts back messages once connected", async () => {
         const expectedMessage = { data: "hello world" };
         const mockPost = jest.fn();
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", mockPost);
 
         // Create the websocket
@@ -140,7 +140,7 @@ describe("panelSocket", () => {
 
     it("posts back errors once connected", async () => {
         const mockPost = jest.fn();
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", mockPost);
 
         // Create the websocket
@@ -158,7 +158,7 @@ describe("panelSocket", () => {
 
     it("posts back close once connected", async () => {
         const mockPost = jest.fn();
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", mockPost);
 
         // Create the websocket
@@ -179,7 +179,7 @@ describe("panelSocket", () => {
     });
 
     it("emits messages correctly", async () => {
-        const ps = await import("./panelSocket");
+        const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         const actualMessages: string[] = [];

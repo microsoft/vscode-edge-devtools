@@ -2,14 +2,14 @@
 // Licensed under the MIT License.
 
 import TelemetryReporter from "vscode-extension-telemetry";
-import { LaunchDebugProvider } from "./launchDebugProvider";
+import { LaunchDebugProvider } from "../src/launchDebugProvider";
 import {
     createFakeExtensionContext,
     createFakeTelemetryReporter,
     createFakeVSCode,
     Mocked,
-} from "./test/helpers";
-import { SETTINGS_STORE_NAME } from "./utils";
+} from "./helpers/helpers";
+import { SETTINGS_STORE_NAME } from "../src/utils";
 
 jest.mock("vscode", () => null, { virtual: true });
 
@@ -27,7 +27,7 @@ describe("launchDebugProvider", () => {
         jest.doMock("vscode", () => createFakeVSCode(), { virtual: true });
         jest.resetModules();
 
-        const ldp = await import("./launchDebugProvider");
+        const ldp = await import("../src/launchDebugProvider");
         host = new ldp.LaunchDebugProvider(createFakeExtensionContext(), mockReporter, attach, launch);
     });
 

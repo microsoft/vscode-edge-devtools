@@ -4,8 +4,8 @@
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
 
-import { createFakeVSCode } from "./test/helpers";
-import { IRemoteTargetJson } from "./utils";
+import { createFakeVSCode } from "./helpers/helpers";
+import { IRemoteTargetJson } from "../src/utils";
 
 describe("CDPTarget", () => {
     let mockVSCode: typeof import("vscode");
@@ -22,7 +22,7 @@ describe("CDPTarget", () => {
             url: "url",
         } as IRemoteTargetJson;
 
-        const ct = await import("./cdpTarget");
+        const ct = await import("../src/cdpTarget");
         const target = new ct.CDPTarget(json, "");
         expect(target).toBeDefined();
     });
@@ -34,7 +34,7 @@ describe("CDPTarget", () => {
             url: "url",
         } as IRemoteTargetJson;
 
-        const ct = await import("./cdpTarget");
+        const ct = await import("../src/cdpTarget");
         const target = new ct.CDPTarget(json, "", "path");
         expect(target.iconPath).toBeDefined();
         expect(target.iconPath!.dark).toEqual(
@@ -51,7 +51,7 @@ describe("CDPTarget", () => {
             webSocketDebuggerUrl: "webSocketDebuggerUrl",
         } as IRemoteTargetJson;
 
-        const ct = await import("./cdpTarget");
+        const ct = await import("../src/cdpTarget");
         const target = new ct.CDPTarget(json, "");
         target.label = "label";
         expect(target.websocketUrl).toEqual(json.webSocketDebuggerUrl);
@@ -72,7 +72,7 @@ describe("CDPTarget", () => {
             webSocketDebuggerUrl: "webSocketDebuggerUrl",
         } as IRemoteTargetJson;
 
-        const ct = await import("./cdpTarget");
+        const ct = await import("../src/cdpTarget");
         const target = new ct.CDPTarget(json, "");
         expect(target.getChildren().length).toEqual(4);
     });
