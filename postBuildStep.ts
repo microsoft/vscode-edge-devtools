@@ -30,6 +30,7 @@ import {
     applyMainViewPatch,
     applyMoveToContextMenuPatch,
     applyPersistDrawerTabs,
+    applyQueryParamsObjectPatch,
     applyRemoveBreakOnContextMenuItem,
     applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
@@ -155,6 +156,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyExtensionSettingsRuntimeObjectPatch,
         applyPortSettingsFunctionCallPatch,
         applyPortSettingsFunctionCreationPatch,
+        applyQueryParamsObjectPatch,
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
     await patchFileForWebViewWrapper('root/root-legacy.js', toolsOutDir, [

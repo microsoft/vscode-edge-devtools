@@ -8,6 +8,9 @@ import { ToolsWebSocket } from './toolsWebSocket';
 
 let listenForSecondKeyChord = false;
 
+declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
+export const vscode = acquireVsCodeApi();
+
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
@@ -58,8 +61,6 @@ export function initialize(dtWindow: IDevToolsWindow): void {
         // Override the resource loading once the window has loaded so that we can control it
         const resourceLoader = ToolsResourceLoader.overrideResourceLoading(dtWindow.Root.Runtime);
         dtWindow.InspectorFrontendHost.setResourceLoader(resourceLoader);
-
-        dtWindow.importScriptPathPrefix = dtWindow.importScriptPathPrefix.replace('null', 'vscode-webview-resource:');
     });
 
     dtWindow.addEventListener('keydown', e => {
