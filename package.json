@@ -587,7 +587,7 @@
         ]
     },
     "scripts": {
-        "package": "vsce package --out vscode-edge-devtools.vsix",
+        "package": "vsce package --yarn --out vscode-edge-devtools.vsix",
         "vscode:prepublish": "npm run build-and-lint",
         "build": "npm run build-wp && npm run build-post",
         "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
