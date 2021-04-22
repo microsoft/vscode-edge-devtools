@@ -298,7 +298,11 @@ export class DevToolsPanel {
     }
 
     private getHtmlForWebview() {
-        // stringsUri and inspectorUri are the files that used to be loaded in inspector.html, we are trying to load them directly to the webview here.
+        // stringsUri and inspectorUri are the files that used to be loaded in inspector.html
+        // They are being loaded directly into the webview.
+        // local resource loading inside iframes was deprecated in these commits:
+        // https://github.com/microsoft/vscode/commit/de9887d9e0eaf402250d2735b3db5dc340184b74
+        // https://github.com/microsoft/vscode/commit/d05ded6d3b64fed4a3cc74106f9b6c72243b18de
         const stringsPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'strings.js'));
         const stringsUri = this.panel.webview.asWebviewUri(stringsPath);
 
