@@ -89,8 +89,6 @@ describe("host", () => {
             callback.call(thisObj);
 
             expect(mockOverride).toHaveBeenCalled();
-            // Check if we still need this.
-            // expect(mockGlobal.importScriptPathPrefix).toBe("vscode-webview-resource:/somepath");
         });
     });
 
