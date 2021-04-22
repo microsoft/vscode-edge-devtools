@@ -602,6 +602,7 @@
         "download-edge": "node scripts/downloadAndExtractEdge.js"
     },
     "dependencies": {
+        "live-server": "^1.2.1",
         "puppeteer-core": "7.1.0",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.7",
