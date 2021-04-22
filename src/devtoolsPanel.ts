@@ -305,9 +305,6 @@ export class DevToolsPanel {
         const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
         const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
 
-        const scriptPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'messaging.bundle.js'));
-        const scriptUri = this.panel.webview.asWebviewUri(scriptPath);
-
         const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
         const hostUri = this.panel.webview.asWebviewUri(hostPath);
 
@@ -330,7 +327,6 @@ export class DevToolsPanel {
                 ">
                 <meta name="referrer" content="no-referrer">
                 <link href="${stylesUri}" rel="stylesheet"/>
-                <script src="${scriptUri}"></script>
                 <script src="${hostUri}"></script>
                 <script src="${stringsUri}"></script>
                 <script type="module" src="${inspectorUri}"></script>
