@@ -320,13 +320,14 @@ export class DevToolsPanel {
             <!doctype html>
             <html>
             <head>
+                <base href="${inspectorUri}">
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
                 <meta http-equiv="Content-Security-Policy"
                     content="default-src;
                     img-src 'self' data: ${this.panel.webview.cspSource};
                     style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
                     script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src ${this.panel.webview.cspSource};
+                    frame-src 'self' ${this.panel.webview.cspSource};
                     connect-src 'self' ${this.panel.webview.cspSource};
                 ">
                 <meta name="referrer" content="no-referrer">
