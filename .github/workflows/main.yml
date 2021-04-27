@@ -6,7 +6,9 @@ name: Sync Issue with ADO
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   issues:
-    types: [labeled]
+    types: [labeled, closed, reopened, edited]
+  issue_comment:
+    types: [created]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -23,7 +25,6 @@ jobs:
         ado_area_path: 'Edge\Dev Experience\Developer Tools\F12 Tools\VSCode Extension'
         ado_tags: 'DevToolsVSCodeExtension_GitHub'
         ado_tag_on_close: 'DevToolsVSCodeExtension_GitHub_Closed'
-        ado_wit: "Scenario"
         ado_bypassrules: false
         ado_set_labels: false
-        create_on_tag: 'tracked'
+        create_on_tagging: true
