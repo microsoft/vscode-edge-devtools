@@ -120,6 +120,13 @@ export function applyQuickOpenPatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyQueryParamsObjectPatch(content: string): string | null {
+    // This patch ensures URL parameters are passed in correctly without inspector.html
+    const pattern = /new URLSearchParams\(location.search\);/;
+    const replacementText = 'new URLSearchParams\(\'?ws=trueD&experiments=true&edgeThemes=true\'\);';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
+}
+
 export function applyCommandMenuPatch(content: string): string | null {
     // pattern intended to match logic of CommandMenu.attach()
     const pattern = /for\s*\(const action of actions\)\s*{\s*const category\s*=\s*action[\s\S]+this\._commands\.sort\(commandComparator\);/;

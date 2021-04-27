@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { encodeMessageForChannel, WebSocketEvent } from '../common/webviewEvents';
+import { vscode } from './host';
 
 interface IMessageEvent {
     data: string;
@@ -24,12 +25,12 @@ export class ToolsWebSocket {
     constructor(_url: string) {
         ToolsWebSocket.devtoolsWebSocket = this;
         // Inform the extension that we are ready to receive messages
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'ready');
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
     }
 
     send(message: string): void {
         // Forward the message to the extension
-        encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'websocket', { message });
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
     }
 
     onMessageFromChannel(e: WebSocketEvent, message?: string): void {

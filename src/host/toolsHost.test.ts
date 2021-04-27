@@ -7,10 +7,9 @@ import { ToolsResourceLoader } from "./toolsResourceLoader";
 describe("toolsHost", () => {
     let mockResourceLoader: Mocked<ToolsResourceLoader>;
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
+    let mockHost: { vscode: { postMessage: jest.Mock } };
 
     beforeEach(() => {
-        window.parent.postMessage = jest.fn();
-
         mockResourceLoader = {
             onResolvedUrlFromChannel: jest.fn(),
         } as Mocked<ToolsResourceLoader>;
@@ -18,7 +17,13 @@ describe("toolsHost", () => {
         mockWebviewEvents = {
             encodeMessageForChannel: jest.fn(),
         };
+        mockHost = {
+          vscode: {
+              postMessage: jest.fn(),
+          },
+      };
         jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
+        jest.doMock("./host", () => mockHost);
         jest.resetModules();
     });
 
@@ -49,7 +54,7 @@ describe("toolsHost", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
 
         it("fires callbacks on response from extension", async () => {
@@ -95,7 +100,7 @@ describe("toolsHost", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 
@@ -121,7 +126,7 @@ describe("toolsHost", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 
@@ -147,7 +152,7 @@ describe("toolsHost", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 
@@ -187,7 +192,7 @@ describe("toolsHost", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 
@@ -218,7 +223,7 @@ describe("toolsHost", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 

@@ -8,6 +8,7 @@ describe("host", () => {
     let mockGlobal: Mocked<IDevToolsWindow>;
 
     beforeEach(() => {
+        (global as any).acquireVsCodeApi = jest.fn();
         mockGlobal = {
             Root: {},
             _importScriptPathPrefix: "",
@@ -88,7 +89,6 @@ describe("host", () => {
             callback.call(thisObj);
 
             expect(mockOverride).toHaveBeenCalled();
-            expect(mockGlobal.importScriptPathPrefix).toBe("vscode-webview-resource:/somepath");
         });
     });
 

@@ -5,15 +5,20 @@ import { getFirstCallback } from "../test/helpers";
 
 describe("toolsWebSocket", () => {
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
+    let mockHost: { vscode: { postMessage: jest.Mock } };
 
     beforeEach(() => {
         mockWebviewEvents = {
             encodeMessageForChannel: jest.fn(),
         };
+        mockHost = {
+          vscode: {
+              postMessage: jest.fn(),
+          },
+        };
+        jest.doMock("./host", () => mockHost);
         jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
         jest.resetModules();
-
-        window.parent.postMessage = jest.fn();
     });
 
     describe("constructor", () => {
@@ -40,7 +45,7 @@ describe("toolsWebSocket", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 
@@ -61,7 +66,7 @@ describe("toolsWebSocket", () => {
             const expectedPostedMessage = "encodedMessage";
             const postMessage = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
             postMessage.callback.call(postMessage.thisObj, expectedPostedMessage);
-            expect(window.parent.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
+            expect(mockHost.vscode.postMessage).toHaveBeenCalledWith(expectedPostedMessage, "*");
         });
     });
 
