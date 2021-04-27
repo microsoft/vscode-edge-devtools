@@ -4,7 +4,6 @@ import * as fse from 'fs-extra';
 import path from 'path';
 
 import { applyPaddingInlineCssPatch } from './src/host/polyfills/cssPaddingInline';
-import { applyContentSecurityPolicyPatch } from './src/host/polyfills/inspectorContentPolicy';
 import { applyRuntimeImportScriptPathPrefixPatch } from './src/host/polyfills/runtime';
 import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from './src/host/polyfills/releaseNote';
 import {
@@ -132,9 +131,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper('host/host.js', toolsOutDir, [
         applyRemovePreferencePatch,
-    ]);
-    await patchFileForWebViewWrapper('inspector.html', toolsOutDir, [
-        applyContentSecurityPolicyPatch,
     ]);
     await patchFileForWebViewWrapper('screencast/screencast.js', toolsOutDir, [
         applyScreencastCursorPatch,
