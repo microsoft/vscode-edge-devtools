@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { testPatch } from "../../test/helpers";
-import * as SimpleView from "./simpleView"
+import { testPatch } from "../../helpers/helpers";
+import * as SimpleView from "../../../src/host/polyfills/simpleView"
 
 describe("simpleView", () => {
     it("revealInVSCode calls openInEditor", async () => {
