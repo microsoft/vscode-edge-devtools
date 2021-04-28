@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { getFirstCallback, Mocked } from "../test/helpers";
-import { ToolsResourceLoader } from "./toolsResourceLoader";
+import { getFirstCallback, Mocked } from "../helpers/helpers";
+import { ToolsResourceLoader } from "../../src/host/toolsResourceLoader";
 
 describe("toolsHost", () => {
     let mockResourceLoader: Mocked<ToolsResourceLoader>;
@@ -22,14 +22,14 @@ describe("toolsHost", () => {
               postMessage: jest.fn(),
           },
       };
-        jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
-        jest.doMock("./host", () => mockHost);
+        jest.doMock("../../src/common/webviewEvents", () => mockWebviewEvents);
+        jest.doMock("../../src/host/host", () => mockHost);
         jest.resetModules();
     });
 
     describe("isHostedMode", () => {
         it("returns true", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             expect(host.isHostedMode()).toEqual(true);
@@ -38,7 +38,7 @@ describe("toolsHost", () => {
 
     describe("getPreferences", () => {
         it("calls across to webview", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const mockCallback = jest.fn();
@@ -58,7 +58,7 @@ describe("toolsHost", () => {
         });
 
         it("fires callbacks on response from extension", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const mockCallback = jest.fn();
@@ -81,7 +81,7 @@ describe("toolsHost", () => {
 
     describe("setPreferences", () => {
         it("calls across to webview", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const expectedPref = {
@@ -106,7 +106,7 @@ describe("toolsHost", () => {
 
     describe("recordEnumeratedHistogram", () => {
         it("calls across to extension", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const expectedTelemetry = {
@@ -132,7 +132,7 @@ describe("toolsHost", () => {
 
     describe("recordPerformanceHistogram", () => {
         it("calls across to extension", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const expectedTelemetry = {
@@ -158,7 +158,7 @@ describe("toolsHost", () => {
 
     describe("reportError", () => {
         it("calls across to extension", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const expectedTelemetry = {
@@ -198,7 +198,7 @@ describe("toolsHost", () => {
 
     describe("openInEditor", () => {
         it("calls across to extension", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const expectedRequest = {
@@ -229,7 +229,7 @@ describe("toolsHost", () => {
 
     describe("onMessageFromChannel", () => {
         it("calls onResolvedUrlFromChannel on getUrl message", async () => {
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
             host.setResourceLoader(mockResourceLoader);
 
@@ -250,9 +250,9 @@ describe("toolsHost", () => {
                     },
                 },
             };
-            jest.doMock("./toolsWebSocket", () => mockToolsWS);
+            jest.doMock("../../src/host/toolsWebSocket", () => mockToolsWS);
 
-            const th = await import("./toolsHost");
+            const th = await import("../../src/host/toolsHost");
             const host = new th.ToolsHost();
 
             const expectedArgs = { event: "message", message: "some websocket message" };

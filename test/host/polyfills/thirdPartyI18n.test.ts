@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { testPatch } from "../../test/helpers";
-import { applyThirdPartyI18nLocalesPatch } from "./thirdPartyI18n";
+import { testPatch } from "../../helpers/helpers";
+import { applyThirdPartyI18nLocalesPatch } from "../../../src/host/polyfills/thirdPartyI18n";
 
 describe("override i18n locales", () => {
     it("applyThirdPartyI18nLocalesPatch correctly changes text", async () => {

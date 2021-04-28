@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { getFirstCallback } from "../test/helpers";
+import { getFirstCallback } from "../helpers/helpers";
 
 describe("toolsWebSocket", () => {
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
@@ -16,14 +16,14 @@ describe("toolsWebSocket", () => {
               postMessage: jest.fn(),
           },
         };
-        jest.doMock("./host", () => mockHost);
-        jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
+        jest.doMock("../../src/host/host", () => mockHost);
+        jest.doMock("../../src/common/webviewEvents", () => mockWebviewEvents);
         jest.resetModules();
     });
 
     describe("constructor", () => {
         it("updates instance property", async () => {
-            const tws = await import("./toolsWebSocket");
+            const tws = await import("../../src/host/toolsWebSocket");
 
             const websocket = new tws.ToolsWebSocket("some url");
             expect(tws.ToolsWebSocket.instance).toEqual(websocket);
@@ -33,7 +33,7 @@ describe("toolsWebSocket", () => {
         });
 
         it("sends ready event", async () => {
-            const tws = await import("./toolsWebSocket");
+            const tws = await import("../../src/host/toolsWebSocket");
             const websocket = new tws.ToolsWebSocket("some url");
             expect(websocket).toBeDefined();
 
@@ -51,7 +51,7 @@ describe("toolsWebSocket", () => {
 
     describe("send", () => {
         it("forwards messages correctly", async () => {
-            const tws = await import("./toolsWebSocket");
+            const tws = await import("../../src/host/toolsWebSocket");
             const websocket = new tws.ToolsWebSocket("some url");
             mockWebviewEvents.encodeMessageForChannel.mockClear();
 
@@ -72,7 +72,7 @@ describe("toolsWebSocket", () => {
 
     describe("onMessageFromChannel", () => {
         it("parses control messages and calls correct handlers", async () => {
-            const tws = await import("./toolsWebSocket");
+            const tws = await import("../../src/host/toolsWebSocket");
             const websocket = new tws.ToolsWebSocket("some url");
 
             websocket.onerror = jest.fn();
@@ -89,7 +89,7 @@ describe("toolsWebSocket", () => {
         });
 
         it("forwards websocket messages to onmessage", async () => {
-            const tws = await import("./toolsWebSocket");
+            const tws = await import("../../src/host/toolsWebSocket");
             const websocket = new tws.ToolsWebSocket("some url");
 
             websocket.onmessage = jest.fn();
@@ -104,7 +104,7 @@ describe("toolsWebSocket", () => {
         });
 
         it("ignores websocket messages with no message data", async () => {
-            const tws = await import("./toolsWebSocket");
+            const tws = await import("../../src/host/toolsWebSocket");
             const websocket = new tws.ToolsWebSocket("some url");
 
             websocket.onmessage = jest.fn();

@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { getFirstCallback, Mocked } from "../test/helpers";
-import { IRuntimeResourceLoader } from "./toolsResourceLoader";
+import { getFirstCallback, Mocked } from "../helpers/helpers";
+import { IRuntimeResourceLoader } from "../../src/host/toolsResourceLoader";
 
 describe("toolsResourceLoader", () => {
     let mockLoader: Mocked<IRuntimeResourceLoader>;
@@ -24,8 +24,8 @@ describe("toolsResourceLoader", () => {
           },
         };
 
-        jest.doMock("./host", () => mockHost);
-        jest.doMock("../common/webviewEvents", () => mockWebviewEvents);
+        jest.doMock("../../src/host/host", () => mockHost);
+        jest.doMock("../../src/common/webviewEvents", () => mockWebviewEvents);
         jest.resetModules();
     });
 
@@ -33,7 +33,7 @@ describe("toolsResourceLoader", () => {
         it("overrides load resource promise correctly", async () => {
             const originalLoader = mockLoader.loadResourcePromise;
 
-            const trl = await import("./toolsResourceLoader");
+            const trl = await import("../../src/host/toolsResourceLoader");
             const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
 
             expect(resourceLoader).toBeDefined();
@@ -43,7 +43,7 @@ describe("toolsResourceLoader", () => {
 
     describe("loadResource", () => {
         it("uses channel to request http url", async () => {
-            const trl = await import("./toolsResourceLoader");
+            const trl = await import("../../src/host/toolsResourceLoader");
             const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
 
             const expectedUrl = "http://file.url";
@@ -69,7 +69,7 @@ describe("toolsResourceLoader", () => {
         });
 
         it("uses channel to request https url", async () => {
-            const trl = await import("./toolsResourceLoader");
+            const trl = await import("../../src/host/toolsResourceLoader");
             const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
 
             const expectedUrl = "https://file.url";
@@ -97,7 +97,7 @@ describe("toolsResourceLoader", () => {
         it("uses real loader for packaged files", async () => {
             const originalLoader = mockLoader.loadResourcePromise;
 
-            const trl = await import("./toolsResourceLoader");
+            const trl = await import("../../src/host/toolsResourceLoader");
             const resourceLoader = trl.ToolsResourceLoader.overrideResourceLoading(mockLoader);
             expect(resourceLoader).toBeDefined();
 

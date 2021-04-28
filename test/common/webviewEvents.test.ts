@@ -5,7 +5,7 @@ import {
     encodeMessageForChannel,
     parseMessageFromChannel,
     webviewEventNames,
-} from "../common/webviewEvents";
+} from "../../src/common/webviewEvents";
 
 describe("webviewEvents", () => {
     describe("parseMessageFromChannel", () => {

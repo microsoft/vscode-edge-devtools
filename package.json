@@ -565,7 +565,7 @@
         "transform": {
             "^.+\\.tsx?$": "ts-jest"
         },
-        "testRegex": "/src/.+\\.test\\.tsx?$",
+        "testRegex": "/test/.+\\.test\\.tsx?$",
         "moduleFileExtensions": [
             "ts",
             "tsx",

@@ -6,13 +6,13 @@
 
 import * as path from "path";
 
-import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./test/helpers";
-import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "./utils";
+import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./helpers/helpers";
+import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "../src/utils";
 
 jest.mock("vscode", () => null, { virtual: true });
 
 describe("utils", () => {
-    let utils: typeof import("./utils");
+    let utils: typeof import("../src/utils");
     let mockGetHttp: jest.Mock;
     let mockGetHttps: jest.Mock;
 
@@ -26,7 +26,7 @@ describe("utils", () => {
         mockGetHttp = jest.requireMock("http").get;
         mockGetHttps = jest.requireMock("https").get;
 
-        utils = await import("./utils");
+        utils = await import("../src/utils");
     });
 
     describe("fixRemoteWebSocket", () => {
@@ -384,10 +384,10 @@ describe("utils", () => {
         const mockReporter = {};
         beforeEach(async () => {
             jest.doMock("../package.json", () => ({}), { virtual: true });
-            jest.doMock("./debugTelemetryReporter", () => ({DebugTelemetryReporter: jest.fn()}));
+            jest.doMock("../src/debugTelemetryReporter", () => ({DebugTelemetryReporter: jest.fn()}));
             jest.resetModules();
 
-            utils = await import("./utils");
+            utils = await import("../src/utils");
         });
 
         it("returns a debug version when no package info in debug env", async () => {
@@ -413,7 +413,7 @@ describe("utils", () => {
             jest.resetModules();
             jest.requireMock("vscode").env.machineId = "12345";
 
-            utils = await import("./utils");
+            utils = await import("../src/utils");
 
             const mockContext = createFakeExtensionContext();
             const reporter = utils.createTelemetryReporter(mockContext);
@@ -426,7 +426,7 @@ describe("utils", () => {
         it("returns the correct platform", async () => {
             jest.doMock("os");
             jest.resetModules();
-            utils = await import("./utils");
+            utils = await import("../src/utils");
 
             const os: Mocked<typeof import("os")> = jest.requireMock("os");
             os.platform.mockReturnValue("darwin");
@@ -451,7 +451,7 @@ describe("utils", () => {
             jest.doMock("fs-extra");
             jest.doMock("os");
             jest.resetModules();
-            utils = await import("./utils");
+            utils = await import("../src/utils");
 
             fse = jest.requireMock("fs-extra");
             os = jest.requireMock("os");
@@ -553,7 +553,7 @@ describe("utils", () => {
         beforeEach(async () => {
             jest.doMock("fs-extra");
             jest.resetModules();
-            utils = await import("./utils");
+            utils = await import("../src/utils");
             fse = jest.requireMock("fs-extra");
         });
 
@@ -577,7 +577,7 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             fse.pathExistsSync.mockImplementation(() => true);
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
-                return { 
+                return {
                     get: (name: string) => [{type: ''}]
                 }
             });
@@ -589,7 +589,7 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             fse.pathExistsSync.mockImplementation(() => true);
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
-                return { 
+                return {
                     get: (name: string) => [{type: 'vscode-edge-devtools.debug'}]
                 }
             });
@@ -604,7 +604,7 @@ describe("utils", () => {
         beforeEach(async () => {
             jest.doMock("fs-extra");
             jest.resetModules();
-            utils = await import("./utils");
+            utils = await import("../src/utils");
 
             fse = jest.requireMock("fs-extra");
             fse.readFileSync.mockImplementation((() => ''));
@@ -615,17 +615,17 @@ describe("utils", () => {
                 update: jest.fn((name: string, value: any) => {}),
             };
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
-                return { 
+                return {
                         get: jest.fn((name: string) => []),
                         update: vscodeMock.WorkspaceConfiguration.update,
-                    
+
                 }
             });
         });
 
         it('adds a debug config to launch.json', async () => {
             const vscodeMock = await jest.requireMock("vscode");
-            
+
             utils.configureLaunchJson();
             expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]));
         });
@@ -652,7 +652,7 @@ describe("utils", () => {
         });
 
         it("spawns the process", async () => {
-            utils = await import("./utils");
+            utils = await import("../src/utils");
             const expectedTempPath = "C:\\someTempPath";
             const os = jest.requireMock("os");
             os.tmpdir.mockReturnValue(expectedTempPath);
@@ -704,7 +704,7 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
-            utils = await import("./utils");
+            utils = await import("../src/utils");
             const expectedTempPath = "C:\\someTempPath";
             const os = jest.requireMock("os");
             os.tmpdir.mockReturnValue(expectedTempPath);
@@ -891,7 +891,7 @@ describe("utils", () => {
         beforeEach(async () => {
             jest.unmock("path");
             jest.resetModules();
-            utils = await import("./utils");
+            utils = await import("../src/utils");
         });
 
         it("removes a matching webpack prefix", () => {
