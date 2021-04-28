@@ -90,7 +90,7 @@ describe("extension", () => {
             expect(commandMock)
                 .toHaveBeenNthCalledWith(6, `${SETTINGS_VIEW_NAME}.openSettings`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(7, `${SETTINGS_VIEW_NAME}.viewChangelog`, expect.any(Function));   
+                .toHaveBeenNthCalledWith(7, `${SETTINGS_VIEW_NAME}.viewChangelog`, expect.any(Function));
             expect(commandMock)
                 .toHaveBeenNthCalledWith(8, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
             expect(commandMock)

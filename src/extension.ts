@@ -127,7 +127,7 @@ export function activate(context: vscode.ExtensionContext): void {
         `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
         () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', {
-                'VSCode.buttonCode': launchConfig === 'None' ? buttonCode.createAndConfigureLaunchJson : buttonCode.configureLaunchJson,
+                'VSCode.buttonCode': launchConfig === 'None' ? buttonCode.generateLaunchJson : buttonCode.configureLaunchJson,
             });
             void configureLaunchJson();
             launchConfig = getLaunchJson();

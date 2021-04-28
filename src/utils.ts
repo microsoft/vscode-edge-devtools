@@ -114,10 +114,10 @@ export interface IRemoteTargetJson {
 /** enum {string} */
 export const buttonCode: Record<string, string> = {
     launchBrowserInstance: '0',
-    configureLaunchJson: '1',
-    launchProject: '2',
-    viewDocumentation: '3',
-    createAndConfigureLaunchJson: '4',
+    launchProject: '1',
+    viewDocumentation: '2',
+    configureLaunchJson: '3',
+    generateLaunchJson: '4',
 };
 
 /**
