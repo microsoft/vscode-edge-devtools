@@ -16,7 +16,7 @@ describe("toolsWebSocket", () => {
               postMessage: jest.fn(),
           },
         };
-        jest.doMock("./../src/host", () => mockHost);
+        jest.doMock("../../src/host/host", () => mockHost);
         jest.doMock("../../src/common/webviewEvents", () => mockWebviewEvents);
         jest.resetModules();
     });

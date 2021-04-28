@@ -23,7 +23,7 @@ describe("toolsHost", () => {
           },
       };
         jest.doMock("../../src/common/webviewEvents", () => mockWebviewEvents);
-        jest.doMock("../../src/host", () => mockHost);
+        jest.doMock("../../src/host/host", () => mockHost);
         jest.resetModules();
     });
 
