@@ -561,7 +561,7 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             vscodeMock.workspace.workspaceFolders = null;
             utils.getLaunchJson();
-            expect(utils.getLaunchJson()).toEqual(null);
+            expect(utils.getLaunchJson()).toEqual('None');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
         });
 
@@ -569,7 +569,7 @@ describe("utils", () => {
             const vscodeMock = await jest.requireMock("vscode");
             fse.pathExistsSync.mockImplementation(() => false);
             utils.getLaunchJson();
-            expect(utils.getLaunchJson()).toEqual(null);
+            expect(utils.getLaunchJson()).toEqual('None');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
         });
 
@@ -581,7 +581,7 @@ describe("utils", () => {
                     get: (name: string) => [{type: ''}]
                 }
             });
-            expect(utils.getLaunchJson()).toEqual(null);
+            expect(utils.getLaunchJson()).toEqual('Unsupported');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Unsupported');
         });
 
