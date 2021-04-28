@@ -10,6 +10,7 @@ import { CDPTargetsProvider } from './cdpTargetsProvider';
 import { DevToolsPanel } from './devtoolsPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
 import {
+    buttonCode,
     createTelemetryReporter,
     fixRemoteWebSocket,
     getBrowserPath,
@@ -29,7 +30,7 @@ import {
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
-let launchConfig: vscode.DebugConfiguration | null;
+let launchConfig: vscode.DebugConfiguration | string;
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -65,6 +66,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launch`,
         async () => {
+            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
             await launch(context);
             cdpTargetsProvider.refresh();
         }));
@@ -88,6 +90,10 @@ export function activate(context: vscode.ExtensionContext): void {
     }));
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewChangelog`, () => {
         void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/CHANGELOG.md'));
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewDocumentation`, () => {
+        telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.viewDocumentation });
+        void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/README.md'));
     }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
@@ -124,14 +130,18 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
         () => {
+            telemetryReporter.sendTelemetryEvent('user/buttonPress', {
+                'VSCode.buttonCode': launchConfig === 'None' ? buttonCode.createAndConfigureLaunchJson : buttonCode.configureLaunchJson,
+            });
             void configureLaunchJson();
             launchConfig = getLaunchJson();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launchProject`,
         () => {
+            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchProject });
             launchConfig = getLaunchJson();
-            if (vscode.workspace.workspaceFolders && launchConfig) {
+            if (vscode.workspace.workspaceFolders && typeof launchConfig === 'object') {
                 void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
                 cdpTargetsProvider.refresh();
             }

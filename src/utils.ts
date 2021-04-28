@@ -111,6 +111,15 @@ export interface IRemoteTargetJson {
     webSocketDebuggerUrl: string;
 }
 
+/** enum {string} */
+export const buttonCode: Record<string, string> = {
+    launchBrowserInstance: '0',
+    configureLaunchJson: '1',
+    launchProject: '2',
+    viewDocumentation: '3',
+    createAndConfigureLaunchJson: '4',
+};
+
 /**
  * Fetch the response for the given uri.
  *
@@ -293,13 +302,13 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
 
 /**
  * Gets a supported debug config and updates the status of the launch.json file associated with the current workspace
- * @returns {vscode.DebugConfiguration | null}
+ * @returns {vscode.DebugConfiguration | string}
  */
- export function getLaunchJson(): vscode.DebugConfiguration | null {
+ export function getLaunchJson(): vscode.DebugConfiguration | string {
     // Check if there is a folder open
     if (!vscode.workspace.workspaceFolders) {
         void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'None');
-        return null;
+        return 'None';
     }
 
     // Check if there's a launch.json file
@@ -315,10 +324,10 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
             }
         }
         void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Unsupported');
-        return null;
+        return 'Unsupported';
     }
     void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'None');
-    return null;
+    return 'None';
 }
 
 /**

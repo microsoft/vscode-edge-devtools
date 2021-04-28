@@ -110,6 +110,11 @@
                 "title": "View Changelog"
             },
             {
+                "command": "vscode-edge-devtools-view.viewDocumentation",
+                "category": "Microsoft Edge Tools",
+                "title": "View Documentation"
+            },
+            {
                 "command": "vscode-edge-devtools-view.configureLaunchJson",
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
@@ -557,7 +562,7 @@
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "If you have any questions or want to learn more, check the [docs on GitHub](https://github.com/microsoft/vscode-edge-devtools/blob/master/README.md)."
+                "contents": "If you have any questions or want to learn more, check the [docs on GitHub](command:vscode-edge-devtools-view.viewDocumentation)."
             }
         ]
     },
