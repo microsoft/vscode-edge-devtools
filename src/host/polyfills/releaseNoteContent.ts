@@ -3,6 +3,18 @@
 
 export const extensionHighlights = `[
     {
+        title: ls\`New default start page when launching Edge DevTools\`,
+        subtitle:
+            ls\`Launch page contains useful links and instructions to help get you started.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/350',
+    },
+    {
+        title: ls\`New landing view for the sidebar when no targets are available\`,
+        subtitle:
+            ls\`The view contains instructions and buttons to help launch a target or configure your project's launch.json file.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/357',
+    },
+    {
         title: ls\`New triple dot dropdown menu on extension sidebar\`,
         subtitle:
             ls\`Dropdown menu contains links to extension settings and changelog.\`,
@@ -25,18 +37,6 @@ export const extensionHighlights = `[
         subtitle:
             ls\`Each DevTools instance will create a console output channel and delete it upon closing the DevTools window.\`,
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/292',
-    },
-    {
-        title: ls\`Support for ARM devices\`,
-        subtitle:
-            ls\`The extension is now compatible with all ARM devices after an update to the puppeteer dependency.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/318',
-    },
-    {
-        title: ls\`Removed Debugger for Microsoft Edge as a dependency\`,
-        subtitle:
-            ls\`Removed Debugger for Microsoft Edge as a dependency.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/329',
     },
 ],`;
 
