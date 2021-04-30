@@ -9,6 +9,7 @@ import { CDPTarget } from './cdpTarget';
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from './utils';
 import { IncomingMessage } from 'http';
 import https = require('https');
+import { setLaunchConfig } from './extension';
 
 export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
@@ -85,7 +86,6 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
             // Just expand the element to show its properties
             targets = element.getChildren();
         }
-
         return targets;
     }
 
@@ -93,35 +93,36 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
         this.telemetryReporter.sendTelemetryEvent('view/refresh');
         this.changeDataEvent.fire(null);
         void this.clearFaviconResourceDirectory();
+        setLaunchConfig();
     }
 
     async clearFaviconResourceDirectory(): Promise<void> {
-      const directory = path.join(this.extensionPath, 'resources', 'favicons');
-      let finalFile = false;
+        const directory = path.join(this.extensionPath, 'resources', 'favicons');
+        let finalFile = false;
 
-      const promise = new Promise<void>(resolve => {
-        fs.readdir(directory, (readdirError: Error | null, files: string[]) => {
-            if (readdirError) {throw readdirError;}
-            for (let i = 0; i < files.length; i++) {
-              if (i === files.length - 1) {
-                  finalFile = true;
-              }
-              const file = files[i];
-              const fileString = file.toString();
-              if (fileString !== '.gitkeep') {
-                fs.unlink(path.join(directory, fileString), unlinkError => {
-                  if (unlinkError) {throw unlinkError;}
-                  if (finalFile) {
-                      resolve();
-                  }
-                });
-              } else if (finalFile) {
-                  resolve();
-              }
-            }
-          });
-      });
-      await promise;
+        const promise = new Promise<void>(resolve => {
+            fs.readdir(directory, (readdirError: Error | null, files: string[]) => {
+                if (readdirError) {throw readdirError;}
+                for (let i = 0; i < files.length; i++) {
+                    if (i === files.length - 1) {
+                        finalFile = true;
+                    }
+                    const file = files[i];
+                    const fileString = file.toString();
+                    if (fileString !== '.gitkeep') {
+                        fs.unlink(path.join(directory, fileString), unlinkError => {
+                        if (unlinkError) {throw unlinkError;}
+                        if (finalFile) {
+                            resolve();
+                        }
+                        });
+                    } else if (finalFile) {
+                        resolve();
+                    }
+                }
+            });
+        });
+        await promise;
     }
 
     downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
@@ -151,27 +152,27 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
         const promise = new Promise<string | null>(resolve => {
             https.get(faviconUrl, (response: IncomingMessage) => {
                 if (response.headers['content-type'] && response.headers['content-type'].includes('icon')) {
-                  response.pipe(file);
-                  file.on('error', () => {
-                      resolve(null);
-                  });
-                  file.on('finish', () => {
-                      if (file.bytesWritten) {
-                          resolve(filePath);
-                      } else {
-                          resolve(null);
-                      }
-                  });
+                    response.pipe(file);
+                    file.on('error', () => {
+                        resolve(null);
+                    });
+                    file.on('finish', () => {
+                        if (file.bytesWritten) {
+                            resolve(filePath);
+                        } else {
+                            resolve(null);
+                        }
+                    });
                 } else {
-                  resolve(null);
+                    resolve(null);
                 }
             });
         });
 
         const timeout = new Promise<null>(resolve => {
             const id = setTimeout(() => {
-              clearTimeout(id);
-              resolve(null);
+                clearTimeout(id);
+                resolve(null);
             }, 1000);
         });
 
