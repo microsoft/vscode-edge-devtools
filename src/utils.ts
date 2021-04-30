@@ -120,6 +120,8 @@ export const buttonCode: Record<string, string> = {
     generateLaunchJson: '4',
 };
 
+export type LaunchConfig = 'None' | 'Unsupported' | vscode.DebugConfiguration;
+
 /**
  * Fetch the response for the given uri.
  *
@@ -302,9 +304,9 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
 
 /**
  * Gets a supported debug config and updates the status of the launch.json file associated with the current workspace
- * @returns {vscode.DebugConfiguration | string}
+ * @returns LaunchConfig
  */
- export function getLaunchJson(): vscode.DebugConfiguration | string {
+ export function getLaunchJson(): LaunchConfig {
     // Check if there is a folder open
     if (!vscode.workspace.workspaceFolders) {
         void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'None');

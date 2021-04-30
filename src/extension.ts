@@ -22,6 +22,7 @@ import {
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
+    LaunchConfig,
     openNewTab,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_STORE_NAME,
@@ -30,7 +31,7 @@ import {
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
-let launchConfig: vscode.DebugConfiguration | string;
+let launchConfig: LaunchConfig;
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -137,7 +138,8 @@ export function activate(context: vscode.ExtensionContext): void {
         () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchProject });
             launchConfig = getLaunchJson();
-            if (vscode.workspace.workspaceFolders && typeof launchConfig === 'object') {
+            const isValidLaunchConfig = typeof launchConfig === 'object';
+            if (vscode.workspace.workspaceFolders && isValidLaunchConfig) {
                 void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
                 cdpTargetsProvider.refresh();
             }
