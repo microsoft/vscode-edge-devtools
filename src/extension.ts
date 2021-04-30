@@ -297,6 +297,6 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
     }
 }
 
-export function setLaunchConfig() {
+export function setLaunchConfig(): void {
     launchConfig = getLaunchJson();
 }
