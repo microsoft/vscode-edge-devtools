@@ -86,6 +86,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
             // Just expand the element to show its properties
             targets = element.getChildren();
         }
+
         return targets;
     }
 

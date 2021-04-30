@@ -77,7 +77,6 @@ export function activate(context: vscode.ExtensionContext): void {
         () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.refreshTargetList });
             cdpTargetsProvider.refresh();
-            setLaunchConfig();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
