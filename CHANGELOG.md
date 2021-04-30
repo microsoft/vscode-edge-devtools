@@ -1,3 +1,10 @@
+## 1.1.8
+* **[Feature]**: New default start page when launching Edge DevTools with useful instructions and links - [PR #350](https://github.com/microsoft/vscode-edge-devtools/pull/350)
+* **[Feature]**: New landing sidebar view for empty target lists with buttons to help launch a target or set up the launch.json file - [PR #357](https://github.com/microsoft/vscode-edge-devtools/pull/357)
+* **[Bug Fix]**: Adding and applying ESLint rules
+ [PR #335](https://github.com/microsoft/vscode-edge-devtools/pull/335)
+* **[Bug Fix]**: Edge DevTools instance now hosted directly inside the WebView - [PR #367](https://github.com/microsoft/vscode-edge-devtools/pull/367)
+
 ## 1.1.7
 * **[Bug Fix]**: Retain focus on property after toggling with context menu
  [PR #332](https://github.com/microsoft/vscode-edge-devtools/pull/332)
