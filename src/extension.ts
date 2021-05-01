@@ -81,8 +81,10 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
         (target?: CDPTarget) => {
-            if (!target)
-                {return;}
+            if (!target){
+                telemetryReporter.sendTelemetryEvent('command/attach/noTarget');
+                return;
+            }
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.attachToTarget });
             telemetryReporter.sendTelemetryEvent('view/devtools');
             const runtimeConfig = getRuntimeConfig();
