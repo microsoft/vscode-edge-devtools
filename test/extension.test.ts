@@ -5,6 +5,7 @@ import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
 import {
+    buttonCode,
     IRemoteTargetJson,
     IRuntimeConfig,
     removeTrailingSlash,
@@ -32,6 +33,7 @@ describe("extension", () => {
 
             // Mock out the imported utils
             mockUtils = {
+                buttonCode,
                 SETTINGS_STORE_NAME,
                 SETTINGS_VIEW_NAME,
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),

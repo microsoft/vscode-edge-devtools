@@ -118,6 +118,11 @@ export const buttonCode: Record<string, string> = {
     viewDocumentation: '2',
     configureLaunchJson: '3',
     generateLaunchJson: '4',
+    refreshTargetList: '5',
+    attachToTarget: '6',
+    openSettings: '7',
+    viewChangelog: '8',
+    closeTarget: '9',
 };
 
 export type LaunchConfig = 'None' | 'Unsupported' | vscode.DebugConfiguration;
