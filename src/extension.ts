@@ -17,21 +17,18 @@ import {
     getListOfTargets,
     getRemoteEndpointSettings,
     getRuntimeConfig,
-    getLaunchJson,
-    configureLaunchJson,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
-    LaunchConfig,
     openNewTab,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
 } from './utils';
+import { LaunchConfigManager } from './LaunchConfigManager';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
-let launchConfig: LaunchConfig;
 let cdpTargetsProvider: CDPTargetsProvider;
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -40,8 +37,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 
     // Check if launch.json exists and has supported config to populate side pane welcome message
-    setLaunchConfig();
-
+    LaunchConfigManager.instance.updateLaunchConfig();
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, (): void => {
         void attach(context);
     }));
@@ -136,19 +132,18 @@ export function activate(context: vscode.ExtensionContext): void {
         `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
         () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', {
-                'VSCode.buttonCode': launchConfig === 'None' ? buttonCode.generateLaunchJson : buttonCode.configureLaunchJson,
+                'VSCode.buttonCode': LaunchConfigManager.instance.getLaunchConfig() === 'None' ? buttonCode.generateLaunchJson : buttonCode.configureLaunchJson,
             });
-            void configureLaunchJson();
-            setLaunchConfig();
+            LaunchConfigManager.instance.configureLaunchJson();
+            LaunchConfigManager.instance.updateLaunchConfig();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launchProject`,
         () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchProject });
-            setLaunchConfig();
-            const isValidLaunchConfig = typeof launchConfig === 'object';
-            if (vscode.workspace.workspaceFolders && isValidLaunchConfig) {
-                void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
+            LaunchConfigManager.instance.updateLaunchConfig();
+            if (vscode.workspace.workspaceFolders && LaunchConfigManager.instance.isValidLaunchConfig) {
+                void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], LaunchConfigManager.instance.getLaunchConfig());
                 cdpTargetsProvider.refresh();
             }
         }));
@@ -297,8 +292,4 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         });
         await attach(context, url, config);
     }
-}
-
-export function setLaunchConfig(): void {
-    launchConfig = getLaunchJson();
 }

@@ -41,7 +41,6 @@ describe("extension", () => {
                 getRemoteEndpointSettings: jest.fn(),
                 getRuntimeConfig: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
-                getLaunchJson: jest.fn(),
             };
             jest.doMock("../src/utils", () => mockUtils);
             jest.doMock("../src/launchDebugProvider");
@@ -396,7 +395,6 @@ describe("extension", () => {
                 launchBrowser: jest.fn().mockResolvedValue(fakeBrowser),
                 openNewTab: jest.fn().mockResolvedValue(null),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
-                getLaunchJson: jest.fn(),
                 buttonCode: { launch: '' },
             };
 
