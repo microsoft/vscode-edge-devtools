@@ -372,7 +372,7 @@ describe("extension", () => {
     });
 
     describe("launch", () => {
-        const fakeBrowser = {addListener: () => null};
+        const fakeBrowser = {on: () => null};
         let mockReporter: Mocked<Readonly<TelemetryReporter>>;
         let mockUtils: Partial<Mocked<typeof import("../src/utils")>>;
         let mockPanel: Partial<Mocked<typeof import("../src/devtoolsPanel")>>;
