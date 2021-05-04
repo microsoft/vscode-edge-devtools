@@ -8,11 +8,14 @@ import * as path from "path";
 
 import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./helpers/helpers";
 import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "../src/utils";
+import { LaunchConfigManager } from "../src/LaunchConfigManager";
 
 jest.mock("vscode", () => null, { virtual: true });
 
 describe("utils", () => {
     let utils: typeof import("../src/utils");
+    let lcm: typeof import("../src/launchConfigManager");
+    let launchConfigManager: LaunchConfigManager;
     let mockGetHttp: jest.Mock;
     let mockGetHttps: jest.Mock;
 
@@ -22,6 +25,7 @@ describe("utils", () => {
         jest.doMock("vscode-nls", () => ({ loadMessageBundle: jest.fn().mockReturnValue(jest.fn()) }));
         jest.doMock("vscode", () => createFakeVSCode(), { virtual: true });
         jest.resetModules();
+        launchConfigManager = lcm.LaunchConfigManager.instance;
 
         mockGetHttp = jest.requireMock("http").get;
         mockGetHttps = jest.requireMock("https").get;
@@ -560,16 +564,16 @@ describe("utils", () => {
         it('updates launchJsonStatus with "None" when there is no folder open', async () => {
             const vscodeMock = await jest.requireMock("vscode");
             vscodeMock.workspace.workspaceFolders = null;
-            utils.getLaunchJson();
-            expect(utils.getLaunchJson()).toEqual('None');
+            launchConfigManager.updateLaunchConfig();
+            expect(launchConfigManager.getLaunchConfig()).toEqual('None');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
         });
 
         it('updates launchJsonStatus with "None" when launch.json does not exist', async () => {
             const vscodeMock = await jest.requireMock("vscode");
             fse.pathExistsSync.mockImplementation(() => false);
-            utils.getLaunchJson();
-            expect(utils.getLaunchJson()).toEqual('None');
+            launchConfigManager.updateLaunchConfig();
+            expect(launchConfigManager.getLaunchConfig()).toEqual('None');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
         });
 
@@ -581,7 +585,7 @@ describe("utils", () => {
                     get: (name: string) => [{type: ''}]
                 }
             });
-            expect(utils.getLaunchJson()).toEqual('Unsupported');
+            expect(launchConfigManager.getLaunchConfig()).toEqual('Unsupported');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Unsupported');
         });
 
@@ -593,7 +597,7 @@ describe("utils", () => {
                     get: (name: string) => [{type: 'vscode-edge-devtools.debug'}]
                 }
             });
-            expect(utils.getLaunchJson()).toEqual({type: 'vscode-edge-devtools.debug'});
+            expect(launchConfigManager.getLaunchConfig()).toEqual({type: 'vscode-edge-devtools.debug'});
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
         });
     });
@@ -626,15 +630,15 @@ describe("utils", () => {
         it('adds a debug config to launch.json', async () => {
             const vscodeMock = await jest.requireMock("vscode");
 
-            utils.configureLaunchJson();
+            launchConfigManager.configureLaunchJson();
             expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]));
         });
 
         it('inserts a comment after the url property', async () => {
-            const expectedText = '\"url\":\"' + utils.providedDebugConfig.url + '\" // Provide your project\'s url to finish configuring';
-            fse.readFileSync.mockImplementation(() => JSON.stringify(utils.providedDebugConfig));
+            const expectedText = '\"url\":\"' + lcm.providedDebugConfig.url + '\" // Provide your project\'s url to finish configuring';
+            fse.readFileSync.mockImplementation(() => JSON.stringify(lcm.providedDebugConfig));
 
-            await utils.configureLaunchJson();
+            await launchConfigManager.configureLaunchJson();
             expect(fse.writeFileSync).toHaveBeenCalledWith(expect.any(String), expect.stringContaining(expectedText));
         });
     });
