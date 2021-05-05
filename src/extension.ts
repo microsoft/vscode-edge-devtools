@@ -134,8 +134,7 @@ export function activate(context: vscode.ExtensionContext): void {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', {
                 'VSCode.buttonCode': LaunchConfigManager.instance.getLaunchConfig() === 'None' ? buttonCode.generateLaunchJson : buttonCode.configureLaunchJson,
             });
-            LaunchConfigManager.instance.configureLaunchJson();
-            LaunchConfigManager.instance.updateLaunchConfig();
+            void LaunchConfigManager.instance.configureLaunchJson();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launchProject`,

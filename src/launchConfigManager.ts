@@ -31,7 +31,8 @@ export class LaunchConfigManager {
         return LaunchConfigManager.launchConfigManagerInstance;
     }
 
-    public getLaunchConfig(): LaunchConfig {
+    getLaunchConfig(): LaunchConfig {
+        this.updateLaunchConfig();
         return this.launchConfig;
     }
 
@@ -99,6 +100,7 @@ export class LaunchConfigManager {
 
         // Open launch.json in editor
         void vscode.commands.executeCommand('vscode.open', vscode.Uri.joinPath(workspaceUri, relativePath));
+        this.updateLaunchConfig();
     }
 
     isValidLaunchConfig(): boolean {
