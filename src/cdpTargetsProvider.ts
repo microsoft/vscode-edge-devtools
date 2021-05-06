@@ -99,31 +99,15 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
 
     async clearFaviconResourceDirectory(): Promise<void> {
         const directory = path.join(this.extensionPath, 'resources', 'favicons');
-        let finalFile = false;
-
-        const promise = new Promise<void>(resolve => {
-            fs.readdir(directory, (readdirError: Error | null, files: string[]) => {
-                if (readdirError) {throw readdirError;}
-                for (let i = 0; i < files.length; i++) {
-                    if (i === files.length - 1) {
-                        finalFile = true;
-                    }
-                    const file = files[i];
-                    const fileString = file.toString();
-                    if (fileString !== '.gitkeep') {
-                        fs.unlink(path.join(directory, fileString), unlinkError => {
-                        if (unlinkError) {throw unlinkError;}
-                        if (finalFile) {
-                            resolve();
-                        }
-                        });
-                    } else if (finalFile) {
-                        resolve();
-                    }
-                }
-            });
-        });
-        await promise;
+        const files = await fs.promises.readdir(directory);
+        for(const file of files) {
+            const fileString = file.toString();
+            if (fileString !== '.gitkeep') {
+                fs.unlink(path.join(directory, fileString), unlinkError => {
+                if (unlinkError) {throw unlinkError;}
+                });
+            }
+        }
     }
 
     downloadFaviconFromSitePromise(url: string) : Promise<string | null> | null {
@@ -151,6 +135,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
 
         const file = fs.createWriteStream(filePath);
         const promise = new Promise<string | null>(resolve => {
+
             https.get(faviconUrl, (response: IncomingMessage) => {
                 if (response.headers['content-type'] && response.headers['content-type'].includes('icon')) {
                     response.pipe(file);
