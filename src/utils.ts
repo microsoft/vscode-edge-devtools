@@ -12,7 +12,7 @@ import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
-import { EdgeTelemetryReporter } from './EdgeTelemetryReporter';
+import { EdgeTelemetryReporter } from './edgeTelemetryReporter';
 
 import puppeteer from 'puppeteer-core';
 
