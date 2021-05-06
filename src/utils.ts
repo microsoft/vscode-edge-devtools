@@ -12,6 +12,7 @@ import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
+import { EdgeTelemetryReporter } from './EdgeTelemetryReporter';
 
 import puppeteer from 'puppeteer-core';
 
@@ -268,7 +269,7 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
 export function createTelemetryReporter(_context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
     if (packageJson && vscode.env.machineId !== 'someValue.machineId') {
         // Use the real telemetry reporter
-        return new TelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
+        return new EdgeTelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
     }
         // Fallback to a fake telemetry reporter
         return new DebugTelemetryReporter();

@@ -157,6 +157,10 @@ export function activate(context: vscode.ExtensionContext): void {
             void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/README.md'));
         }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    if (settings.get('enableSessionId') === 'Undecided') {
+        sessionTelemetryInformationToast();
+    }
 }
 
 export async function attach(
@@ -301,4 +305,17 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
 
 export function setLaunchConfig(): void {
     launchConfig = getLaunchJson();
+}
+
+async function sessionTelemetryInformationToast() {
+    const response = await vscode.window.showInformationMessage(`Opt into sending session information?`, 'Yes', 'No');
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    if (response === 'Yes') {
+        // Updating for both user and workspace settings
+        settings.update('enableSessionId', 'Opted in', true);
+        settings.update('enableSessionId', 'Opted in');
+    } else if (response === 'No') {
+        settings.update('enableSessionId', 'Opted out', true);
+        settings.update('enableSessionId', 'Opted out');
+    }
 }
