@@ -100,12 +100,10 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     async clearFaviconResourceDirectory(): Promise<void> {
         const directory = path.join(this.extensionPath, 'resources', 'favicons');
         const files = await fs.promises.readdir(directory);
-        for(const file of files) {
+        for (const file of files) {
             const fileString = file.toString();
             if (fileString !== '.gitkeep') {
-                fs.unlink(path.join(directory, fileString), unlinkError => {
-                if (unlinkError) {throw unlinkError;}
-                });
+                await fs.promises.unlink(path.join(directory, fileString));
             }
         }
     }
