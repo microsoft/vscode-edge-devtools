@@ -1,15 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { DebugTelemetryReporter } from './debugTelemetryReporter';
 import * as vscode from 'vscode';
 import { SETTINGS_STORE_NAME } from './utils';
+import TelemetryReporter from 'vscode-extension-telemetry';
+import { v4 } from 'uuid';
 
-export class EdgeTelemetryReporter extends DebugTelemetryReporter {
+export class EdgeTelemetryReporter extends TelemetryReporter {
     private uuid: string;
     constructor(extensionId: string, extensionVersion: string, key: string, firstParty?: boolean) {
-        // super(extensionId, extensionVersion, key, firstParty);
-        super();
-        const { v4 } = require('uuid');
+        super(extensionId, extensionVersion, key, firstParty);
         this.uuid = v4();
     }
 

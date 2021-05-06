@@ -159,7 +159,7 @@ export function activate(context: vscode.ExtensionContext): void {
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     if (settings.get('enableSessionId') === 'Undecided') {
-        sessionTelemetryInformationToast();
+        void sessionTelemetryInformationToast();
     }
 }
 
@@ -308,14 +308,14 @@ export function setLaunchConfig(): void {
 }
 
 async function sessionTelemetryInformationToast() {
-    const response = await vscode.window.showInformationMessage(`Opt into sending session information?`, 'Yes', 'No');
+    const response = await vscode.window.showInformationMessage(`Help Edge DevTools for VS Code improve the user experience by enabling session IDs to be sent with telemetry`, 'Yes', 'No');
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     if (response === 'Yes') {
         // Updating for both user and workspace settings
-        settings.update('enableSessionId', 'Opted in', true);
-        settings.update('enableSessionId', 'Opted in');
+        void settings.update('enableSessionId', 'Opted in', true);
+        void settings.update('enableSessionId', 'Opted in');
     } else if (response === 'No') {
-        settings.update('enableSessionId', 'Opted out', true);
-        settings.update('enableSessionId', 'Opted out');
+        void settings.update('enableSessionId', 'Opted out', true);
+        void settings.update('enableSessionId', 'Opted out');
     }
 }
