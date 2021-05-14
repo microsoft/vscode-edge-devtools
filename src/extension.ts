@@ -176,7 +176,7 @@ export async function attachToCurrentDebugTarget(
     }
 
     const telemetryProps = { viaConfig: `${!!config}`, withTargetUrl: `${!!attachUrl}` };
-    telemetryReporter.sendTelemetryEvent('command/attach', telemetryProps);
+    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget', telemetryProps);
 
     const { timeout } = getRemoteEndpointSettings(config);
 
@@ -205,7 +205,7 @@ export async function attachToCurrentDebugTarget(
         if (targetWebsocketUrl) {
             // Auto connect to found target
             useRetry = false;
-            telemetryReporter.sendTelemetryEvent('command/attach/devtools', telemetryProps);
+            telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools', telemetryProps);
             const runtimeConfig = getRuntimeConfig(config);
             DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
         } else if (useRetry) {
@@ -216,7 +216,7 @@ export async function attachToCurrentDebugTarget(
                 }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
             });
         } else {
-            console.error("could not connect to shared url")
+            console.error("could not connect to shared current debug target")
         }
     } while (useRetry && Date.now() - startTime < timeout);
 }
