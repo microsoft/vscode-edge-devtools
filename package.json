@@ -65,7 +65,7 @@
                 }
             },
             {
-                "command": "vscode-edge-devtools-view.attachShare",
+                "command": "vscode-edge-devtools-view.attachToCurrentDebugTarget",
                 "category": "Microsoft Edge Tools",
                 "title": "Attach to active debug target",
                 "enablement": "titleCommandsRegistered",
@@ -467,7 +467,7 @@
                     "when": "view == vscode-edge-devtools-view.targets"
                 },
                 {
-                    "command": "vscode-edge-devtools-view.attachShare",
+                    "command": "vscode-edge-devtools-view.attachToCurrentDebugTarget",
                     "when": "view == vscode-edge-devtools-view.targets"
                 },
                 {
@@ -494,7 +494,7 @@
                     "group": "navigation"
                 },
                 {
-                    "command": "vscode-edge-devtools-view.attachShare",
+                    "command": "vscode-edge-devtools-view.attachToCurrentDebugTarget",
                     "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },

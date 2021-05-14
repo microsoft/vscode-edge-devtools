@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext): void {
         void launch(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachShare`, (): void => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (): void => {
         void attach(context);
     }));
 
@@ -77,9 +77,9 @@ export function activate(context: vscode.ExtensionContext): void {
             cdpTargetsProvider.refresh();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
-        `${SETTINGS_VIEW_NAME}.attachShare`,
+        `${SETTINGS_VIEW_NAME}.attachToCurrentDebugTarget`,
         async () => {
-            await attachShare(context);
+            await attachToCurrentDebugTarget(context);
             cdpTargetsProvider.refresh();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -169,7 +169,7 @@ export function activate(context: vscode.ExtensionContext): void {
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
 }
 
-export async function attachShare(
+export async function attachToCurrentDebugTarget(
     context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
@@ -196,8 +196,7 @@ export async function attachShare(
             'extension.js-debug.requestCDPProxy',
             session.id,
             );
-            const formed = `ws://${addr.host}:${addr.port}`;
-            vscode.window.showInformationMessage(`Address copied to your clipboard (${formed})`);
+            const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
             targetWebsocketUrl = formed;
         } catch (e) {
             vscode.window.showErrorMessage(e.message);
