@@ -170,55 +170,40 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export async function attachToCurrentDebugTarget(
-    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
+    context: vscode.ExtensionContext): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const telemetryProps = { viaConfig: `${!!config}`, withTargetUrl: `${!!attachUrl}` };
-    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget', telemetryProps);
+    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
 
-    const { timeout } = getRemoteEndpointSettings(config);
+    // Attempt to attach to active CDP target
+    const session = vscode.debug.activeDebugSession;
+    if (!session) {
+        vscode.window.showErrorMessage('No active debug session');
+        return;
+    }
 
-    // Get the attach target and keep trying until reaching timeout
-    const startTime = Date.now();
-    do {
-        // Attempt to attach to active CDP target
-        const session = vscode.debug.activeDebugSession;
-        if (!session) {
-            vscode.window.showErrorMessage('No active debug session');
-            continue;
-        }
+    let targetWebsocketUrl;
+    try {
+        const addr: any = await vscode.commands.executeCommand(
+        'extension.js-debug.requestCDPProxy',
+        session.id,
+        );
+        const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
+        targetWebsocketUrl = formed;
+    } catch (e) {
+        vscode.window.showErrorMessage(e.message);
+    }
 
-        let targetWebsocketUrl;
-        try {
-            const addr: any = await vscode.commands.executeCommand(
-            'extension.js-debug.requestCDPProxy',
-            session.id,
-            );
-            const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
-            targetWebsocketUrl = formed;
-        } catch (e) {
-            vscode.window.showErrorMessage(e.message);
-        }
-
-        if (targetWebsocketUrl) {
-            // Auto connect to found target
-            useRetry = false;
-            telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools', telemetryProps);
-            const runtimeConfig = getRuntimeConfig(config);
-            DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
-        } else if (useRetry) {
-            // Wait for a little bit until we retry
-            await new Promise<void>(resolve => {
-                setTimeout(() => {
-                    resolve();
-                }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
-            });
-        } else {
-            console.error("could not connect to shared current debug target")
-        }
-    } while (useRetry && Date.now() - startTime < timeout);
+    if (targetWebsocketUrl) {
+        // Auto connect to found target
+        telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
+        const runtimeConfig = getRuntimeConfig();
+        DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+    } else {
+        vscode.window.showErrorMessage('Unable to attach DevTools to current debug session.');
+    }
 }
 
 export async function attach(
