@@ -55,7 +55,7 @@ export class DevToolsPanel {
         this.consoleOutput.appendLine('');
 
         // Hook up the socket events
-        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
+        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg), this.config.isCDPShared);
         this.panelSocket.on('ready', () => this.onSocketReady());
         this.panelSocket.on('websocket', () => this.onSocketMessage());
         this.panelSocket.on('telemetry', msg => this.onSocketTelemetry(msg));

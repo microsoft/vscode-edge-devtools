@@ -38,6 +38,7 @@
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
         "onCommand:vscode-edge-devtools.launch",
+        "onCommand:vscode-edge-devtools.attachToCurrentDebugTarget",
         "onWebviewPanel:vscode-edge-devtools",
         "onView:vscode-edge-devtools-view.targets",
         "onDebug"
@@ -55,19 +56,14 @@
                 "category": "Microsoft Edge Tools"
             },
             {
+                "command": "vscode-edge-devtools.attachToCurrentDebugTarget",
+                "category": "Microsoft Edge Tools",
+                "title": "Attach to active debug target"
+            },
+            {
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "Microsoft Edge Tools",
                 "title": "Open a new tab",
-                "enablement": "titleCommandsRegistered",
-                "icon": {
-                    "light": "resources/light/launch.svg",
-                    "dark": "resources/dark/launch.svg"
-                }
-            },
-            {
-                "command": "vscode-edge-devtools-view.attachToCurrentDebugTarget",
-                "category": "Microsoft Edge Tools",
-                "title": "Attach to active debug target",
                 "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/launch.svg",
@@ -467,10 +463,6 @@
                     "when": "view == vscode-edge-devtools-view.targets"
                 },
                 {
-                    "command": "vscode-edge-devtools-view.attachToCurrentDebugTarget",
-                    "when": "view == vscode-edge-devtools-view.targets"
-                },
-                {
                     "command": "vscode-edge-devtools-view.refresh",
                     "when": "view == vscode-edge-devtools-view.targets"
                 },
@@ -490,11 +482,6 @@
             "view/title": [
                 {
                     "command": "vscode-edge-devtools-view.launch",
-                    "when": "view == vscode-edge-devtools-view.targets",
-                    "group": "navigation"
-                },
-                {
-                    "command": "vscode-edge-devtools-view.attachToCurrentDebugTarget",
                     "when": "view == vscode-edge-devtools-view.targets",
                     "group": "navigation"
                 },

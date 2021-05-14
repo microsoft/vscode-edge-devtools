@@ -51,7 +51,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (): void => {
-        void attach(context);
+        void attachToCurrentDebugTarget(context);
     }));
 
     // Register the launch provider
@@ -74,12 +74,6 @@ export function activate(context: vscode.ExtensionContext): void {
         async () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
             await launch(context);
-            cdpTargetsProvider.refresh();
-        }));
-    context.subscriptions.push(vscode.commands.registerCommand(
-        `${SETTINGS_VIEW_NAME}.attachToCurrentDebugTarget`,
-        async () => {
-            await attachToCurrentDebugTarget(context);
             cdpTargetsProvider.refresh();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -199,7 +193,8 @@ export async function attachToCurrentDebugTarget(
     if (targetWebsocketUrl) {
         // Auto connect to found target
         telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
-        const runtimeConfig = getRuntimeConfig();
+        let runtimeConfig = getRuntimeConfig();
+        runtimeConfig.isCDPShared = true;
         DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
     } else {
         vscode.window.showErrorMessage('Unable to attach DevTools to current debug session.');
