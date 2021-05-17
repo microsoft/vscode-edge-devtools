@@ -55,7 +55,7 @@ export interface IRuntimeConfig {
     sourceMapPathOverrides: IStringDictionary<string>;
     sourceMaps: boolean;
     webRoot: string;
-    isCDPShared: boolean;
+    isJsDebugProxiedCDPConnection: boolean;
 }
 export interface IStringDictionary<T> {
     [name: string]: T;
@@ -473,7 +473,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         sourceMapPathOverrides: resolvedOverrides,
         sourceMaps,
         webRoot: resolvedWebRoot,
-        isCDPShared: false,
+        isJsDebugProxiedCDPConnection: false,
     };
 }
 

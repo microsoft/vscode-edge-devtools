@@ -297,7 +297,7 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
         // Auto connect to found target
         telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
         const runtimeConfig = getRuntimeConfig();
-        runtimeConfig.isCDPShared = true;
+        runtimeConfig.isJsDebugProxiedCDPConnection = true;
         DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
     } else {
         const errorMessage = 'Unable to attach DevTools to current debug session.';

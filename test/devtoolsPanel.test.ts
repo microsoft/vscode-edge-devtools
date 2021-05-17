@@ -39,7 +39,7 @@ describe("devtoolsPanel", () => {
             sourceMapPathOverrides: {},
             sourceMaps: true,
             webRoot: "",
-            isCDPShared: false,
+            isJsDebugProxiedCDPConnection: false,
         };
 
         mockPanel = {

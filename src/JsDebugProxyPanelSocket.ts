@@ -12,13 +12,14 @@ export class JsDebugProxyPanelSocket extends PanelSocket {
      */
     protected onOpen(): void {
         if (this.socket) {
-            this.registerForCDPEvents();
+            this.registerForJsDebugSharedCDPEvents();
         }
         super.onOpen();
     }
 
-    private registerForCDPEvents() {
+    private registerForJsDebugSharedCDPEvents() {
         // register for custom events from jsdebug:
+        // TODO before checkin: add docs here
         const registrationMessage = {
             method: 'JsDebug.subscribe',
             params: {

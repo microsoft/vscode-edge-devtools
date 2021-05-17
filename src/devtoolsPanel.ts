@@ -56,7 +56,7 @@ export class DevToolsPanel {
         this.consoleOutput.appendLine('');
 
         // Hook up the socket events
-        if (this.config.isCDPShared) {
+        if (this.config.isJsDebugProxiedCDPConnection) {
             this.panelSocket = new JsDebugProxyPanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
         } else {
             this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
