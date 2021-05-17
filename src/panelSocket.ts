@@ -13,13 +13,11 @@ export class PanelSocket extends EventEmitter {
     private socket: WebSocket | undefined;
     private isConnected = false;
     private messages: string[] = [];
-    private isCDPShared = false;
 
-    constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback, isCDPShared = false) {
+    constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback) {
         super();
         this.targetUrl = targetUrl;
         this.postMessageToDevTools = postMessageToDevTools;
-        this.isCDPShared = isCDPShared;
     }
 
     get isConnectedToTarget(): boolean {
@@ -78,14 +76,10 @@ export class PanelSocket extends EventEmitter {
         this.socket.onclose = () => this.onClose();
     }
 
-    private onOpen() {
-
+    protected onOpen() {
         this.isConnected = true;
         this.postMessageToDevTools('open');
         if (this.socket) {
-            if (this.isCDPShared) {
-                this.registerForCDPEvents();
-            }
             // Forward any cached messages onto the real websocket
             for (const message of this.messages) {
                 this.socket.send(message);
@@ -116,27 +110,5 @@ export class PanelSocket extends EventEmitter {
         }
 
         this.isConnected = false;
-    }
-
-    private registerForCDPEvents() {
-        // register for custom events from jsdebug:
-        const registrationMessage = {
-            method: 'JsDebug.subscribe',
-            params: {
-                events: [
-                'Runtime.*',
-                'DOM.*',
-                'CSS.*',
-                'DOMDebugger.*',
-                'Network.*',
-                'Page.*',
-                'Target.*',
-                'Overlay.*',
-                ],
-            },
-        };
-        if (this.socket) {
-            this.socket.send(JSON.stringify(registrationMessage));
-        }
     }
 }
