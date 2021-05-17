@@ -15,7 +15,7 @@ export class PanelSocket extends EventEmitter {
     private messages: string[] = [];
     private isCDPShared = false;
 
-    constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback, isCDPShared: boolean = false) {
+    constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback, isCDPShared = false) {
         super();
         this.targetUrl = targetUrl;
         this.postMessageToDevTools = postMessageToDevTools;
@@ -132,9 +132,9 @@ export class PanelSocket extends EventEmitter {
                 'Page.*',
                 'Target.*',
                 'Overlay.*',
-                ]
-            }
-        }
+                ],
+            },
+        };
         if (this.socket) {
             this.socket.send(JSON.stringify(registrationMessage));
         }

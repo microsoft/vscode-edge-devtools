@@ -163,48 +163,6 @@ export function activate(context: vscode.ExtensionContext): void {
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
 }
 
-export async function attachToCurrentDebugTarget(
-    context: vscode.ExtensionContext): Promise<void> {
-    if (!telemetryReporter) {
-        telemetryReporter = createTelemetryReporter(context);
-    }
-
-    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
-
-    // Attempt to attach to active CDP target
-    const session = vscode.debug.activeDebugSession;
-    if (!session) {
-        const errorMessage = 'No active debug session';
-        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
-        vscode.window.showErrorMessage(errorMessage);
-        return;
-    }
-
-    let targetWebsocketUrl;
-    try {
-        const addr: any = await vscode.commands.executeCommand(
-        'extension.js-debug.requestCDPProxy',
-        session.id,
-        );
-        const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
-        targetWebsocketUrl = formed;
-    } catch (e) {
-        vscode.window.showErrorMessage(e.message);
-    }
-
-    if (targetWebsocketUrl) {
-        // Auto connect to found target
-        telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
-        let runtimeConfig = getRuntimeConfig();
-        runtimeConfig.isCDPShared = true;
-        DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
-    } else {
-        const errorMessage = 'Unable to attach DevTools to current debug session.';
-        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
-        vscode.window.showErrorMessage(errorMessage);
-    }
-}
-
 export async function attach(
     context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
     if (!telemetryReporter) {
@@ -293,6 +251,49 @@ export async function attach(
             telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
         }
     } while (useRetry && Date.now() - startTime < timeout);
+}
+
+export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext): Promise<void> {
+    if (!telemetryReporter) {
+        telemetryReporter = createTelemetryReporter(context);
+    }
+
+    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
+
+    // Attempt to attach to active CDP target
+    const session = vscode.debug.activeDebugSession;
+    if (!session) {
+        const errorMessage = 'No active debug session';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        vscode.window.showErrorMessage(errorMessage);
+        return;
+    }
+
+    let targetWebsocketUrl;
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const addr: any = await vscode.commands.executeCommand(
+        'extension.js-debug.requestCDPProxy',
+        session.id,
+        );
+        const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
+        targetWebsocketUrl = formed;
+    } catch (e) {
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: e.message});
+        vscode.window.showErrorMessage(e.message);
+    }
+
+    if (targetWebsocketUrl) {
+        // Auto connect to found target
+        telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
+        const runtimeConfig = getRuntimeConfig();
+        runtimeConfig.isCDPShared = true;
+        DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+    } else {
+        const errorMessage = 'Unable to attach DevTools to current debug session.';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        vscode.window.showErrorMessage(errorMessage);
+    }
 }
 
 export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>): Promise<void> {
