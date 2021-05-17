@@ -290,7 +290,8 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
             telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: e.message});
             void vscode.window.showErrorMessage(e.message);
         }
-        return;
+        // Throw remaining unhandled exceptions
+        throw e;
     }
 
     if (targetWebsocketUrl) {
