@@ -10,7 +10,7 @@ export type IDevToolsPostMessageCallback = (e: WebSocketEvent, message?: string)
 export class PanelSocket extends EventEmitter {
     private readonly targetUrl: string;
     private readonly postMessageToDevTools: IDevToolsPostMessageCallback;
-    private socket: WebSocket | undefined;
+    protected socket: WebSocket | undefined;
     private isConnected = false;
     private messages: string[] = [];
 
