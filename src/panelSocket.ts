@@ -13,7 +13,7 @@ export class PanelSocket extends EventEmitter {
     private socket: WebSocket | undefined;
     private isConnected = false;
     private messages: string[] = [];
-    private isCDPShared = false
+    private isCDPShared = false;
 
     constructor(targetUrl: string, postMessageToDevTools: IDevToolsPostMessageCallback, isCDPShared: boolean = false) {
         super();
@@ -76,7 +76,6 @@ export class PanelSocket extends EventEmitter {
         this.socket.onmessage = ev => this.onMessage(ev);
         this.socket.onerror = () => this.onError();
         this.socket.onclose = () => this.onClose();
-
     }
 
     private onOpen() {
@@ -122,20 +121,22 @@ export class PanelSocket extends EventEmitter {
     private registerForCDPEvents() {
         // register for custom events from jsdebug:
         const registrationMessage = {
-            method: "JsDebug.subscribe",
+            method: 'JsDebug.subscribe',
             params: {
                 events: [
-                "Runtime.*",
-                "DOM.*",
-                "CSS.*",
-                "DOMDebugger.*",
-                "Network.*",
-                "Page.*",
-                "Target.*",
-                "Overlay.*"
+                'Runtime.*',
+                'DOM.*',
+                'CSS.*',
+                'DOMDebugger.*',
+                'Network.*',
+                'Page.*',
+                'Target.*',
+                'Overlay.*',
                 ]
             }
         }
-        this.socket?.send(JSON.stringify(registrationMessage));
+        if (this.socket) {
+            this.socket.send(JSON.stringify(registrationMessage));
+        }
     }
 }

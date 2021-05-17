@@ -174,7 +174,9 @@ export async function attachToCurrentDebugTarget(
     // Attempt to attach to active CDP target
     const session = vscode.debug.activeDebugSession;
     if (!session) {
-        vscode.window.showErrorMessage('No active debug session');
+        const errorMessage = 'No active debug session';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        vscode.window.showErrorMessage(errorMessage);
         return;
     }
 
@@ -197,7 +199,9 @@ export async function attachToCurrentDebugTarget(
         runtimeConfig.isCDPShared = true;
         DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
     } else {
-        vscode.window.showErrorMessage('Unable to attach DevTools to current debug session.');
+        const errorMessage = 'Unable to attach DevTools to current debug session.';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        vscode.window.showErrorMessage(errorMessage);
     }
 }
 
