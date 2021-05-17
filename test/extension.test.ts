@@ -77,32 +77,34 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(13);
-            expect(commandMock).toHaveBeenCalledTimes(12);
+            expect(context.subscriptions.length).toBe(14);
+            expect(commandMock).toHaveBeenCalledTimes(13);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
                 .toHaveBeenNthCalledWith(2, `${SETTINGS_STORE_NAME}.launch`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(3, `${SETTINGS_VIEW_NAME}.launch`, expect.any(Function));
+                .toHaveBeenNthCalledWith(3, `${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(4, `${SETTINGS_VIEW_NAME}.refresh`, expect.any(Function));
+                .toHaveBeenNthCalledWith(4, `${SETTINGS_VIEW_NAME}.launch`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(5, `${SETTINGS_VIEW_NAME}.attach`, expect.any(Function));
+                .toHaveBeenNthCalledWith(5, `${SETTINGS_VIEW_NAME}.refresh`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(6, `${SETTINGS_VIEW_NAME}.openSettings`, expect.any(Function));
+                .toHaveBeenNthCalledWith(6, `${SETTINGS_VIEW_NAME}.attach`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(7, `${SETTINGS_VIEW_NAME}.viewChangelog`, expect.any(Function));
+                .toHaveBeenNthCalledWith(7, `${SETTINGS_VIEW_NAME}.openSettings`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(8, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
+                .toHaveBeenNthCalledWith(8, `${SETTINGS_VIEW_NAME}.viewChangelog`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(9, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
+                .toHaveBeenNthCalledWith(9, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(10, `${SETTINGS_VIEW_NAME}.configureLaunchJson`, expect.any(Function));
+                .toHaveBeenNthCalledWith(10, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(11, `${SETTINGS_VIEW_NAME}.launchProject`, expect.any(Function));
+                .toHaveBeenNthCalledWith(11, `${SETTINGS_VIEW_NAME}.configureLaunchJson`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(12, `${SETTINGS_VIEW_NAME}.viewDocumentation`, expect.any(Function)); 
+                .toHaveBeenNthCalledWith(12, `${SETTINGS_VIEW_NAME}.launchProject`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(13, `${SETTINGS_VIEW_NAME}.viewDocumentation`, expect.any(Function));
             expect(mockRegisterTree)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
@@ -151,15 +153,15 @@ describe("extension", () => {
                 return { callback: commandMock.mock.calls[index][1], thisObj: commandMock.mock.instances[index] };
             }
 
-            const refresh = getCommandCallback(3);
+            const refresh = getCommandCallback(4);
             refresh.callback.call(refresh.thisObj);
             expect(mockProviderRefresh).toHaveBeenCalled();
 
-            const attach = getCommandCallback(4);
+            const attach = getCommandCallback(5);
             attach.callback.call(attach.thisObj, { websocketUrl: "" });
             expect(mockPanelShow).toHaveBeenCalled();
 
-            const copy = getCommandCallback(8);
+            const copy = getCommandCallback(9);
             copy.callback.call(copy.thisObj, { tooltip: "something" });
             expect(mockClipboard).toHaveBeenCalledWith("something");
         });
