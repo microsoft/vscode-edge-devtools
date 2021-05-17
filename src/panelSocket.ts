@@ -78,7 +78,9 @@ export class PanelSocket extends EventEmitter {
 
     protected onOpen(): void {
         this.isConnected = true;
+
         this.postMessageToDevTools('open');
+
         if (this.socket) {
             // Forward any cached messages onto the real websocket
             for (const message of this.messages) {
