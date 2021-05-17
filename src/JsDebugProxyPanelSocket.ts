@@ -10,7 +10,7 @@ export class JsDebugProxyPanelSocket extends PanelSocket {
     /**
      * @override
      */
-    protected onOpen() {
+    protected onOpen(): void {
         if (this.socket) {
             this.registerForCDPEvents();
         }

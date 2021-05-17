@@ -76,7 +76,7 @@ export class PanelSocket extends EventEmitter {
         this.socket.onclose = () => this.onClose();
     }
 
-    protected onOpen() {
+    protected onOpen(): void {
         this.isConnected = true;
         this.postMessageToDevTools('open');
         if (this.socket) {
