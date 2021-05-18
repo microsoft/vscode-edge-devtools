@@ -27,6 +27,8 @@ import {
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
+    getActiveDebugSessionId,
+    getJsDebugCDPProxyWebsocketUrl,
 } from './utils';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
@@ -34,11 +36,6 @@ let browserInstance: Browser;
 let launchConfig: LaunchConfig;
 let cdpTargetsProvider: CDPTargetsProvider;
 
-interface RequestCDPProxyResult {
-    host: string;
-    port: number;
-    path: string;
-}
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -265,42 +262,21 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
     }
 
     telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
-    let sessionId = debugSessionId;
+    let sessionId = debugSessionId || getActiveDebugSessionId();
 
-    if (!debugSessionId) {
-        // Attempt to attach to active CDP target
-        const session = vscode.debug.activeDebugSession;
-        if (!session) {
-            const errorMessage = 'No active debug session';
-            telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
-            void vscode.window.showErrorMessage(errorMessage);
-            return;
-        }
-        sessionId = session.id;
-    }
-
-    let targetWebsocketUrl;
-    try {
-        const addr: RequestCDPProxyResult|undefined = await vscode.commands.executeCommand(
-        'extension.js-debug.requestCDPProxy',
-        sessionId,
-        );
-        if (addr) {
-            const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
-            targetWebsocketUrl = formed;
-        }
-    } catch (e) {
-        if (e instanceof Error) {
-            telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: e.message});
-            void vscode.window.showErrorMessage(e.message);
-        } else {
-            // Throw remaining unhandled exceptions
-            throw e;
-        }
+    if (!sessionId) {
+        const errorMessage = 'No active debug session';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        void vscode.window.showErrorMessage(errorMessage);
         return;
     }
 
-    if (targetWebsocketUrl) {
+    let targetWebsocketUrl = await getJsDebugCDPProxyWebsocketUrl(sessionId);
+
+    if (targetWebsocketUrl instanceof Error) {
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: targetWebsocketUrl.message});
+        void vscode.window.showErrorMessage(targetWebsocketUrl.message);
+    } else if (targetWebsocketUrl) {
         // Auto connect to found target
         telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
         const runtimeConfig = getRuntimeConfig();

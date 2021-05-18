@@ -61,6 +61,12 @@ export interface IStringDictionary<T> {
     [name: string]: T;
 }
 
+export interface IRequestCDPProxyResult {
+    host: string;
+    port: number;
+    path: string;
+}
+
 export type Platform = 'Windows' | 'OSX' | 'Linux';
 
 export const SETTINGS_STORE_NAME = 'vscode-edge-devtools';
@@ -259,6 +265,41 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     }
 
     return { hostname, port, useHttps, defaultUrl, userDataDir, timeout };
+}
+
+/**
+ * Get the session id for the currently active VSCode debugging session
+ */
+export function getActiveDebugSessionId(): string|undefined {
+    // Attempt to attach to active CDP target
+    const session = vscode.debug.activeDebugSession;
+    return session ? session.id : undefined;
+}
+
+/**
+ * Create the target websocket url for attaching to the shared CDP instance exposed by
+ * the JavaScript Debugging Extension for VSCode.
+ * https://github.com/microsoft/vscode-js-debug/blob/main/CDP_SHARE.md
+ *
+ * @param debugSessionId The session id of the active VSCode debugging session
+ */
+export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Promise<string|Error|undefined> {
+    try {
+        const addr: IRequestCDPProxyResult|undefined = await vscode.commands.executeCommand(
+        'extension.js-debug.requestCDPProxy',
+        debugSessionId,
+        );
+        if (addr) {
+            return `ws://${addr.host}:${addr.port}${addr.path || ''}`;
+        }
+    } catch (e) {
+        if (e instanceof Error) {
+            return e;
+        } else {
+            // Throw remaining unhandled exceptions
+            throw e;
+        }
+    }
 }
 
 /**

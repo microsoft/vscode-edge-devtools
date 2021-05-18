@@ -56,11 +56,6 @@
                 "category": "Microsoft Edge Tools"
             },
             {
-                "command": "vscode-edge-devtools.attachToCurrentDebugTarget",
-                "category": "Microsoft Edge Tools",
-                "title": "Attach to active debug target"
-            },
-            {
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "Microsoft Edge Tools",
                 "title": "Open a new tab",

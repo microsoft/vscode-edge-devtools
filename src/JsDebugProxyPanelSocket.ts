@@ -18,8 +18,8 @@ export class JsDebugProxyPanelSocket extends PanelSocket {
     }
 
     private registerForJsDebugSharedCDPEvents() {
-        // register for custom events from jsdebug:
-        // TODO before checkin: add docs here
+        // Register for CDP events from jsdebug:
+        // https://github.com/microsoft/vscode-js-debug/blob/main/CDP_SHARE.md
         const registrationMessage = {
             method: 'JsDebug.subscribe',
             params: {
