@@ -42,7 +42,7 @@ describe("extension", () => {
                 getRuntimeConfig: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getLaunchJson: jest.fn(),
-                getJsDebugCDPProxyWebsocketUrl: jest.fn().mockResolvedValue('ws://127.0.0.1:9222/uniquePath'),
+                getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 getActiveDebugSessionId: jest.fn(),
             };
             jest.doMock("../src/utils", () => mockUtils);
@@ -401,6 +401,7 @@ describe("extension", () => {
                 openNewTab: jest.fn().mockResolvedValue(null),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getLaunchJson: jest.fn(),
+                getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 buttonCode: { launch: '' },
             };
 
