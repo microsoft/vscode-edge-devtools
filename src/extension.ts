@@ -56,8 +56,8 @@ export function activate(context: vscode.ExtensionContext): void {
         void launch(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (): void => {
-        void attachToCurrentDebugTarget(context);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId): void => {
+        void attachToCurrentDebugTarget(context, debugSessionId);
     }));
 
     // Register the launch provider
@@ -259,27 +259,31 @@ export async function attach(
     } while (useRetry && Date.now() - startTime < timeout);
 }
 
-export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext): Promise<void> {
+export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext, debugSessionId?: string): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
 
     telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
+    let sessionId = debugSessionId;
 
-    // Attempt to attach to active CDP target
-    const session = vscode.debug.activeDebugSession;
-    if (!session) {
-        const errorMessage = 'No active debug session';
-        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
-        void vscode.window.showErrorMessage(errorMessage);
-        return;
+    if (!debugSessionId) {
+        // Attempt to attach to active CDP target
+        const session = vscode.debug.activeDebugSession;
+        if (!session) {
+            const errorMessage = 'No active debug session';
+            telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+            void vscode.window.showErrorMessage(errorMessage);
+            return;
+        }
+        sessionId = session.id;
     }
 
     let targetWebsocketUrl;
     try {
         const addr: RequestCDPProxyResult|undefined = await vscode.commands.executeCommand(
         'extension.js-debug.requestCDPProxy',
-        session.id,
+        sessionId,
         );
         if (addr) {
             const formed = `ws://${addr.host}:${addr.port}${addr.path || ''}`;
