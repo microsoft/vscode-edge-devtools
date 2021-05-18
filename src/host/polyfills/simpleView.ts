@@ -109,6 +109,7 @@ export function applyStylesToggleFocusPatch(content: string): string | null {
     const replacementText = `
         const sectionIndex = this._parentPane.focusedSectionIndex();
         contextMenu.defaultSection().appendCheckboxItem(ls \`Toggle property and continue editing\`, async () => {
+            ARIAUtils.alert('Toggle property and continue editing selected', this.nameElement);
     `;
     return replaceInSourceCode(content, pattern, replacementText);
 }
