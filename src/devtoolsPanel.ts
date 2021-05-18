@@ -14,6 +14,7 @@ import {
     TelemetryData,
     WebSocketEvent,
 } from './common/webviewEvents';
+import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
 import {
     applyPathMapping,
@@ -55,7 +56,11 @@ export class DevToolsPanel {
         this.consoleOutput.appendLine('');
 
         // Hook up the socket events
-        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
+        if (this.config.isJsDebugProxiedCDPConnection) {
+            this.panelSocket = new JsDebugProxyPanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
+        } else {
+            this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
+        }
         this.panelSocket.on('ready', () => this.onSocketReady());
         this.panelSocket.on('websocket', () => this.onSocketMessage());
         this.panelSocket.on('telemetry', msg => this.onSocketTelemetry(msg));

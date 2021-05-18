@@ -38,6 +38,7 @@
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
         "onCommand:vscode-edge-devtools.launch",
+        "onCommand:vscode-edge-devtools.attachToCurrentDebugTarget",
         "onWebviewPanel:vscode-edge-devtools",
         "onView:vscode-edge-devtools-view.targets",
         "onDebug"
@@ -596,7 +597,9 @@
         "download-edge": "node scripts/downloadAndExtractEdge.js"
     },
     "dependencies": {
+        "bufferutil": "4.0.1",
         "puppeteer-core": "9.1.1",
+        "utf-8-validate": "5.0.2",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.7",
         "ws": "7.4.5",
