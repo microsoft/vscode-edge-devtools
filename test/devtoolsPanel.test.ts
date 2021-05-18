@@ -8,6 +8,7 @@ import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 import { TelemetryData, webviewEventNames } from "../src/common/webviewEvents";
 import { PanelSocket } from "../src/panelSocket";
+import { JsDebugProxyPanelSocket } from "../src/JsDebugProxyPanelSocket";
 import {
     createFakeExtensionContext,
     createFakeTelemetryReporter,
@@ -26,6 +27,8 @@ describe("devtoolsPanel", () => {
     let mockPanel: Mocked<WebviewPanel>;
     let mockPanelSocket: Mocked<PanelSocket>;
     let mockPanelSocketFactory: { PanelSocket: jest.Mock };
+    let mockJsDebugProxyPanelSocket: Mocked<JsDebugProxyPanelSocket>;
+    let mockJsDebugProxyPanelSocketFactory: { JsDebugProxyPanelSocket: jest.Mock };
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
     let mockRuntimeConfig: IRuntimeConfig;
 
@@ -65,6 +68,17 @@ describe("devtoolsPanel", () => {
             PanelSocket: jest.fn(() => mockPanelSocket),
         };
         jest.doMock("../src/panelSocket", () => mockPanelSocketFactory);
+
+        mockJsDebugProxyPanelSocket = {
+            dispose: jest.fn(),
+            on: jest.fn(),
+            onMessageFromWebview: jest.fn(),
+        } as Mocked<JsDebugProxyPanelSocket>;
+
+        mockJsDebugProxyPanelSocketFactory = {
+            JsDebugProxyPanelSocket: jest.fn(() => mockJsDebugProxyPanelSocket),
+        };
+        jest.doMock("../src/JsDebugProxyPanelSocket", () => mockJsDebugProxyPanelSocketFactory);
 
         mockWebviewEvents = {
             encodeMessageForChannel: jest.fn(),
@@ -519,6 +533,14 @@ describe("devtoolsPanel", () => {
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
                 expect(mockVsCode.window.showErrorMessage).toHaveBeenCalledWith(
                     expect.stringContaining(expectedRequest.url));
+            });
+
+            it("creates a JsDebugProxyPanelSocket when config requires it", async () => {
+                mockRuntimeConfig.isJsDebugProxiedCDPConnection = true;
+                const dtp = await import("../src/devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                expect(mockJsDebugProxyPanelSocket.on).toHaveBeenCalled();
             });
         });
     });

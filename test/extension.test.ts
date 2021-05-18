@@ -42,6 +42,8 @@ describe("extension", () => {
                 getRuntimeConfig: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getLaunchJson: jest.fn(),
+                getJsDebugCDPProxyWebsocketUrl: jest.fn().mockResolvedValue('ws://127.0.0.1:9222/uniquePath'),
+                getActiveDebugSessionId: jest.fn(),
             };
             jest.doMock("../src/utils", () => mockUtils);
             jest.doMock("../src/launchDebugProvider");
@@ -535,6 +537,95 @@ describe("extension", () => {
                     expect.objectContaining({ exe: t.exe }),
                 );
             }
+        });
+    });
+    describe("attachToCurrentDebugTarget", () => {
+        let mocks: {
+            panel: any,
+            utils: Partial<Mocked<typeof import("../src/utils")>>,
+            vscode: any,
+        };
+        let mockTelemetry: Mocked<Readonly<TelemetryReporter>>;
+        const websocketUrl = 'ws://127.0.0.1:9222/uniquePath';
+
+        beforeEach(() => {
+            mockTelemetry = createFakeTelemetryReporter();
+
+            mocks = {
+                panel: {
+                    DevToolsPanel: {
+                        createOrShow: jest.fn(),
+                    },
+                },
+                utils: {
+                    createTelemetryReporter: jest.fn((_: ExtensionContext) => mockTelemetry),
+                    getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),
+                    getActiveDebugSessionId: jest.fn().mockReturnValue('vscode-active-debug-session-id'),
+                    getJsDebugCDPProxyWebsocketUrl: jest.fn().mockResolvedValue(websocketUrl),
+                },
+                vscode: createFakeVSCode(),
+            };
+
+            jest.doMock("vscode", () => mocks.vscode, { virtual: true });
+            jest.doMock("../src/devtoolsPanel", () => mocks.panel);
+            jest.doMock("../src/utils", () => mocks.utils);
+            jest.resetModules();
+        });
+
+        it("creates a telemetry reporter", async () => {
+            const newExtension = await import("../src/extension");
+
+            // Activation should create a new reporter
+            await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
+            expect(mocks.utils.createTelemetryReporter).toHaveBeenCalled();
+        });
+
+        it("finds the active debug session id if one is not provided", async () => {
+            const newExtension = await import("../src/extension");
+
+            await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
+            expect(mocks.utils.getActiveDebugSessionId).toHaveBeenCalled();
+        });
+
+        it("throws an error if there is no active debug session", async () => {
+            const expectedErrorMessage = 'No active debug session';
+
+            mocks.utils.getActiveDebugSessionId!.mockReturnValueOnce(undefined);
+            const newExtension = await import("../src/extension");
+
+            await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
+            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedErrorMessage));
+        });
+
+        it("creates a panel with a constructed url", async () => {
+            const newExtension = await import("../src/extension");
+
+            await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
+            expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
+            expect(mocks.panel.DevToolsPanel!.createOrShow).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                websocketUrl,
+                {...fakeRuntimeConfig, isJsDebugProxiedCDPConnection: true},
+            );
+        });
+
+        it("throws an error when unable to resolve the JsDebugCDPProxyWebSocketUrl", async () => {
+            mocks.utils.getJsDebugCDPProxyWebsocketUrl?.mockResolvedValueOnce(Error('Error Message'));
+            const newExtension = await import("../src/extension");
+
+            await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
+            expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
+            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining('Error Message'));
+        });
+
+        it("shows an error if JsDebugCDPProxyWebSocketUrl is undefined", async () => {
+            mocks.utils.getJsDebugCDPProxyWebsocketUrl?.mockResolvedValueOnce(undefined);
+            const newExtension = await import("../src/extension");
+
+            await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
+            expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
+            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining('Unable to attach DevTools to current debug session.'));
         });
     });
 });
