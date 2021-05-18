@@ -295,10 +295,9 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
     } catch (e) {
         if (e instanceof Error) {
             return e;
-        } else {
-            // Throw remaining unhandled exceptions
-            throw e;
         }
+        // Throw remaining unhandled exceptions
+        throw e;
     }
 }
 

@@ -262,7 +262,7 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
     }
 
     telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
-    let sessionId = debugSessionId || getActiveDebugSessionId();
+    const sessionId = debugSessionId || getActiveDebugSessionId();
 
     if (!sessionId) {
         const errorMessage = 'No active debug session';
@@ -271,7 +271,7 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
         return;
     }
 
-    let targetWebsocketUrl = await getJsDebugCDPProxyWebsocketUrl(sessionId);
+    const targetWebsocketUrl = await getJsDebugCDPProxyWebsocketUrl(sessionId);
 
     if (targetWebsocketUrl instanceof Error) {
         telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: targetWebsocketUrl.message});
