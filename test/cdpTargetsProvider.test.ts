@@ -85,6 +85,7 @@ describe("CDPTargetsProvider", () => {
                 port: "port",
                 useHttps: false,
             }),
+            isLocalResource: jest.fn(),
         };
         jest.doMock("../src/utils", () => mockUtils);
         jest.doMock("../src/cdpTarget", () => ({

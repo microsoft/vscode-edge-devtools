@@ -1022,4 +1022,18 @@ describe("utils", () => {
             expect(result.message).toBe('error message');
         });
     });
+
+    describe("isLocalResource", () => {
+        it("tests if a http URL returns false", async () => {
+            let result = utils.isLocalResource('http://bing.com');
+            expect(result).toBe(false);
+            result = utils.isLocalResource('https://www.bing.com');
+            expect(result).toBe(false);
+        });
+
+        it("tests if a local resource path returns true", async () => {
+            let result = utils.isLocalResource('g:/user/test.ico');
+            expect(result).toBe(true);
+        });
+    });
 });
