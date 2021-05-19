@@ -6,7 +6,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import * as path from 'path';
 import * as fs from 'fs';
 import { CDPTarget } from './cdpTarget';
-import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, SETTINGS_STORE_NAME } from './utils';
+import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, isLocalResource, SETTINGS_STORE_NAME } from './utils';
 import { IncomingMessage } from 'http';
 import https = require('https');
 import { setLaunchConfig } from './extension';
@@ -57,7 +57,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
 
                     const iconResultsArray = await Promise.all(responseIconPromiseArray);
                     for (const actualTarget of iconResultsArray) {
-                        if (actualTarget && actualTarget.faviconUrl) {
+                        if (isLocalResource(actualTarget.faviconUrl)) {
                             targets.push(new CDPTarget(actualTarget, '', this.extensionPath, actualTarget.faviconUrl));
                         } else {
                             targets.push(new CDPTarget(actualTarget, '', this.extensionPath));
