@@ -1,3 +1,7 @@
+## 1.1.9
+* **[Feature]**: New integration with VSCode's JavaScript Debugger for attaching Microsoft Edge Devtools to the active debug target - [PR #391](https://github.com/microsoft/vscode-edge-devtools/pull/391)
+* **[Bug Fix]**: Accessibility - Screen readers now announces a success message for when using the "Toggle Property and continue editing" option in the style property context menu - [PR #390](https://github.com/microsoft/vscode-edge-devtools/pull/390)
+
 ## 1.1.8
 * **[Feature]**: New default start page when launching Edge DevTools with useful instructions and links - [PR #350](https://github.com/microsoft/vscode-edge-devtools/pull/350)
 * **[Feature]**: New landing sidebar view for empty target lists with buttons to help launch a target or set up the launch.json file - [PR #357](https://github.com/microsoft/vscode-edge-devtools/pull/357)
