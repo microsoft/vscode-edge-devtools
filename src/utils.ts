@@ -588,6 +588,24 @@ export function applyPathMapping(
 }
 
 /**
+ * Verifies if a given path points to a local resource.
+ * @param path the path to be tested
+ * @returns True if the path points to a local resource false otherwise.
+ */
+export function isLocalResource(path: string): boolean {
+    try {
+        const pathURL = new URL(path);
+        if (pathURL.protocol && !pathURL.protocol.includes('http')) {
+            return true;
+        }
+    } catch {
+        return false;
+    }
+
+    return false;
+}
+
+/**
  * Verifies if the headless checkbox in extension settings is enabled.
  */
 function isHeadlessEnabled() {
