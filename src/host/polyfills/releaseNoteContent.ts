@@ -3,6 +3,18 @@
 
 export const extensionHighlights = `[
     {
+        title: ls\`New integration with VSCode's JavaScript Debugger\`,
+        subtitle:
+            ls\`JavaScript Debugger can now ask Microsoft Edge Devtools to attach to the active debug target.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/391',
+    },
+    {
+        title: ls\`Bug Fix for accessibility in the styles property pane\`,
+        subtitle:
+            ls\`Screen readers now announces a success message for when using the "Toggle Property and continue editing" option in the style property context menu.\`,
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/390',
+    },
+    {
         title: ls\`New default start page when launching Edge DevTools\`,
         subtitle:
             ls\`Launch page contains useful links and instructions to help get you started.\`,
@@ -25,18 +37,6 @@ export const extensionHighlights = `[
         subtitle:
             ls\`Created new settings checkbox that will hide or show service and shared workers in the target list (default to hide).\`,
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/284',
-    },
-    {
-        title: ls\`Target list now auto refreshes\`,
-        subtitle:
-            ls\`Creation and deletion of targets will trigger a refresh on the target list.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/300',
-    },
-    {
-        title: ls\`Bug fix for multiple DevTools console output channels\`,
-        subtitle:
-            ls\`Each DevTools instance will create a console output channel and delete it upon closing the DevTools window.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/292',
     },
 ],`;
 
