@@ -986,4 +986,54 @@ describe("utils", () => {
             })).toEqual(pathResolve("/project/src/app.js"));
         });
     });
+
+    describe("getActiveDebugSessionId", () => {
+        it("retrieves the debug session id from vscode properly", () => {
+            expect(utils.getActiveDebugSessionId()).toBe('vscode-session-debug-id');
+        });
+
+        it("returns undefined when there is not an active vscode session", async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.debug.activeDebugSession = undefined;
+            expect(utils.getActiveDebugSessionId()).toBe(undefined);
+        });
+    });
+
+    describe("getJsDebugCDPProxyWebsocketUrl", () => {
+        it("creates a proper websocket url from a debug session id", async () => {
+            const expectedAddr = {
+                host: '127.0.0.1',
+                port: '9222',
+                path: '/uniquePath'
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.commands.executeCommand.mockImplementationOnce((name: string, sessionId: string) => {return expectedAddr;});
+
+            const result = await utils.getJsDebugCDPProxyWebsocketUrl('debugSessionId');
+            expect(result).toBe('ws://127.0.0.1:9222/uniquePath');
+        });
+
+        it("returns an error if the VSCode execute command throws an error", async () => {
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.commands.executeCommand.mockImplementationOnce((name: string, sessionId: string) => {throw new Error("error message")});
+
+            const result = await utils.getJsDebugCDPProxyWebsocketUrl('debugSessionId') as Error;
+            expect(result).toBeInstanceOf(Error);
+            expect(result.message).toBe('error message');
+        });
+    });
+
+    describe("isLocalResource", () => {
+        it("tests if a http URL returns false", async () => {
+            let result = utils.isLocalResource('http://bing.com');
+            expect(result).toBe(false);
+            result = utils.isLocalResource('https://www.bing.com');
+            expect(result).toBe(false);
+        });
+
+        it("tests if a local resource path returns true", async () => {
+            let result = utils.isLocalResource('g:/user/test.ico');
+            expect(result).toBe(true);
+        });
+    });
 });

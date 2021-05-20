@@ -55,9 +55,16 @@ export interface IRuntimeConfig {
     sourceMapPathOverrides: IStringDictionary<string>;
     sourceMaps: boolean;
     webRoot: string;
+    isJsDebugProxiedCDPConnection: boolean;
 }
 export interface IStringDictionary<T> {
     [name: string]: T;
+}
+
+export interface IRequestCDPProxyResult {
+    host: string;
+    port: number;
+    path: string;
 }
 
 export type Platform = 'Windows' | 'OSX' | 'Linux';
@@ -258,6 +265,40 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     }
 
     return { hostname, port, useHttps, defaultUrl, userDataDir, timeout };
+}
+
+/**
+ * Get the session id for the currently active VSCode debugging session
+ */
+export function getActiveDebugSessionId(): string|undefined {
+    // Attempt to attach to active CDP target
+    const session = vscode.debug.activeDebugSession;
+    return session ? session.id : undefined;
+}
+
+/**
+ * Create the target websocket url for attaching to the shared CDP instance exposed by
+ * the JavaScript Debugging Extension for VSCode.
+ * https://github.com/microsoft/vscode-js-debug/blob/main/CDP_SHARE.md
+ *
+ * @param debugSessionId The session id of the active VSCode debugging session
+ */
+export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Promise<string|Error|undefined> {
+    try {
+        const addr: IRequestCDPProxyResult|undefined = await vscode.commands.executeCommand(
+        'extension.js-debug.requestCDPProxy',
+        debugSessionId,
+        );
+        if (addr) {
+            return `ws://${addr.host}:${addr.port}${addr.path || ''}`;
+        }
+    } catch (e) {
+        if (e instanceof Error) {
+            return e;
+        }
+        // Throw remaining unhandled exceptions
+        throw e;
+    }
 }
 
 /**
@@ -472,6 +513,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         sourceMapPathOverrides: resolvedOverrides,
         sourceMaps,
         webRoot: resolvedWebRoot,
+        isJsDebugProxiedCDPConnection: false,
     };
 }
 
@@ -543,6 +585,24 @@ export function applyPathMapping(
     }
 
     return sourcePath;
+}
+
+/**
+ * Verifies if a given path points to a local resource.
+ * @param path the path to be tested
+ * @returns True if the path points to a local resource false otherwise.
+ */
+export function isLocalResource(path: string): boolean {
+    try {
+        const pathURL = new URL(path);
+        if (pathURL.protocol && !pathURL.protocol.includes('http')) {
+            return true;
+        }
+    } catch {
+        return false;
+    }
+
+    return false;
 }
 
 /**

@@ -27,12 +27,15 @@ import {
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
+    getActiveDebugSessionId,
+    getJsDebugCDPProxyWebsocketUrl,
 } from './utils';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let launchConfig: LaunchConfig;
 let cdpTargetsProvider: CDPTargetsProvider;
+
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -48,6 +51,10 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, (): void => {
         void launch(context);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId): void => {
+        void attachToCurrentDebugTarget(context, debugSessionId);
     }));
 
     // Register the launch provider
@@ -247,6 +254,39 @@ export async function attach(
             telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
         }
     } while (useRetry && Date.now() - startTime < timeout);
+}
+
+export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext, debugSessionId?: string): Promise<void> {
+    if (!telemetryReporter) {
+        telemetryReporter = createTelemetryReporter(context);
+    }
+
+    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
+    const sessionId = debugSessionId || getActiveDebugSessionId();
+
+    if (!sessionId) {
+        const errorMessage = 'No active debug session';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        void vscode.window.showErrorMessage(errorMessage);
+        return;
+    }
+
+    const targetWebsocketUrl = await getJsDebugCDPProxyWebsocketUrl(sessionId);
+
+    if (targetWebsocketUrl instanceof Error) {
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: targetWebsocketUrl.message});
+        void vscode.window.showErrorMessage(targetWebsocketUrl.message);
+    } else if (targetWebsocketUrl) {
+        // Auto connect to found target
+        telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
+        const runtimeConfig = getRuntimeConfig();
+        runtimeConfig.isJsDebugProxiedCDPConnection = true;
+        DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+    } else {
+        const errorMessage = 'Unable to attach DevTools to current debug session.';
+        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        void vscode.window.showErrorMessage(errorMessage);
+    }
 }
 
 export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>): Promise<void> {
