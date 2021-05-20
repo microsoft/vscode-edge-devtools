@@ -68,10 +68,3 @@ coverage/
 # favicons - we want to ignore any downloaded .ico files but keep the directory that stores them.
 resources/favicons/*
 !resources/favicons/.gitkeep
-<<<<<<< Updated upstream
-=======
-.DS_Store
-.DS_Store
-.DS_Store
-.DS_Store
->>>>>>> Stashed changes
