@@ -34,8 +34,8 @@ You can use the extension either in an own window or embedded in your editor.
 * [Reporting Security Issues](#reporting-security-issues)
 
 
-## Supported Features
-
+## Feature Overview
+ 
 * Fully featured Elements and Network tool with views for HTML, CSS, accessibility and more.
 * Screen-casting feature to allow you to see your page without leaving Visual Studio Code.
 * Debug configurations for launching Microsoft Edge browser in remote-debugging mode and auto attaching the tools.
@@ -47,21 +47,20 @@ You can use the extension either in an own window or embedded in your editor.
 
 ## Getting Started
 
-For use inside Visual Studio Code:
+### Prerequisites:
 
 1. Install any channel (Canary/Dev/etc.) of [Microsoft Edge](https://aka.ms/edgeinsider).
 1. Install the extension* [Microsoft Edge Tools](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools).
 1. Navigate to any project or open the folder containing the project you want to work on.
 
+### Launching the tool
+
+1. Click the `Microsoft Edge Tools` icon in the VSCode side bar.
+1. Click `Generate launch.json` in order to properly setup breakpoint debugging and proper source mapping. If your project already contains a launch.json file, ensure the ``type`` field  contains `"vscode-edge-devtools.debug"`.
+1. Click the `Launch Project` button to launch the browser.
+  
+
 ## Using the tools
-
-### Launching the browser via the side bar view
-
-* Start Microsoft Edge via the side bar
-  * Click the `Microsoft Edge Tools` view in the side bar.
-  * Click the `Open a new tab` icon to launch the browser (if it isn't open yet) and open a new tab.
-* Attach the Microsoft Edge Tools via the side bar view
-  * Click the `Attach` icon next to the tab to open the Microsoft Edge Tools.
 
 The extension operates in two modes - it can launch an instance of Microsoft Edge navigated to your app, or it can attach to a running instance of Microsoft Edge. Both modes requires you to be serving your web application from local web server, which is started from either a Visual Studio Code task or from your command-line. Using the `url` parameter you tell Visual Studio Code which URL to either open or launch in the browser.
 
@@ -141,6 +140,11 @@ You can see an example of the change in the following screencast:
 * `sourceMapPathOverrides`: A mapping of source paths from the sourcemap, to the locations of these sources on disk. 
 * `urlFilter`: A string that can contain wildcards that will be used for finding a browser target, for example, "localhost:*/app" will match either "http://localhost:123/app" or "http://localhost:456/app", but not "https://stackoverflow.com". This property will only be used if `url` and `file` are not specified.
 * `timeout`: The number of milliseconds that the Microsoft Edge Tools will keep trying to attach to the browser before timing out. Defaults to 10000ms.
+
+## FAQ
+
+1. How does this extension interact with the older JSDebugger Extension. 
+    1. The other JSDebugger Extension is deprecated and has been integrated in the default debugging experience in VSCode. 
 
 ## Contributing
 
