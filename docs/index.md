@@ -1,6 +1,27 @@
 
 # Microsoft Edge Developer Tools for Visual Studio Code
 
+This is the documentation of the Microsoft Edge Developer Tools for Visual Studio Code extension. You can [Download the extension](https:/aka.ms/devtools-for-code) and [check the source code](https://github.com/microsoft/vscode-edge-devtools/blob/user/chheilma-docs-folder/docs/index.md).
+
+## Table of Contents
+
+IF you want to learn more about the extension and how to use it, please choose from the following topics:
+
+* [Introduction](./index#introduction)
+* [Using the Extension](./using.md)
+* [Changing Extension Settings](./changing.md)
+* [Opening source files from the Elements tool](./opening-source-files.md)
+* [Using Sourcemaps](./sourcemaps.md)
+* [Setting up your project to show live changes in the extension](./live-changes.md)
+* [Getting Console information](./console.md)
+* [More information about the project](./index#more-information-about-the-project)
+  * [Contributing](./index#contributing)
+  * [Data and Telemetry](./index#data-and-telemetry)
+  * [Reporting security issues](./index#reporting-security-issues)
+
+
+## Introduction
+
 **Show the browser's Elements and Network tool inside the Visual Studio Code editor and use it to fix CSS issues with your site and inspect network activity.**
 
 ![Microsoft Edge Tools - Full window demo](/img/devtools-for-code-demo-full-window.gif)
@@ -8,20 +29,6 @@
 A Visual Studio Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, read console messages and view network requests. All without leaving Visual Studio Code.
 
 **Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
-
-* [Download the extension](https:/aka.ms/devtools-for-code)
-* [Get the source code](https://github.com/microsoft/vscode-edge-devtools/blob/user/chheilma-docs-folder/docs/index.md)
-
-## Table of Contents
-
-IF you want to learn more about the extension and how to use it, please choose from the following topics:
-
-* [Using the Extension](./using.md)
-* [Changing Extension Settings](./changing.md)
-* [Opening source files from the Elements tool](./opening-source-files.md)
-* [Using Sourcemaps](./sourcemaps.md)
-* [Setting up your project to show live changes in the extension](./live-changes.md)
-* [Getting Console information](./console.md)
 
 ## More information about the project 
 
