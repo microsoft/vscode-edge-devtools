@@ -9,7 +9,7 @@ IF you want to learn more about the extension and how to use it, please choose f
 
 * [Introduction](./index#introduction)
 * [Using the Extension](./using.md)
-* [Changing Extension Settings](./changing.md)
+* [Changing Extension Settings](./changing-settings.md)
 * [Opening source files from the Elements tool](./opening-source-files.md)
 * [Using Sourcemaps](./sourcemaps.md)
 * [Setting up your project to show live changes in the extension](./live-changes.md)
