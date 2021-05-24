@@ -1,4 +1,4 @@
-# Sourcemaps
+# Using Sourcemaps
 
 The elements tool uses sourcemaps to correctly open original source files when you click links in the UI, but sometimes the sourcemaps aren't generated properly and overrides are needed. In the config we support `sourceMapPathOverrides`, a mapping of source paths from the sourcemap, to the locations of these sources on disk. Useful when the sourcemap isn't accurate or can't be fixed in the build process.
 
@@ -49,3 +49,5 @@ Ionic and gulp-sourcemaps output a sourceRoot of `"/source/"` by default. If you
     "/source/*": "${workspaceFolder}/*"
 }
 ```
+
+Go [back to documentation](./index.md)

@@ -5,3 +5,5 @@ The extension automatically forwards messages from the [Developer Tools Console]
 ![CSS links in the elements tab and](/img/console-output.png)
 
 Notice that this is a read-only experience. You can't use the Console like you would in the browser Developer Tools.
+
+Go [back to documentation](./index.md)

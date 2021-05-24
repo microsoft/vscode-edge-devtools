@@ -14,3 +14,5 @@ The extension operates in two modes - it can launch an instance of Microsoft Edg
 You can now use the high-fidelity tools to tweak your CSS and inspect network calls and go directly back to your code without leaving the editor.
 
 ![Microsoft Edge Tools - Demo](/img/basic_usage.gif)
+
+Go [back to documentation](./index.md)
