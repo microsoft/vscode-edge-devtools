@@ -30,6 +30,7 @@ import {
     SETTINGS_VIEW_NAME,
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
+    reportUrlType,
 } from './utils';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
@@ -331,7 +332,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
 
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
         if (url !== SETTINGS_DEFAULT_URL) {
-            reportUrlType(url);
+            reportUrlType(url, telemetryReporter);
         }
         browserInstance.on('targetcreated', () => {
             cdpTargetsProvider.refresh();
@@ -341,7 +342,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         });
         browserInstance.on('targetchanged',  (target: Target) => {
             if (target.type() === 'page') {
-                reportUrlType(target.url());
+                reportUrlType(target.url(), telemetryReporter);
             }
         });
         await attach(context, url, config);
@@ -350,19 +351,4 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
 
 export function setLaunchConfig(): void {
     launchConfig = getLaunchJson();
-}
-
-function reportUrlType(url: string): void {
-    const localhostPattern = /^https?:\/\/localhost:/;
-    const ipPattern = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
-    const filePattern = /^file:\/\//;
-    let urlType;
-    if (localhostPattern.exec(url) || ipPattern.exec(url)) {
-        urlType = 'localhost';
-    } else if (filePattern.exec(url)) {
-        urlType = 'file';
-    } else {
-        urlType = 'other';
-    }
-    telemetryReporter.sendTelemetryEvent('user/browserNavigation', { 'urlType': urlType });
 }

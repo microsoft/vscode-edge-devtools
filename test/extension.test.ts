@@ -9,6 +9,7 @@ import {
     IRemoteTargetJson,
     IRuntimeConfig,
     removeTrailingSlash,
+    reportUrlType,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
 } from "../src/utils";
@@ -44,6 +45,7 @@ describe("extension", () => {
                 getLaunchJson: jest.fn(),
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 getActiveDebugSessionId: jest.fn(),
+                reportUrlType: jest.fn(reportUrlType),
             };
             jest.doMock("../src/utils", () => mockUtils);
             jest.doMock("../src/launchDebugProvider");
@@ -403,6 +405,7 @@ describe("extension", () => {
                 getLaunchJson: jest.fn(),
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 buttonCode: { launch: '' },
+                reportUrlType: jest.fn(),
             };
 
             mockPanel = {
