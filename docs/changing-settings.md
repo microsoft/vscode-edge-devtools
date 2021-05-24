@@ -20,6 +20,6 @@ You can see an example of the change in the following screencast:
 
 By default, the extension will show the Network Network Pane to inspect any network request of the attached browser. If you don't want this, you can turn it off in the settings and restart the extension.
 
-![Network section in the extension settings](../img/settings-network.png)
+![Network section in the extension settings](/img/settings-network.png)
 
 Go [back to documentation](./index.md)
