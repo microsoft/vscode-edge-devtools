@@ -45,6 +45,9 @@ export function createFakeVSCode() {
         },
         debug: {
             registerDebugConfigurationProvider: jest.fn(),
+            activeDebugSession: {
+                id: 'vscode-session-debug-id'
+            }
         },
         env: {
             clipboard: { writeText: jest.fn() },

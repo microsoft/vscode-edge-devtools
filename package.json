@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.1.8",
+    "version": "1.1.9",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -38,6 +38,7 @@
     "activationEvents": [
         "onCommand:vscode-edge-devtools.attach",
         "onCommand:vscode-edge-devtools.launch",
+        "onCommand:vscode-edge-devtools.attachToCurrentDebugTarget",
         "onWebviewPanel:vscode-edge-devtools",
         "onView:vscode-edge-devtools-view.targets",
         "onDebug"
@@ -596,7 +597,9 @@
         "download-edge": "node scripts/downloadAndExtractEdge.js"
     },
     "dependencies": {
+        "bufferutil": "4.0.1",
         "puppeteer-core": "9.1.1",
+        "utf-8-validate": "5.0.2",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.7",
         "ws": "7.4.5",

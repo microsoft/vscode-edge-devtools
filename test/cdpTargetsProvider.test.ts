@@ -85,6 +85,7 @@ describe("CDPTargetsProvider", () => {
                 port: "port",
                 useHttps: false,
             }),
+            isLocalResource: jest.fn(),
         };
         jest.doMock("../src/utils", () => mockUtils);
         jest.doMock("../src/cdpTarget", () => ({
@@ -110,10 +111,27 @@ describe("CDPTargetsProvider", () => {
         const dir = './resources/favicons/';
 
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
-        const microsoftIcon = await provider.downloadFaviconFromSitePromise("https://docs.microsoft.com/en-us/microsoft-edge/");
-        const bingIcon = await provider.downloadFaviconFromSitePromise("https://www.bing.com/");
+        let template: IRemoteTargetJson = {
+            description: '',
+            devtoolsFrontendUrl: '',
+            faviconUrl: '',
+            id: '',
+            title: '',
+            type: '',
+            url: '',
+            webSocketDebuggerUrl: ''
+        }
+        template.url = "https://docs.microsoft.com/en-us/microsoft-edge/";
+        await provider.downloadFaviconFromSitePromise(template);
+        const microsoftIcon = template.faviconUrl;
+        template.url = "https://www.bing.com/";
+        await provider.downloadFaviconFromSitePromise(template);
+        const bingIcon = template.faviconUrl;
         expect(microsoftIcon).not.toEqual(null);
+        expect(microsoftIcon).not.toEqual('');
+        expect(microsoftIcon).not.toEqual(bingIcon);
         expect(bingIcon).not.toEqual(null);
+        expect(bingIcon).not.toEqual('');
         const checkFileLengthPromise = new Promise<number>((resolve) => {
             fs.readdir(dir, (err: Error, files: File[]) => {
                 resolve(files.length);

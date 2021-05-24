@@ -282,8 +282,7 @@ describe("simpleView", () => {
     it("applyStylesToggleFocusPatch correctly changes root.js to set extensionSettings map", async () => {
         const filePath = "elements/elements.js";
         const patch = SimpleView.applyStylesToggleFocusPatch;
-        const expectedStrings = [`const sectionIndex = this._parentPane.focusedSectionIndex();
-        contextMenu.defaultSection()`];
+        const expectedStrings = ["ARIAUtils.alert('Toggle property and continue editing selected', this.nameElement);"];
 
         testPatch(filePath, patch, expectedStrings);
     });
