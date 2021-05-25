@@ -14,11 +14,11 @@ IF you want to learn more about the extension and how to use it, please choose f
 * [Using Sourcemaps](./sourcemaps.md)
 * [Setting up your project to show live changes in the extension](./live-changes.md)
 * [Getting Console information](./console.md)
+* [Launching the extension from the VS Code `Run and Debug` workflow](./debugger-integration.md)
 * [More information about the project](./index#more-information-about-the-project)
   * [Contributing](./index#contributing)
   * [Data and Telemetry](./index#data-and-telemetry)
   * [Reporting security issues](./index#reporting-security-issues)
-
 
 ## Introduction
 
@@ -30,11 +30,11 @@ A Visual Studio Code extension that allows you to use the browser's Elements and
 
 **Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
 
-## More information about the project 
+## More information about the project
 
 ### Contributing
 
-This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.microsoft.com.
+This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit [https://cla.microsoft.com](https://cla.microsoft.com).
 
 See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/master/CONTRIBUTING.md) for more information.
 
@@ -48,5 +48,5 @@ Security issues and bugs should be reported privately, via email, to the Microso
 Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
 receive a response within 24 hours. If for some reason you do not, please follow up via
 email to ensure we received your original message. Further information, including the
-[MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in
-the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+[MSRC PGP](https://technet.microsoft.com/security/dn606155) key, can be found in
+the [Security TechCenter](https://technet.microsoft.com/security/default).

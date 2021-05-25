@@ -13,16 +13,15 @@ You can use the extension either in an own window or embedded in your editor.
 
 ![Microsoft Edge Tools - Embedded headless demo](img/devtools-for-code-demo-headless.gif)
 
-## Documentation 
+## Documentation
 
-For more details on how to use and customize the extension, [refer to the documentation](https://microsoft.github.io/vscode-edge-devtools/index). 
-
+For more details on how to use and customize the extension, [refer to the documentation](https://microsoft.github.io/vscode-edge-devtools/index).
 
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+the rights to use your contribution. For details, visit [https://cla.microsoft.com](https://cla.microsoft.com).
 
 See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/master/CONTRIBUTING.md) for more information.
 
@@ -38,5 +37,5 @@ Security issues and bugs should be reported privately, via email, to the Microso
 Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should
 receive a response within 24 hours. If for some reason you do not, please follow up via
 email to ensure we received your original message. Further information, including the
-[MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in
-the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+[MSRC PGP](https://technet.microsoft.com/security/dn606155) key, can be found in
+the [Security TechCenter](https://technet.microsoft.com/security/default).

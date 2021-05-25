@@ -15,7 +15,7 @@ Attach the extension to your live reloading project
 * Navigate to your `my-project` folder in your command prompt and run `reload`
 * Open VS Code and open the directory
 * Go to the extension and launch an instance
-* Navigate in the browser of the extension to `localhost:8080/{file name you want to open}`	
+* Navigate in the browser of the extension to `localhost:8080/{file name you want to open}`
 * All changes that are saved in this folder now trigger a refresh
 
 Go [back to documentation](./index.md)
