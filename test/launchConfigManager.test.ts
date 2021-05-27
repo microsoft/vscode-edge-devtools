@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import {createFakeVSCode} from "./helpers/helpers";
-import { LaunchConfigManager, providedDebugConfig} from "../src/LaunchConfigManager";
+import { LaunchConfigManager, providedDebugConfig} from "../src/launchConfigManager";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 jest.mock("fs-extra");
