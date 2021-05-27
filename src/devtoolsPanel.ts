@@ -363,9 +363,12 @@ export class DevToolsPanel {
         config: IRuntimeConfig): void {
         const column = vscode.ViewColumn.Beside;
 
-        if (DevToolsPanel.instance) {
-            DevToolsPanel.instance.panel.reveal(column);
+        if (DevToolsPanel.instance && DevToolsPanel.instance.targetUrl === targetUrl) {
+                DevToolsPanel.instance.panel.reveal(column);
         } else {
+            if (DevToolsPanel.instance) {
+                DevToolsPanel.instance.dispose();
+            }
             const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME, column, {
                 enableCommandUris: true,
                 enableScripts: true,
