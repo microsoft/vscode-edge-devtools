@@ -9,9 +9,9 @@ A Visual Studio Code extension that allows you to use the browser's Elements and
 
 You can use the extension either in an own window or embedded in your editor.
 
-![Microsoft Edge Tools - Full window demo](img/devtools-for-code-demo-full-window.gif)
+![Microsoft Edge Tools - Full window demo](docs/img/devtools-for-code-demo-full-window.gif)
 
-![Microsoft Edge Tools - Embedded headless demo](img/devtools-for-code-demo-headless.gif)
+![Microsoft Edge Tools - Embedded headless demo](docs/img/devtools-for-code-demo-headless.gif)
 
 ## Documentation
 
