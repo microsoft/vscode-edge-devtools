@@ -614,6 +614,21 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
     }
 }
 
+export function reportUrlType(url: string, telemetryReporter: Readonly<TelemetryReporter>): void {
+    const localhostPattern = /^https?:\/\/localhost:/;
+    const ipPattern = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
+    const filePattern = /^file:\/\//;
+    let urlType;
+    if (localhostPattern.exec(url) || ipPattern.exec(url)) {
+        urlType = 'localhost';
+    } else if (filePattern.exec(url)) {
+        urlType = 'file';
+    } else {
+        urlType = 'other';
+    }
+    telemetryReporter.sendTelemetryEvent('user/browserNavigation', { 'urlType': urlType });
+}
+
 (function initialize() {
     // insertion order matters.
     msEdgeBrowserMapping.set('Stable', {

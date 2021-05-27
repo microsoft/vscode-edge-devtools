@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Browser } from 'puppeteer-core';
+import { Browser, Target } from 'puppeteer-core';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
@@ -22,10 +22,12 @@ import {
     launchBrowser,
     openNewTab,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
+    SETTINGS_DEFAULT_URL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
+    reportUrlType,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
 
@@ -323,11 +325,19 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             telemetryReporter.sendTelemetryEvent('command/launch/browser', browserProps);
 
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
-        browserInstance.addListener('targetcreated', () => {
+        if (url !== SETTINGS_DEFAULT_URL) {
+            reportUrlType(url, telemetryReporter);
+        }
+        browserInstance.on('targetcreated', () => {
             cdpTargetsProvider.refresh();
         });
-        browserInstance.addListener('targetdestroyed', () => {
+        browserInstance.on('targetdestroyed', () => {
             cdpTargetsProvider.refresh();
+        });
+        browserInstance.on('targetchanged',  (target: Target) => {
+            if (target.type() === 'page') {
+                reportUrlType(target.url(), telemetryReporter);
+            }
         });
         await attach(context, url, config);
     }
