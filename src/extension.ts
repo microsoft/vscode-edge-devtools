@@ -27,7 +27,7 @@ import {
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
 } from './utils';
-import { LaunchConfigManager } from './LaunchConfigManager';
+import { LaunchConfigManager } from './launchConfigManager';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
