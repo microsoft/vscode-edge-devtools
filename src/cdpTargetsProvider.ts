@@ -39,11 +39,6 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
             const responseArray = await getListOfTargets(hostname, port, useHttps);
             if (Array.isArray(responseArray)) {
                 await this.clearFaviconResourceDirectory();
-                this.telemetryReporter.sendTelemetryEvent(
-                    'view/list',
-                    undefined,
-                    { targetCount: responseArray.length },
-                );
                 if (responseArray.length > 0) {
                     const responseIconPromiseArray: Array<Promise<IRemoteTargetJson>> = [];
                     responseArray.forEach((target: IRemoteTargetJson) => {
@@ -90,7 +85,6 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     }
 
     refresh(): void {
-        this.telemetryReporter.sendTelemetryEvent('view/refresh');
         this.changeDataEvent.fire(null);
         void this.clearFaviconResourceDirectory();
         LaunchConfigManager.instance.updateLaunchConfig();
