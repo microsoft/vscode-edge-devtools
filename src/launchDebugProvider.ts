@@ -5,11 +5,11 @@ import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import {
     IUserConfig,
-    providedDebugConfig,
     SETTINGS_DEFAULT_ATTACH_INTERVAL,
     SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
     SETTINGS_STORE_NAME,
 } from './utils';
+import { providedDebugConfig } from './launchConfigManager';
 
 type AttachCallback = (
     context: vscode.ExtensionContext,

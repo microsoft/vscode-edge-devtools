@@ -9,7 +9,7 @@ import { CDPTarget } from './cdpTarget';
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, isLocalResource, SETTINGS_STORE_NAME } from './utils';
 import { IncomingMessage } from 'http';
 import https = require('https');
-import { setLaunchConfig } from './extension';
+import { LaunchConfigManager } from './launchConfigManager';
 
 export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
@@ -92,7 +92,8 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     refresh(): void {
         this.telemetryReporter.sendTelemetryEvent('view/refresh');
         this.changeDataEvent.fire(null);
-        setLaunchConfig();
+        void this.clearFaviconResourceDirectory();
+        LaunchConfigManager.instance.updateLaunchConfig();
     }
 
     async clearFaviconResourceDirectory(): Promise<void> {
