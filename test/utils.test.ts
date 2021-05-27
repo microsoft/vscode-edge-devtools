@@ -6,7 +6,7 @@
 
 import * as path from "path";
 
-import { createFakeExtensionContext, createFakeGet, createFakeVSCode, Mocked } from "./helpers/helpers";
+import { createFakeExtensionContext, createFakeGet, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
 import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "../src/utils";
 
 jest.mock("vscode", () => null, { virtual: true });
@@ -1034,6 +1034,37 @@ describe("utils", () => {
         it("tests if a local resource path returns true", async () => {
             let result = utils.isLocalResource('g:/user/test.ico');
             expect(result).toBe(true);
+        });
+    });
+
+    describe('reportUrlType', () => {
+        it('correctly classifies the url type', async () => {
+            const reporter = createFakeTelemetryReporter();
+            const input = [
+                'http://localhost:8000',
+                'https://localhost:8080',
+                '127.0.0.1',
+                '123.123.123.123',
+                'file://path/to/resource',
+                'file:///path/to/resouce',
+                '123.456.789.0',
+                'https://www.bing.com'
+            ];
+            const expected = [
+                'localhost',
+                'localhost',
+                'localhost',
+                'localhost',
+                'file',
+                'file',
+                'other',
+                'other',
+            ];
+
+            for (let i = 0; i < input.length; i++) {
+                utils.reportUrlType(input[i], reporter);
+                expect(reporter.sendTelemetryEvent).toBeCalledWith('user/browserNavigation', { 'urlType': expected[i] })
+            }
         });
     });
 });
