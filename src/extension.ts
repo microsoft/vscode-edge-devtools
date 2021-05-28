@@ -290,7 +290,11 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const telemetryProps = { viaConfig: `${!!config}` };
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const browserType: string = settings.get('browserFlavor') || 'Default';
+    const isHeadless: string = settings.get('headless') || 'false';
+
+    const telemetryProps = { viaConfig: `${!!config}`, browserType, isHeadless};
     telemetryReporter.sendTelemetryEvent('command/launch', telemetryProps);
 
     const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);
