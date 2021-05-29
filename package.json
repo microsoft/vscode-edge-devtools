@@ -602,7 +602,7 @@
         "utf-8-validate": "5.0.2",
         "vscode-chrome-debug-core": "6.8.9",
         "vscode-extension-telemetry": "0.1.7",
-        "ws": "7.4.5",
+        "ws": "7.4.6",
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
