@@ -29,4 +29,6 @@ In order to get this option, you need to select Edge as the debug type. In your 
 }
 ```
 
+A more detailed [video showing the integration of the Edge DevTools extension in the debugger workflow](https://youtu.be/1-6fRdqyoA0) is available. If you haven't got the extension, the debugger will automatically guide you through installing it.
+
 Go [back to documentation](./index.md)
