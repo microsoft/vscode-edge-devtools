@@ -631,18 +631,21 @@ export function reportUrlType(url: string, telemetryReporter: Readonly<Telemetry
 
 export async function reportFileExtensionTypes(telemetryReporter: Readonly<TelemetryReporter>): Promise<void> {
     const files = await vscode.workspace.findFiles('**/*.*', '**/node_modules/**');
-    const extensionSet: Set<string> = new Set();
+    const extensionMap: Map<string, number> = new Map<string, number>();
     for (const file of files) {
         const extension: string | undefined = file.path.split('.').pop();
         if (extension) {
-            extensionSet.add(extension);
+            const currentValue = extensionMap.get(extension);
+            if (currentValue) {
+                extensionMap.set(extension, currentValue + 1);
+            } else {
+                extensionMap.set(extension, 1);
+            }
         }
     }
-    let fileTypes = '';
-    for (const extension of extensionSet.keys()) {
-        fileTypes += extension + ';';
-    }
-    telemetryReporter.sendTelemetryEvent('workspace/metadata', {fileTypes});
+    extensionMap.set('total', files.length);
+    const fileTypes = Object.fromEntries(extensionMap);
+    telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
 }
 
 (function initialize() {
