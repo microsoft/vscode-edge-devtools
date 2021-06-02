@@ -644,7 +644,10 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
         }
     }
     extensionMap.set('total', files.length);
-    const fileTypes = Object.fromEntries(extensionMap);
+
+    // Creates Object from map
+    const fileTypes: {[key: string]: number} = {};
+    Object.assign(fileTypes, ...[...extensionMap.entries()].map(([k, v]) => ({[k]: v})));
     telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
 }
 
