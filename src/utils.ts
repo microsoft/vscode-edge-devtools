@@ -629,6 +629,22 @@ export function reportUrlType(url: string, telemetryReporter: Readonly<Telemetry
     telemetryReporter.sendTelemetryEvent('user/browserNavigation', { 'urlType': urlType });
 }
 
+export async function reportFileExtensionTypes(telemetryReporter: Readonly<TelemetryReporter>): Promise<void> {
+    const files = await vscode.workspace.findFiles('**/*.*', '**/node_modules/**');
+    const extensionSet: Set<string> = new Set();
+    for (const file of files) {
+        const extension: string | undefined = file.path.split('.').pop();
+        if (extension) {
+            extensionSet.add(extension);
+        }
+    }
+    let fileTypes = '';
+    for (const extension of extensionSet.keys()) {
+        fileTypes += extension + ';';
+    }
+    telemetryReporter.sendTelemetryEvent('workspace/metadata', {fileTypes});
+}
+
 (function initialize() {
     // insertion order matters.
     msEdgeBrowserMapping.set('Stable', {

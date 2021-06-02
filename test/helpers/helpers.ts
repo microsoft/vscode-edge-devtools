@@ -62,6 +62,14 @@ export function createFakeVSCode() {
             showTextDocument: jest.fn(),
         },
         workspace: {
+            findFiles: jest.fn(() => {
+                return [
+                    {path: '/c:/test/main.js'},
+                    {path: '/c:/test/styles.css'},
+                    {path: '/c:/test/react/test.jsx'},
+                    {path: '/c:/.vscode/launch.json'}
+                ];
+            }),
             getConfiguration: jest.fn(() => {
                 return { get: (name: string) => {
                     switch(name) {

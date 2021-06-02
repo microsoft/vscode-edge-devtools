@@ -975,4 +975,12 @@ describe("utils", () => {
             }
         });
     });
+
+    describe('reportFileExtensionTypes', () => {
+        it('correctly lists extension types in the workspace', async () => {
+            const reporter = createFakeTelemetryReporter();
+            await utils.reportFileExtensionTypes(reporter);
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('workspace/metadata', { 'fileTypes': 'js;css;jsx;json;' });
+        });
+    });
 });
