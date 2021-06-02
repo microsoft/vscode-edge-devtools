@@ -161,6 +161,7 @@ export class ToolsHost {
             enableNetwork: vscodeObject.enableNetwork,
             theme,
             whatsNew: vscodeObject.whatsNew,
+            isHeadless: vscodeObject.isHeadless,
         });
     }
 
