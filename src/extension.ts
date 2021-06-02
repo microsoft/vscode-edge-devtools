@@ -169,8 +169,6 @@ export async function attach(
     }
 
     const telemetryProps = { viaConfig: `${!!config}`, withTargetUrl: `${!!attachUrl}` };
-    telemetryReporter.sendTelemetryEvent('command/attach', telemetryProps);
-
     const { hostname, port, useHttps, timeout } = getRemoteEndpointSettings(config);
 
     // Get the attach target and keep trying until reaching timeout
@@ -189,12 +187,6 @@ export async function attach(
         }
 
         if (Array.isArray(responseArray)) {
-            telemetryReporter.sendTelemetryEvent(
-                'command/attach/list',
-                telemetryProps,
-                { targetCount: responseArray.length },
-            );
-
             // Try to match the given target with the list of targets we received from the endpoint
             let targetWebsocketUrl = '';
             if (attachUrl) {
@@ -217,7 +209,6 @@ export async function attach(
             if (targetWebsocketUrl) {
                 // Auto connect to found target
                 useRetry = false;
-                telemetryReporter.sendTelemetryEvent('command/attach/devtools', telemetryProps);
                 const runtimeConfig = getRuntimeConfig(config);
                 DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
             } else if (useRetry) {
@@ -241,7 +232,6 @@ export async function attach(
                 // Show the target list and allow the user to select one
                 const selection = await vscode.window.showQuickPick(items);
                 if (selection && selection.detail) {
-                    telemetryReporter.sendTelemetryEvent('command/attach/devtools', telemetryProps);
                     const runtimeConfig = getRuntimeConfig(config);
                     DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
                 }

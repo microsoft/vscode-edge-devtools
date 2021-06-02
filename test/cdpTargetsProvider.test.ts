@@ -50,7 +50,6 @@ describe("CDPTargetsProvider", () => {
         const provider = new ctp.CDPTargetsProvider(mockContext, mockReporter);
         provider.refresh();
         expect(mockFire).toHaveBeenCalled();
-        expect(mockReporter.sendTelemetryEvent).toHaveBeenCalled();
     });
 
     it("calls getChildren on the element", async () => {
