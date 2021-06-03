@@ -44,6 +44,8 @@ describe("extension", () => {
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 getActiveDebugSessionId: jest.fn(),
                 reportFileExtensionTypes: jest.fn(),
+                reportChangedExtensionSetting: jest.fn(),
+                reportExtensionSettings: jest.fn(),
             };
             jest.doMock("../src/utils", () => mockUtils);
             jest.doMock("../src/launchDebugProvider");
@@ -402,6 +404,8 @@ describe("extension", () => {
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 buttonCode: { launch: '' },
+                reportChangedExtensionSetting: jest.fn(),
+                reportExtensionSettings: jest.fn(),
                 reportUrlType: jest.fn(),
                 reportFileExtensionTypes: jest.fn(),
             };

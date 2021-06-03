@@ -8,6 +8,7 @@ import * as path from "path";
 
 import { createFakeExtensionContext, createFakeGet, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
 import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "../src/utils";
+import { ConfigurationChangeEvent } from "vscode";
 
 jest.mock("vscode", () => null, { virtual: true });
 
@@ -971,7 +972,7 @@ describe("utils", () => {
 
             for (let i = 0; i < input.length; i++) {
                 utils.reportUrlType(input[i], reporter);
-                expect(reporter.sendTelemetryEvent).toBeCalledWith('user/browserNavigation', { 'urlType': expected[i] })
+                expect(reporter.sendTelemetryEvent).toBeCalledWith('user/browserNavigation', { 'urlType': expected[i] });
             }
         });
     });
@@ -981,6 +982,29 @@ describe("utils", () => {
             const reporter = createFakeTelemetryReporter();
             await utils.reportFileExtensionTypes(reporter);
             expect(reporter.sendTelemetryEvent).toBeCalledWith('workspace/metadata', undefined, {"css": 1, "js": 1, "json": 1, "jsx": 1, "total": 4});
+        });
+    });
+
+    describe('reportExtensionSettings', () => {
+        it('correctly records all changed extension settings', async () => {
+            const reporter = createFakeTelemetryReporter();
+            utils.reportExtensionSettings(reporter);
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { themes: 'System preference', whatsNew: 'true' });
+        });
+    });
+
+    describe('reportChangedExtensionSetting', () => {
+        it('correctly sends telemetry event for changed event', async () => {
+            const reporter = createFakeTelemetryReporter();
+            const configurationChangedEvent: ConfigurationChangeEvent = {affectsConfiguration: (name): boolean=> {
+                if (name === 'vscode-edge-devtools.enableNetwork') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }};
+            utils.reportChangedExtensionSetting(configurationChangedEvent, reporter);
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChanged', { enableNetwork: 'true' });
         });
     });
 });

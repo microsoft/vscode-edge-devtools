@@ -28,6 +28,8 @@ import {
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
     reportFileExtensionTypes,
+    reportChangedExtensionSetting,
+    reportExtensionSettings,
     reportUrlType,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
@@ -166,6 +168,8 @@ export function activate(context: vscode.ExtensionContext): void {
         }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     void reportFileExtensionTypes(telemetryReporter);
+    reportExtensionSettings(telemetryReporter);
+    vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
 }
 
 export async function attach(

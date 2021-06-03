@@ -99,6 +99,25 @@ export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
+const extensionSettingsList: string[] = [
+    'hostname',
+    'port',
+    'useHttps',
+    'defaultUrl',
+    'userDataDir',
+    'webRoot',
+    'pathMapping',
+    'sourceMapPathOverrides',
+    'sourceMaps',
+    'autoAttachViaDebuggerForEdge',
+    'enableNetwork',
+    'showWorkers',
+    'whatsNew',
+    'headless',
+    'timeout',
+    'browserFlavor',
+    'themes',
+];
 
 export interface IRemoteTargetJson {
     [index: string]: string;
@@ -612,6 +631,50 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
     }
 
         return '';
+    }
+}
+
+export function reportExtensionSettings(telemetryReporter: Readonly<TelemetryReporter>): void {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const changedSettingsMap: Map<string, string> = new Map<string, string>();
+    for (const setting of extensionSettingsList) {
+        const settingInspect = settings.inspect(setting);
+        if (settingInspect) {
+            const defaultValue = settingInspect.defaultValue;
+            const currentValue: boolean | string | {[key: string]: string} | undefined = settings.get(setting);
+            if (currentValue !== undefined && currentValue !== defaultValue) {
+                if (defaultValue && typeof defaultValue === 'object' && typeof currentValue === 'object') {
+                    for (const [key, value] of Object.entries(defaultValue)) {
+                        if (currentValue[key] !== value) {
+                            changedSettingsMap.set(setting, JSON.stringify(currentValue));
+                            break;
+                        }
+                    }
+                } else {
+                    changedSettingsMap.set(setting, currentValue.toString());
+                }
+            }
+        }
+    }
+    const changedSettingsObject = {};
+    Object.assign(changedSettingsObject, ...[...changedSettingsMap.entries()].map(([k, v]) => ({[k]: v})));
+    telemetryReporter.sendTelemetryEvent('user/settingsChangedAtLaunch', changedSettingsObject);
+}
+
+export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeEvent, telemetryReporter: Readonly<TelemetryReporter>): void {
+    for (const setting of extensionSettingsList) {
+        if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.${setting}`)) {
+            const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+            if (setting !== undefined) {
+                const currentValue: boolean | string | {[key: string]: string} | undefined = settings.get(setting);
+                if (currentValue !== undefined) {
+                    const telemetryObject: {[key: string]: string}  = {};
+                    const objString = typeof currentValue !== 'object' ? currentValue.toString() : JSON.stringify(currentValue);
+                    telemetryObject[setting] = objString;
+                    telemetryReporter.sendTelemetryEvent('user/settingsChanged', telemetryObject);
+                }
+            }
+        }
     }
 }
 
