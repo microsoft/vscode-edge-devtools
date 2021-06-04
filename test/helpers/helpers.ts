@@ -168,13 +168,6 @@ export function createFakeGet(getResponse: () => string, getStatusCode: () => nu
 }
 
 /**
- * Creates a fake vscode.ConfigurationChangeEvent
- */
-export function createFakeConfigurationChangeEvent() {
-
-}
-
-/**
  * Get a callable function from the first invocation of a mock function
  * @param mock The mock function that got passed the callback as an argument
  * @param callbackArgIndex The index of the argument that contains the callback
