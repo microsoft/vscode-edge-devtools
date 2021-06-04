@@ -653,8 +653,6 @@ export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeE
         const settingValue: boolean | string | {[key: string]: string} | undefined = currentSetting[1];
         if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.${settingName}`)) {
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-            const test = Object.entries(settings);
-            test;
             if (settingName !== undefined) {
                 if (settingValue !== undefined) {
                     const telemetryObject: {[key: string]: string}  = {};
