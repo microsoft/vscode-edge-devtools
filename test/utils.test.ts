@@ -986,14 +986,54 @@ describe("utils", () => {
     });
 
     describe('reportExtensionSettings', () => {
+        let mockVSCode: typeof import("vscode");
+
+        beforeEach(() => {
+            const vscodeMock = jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return {
+                    get: (name: string) => {
+                        switch(name) {
+                            case "enableNetwork":
+                                return true;
+                            case "themes":
+                                return "System preference";
+                            case "whatsNew":
+                                return true;
+                            default:
+                                return undefined;
+                        }
+                    },
+                    inspect: (name: string) => {
+                        switch(name) {
+                            case "enableNetwork":
+                                return {defaultValue: true};
+                            case "themes":
+                                return {defaultValue: "Light"};
+                            case "whatsNew":
+                                return {defaultValue: false};
+                            default:
+                                return {defaultValue: undefined};
+                        }
+                    },
+                    filler: 'hello',
+                    filler1: 'hello',
+                    themes: 'System preference',
+                    whatsNew: 'true',
+                    enableNetwork: 'false',
+                }
+            });
+
+            jest.doMock("vscode", () => mockVSCode, { virtual: true });
+            jest.resetModules();
+        });
+
         it('correctly records all changed extension settings', async () => {
             const reporter = createFakeTelemetryReporter();
             utils.reportExtensionSettings(reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { themes: 'System preference', whatsNew: 'true' });
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { themes: 'System preference', whatsNew: 'true', enableNetwork: 'false' });
         });
-    });
 
-    describe('reportChangedExtensionSetting', () => {
         it('correctly sends telemetry event for changed event', async () => {
             const reporter = createFakeTelemetryReporter();
             const configurationChangedEvent: ConfigurationChangeEvent = {affectsConfiguration: (name): boolean=> {
@@ -1004,7 +1044,7 @@ describe("utils", () => {
                 }
             }};
             utils.reportChangedExtensionSetting(configurationChangedEvent, reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChanged', { enableNetwork: 'true' });
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChanged', { enableNetwork: 'false' });
         });
     });
 });
