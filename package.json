@@ -176,6 +176,8 @@
                     "type": "object",
                     "description": "A set of mappings to override the locations of source map files.",
                     "default": {
+                        "webpack://./*": "${webRoot}/*",
+                        "webpack://*": "${webRoot}/*",
                         "webpack:///./*": "${webRoot}/*",
                         "webpack:///src/*": "${webRoot}/*",
                         "webpack:///*": "*",
