@@ -990,32 +990,10 @@ describe("utils", () => {
 
         beforeEach(() => {
             const vscodeMock = jest.requireMock("vscode");
+            const originalWorkspaceMockConfig = vscodeMock.workspace.getConfiguration();
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return {
-                    get: (name: string) => {
-                        switch(name) {
-                            case "enableNetwork":
-                                return true;
-                            case "themes":
-                                return "System preference";
-                            case "whatsNew":
-                                return true;
-                            default:
-                                return undefined;
-                        }
-                    },
-                    inspect: (name: string) => {
-                        switch(name) {
-                            case "enableNetwork":
-                                return {defaultValue: true};
-                            case "themes":
-                                return {defaultValue: "Light"};
-                            case "whatsNew":
-                                return {defaultValue: false};
-                            default:
-                                return {defaultValue: undefined};
-                        }
-                    },
+                    ...originalWorkspaceMockConfig,
                     fillerPropertyOne: 'Need to add filler values since the extension related telemetry functions removes the first 4 entries to create an array of extension settings',
                     fillerPropertyTwo: 'The first 4 entries for a workspaceConfiguration object are class related functions, the rest are all extension related settings.',
                     themes: 'System preference',
