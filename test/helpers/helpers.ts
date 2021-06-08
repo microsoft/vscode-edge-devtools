@@ -62,19 +62,45 @@ export function createFakeVSCode() {
             showTextDocument: jest.fn(),
         },
         workspace: {
+            findFiles: jest.fn(() => {
+                return [
+                    {path: '/c:/test/main.js'},
+                    {path: '/c:/test/styles.css'},
+                    {path: '/c:/test/react/test.jsx'},
+                    {path: '/c:/.vscode/launch.json'}
+                ];
+            }),
             getConfiguration: jest.fn(() => {
-                return { get: (name: string) => {
-                    switch(name) {
-                        case "enableNetwork":
-                            return true;
-                        case "themeString":
-                            return "System preference";
-                        case "whatsNew":
-                            return true;
-                        default:
-                            return undefined;
+                return {
+                    get: (name: string) => {
+                        switch(name) {
+                            case "enableNetwork":
+                                return true;
+                            case "themes":
+                                return "System preference";
+                            case "whatsNew":
+                                return true;
+                            case "isHeadless":
+                                return false;
+                            default:
+                                return undefined;
+                        }
+                    },
+                    inspect: (name: string) => {
+                        switch(name) {
+                            case "enableNetwork":
+                                return {defaultValue: true};
+                            case "themes":
+                                return {defaultValue: "Light"};
+                            case "whatsNew":
+                                return {defaultValue: false};
+                            case "isHeadless":
+                                return {defaultValue: false};
+                            default:
+                                return {defaultValue: undefined};
+                        }
                     }
-                } };
+                };
             }),
             onDidChangeConfiguration: jest.fn(),
             openTextDocument: jest.fn().mockResolvedValue(null),
