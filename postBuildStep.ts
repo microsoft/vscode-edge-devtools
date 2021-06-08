@@ -42,6 +42,7 @@ import {
     applyStylesRevealerPatch,
     applyStylesToggleFocusPatch,
     applyThemePatch,
+    applyNoMatchingStylesPatch,
 } from './src/host/polyfills/simpleView';
 import { applySetupTextSelectionPatch } from './src/host/polyfills/textSelection';
 import { applyThirdPartyI18nLocalesPatch } from './src/host/polyfills/thirdPartyI18n';
@@ -125,6 +126,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyPaddingInlineCssPatch,
     ]);
     await patchFileForWebViewWrapper('elements/elements.js', toolsOutDir, [
+        applyNoMatchingStylesPatch,
         applySetupTextSelectionPatch,
         applyStylesRevealerPatch,
         applyStylesToggleFocusPatch,
