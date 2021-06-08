@@ -72,8 +72,12 @@ export function activate(context: vscode.ExtensionContext): void {
         cdpTargetsProvider));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launch`,
-        async () => {
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
+        async (fromEmptyTargetView?: boolean) => {
+            if (fromEmptyTargetView) {
+                telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.emptyTargetListLaunchBrowserInstance });
+            } else {
+                telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
+            }
             await launch(context);
             cdpTargetsProvider.refresh();
         }));
