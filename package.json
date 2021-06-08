@@ -538,7 +538,7 @@
         "viewsWelcome": [
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying webpages.\n[Launch Instance](command:vscode-edge-devtools-view.launch)",
+                "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying webpages.\n[Launch Instance](command:vscode-edge-devtools-view.launch?[true])",
                 "when": "launchJsonStatus != Supported"
             },
             {

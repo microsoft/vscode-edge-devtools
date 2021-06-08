@@ -43,6 +43,7 @@ describe("extension", () => {
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 getActiveDebugSessionId: jest.fn(),
+                reportFileExtensionTypes: jest.fn(),
             };
             jest.doMock("../src/utils", () => mockUtils);
             jest.doMock("../src/launchDebugProvider");
@@ -402,6 +403,7 @@ describe("extension", () => {
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 buttonCode: { launch: '' },
                 reportUrlType: jest.fn(),
+                reportFileExtensionTypes: jest.fn(),
             };
 
             mockPanel = {

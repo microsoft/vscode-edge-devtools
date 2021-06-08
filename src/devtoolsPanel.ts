@@ -3,6 +3,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
+import { performance } from 'perf_hooks';
 import TelemetryReporter from 'vscode-extension-telemetry';
 
 import { SettingsProvider } from './common/settingsProvider';
@@ -37,6 +38,7 @@ export class DevToolsPanel {
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
     private consoleOutput: vscode.OutputChannel;
+    private timeStart: number | null;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -50,6 +52,7 @@ export class DevToolsPanel {
         this.extensionPath = this.context.extensionPath;
         this.targetUrl = targetUrl;
         this.config = config;
+        this.timeStart = null;
         this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
         this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
         this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
@@ -100,8 +103,12 @@ export class DevToolsPanel {
         this.panel.dispose();
         this.panelSocket.dispose();
         this.consoleOutput.dispose();
-
-        this.telemetryReporter.sendTelemetryEvent('websocket/dispose');
+        if (this.timeStart !== null) {
+            const timeEnd = performance.now();
+            const sessionTime = timeEnd - this.timeStart;
+            this.telemetryReporter.sendTelemetryEvent('websocket/dispose', undefined, {sessionTime});
+            this.timeStart = null;
+        }
 
         while (this.disposables.length) {
             const d = this.disposables.pop();
@@ -126,6 +133,7 @@ export class DevToolsPanel {
         // Report success telemetry
         this.telemetryReporter.sendTelemetryEvent(
             this.panelSocket.isConnectedToTarget ? 'websocket/reconnect' : 'websocket/connect');
+        this.timeStart = performance.now();
     }
 
     private onSocketMessage() {

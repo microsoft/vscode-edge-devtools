@@ -124,6 +124,7 @@ export const buttonCode: Record<string, string> = {
     openSettings: '7',
     viewChangelog: '8',
     closeTarget: '9',
+    emptyTargetListLaunchBrowserInstance: '10',
 };
 
 /**
@@ -627,6 +628,28 @@ export function reportUrlType(url: string, telemetryReporter: Readonly<Telemetry
         urlType = 'other';
     }
     telemetryReporter.sendTelemetryEvent('user/browserNavigation', { 'urlType': urlType });
+}
+
+export async function reportFileExtensionTypes(telemetryReporter: Readonly<TelemetryReporter>): Promise<void> {
+    const files = await vscode.workspace.findFiles('**/*.*', '**/node_modules/**');
+    const extensionMap: Map<string, number> = new Map<string, number>();
+    for (const file of files) {
+        const extension: string | undefined = file.path.split('.').pop();
+        if (extension) {
+            const currentValue = extensionMap.get(extension);
+            if (currentValue) {
+                extensionMap.set(extension, currentValue + 1);
+            } else {
+                extensionMap.set(extension, 1);
+            }
+        }
+    }
+    extensionMap.set('total', files.length);
+
+    // Creates Object from map
+    const fileTypes: {[key: string]: number} = {};
+    Object.assign(fileTypes, ...[...extensionMap.entries()].map(([k, v]) => ({[k]: v})));
+    telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
 }
 
 (function initialize() {
