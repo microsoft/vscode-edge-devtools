@@ -27,6 +27,7 @@ import {
     SETTINGS_VIEW_NAME,
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
+    reportFileExtensionTypes,
     reportUrlType,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
@@ -164,6 +165,7 @@ export function activate(context: vscode.ExtensionContext): void {
             void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/master/README.md'));
         }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
+    void reportFileExtensionTypes(telemetryReporter);
 }
 
 export async function attach(
