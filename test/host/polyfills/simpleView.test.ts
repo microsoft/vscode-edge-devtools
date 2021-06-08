@@ -287,6 +287,14 @@ describe("simpleView", () => {
         testPatch(filePath, patch, expectedStrings);
     });
 
+    it("applyNoMatchingStylesPatch correctly changes elements.js to set No Matching Styles message", async () => {
+        const filePath = "elements/elements.js";
+        const patch = SimpleView.applyNoMatchingStylesPatch;
+        const expectedStrings = ["Styles may not be available if target was paused when opening Edge DevTools."];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
     it("applyRerouteConsoleMessagePatch correctly changes root.js to set extensionSettings map", async () => {
         const filePath = "sdk/sdk.js";
         const patch = SimpleView.applyRerouteConsoleMessagePatch;
