@@ -443,3 +443,28 @@ export function applyScreencastCursorPatch(content: string): string | null {
     const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
+
+export function applyScreencastHeadlessPatch(content: string): string | null {
+    // This patch will toggle the DevTools screencast on or off based on if the user is using headless or non-headless mode.
+    // This patch also marks a time stamp if the setting is enabled.
+    const pattern = /this\._enabledSetting\s*=\s*Settings\.Settings\.instance\(\)\.createSetting\('screencastEnabled',\s*true\);/g;
+    const replacementText = "const isHeadless = Root.Runtime.vscodeSettings.isHeadless; this._enabledSetting.set(isHeadless); this._startTime = isHeadless ? performance.now() : null;";
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
+}
+
+export function applyScreencastTelemetry(content: string): string | null {
+    // This patch will add a telemetry event inside the DevTools that tracks screencast toggle and duration
+    const pattern = /const enabled\s*=\s*!this\._toggleButton\.toggled\(\);/g;
+    const replacementText = `
+    if (enabled) {
+        InspectorFrontendHost.InspectorFrontendHostInstance.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1, 2);
+        this._startTime = performance.now();
+    } else {
+        InspectorFrontendHost.InspectorFrontendHostInstance.recordEnumeratedHistogram('DevTools.ScreencastToggle', 0, 2);
+        if (this._startTime) {
+            const sessionDuration = performance.now() - this._startTime;
+            InspectorFrontendHost.InspectorFrontendHostInstance.recordPerformanceHistogram('DevTools.ScreencastDuration', sessionDuration);
+        }
+    }`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
+}

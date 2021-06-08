@@ -79,6 +79,8 @@ export function createFakeVSCode() {
                             return "System preference";
                         case "whatsNew":
                             return true;
+                        case "isHeadless":
+                            return false;
                         default:
                             return undefined;
                     }

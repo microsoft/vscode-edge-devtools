@@ -219,6 +219,7 @@ export class DevToolsPanel {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
             whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
+            isHeadless: SettingsProvider.instance.getHeadlessSettings(),
             id });
     }
 
