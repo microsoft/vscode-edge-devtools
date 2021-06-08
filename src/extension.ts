@@ -72,8 +72,12 @@ export function activate(context: vscode.ExtensionContext): void {
         cdpTargetsProvider));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launch`,
-        async () => {
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
+        async (fromEmptyTargetView?: boolean) => {
+            if (fromEmptyTargetView) {
+                telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.emptyTargetListLaunchBrowserInstance });
+            } else {
+                telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
+            }
             await launch(context);
             cdpTargetsProvider.refresh();
         }));
@@ -280,7 +284,11 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const telemetryProps = { viaConfig: `${!!config}` };
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const browserType: string = settings.get('browserFlavor') || 'Default';
+    const isHeadless: string = settings.get('headless') || 'false';
+
+    const telemetryProps = { viaConfig: `${!!config}`, browserType, isHeadless};
     telemetryReporter.sendTelemetryEvent('command/launch', telemetryProps);
 
     const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);

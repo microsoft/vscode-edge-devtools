@@ -124,6 +124,7 @@ export const buttonCode: Record<string, string> = {
     openSettings: '7',
     viewChangelog: '8',
     closeTarget: '9',
+    emptyTargetListLaunchBrowserInstance: '10',
 };
 
 /**
