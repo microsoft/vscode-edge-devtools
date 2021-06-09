@@ -37,7 +37,7 @@ export class DevToolsPanel {
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
-    private consoleOutput: vscode.OutputChannel|null;
+    private consoleOutput: vscode.OutputChannel;
     private timeStart: number | null;
 
     private constructor(
@@ -53,10 +53,15 @@ export class DevToolsPanel {
         this.targetUrl = targetUrl;
         this.config = config;
         this.timeStart = null;
-        this.consoleOutput = null;
-        if (!config.isJsDebugProxiedCDPConnection) {
+        this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
+        if (config.isJsDebugProxiedCDPConnection) {
+            // Direct users to the Debug Console
+            this.consoleOutput.appendLine('// Microsoft Edge Devtools Extension:');
+            this.consoleOutput.appendLine('// You have connected to a target using Visual Studio Code\'s JavaScript Debugger.');
+            this.consoleOutput.appendLine('// Please use the "Debug Console" to view console messages from your webpage and evaluate expressions.');
+        } else {
             // Provide 1-way console when attached to a target that is not the current debug target
-            this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
+            this.consoleOutput.appendLine('// Microsoft Edge Devtools Extension:');
             this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
             this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
             this.consoleOutput.appendLine('');
@@ -177,9 +182,6 @@ export class DevToolsPanel {
     }
 
     private onSocketConsoleOutput(message: string) {
-        if (!this.consoleOutput) {
-            return;
-        }
         const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
         this.consoleOutput.appendLine(consoleMessage);
     }
