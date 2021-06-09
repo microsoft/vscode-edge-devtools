@@ -615,6 +615,55 @@ async function verifyFlavorPath(flavor: BrowserFlavor | undefined, platform: Pla
     }
 }
 
+type ExtensionSettings = [string, boolean | string | {[key: string]: string} | undefined];
+
+export function reportExtensionSettings(telemetryReporter: Readonly<TelemetryReporter>): void {
+    const extensionSettingsList = Object.entries(vscode.workspace.getConfiguration(SETTINGS_STORE_NAME)).splice(4) as Array<ExtensionSettings>;
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const changedSettingsMap: Map<string, string> = new Map<string, string>();
+    for (const currentSetting of extensionSettingsList) {
+        const settingName: string = currentSetting[0];
+        const settingValue: boolean | string | {[key: string]: string} | undefined = currentSetting[1];
+        const settingInspect = settings.inspect(settingName);
+        if (settingInspect) {
+            const defaultValue = settingInspect.defaultValue;
+            if (settingValue !== undefined && settingValue !== defaultValue) {
+                if (defaultValue && typeof defaultValue === 'object' && typeof settingValue === 'object') {
+                    for (const [key, value] of Object.entries(defaultValue)) {
+                        if (settingValue[key] !== value) {
+                            changedSettingsMap.set(settingName, JSON.stringify(settingValue));
+                            break;
+                        }
+                    }
+                } else {
+                    changedSettingsMap.set(settingName, settingValue.toString());
+                }
+            }
+        }
+    }
+    const changedSettingsObject = {};
+    Object.assign(changedSettingsObject, ...[...changedSettingsMap.entries()].map(([k, v]) => ({[k]: v})));
+    telemetryReporter.sendTelemetryEvent('user/settingsChangedAtLaunch', changedSettingsObject);
+}
+
+export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeEvent, telemetryReporter: Readonly<TelemetryReporter>): void {
+    const extensionSettingsList = Object.entries(vscode.workspace.getConfiguration(SETTINGS_STORE_NAME)).splice(4) as Array<ExtensionSettings>;
+    for (const currentSetting of extensionSettingsList) {
+        const settingName: string = currentSetting[0];
+        const settingValue: boolean | string | {[key: string]: string} | undefined = currentSetting[1];
+        if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.${settingName}`)) {
+            if (settingName !== undefined) {
+                if (settingValue !== undefined) {
+                    const telemetryObject: {[key: string]: string}  = {};
+                    const objString = typeof settingValue !== 'object' ? settingValue.toString() : JSON.stringify(settingValue);
+                    telemetryObject[settingName] = objString;
+                    telemetryReporter.sendTelemetryEvent('user/settingsChanged', telemetryObject);
+                }
+            }
+        }
+    }
+}
+
 export function reportUrlType(url: string, telemetryReporter: Readonly<TelemetryReporter>): void {
     const localhostPattern = /^https?:\/\/localhost:/;
     const ipPattern = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;

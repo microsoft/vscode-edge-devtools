@@ -308,10 +308,26 @@ describe("simpleView", () => {
         testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyScreencastCursorPatch correctly changes inspector.js text to remove touch cursor", async () => {
+    it("applyScreencastCursorPatch correctly changes screencast.js text to remove touch cursor", async () => {
         const filePath = "screencast/screencast.js";
         const patch = SimpleView.applyScreencastCursorPatch;
         const expectedStrings = ["this._canvasContainerElement.style.cursor = 'unset';"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyScreencastHeadlessPatch correctly replaces screencast.js text to toggle screencast based on headless settings", async () => {
+        const filePath = "screencast/screencast.js";
+        const patch = SimpleView.applyScreencastHeadlessPatch;
+        const expectedStrings = ["const isHeadless = Root.Runtime.vscodeSettings.isHeadless;"];
+
+        testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyScreencastTelemetry correctly changes screencast.js text to implement screencast telemetry", async () => {
+        const filePath = "screencast/screencast.js";
+        const patch = SimpleView.applyScreencastTelemetry;
+        const expectedStrings = ["DevTools.ScreencastToggle", "DevTools.ScreencastDuration"];
 
         testPatch(filePath, patch, expectedStrings);
     });

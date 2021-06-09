@@ -71,18 +71,36 @@ export function createFakeVSCode() {
                 ];
             }),
             getConfiguration: jest.fn(() => {
-                return { get: (name: string) => {
-                    switch(name) {
-                        case "enableNetwork":
-                            return true;
-                        case "themeString":
-                            return "System preference";
-                        case "whatsNew":
-                            return true;
-                        default:
-                            return undefined;
+                return {
+                    get: (name: string) => {
+                        switch(name) {
+                            case "enableNetwork":
+                                return true;
+                            case "themes":
+                                return "System preference";
+                            case "whatsNew":
+                                return true;
+                            case "isHeadless":
+                                return false;
+                            default:
+                                return undefined;
+                        }
+                    },
+                    inspect: (name: string) => {
+                        switch(name) {
+                            case "enableNetwork":
+                                return {defaultValue: true};
+                            case "themes":
+                                return {defaultValue: "Light"};
+                            case "whatsNew":
+                                return {defaultValue: false};
+                            case "isHeadless":
+                                return {defaultValue: false};
+                            default:
+                                return {defaultValue: undefined};
+                        }
                     }
-                } };
+                };
             }),
             onDidChangeConfiguration: jest.fn(),
             openTextDocument: jest.fn().mockResolvedValue(null),

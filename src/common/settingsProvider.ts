@@ -26,6 +26,12 @@ export class SettingsProvider {
     return whatsNewEnabled;
   }
 
+  getHeadlessSettings(): boolean {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const isHeadless: boolean = settings.get('headless') || false;
+    return isHeadless;
+  }
+
   static get instance(): SettingsProvider {
     if (!SettingsProvider.singletonInstance) {
       SettingsProvider.singletonInstance = new SettingsProvider();

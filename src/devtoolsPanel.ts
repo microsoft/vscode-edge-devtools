@@ -219,6 +219,7 @@ export class DevToolsPanel {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
             whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
+            isHeadless: SettingsProvider.instance.getHeadlessSettings(),
             id });
     }
 
@@ -341,7 +342,7 @@ export class DevToolsPanel {
                     style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
                     script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
                     frame-src 'self' ${this.panel.webview.cspSource};
-                    connect-src 'self' ${this.panel.webview.cspSource};
+                    connect-src 'self' data: ${this.panel.webview.cspSource};
                 ">
                 <meta name="referrer" content="no-referrer">
                 <link href="${stylesUri}" rel="stylesheet"/>

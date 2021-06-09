@@ -484,7 +484,7 @@ describe("devtoolsPanel", () => {
 
             it("calls getVscodeSettings", async () => {
                 const expectedId = { id: 0 };
-                const expectedState = { enableNetwork: true, themeString: "System preference", whatsNew: true};
+                const expectedState = { enableNetwork: true, themeString: "System preference", whatsNew: true, isHeadless: false};
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
 
                 const dtp = await import("../src/devtoolsPanel");
@@ -498,6 +498,7 @@ describe("devtoolsPanel", () => {
                         themeString: expectedState.themeString,
                         enableNetwork: expectedState.enableNetwork,
                         whatsNew: expectedState.whatsNew,
+                        isHeadless: expectedState.isHeadless,
                         id: expectedId.id,
                     },
                 );
