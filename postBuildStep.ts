@@ -31,7 +31,6 @@ import {
     applyPersistDrawerTabs,
     applyQueryParamsObjectPatch,
     applyRemoveBreakOnContextMenuItem,
-    applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
     applyScreencastAppPatch,
@@ -178,9 +177,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyAnnouncementNamePatch,
         applyGithubLinksPatch,
         applyReleaseNotePatch,
-    ]);
-    await patchFileForWebViewWrapper('sdk/sdk.js', toolsOutDir, [
-        applyRerouteConsoleMessagePatch,
     ]);
     await patchFileForWebViewWrapper('i18n/i18n.js', toolsOutDir, [
         applyThirdPartyI18nLocalesPatch,

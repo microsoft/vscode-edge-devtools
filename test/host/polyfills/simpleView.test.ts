@@ -300,14 +300,6 @@ describe("simpleView", () => {
         testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyRerouteConsoleMessagePatch correctly changes root.js to set extensionSettings map", async () => {
-        const filePath = "sdk/sdk.js";
-        const patch = SimpleView.applyRerouteConsoleMessagePatch;
-        const expectedStrings = ["sendToVscodeOutput"];
-
-        testPatch(filePath, patch, expectedStrings);
-    });
-
     it("applyScreencastCursorPatch correctly changes screencast.js text to remove touch cursor", async () => {
         const filePath = "screencast/screencast.js";
         const patch = SimpleView.applyScreencastCursorPatch;

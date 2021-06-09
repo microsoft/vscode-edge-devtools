@@ -54,9 +54,9 @@ export class DevToolsPanel {
         this.config = config;
         this.timeStart = null;
         this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
-        this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
-        this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
-        this.consoleOutput.appendLine('');
+        this.consoleOutput.appendLine('// Microsoft Edge Devtools Console output is Deprecated and will be removed soon.');
+        this.consoleOutput.appendLine('// For console output from your webpage, please use VSCode\'s Built in JavaScript Debugger and the "Debug Console".');
+
 
         // Hook up the socket events
         if (this.config.isJsDebugProxiedCDPConnection) {
@@ -77,7 +77,6 @@ export class DevToolsPanel {
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
-        this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -165,11 +164,6 @@ export class DevToolsPanel {
         } else {
             void vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
-    }
-
-    private onSocketConsoleOutput(message: string) {
-        const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
-        this.consoleOutput.appendLine(consoleMessage);
     }
 
     private onSocketTelemetry(message: string) {

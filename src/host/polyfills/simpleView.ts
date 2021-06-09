@@ -443,12 +443,6 @@ export function applyRemovePreferencePatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyRerouteConsoleMessagePatch(content: string): string | null {
-    const pattern = /this\.dispatchEventToListeners\(Events\$h\.MessageAdded,\s*msg\);/g;
-    const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
-    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
-}
-
 export function applyScreencastCursorPatch(content: string): string | null {
     // This patch removes the touch cursor from the screencast view
     const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g;
