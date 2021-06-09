@@ -290,7 +290,12 @@ describe("simpleView", () => {
     it("applyNoMatchingStylesPatch correctly changes elements.js to set No Matching Styles message", async () => {
         const filePath = "elements/elements.js";
         const patch = SimpleView.applyNoMatchingStylesPatch;
-        const expectedStrings = ["Styles may not be available if target was paused when opening Edge DevTools."];
+        const expectedStrings = [
+            `const noMatchSelector = ls \`No matching selector or style.\`;`,
+            `const pausedExplanation = ls \`Styles may not be available if target was paused when opening Edge DevTools.\`;`,
+            `const resumePrompt = ls \`Please resume or refresh the target.\`;`,
+            `this._noMatchesElement.innerHTML = \`\${noMatchSelector}<br />\${pausedExplanation}<br />\${resumePrompt}\`;`,
+        ];
 
         testPatch(filePath, patch, expectedStrings);
     });
