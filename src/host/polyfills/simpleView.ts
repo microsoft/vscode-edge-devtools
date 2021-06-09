@@ -114,6 +114,18 @@ export function applyStylesToggleFocusPatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyNoMatchingStylesPatch(content: string): string | null {
+    // Patch to inform user to refresh/resume target to get CSS information when attaching to a paused target.
+    const pattern = /this\._noMatchesElement\.textContent\s*=\s*(ls\s*`No matching selector or style`);/g;
+    const replacementText = `
+       const noMatchSelector = ls \`No matching selector or style.\`;
+       const pausedExplanation = ls \`Styles may not be available if target was paused when opening Edge DevTools.\`;
+       const resumePrompt = ls \`Please resume or refresh the target.\`;
+       this._noMatchesElement.innerHTML = \`\${noMatchSelector}<br />\${pausedExplanation}<br />\${resumePrompt}\`;
+    `;
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyQuickOpenPatch(content: string): string | null {
     // This patch removes the ability to use the quick open menu (CTRL + P)
     const pattern = /handleAction\(context,\s*actionId\)\s*{\s*switch\s*\(actionId\)/;
