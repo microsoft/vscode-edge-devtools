@@ -37,7 +37,7 @@ export class DevToolsPanel {
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
-    private consoleOutput: vscode.OutputChannel;
+    private consoleOutput: vscode.OutputChannel|null;
     private timeStart: number | null;
 
     private constructor(
@@ -53,10 +53,14 @@ export class DevToolsPanel {
         this.targetUrl = targetUrl;
         this.config = config;
         this.timeStart = null;
-        this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
-        this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
-        this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
-        this.consoleOutput.appendLine('');
+        this.consoleOutput = null;
+        if (!config.isJsDebugProxiedCDPConnection) {
+            // Provide 1-way console when attached to a target that is not the current debug target
+            this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
+            this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
+            this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
+            this.consoleOutput.appendLine('');
+        }
 
         // Hook up the socket events
         if (this.config.isJsDebugProxiedCDPConnection) {
@@ -77,7 +81,10 @@ export class DevToolsPanel {
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
-        this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
+        if (!config.isJsDebugProxiedCDPConnection){
+            // Provide 1-way console when attached to a target that is not the current debug target
+            this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
+        }
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -102,7 +109,9 @@ export class DevToolsPanel {
 
         this.panel.dispose();
         this.panelSocket.dispose();
-        this.consoleOutput.dispose();
+        if (this.consoleOutput) {
+            this.consoleOutput.dispose();
+        }
         if (this.timeStart !== null) {
             const timeEnd = performance.now();
             const sessionTime = timeEnd - this.timeStart;
@@ -168,6 +177,9 @@ export class DevToolsPanel {
     }
 
     private onSocketConsoleOutput(message: string) {
+        if (!this.consoleOutput) {
+            return;
+        }
         const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
         this.consoleOutput.appendLine(consoleMessage);
     }
