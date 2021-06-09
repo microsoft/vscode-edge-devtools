@@ -114,9 +114,7 @@ export class DevToolsPanel {
 
         this.panel.dispose();
         this.panelSocket.dispose();
-        if (this.consoleOutput) {
-            this.consoleOutput.dispose();
-        }
+        this.consoleOutput.dispose();
         if (this.timeStart !== null) {
             const timeEnd = performance.now();
             const sessionTime = timeEnd - this.timeStart;
