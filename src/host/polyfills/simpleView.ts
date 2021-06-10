@@ -416,9 +416,10 @@ export function applyInspectorCommonCssTabSliderPatch(content: string): string |
 }
 
 export function applyContextMenuRevealOption(content: string): string | null {
-    const pattern = /const destination\s*=\s*Revealer\.revealDestination\(revealable\);/;
+    // const destination = revealDestination(revealable);
+    const pattern = /const destination\s*=\s*revealDestination\(revealable\);/;
     const replacementText = `
-        let destination = Revealer.revealDestination(revealable);
+        let destination = revealDestination(revealable);
         if (destination==="Sources panel") {
             destination = "Visual Studio Code";
         };`;

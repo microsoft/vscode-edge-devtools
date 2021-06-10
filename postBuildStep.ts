@@ -121,7 +121,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('core/common/Revealer.js', toolsOutDir, [
         applyCommonRevealerPatch,
     ]);
-    await patchFileForWebViewWrapper('components/components.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('components/Linkifier.js', toolsOutDir, [
         applyContextMenuRevealOption,
     ]);
     await patchFileForWebViewWrapper('elements/elements_module.js', toolsOutDir, [
