@@ -168,7 +168,7 @@ export class DevToolsPanel {
     }
 
     private onSocketConsoleOutput(message: string) {
-        const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
+        const { consoleMessage } = JSON.parse(message) as { consoleMessage : string };
         this.consoleOutput.appendLine(consoleMessage);
     }
 
@@ -218,7 +218,7 @@ export class DevToolsPanel {
         encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
-            whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
+            welcome: SettingsProvider.instance.getWelcomeSettings(),
             isHeadless: SettingsProvider.instance.getHeadlessSettings(),
             id });
     }

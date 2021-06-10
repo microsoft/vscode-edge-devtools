@@ -16,7 +16,7 @@ import { vscode } from './host';
 export class ToolsHost {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    InspectorFrontendHostInstance: any;
+    InspectorFrontendHost: any;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
@@ -160,7 +160,7 @@ export class ToolsHost {
         this.fireGetHostCallback(id, {
             enableNetwork: vscodeObject.enableNetwork,
             theme,
-            whatsNew: vscodeObject.whatsNew,
+            welcome: vscodeObject.welcome,
             isHeadless: vscodeObject.isHeadless,
         });
     }

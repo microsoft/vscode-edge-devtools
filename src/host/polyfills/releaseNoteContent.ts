@@ -3,58 +3,50 @@
 
 export const extensionHighlights = `[
     {
-        title: ls\`New integration with VSCode's JavaScript Debugger\`,
+        title: i18nLazyString("Introducing the new 'Welcome' tab!"),
         subtitle:
-            ls\`JavaScript Debugger can now ask Microsoft Edge Devtools to attach to the active debug target.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/391',
+            i18nLazyString("The 'Welcome' tab has replaced the What's New tab as part of the Edge DevTools version update."),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/01/devtools#whats-new-is-now-welcome',
     },
     {
-        title: ls\`Bug Fix for accessibility in the styles property pane\`,
+        title: i18nLazyString("Major Edge DevTools Version update"),
         subtitle:
-            ls\`Screen readers now announces a success message for when using the "Toggle Property and continue editing" option in the style property context menu.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/390',
+            i18nLazyString("We have updated the DevTools version from 88 to 91.  Check out all the major new features in the section below!"),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/414',
     },
     {
-        title: ls\`New default start page when launching Edge DevTools\`,
+        title: i18nLazyString("New home for Microsoft Edge DevTools for VS Code documentation"),
         subtitle:
-            ls\`Launch page contains useful links and instructions to help get you started.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/350',
-    },
-    {
-        title: ls\`New landing view for the sidebar when no targets are available\`,
-        subtitle:
-            ls\`The view contains instructions and buttons to help launch a target or configure your project's launch.json file.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/357',
-    },
-    {
-        title: ls\`New triple dot dropdown menu on extension sidebar\`,
-        subtitle:
-            ls\`Dropdown menu contains links to extension settings and changelog.\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/288',
-    },
-    {
-        title: ls\`Hide and show service and shared workers\`,
-        subtitle:
-            ls\`Created new settings checkbox that will hide or show service and shared workers in the target list (default to hide).\`,
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/284',
+            i18nLazyString("Find our new location for all up-to-date documentation regarding this extension!"),
+        link: 'https://microsoft.github.io/vscode-edge-devtools/',
     },
 ],`;
 
 export const devtoolsHighlights = `[
     {
-        title: ls\`Use improved CSS Grid tools\`,
+        title: i18nLazyString("New Flexbox (flex) icon helps identify and display flex containers"),
         subtitle:
-            ls\`Now you can debug and inspect CSS Grids with persistent overlays, with support for multiple grids, and the new Layout tool.\`,
-        link: 'https://go.microsoft.com/fwlink/?linkid=2146827',
+            i18nLazyString("In the Elements tool, the new Flexbox (flex) icon helps you identify Flexbox containers in your code."),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/01/devtools#new-flexbox-flex-icon-helps-identify-and-display-flex-containers',
     },
     {
-        title: ls\`Learn about updates to the Elements tool\`,
-        subtitle: ls\`View the Computed pane in the Styles pane, and more.\`,
-        link: 'https://go.microsoft.com/fwlink/?linkid=2146829',
+        title: i18nLazyString("Display alignment icons and visual guides when Flexbox layouts change using CSS properties"),
+        subtitle: i18nLazyString("When you edit CSS for your Flexbox layout, CSS autocompletes in the Styles pane now displays helpful icons next to relevant Flexbox properties."),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/01/devtools#display-alignment-icons-and-visual-guides-when-flexbox-layouts-change-using-css-properties',
     },
     {
-        title: ls\`Apply new filters in the Network tool\`,
-        subtitle: ls\`Filter network requests with the new 'resource-type' and 'url' keywords in the Network tool.\`,
-        link: 'https://go.microsoft.com/fwlink/?linkid=2147022',
+        title: i18nLazyString("Improved CSS flexbox editing with visual flexbox editor and multiple overlays"),
+        subtitle: i18nLazyString("DevTools now has dedicated CSS flexbox debugging tools. If the display: flex or display: inline-flex CSS style is applied to an HTML element, a flex icon displays next to that element in the Elements tool."),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/02/devtools#improved-css-flexbox-editing-with-visual-flexbox-editor-and-multiple-overlays',
+    },
+    {
+        title: i18nLazyString("Wavy underlines highlight code issues and improvements in Elements tool"),
+        subtitle: i18nLazyString("In most modern IDEs, wavy underlines under text indicate syntax errors. Now, wavy underlines display under HTML in the DOM view of the Elements tool"),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/04/devtools#wavy-underlines-highlight-code-issues-and-improvements-in-elements-tool',
+    },
+    {
+        title: i18nLazyString("Learn about DevTools with informative tooltips"),
+        subtitle: i18nLazyString("The DevTools Tooltips feature helps you learn about all the different tools and panes in DevTools. Toggle on with 'CTRL/CMD + SHIFT + H' and Toggle off with 'Esc'"),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/04/devtools#learn-about-devtools-with-informative-tooltips',
     },
 ],`;
