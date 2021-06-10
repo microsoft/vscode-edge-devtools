@@ -164,7 +164,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyDefaultTabPatch,
         applyShowDrawerTabs,
     ]);
-    await patchFileForWebViewWrapper('root/root.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('core/root/Runtime_edge.js', toolsOutDir, [
         applyExtensionSettingsInstantiatePatch,
         applyExtensionSettingsRuntimeObjectPatch,
         applyPortSettingsFunctionCallPatch,
@@ -172,7 +172,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyQueryParamsObjectPatch,
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
-    await patchFileForWebViewWrapper('root/root-legacy.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('core/root/root-legacy.js', toolsOutDir, [
         applyCreateExtensionSettingsLegacyPatch,
     ]);
     await patchFileForWebViewWrapper('quick_open/quick_open.js', toolsOutDir, [

@@ -68,8 +68,8 @@ export function applyExtensionSettingsInstantiatePatch(content: string): string 
 }
 
 export function applyExtensionSettingsRuntimeObjectPatch(content: string): string | null {
-    const pattern = /experiments:\s*experiments/;
-    const replacementText = ', vscodeSettings:vscodeSettings';
+    const pattern = /__scope\.experiments\s*=\s*experiments;/;
+    const replacementText = 'vscodeSettings = vscodeSettings';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
