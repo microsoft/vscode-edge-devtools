@@ -149,15 +149,19 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyScreencastTelemetry,
         applyScreencastHeadlessPatch,
     ]);
-    await patchFileForWebViewWrapper('ui/ui.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('ui/legacy/TabbedPane.js', toolsOutDir, [
         applyAppendTabOverridePatch,
         applyAppendTabConditionsPatch,
-        applyDefaultTabPatch,
+        applyPersistDrawerTabs,
+        applySetTabIconPatch,
+    ]);
+    await patchFileForWebViewWrapper('ui/legacy/InspectorView_edge.js', toolsOutDir, [
         applyDrawerTabLocationPatch,
         applyInspectorViewShowDrawerPatch,
         applyMoveToContextMenuPatch,
-        applyPersistDrawerTabs,
-        applySetTabIconPatch,
+    ]);
+    await patchFileForWebViewWrapper('ui/legacy/ViewManager.js', toolsOutDir, [
+        applyDefaultTabPatch,
         applyShowDrawerTabs,
     ]);
     await patchFileForWebViewWrapper('root/root.js', toolsOutDir, [
