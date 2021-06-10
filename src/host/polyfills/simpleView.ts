@@ -106,10 +106,11 @@ export function applyStylesRevealerPatch(content: string): string | null {
 
 export function applyStylesToggleFocusPatch(content: string): string | null {
     // Patch to fix accessibility focus issue when toggling a property with context menu option.
-    const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(ls\s*`Toggle property[\s\S]+.const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
+    const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(\s*.*\s*const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
     const replacementText = `
         const sectionIndex = this._parentPane.focusedSectionIndex();
-        contextMenu.defaultSection().appendCheckboxItem(ls \`Toggle property and continue editing\`, async () => {
+        contextMenu.defaultSection().appendCheckboxItem(
+            i18nString(UIStrings.togglePropertyAndContinueEditing), async () => {
             ARIAUtils.alert('Toggle property and continue editing selected', this.nameElement);
     `;
     return replaceInSourceCode(content, pattern, replacementText);
@@ -117,11 +118,12 @@ export function applyStylesToggleFocusPatch(content: string): string | null {
 
 export function applyNoMatchingStylesPatch(content: string): string | null {
     // Patch to inform user to refresh/resume target to get CSS information when attaching to a paused target.
-    const pattern = /this\._noMatchesElement\.textContent\s*=\s*(ls\s*`No matching selector or style`);/g;
+    // this._noMatchesElement.textContent = i18nString(UIStrings.noMatchingSelectorOrStyle);
+    const pattern = /this\._noMatchesElement\.textContent\s*=\s*i18nString\(UIStrings\.noMatchingSelectorOrStyle\);/g;
     const replacementText = `
-       const noMatchSelector = ls \`No matching selector or style.\`;
-       const pausedExplanation = ls \`Styles may not be available if target was paused when opening Edge DevTools.\`;
-       const resumePrompt = ls \`Please resume or refresh the target.\`;
+       const noMatchSelector = i18nString(UIStrings.noMatchingSelectorOrStyle);
+       const pausedExplanation = i18nString("Styles may not be available if target was paused when opening Edge DevTools.");
+       const resumePrompt = i18nString("Please resume or refresh the target.");
        this._noMatchesElement.innerHTML = \`\${noMatchSelector}<br />\${pausedExplanation}<br />\${resumePrompt}\`;
     `;
     return replaceInSourceCode(content, pattern, replacementText);

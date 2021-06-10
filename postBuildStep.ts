@@ -124,12 +124,17 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('components/Linkifier.js', toolsOutDir, [
         applyContextMenuRevealOption,
     ]);
-    await patchFileForWebViewWrapper('elements/elements_module.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('panels/elements/elements_module.js', toolsOutDir, [
         applyPaddingInlineCssPatch,
     ]);
-    await patchFileForWebViewWrapper('elements/elements.js', toolsOutDir, [
-        applyNoMatchingStylesPatch,
+    // Post built files swap upstream and downstream names for file loading
+    await patchFileForWebViewWrapper('panels/elements/StylesSidebarPane_edge.js', toolsOutDir, [
+        applyNoMatchingStylesPatch
+    ]);
+    await patchFileForWebViewWrapper('panels/elements/ElementsPanel.js', toolsOutDir, [
         applySetupTextSelectionPatch,
+    ]);
+    await patchFileForWebViewWrapper('panels/elements/StylePropertyTreeElement.js', toolsOutDir, [
         applyStylesRevealerPatch,
         applyStylesToggleFocusPatch,
     ]);
