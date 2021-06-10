@@ -340,9 +340,9 @@ export function applyInspectorCommonCssPatch(content: string): string | null {
         hideMoreToolsBtn +
         unHideScreenCastBtn;
 
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    const replacementText = `${topHeaderCSS}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText);
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${topHeaderCSS}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyInspectorCommonNetworkPatch(content: string): string | null {
@@ -370,9 +370,9 @@ export function applyInspectorCommonNetworkPatch(content: string): string | null
         hidePrettyPrintBtn +
         unHideSearchCloseButton;
 
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    const replacementText = `${networkCSS}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText);
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${networkCSS}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyInspectorCommonContextMenuPatch(content: string): string | null {
@@ -389,10 +389,10 @@ export function applyInspectorCommonContextMenuPatch(content: string): string | 
         .soft-context-menu-item[aria-label='Save as...'] {
             display: none !important;
         }`.replace(/\n/g, separator);
-
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    const replacementText = `${hideContextMenuItems}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText);
+        //platform-mac,\n:host-context(.platform-mac)
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${hideContextMenuItems}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyInspectorCommonCssRightToolbarPatch(content: string): string | null {
