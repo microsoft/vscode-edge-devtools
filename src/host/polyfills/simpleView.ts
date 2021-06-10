@@ -92,7 +92,8 @@ export function applyPortSettingsFunctionCallPatch(content: string): string | nu
 }
 
 export function applyCommonRevealerPatch(content: string): string | null {
-    const pattern = /let reveal\s*=\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
+    // let reveal = async function (revealable, omitFocus) {
+    const pattern = /let\s*reveal\s*=\s*async\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
     const replacementText = `let reveal = ${revealInVSCode.toString().slice(0, -1)}`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
@@ -195,12 +196,12 @@ export function applyMainViewPatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyScreencastAppPatch(content: string): string | null {
-    // This patch fixes screencasting functionality in version 88
-    const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
-    const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
-    return replaceInSourceCode(content, pattern, replacementText);
-}
+// export function applyScreencastAppPatch(content: string): string | null {
+//     // This patch fixes screencasting functionality in version 88
+//     const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
+//     const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
+//     return replaceInSourceCode(content, pattern, replacementText);
+// }
 
 export function applyScreencastRepaintPatch(content: string): string | null {
     // This patch removes a condition that calls repaint to restore scroll functionality

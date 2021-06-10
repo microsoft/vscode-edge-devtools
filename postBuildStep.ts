@@ -34,7 +34,7 @@ import {
     applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
     applyRemovePreferencePatch,
-    applyScreencastAppPatch,
+    // applyScreencastAppPatch,
     applyScreencastCursorPatch,
     applyScreencastTelemetry,
     applyScreencastHeadlessPatch,
@@ -116,9 +116,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('main/MainImpl.js', toolsOutDir, [
         applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
-        applyScreencastAppPatch,
+        // applyScreencastAppPatch,
     ]);
-    await patchFileForWebViewWrapper('common/common.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('core/common/Revealer.js', toolsOutDir, [
         applyCommonRevealerPatch,
     ]);
     await patchFileForWebViewWrapper('components/components.js', toolsOutDir, [

@@ -79,13 +79,13 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyScreencastAppPatch correctly changes text", async () => {
-        const filePath = "main/main.js";
-        const patch = SimpleView.applyScreencastAppPatch;
-        const expectedStrings = ["Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();"];
+    // it("applyScreencastAppPatch correctly changes text", async () => {
+    //     const filePath = "main/main.js";
+    //     const patch = SimpleView.applyScreencastAppPatch;
+    //     const expectedStrings = ["Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();"];
 
-        await testPatch(filePath, patch, expectedStrings);
-    });
+    //     await testPatch(filePath, patch, expectedStrings);
+    // });
 
     it("applyScreencastRepaintPatch correctly changes text", async () => {
         const filePath = "screencast/screencast.js";
