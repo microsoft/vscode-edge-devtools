@@ -113,7 +113,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyInspectorCommonNetworkPatch,
         applyInspectorCommonCssTabSliderPatch,
     ]);
-    await patchFileForWebViewWrapper('main/main.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('main/MainImpl.js', toolsOutDir, [
         applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
         applyScreencastAppPatch,

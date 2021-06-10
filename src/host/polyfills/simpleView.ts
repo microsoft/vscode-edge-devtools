@@ -183,7 +183,8 @@ export function applyInspectorViewShowDrawerPatch(content: string): string | nul
 
 export function applyInspectorViewCloseDrawerPatch(content: string): string | null {
     // this patch closes the drawer if the network tool is disabled
-    const pattern = /InspectorView\.InspectorView\.instance\(\)\.createToolbars\(\);/g;
+    // await InspectorView.instance().createToolbars();
+    const pattern = /await\s*InspectorView\.instance\(\)\.createToolbars\(\);/g;
     const replacementText = `if (!${isDrawerEnabled}) {InspectorView.InspectorView.instance()._closeDrawer();}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
