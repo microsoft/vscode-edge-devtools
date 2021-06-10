@@ -205,12 +205,12 @@ export function applyMainViewPatch(content: string): string | null {
 //     return replaceInSourceCode(content, pattern, replacementText);
 // }
 
-export function applyScreencastRepaintPatch(content: string): string | null {
-    // This patch removes a condition that calls repaint to restore scroll functionality
-    const pattern = /\(this._highlightNode\)/g;
-    const replacementText = '(true)';
-    return replaceInSourceCode(content, pattern, replacementText);
-}
+// export function applyScreencastRepaintPatch(content: string): string | null {
+//     // This patch removes a condition that calls repaint to restore scroll functionality
+//     const pattern = /\(this._highlightNode\)/g;
+//     const replacementText = '(true)';
+//     return replaceInSourceCode(content, pattern, replacementText);
+// }
 
 export function applyRemoveBreakOnContextMenuItem(content: string): string | null {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
@@ -456,7 +456,7 @@ export function applyRerouteConsoleMessagePatch(content: string): string | null 
 
 export function applyScreencastCursorPatch(content: string): string | null {
     // This patch removes the touch cursor from the screencast view
-    const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g;
+    const pattern = /\('div',\s*'screencast-canvas-container'\);/g;
     const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
@@ -464,7 +464,8 @@ export function applyScreencastCursorPatch(content: string): string | null {
 export function applyScreencastHeadlessPatch(content: string): string | null {
     // This patch will toggle the DevTools screencast on or off based on if the user is using headless or non-headless mode.
     // This patch also marks a time stamp if the setting is enabled.
-    const pattern = /this\._enabledSetting\s*=\s*Settings\.Settings\.instance\(\)\.createSetting\('screencastEnabled',\s*true\);/g;
+    // this._enabledSetting = Settings.instance().createSetting('screencastEnabled', true);
+    const pattern = /this\._enabledSetting\s*=\s*Settings\.instance\(\)\.createSetting\('screencastEnabled',\s*true\);/g;
     const replacementText = "const isHeadless = Root.Runtime.vscodeSettings.isHeadless; this._enabledSetting.set(isHeadless); this._startTime = isHeadless ? performance.now() : null;";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }

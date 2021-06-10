@@ -38,7 +38,7 @@ import {
     applyScreencastCursorPatch,
     applyScreencastTelemetry,
     applyScreencastHeadlessPatch,
-    applyScreencastRepaintPatch,
+    // applyScreencastRepaintPatch,
     applySetTabIconPatch,
     applyShowDrawerTabs,
     applyStylesRevealerPatch,
@@ -127,7 +127,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('panels/elements/elements_module.js', toolsOutDir, [
         applyPaddingInlineCssPatch,
     ]);
-    // Post built files swap upstream and downstream names for file loading
+    // Post built files swap upstream and downstream names
     await patchFileForWebViewWrapper('panels/elements/StylesSidebarPane_edge.js', toolsOutDir, [
         applyNoMatchingStylesPatch
     ]);
@@ -138,14 +138,16 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyStylesRevealerPatch,
         applyStylesToggleFocusPatch,
     ]);
-    await patchFileForWebViewWrapper('host/host.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('core/host/InspectorFrontendHost.js', toolsOutDir, [
         applyRemovePreferencePatch,
     ]);
-    await patchFileForWebViewWrapper('screencast/screencast.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('screencast/ScreencastView.js', toolsOutDir, [
         applyScreencastCursorPatch,
+        // applyScreencastRepaintPatch,
+    ]);
+    await patchFileForWebViewWrapper('screencast/ScreencastApp.js', toolsOutDir, [
         applyScreencastTelemetry,
         applyScreencastHeadlessPatch,
-        applyScreencastRepaintPatch,
     ]);
     await patchFileForWebViewWrapper('ui/ui.js', toolsOutDir, [
         applyAppendTabOverridePatch,
