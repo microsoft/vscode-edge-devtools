@@ -92,10 +92,6 @@ export class ToolsHost {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getVscodeSettings', {id});
     }
 
-    sendToVscodeOutput(consoleMessage: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
-    }
-
     copyText(clipboardData: string): void {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'copyText', {clipboardData});
     }

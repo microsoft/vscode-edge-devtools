@@ -17,7 +17,6 @@ import {
     applyExtensionSettingsInstantiatePatch,
     applyExtensionSettingsRuntimeObjectPatch,
     applyPortSettingsFunctionCallPatch,
-    applyPortSettingsFunctionCreationPatch,
     applyQuickOpenPatch,
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
@@ -45,6 +44,9 @@ import {
     applyStylesToggleFocusPatch,
     applyThemePatch,
     applyNoMatchingStylesPatch,
+    applyExtensionSettingExportPatch,
+    applyPortSettingsFunctionCreationPatch,
+    applyConsoleImportPatch,
 } from './src/host/polyfills/simpleView';
 import { applySetupTextSelectionPatch } from './src/host/polyfills/textSelection';
 import { applyThirdPartyI18nLocalesPatch } from './src/host/polyfills/thirdPartyI18n';
@@ -165,12 +167,15 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyShowDrawerTabs,
     ]);
     await patchFileForWebViewWrapper('core/root/Runtime_edge.js', toolsOutDir, [
-        applyExtensionSettingsInstantiatePatch,
-        applyExtensionSettingsRuntimeObjectPatch,
-        applyPortSettingsFunctionCallPatch,
-        applyPortSettingsFunctionCreationPatch,
         applyQueryParamsObjectPatch,
         applyRuntimeImportScriptPathPrefixPatch,
+    ]);
+    await patchFileForWebViewWrapper('core/root/Runtime.js', toolsOutDir, [
+        applyExtensionSettingsInstantiatePatch,
+        applyExtensionSettingsRuntimeObjectPatch,
+        applyExtensionSettingExportPatch,
+        applyPortSettingsFunctionCallPatch,
+        applyPortSettingsFunctionCreationPatch,
     ]);
     await patchFileForWebViewWrapper('core/root/root-legacy.js', toolsOutDir, [
         applyCreateExtensionSettingsLegacyPatch,
@@ -196,6 +201,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper('core/sdk/ConsoleModel.js', toolsOutDir, [
         applyRerouteConsoleMessagePatch,
+        applyConsoleImportPatch,
     ]);
     await patchFileForWebViewWrapper('third_party/i18n/i18n-bundle.js', toolsOutDir, [
         applyThirdPartyI18nLocalesPatch,

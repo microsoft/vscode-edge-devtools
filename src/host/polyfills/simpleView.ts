@@ -56,7 +56,7 @@ export function getVscodeSettings(callback: (arg0: Record<string, unknown>) => v
 }
 
 export function sendToVscodeOutput(message: string): void {
-    // Since we are calling InspectorFrontendHost outside of root.js, we need to use InspectorFrontendHost.InspectorFrontendHostInstance
+    // Since we are calling InspectorFrontendHost outside of root.js, we need to use Host.InspectorFrontendHost.InspectorFrontendHostInstance
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
 }
@@ -69,8 +69,15 @@ export function applyExtensionSettingsInstantiatePatch(content: string): string 
 
 export function applyExtensionSettingsRuntimeObjectPatch(content: string): string | null {
     const pattern = /__scope\.experiments\s*=\s*experiments;/;
-    const replacementText = 'vscodeSettings = vscodeSettings';
+    const replacementText = '__scope.vscodeSettings = vscodeSettings';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
+}
+
+export function applyExtensionSettingExportPatch(content: string): string | null {
+    // export { Experiment, ExperimentsSupport, Runtime, experiments, loadResourcePromise, loadScriptPromise };
+    const pattern = /export { Experiment, ExperimentsSupport, Runtime, experiments, loadResourcePromise, loadScriptPromise }/;
+    const replacementText = 'export { Experiment, ExperimentsSupport, Runtime, experiments, vscodeSettings, loadResourcePromise, loadScriptPromise }';
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyCreateExtensionSettingsLegacyPatch(content: string): string | null {
@@ -80,13 +87,14 @@ export function applyCreateExtensionSettingsLegacyPatch(content: string): string
 }
 
 export function applyPortSettingsFunctionCreationPatch(content: string): string | null {
-    const pattern = /static instance/g;
+    const pattern = /static isDescriptorEnabled/g;
     const replacementText = getVscodeSettings.toString().slice(9);
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyPortSettingsFunctionCallPatch(content: string): string | null {
-    const pattern = /this._descriptorsMap\s*=\s*{};/g;
+    // super(descriptors);
+    const pattern = /super\(descriptors\);/g;
     const replacementText = 'this.getVscodeSettings((vscodeSettingsObject) => {Object.assign(vscodeSettings, vscodeSettingsObject);});';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
@@ -94,7 +102,7 @@ export function applyPortSettingsFunctionCallPatch(content: string): string | nu
 export function applyCommonRevealerPatch(content: string): string | null {
     // let reveal = async function (revealable, omitFocus) {
     const pattern = /let\s*reveal\s*=\s*async\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
-    const replacementText = `let reveal = ${revealInVSCode.toString().slice(0, -1)}`;
+    const replacementText = `let reveal = async ${revealInVSCode.toString().slice(0, -1)}`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -438,7 +446,7 @@ export function applyThemePatch(content: string): string | null {
     // Sets the theme of the DevTools
     // const themeSetting = Settings.instance().createSetting('uiTheme', EDGE_DEFAULT_THEME);
     const pattern = /const\s*themeSetting\s*=\s*Settings\.instance\(\)\.createSetting\('uiTheme',\s*EDGE_DEFAULT_THEME\);/;
-    const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor';
+    const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);}';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
@@ -446,6 +454,13 @@ export function applyRemovePreferencePatch(content: string): string | null {
     // This patch returns early whe trying to remove localStorage which we already set as undefined
     const pattern = /removePreference\(name\)\s*{\s*delete window\.localStorage\[name\];\s*}/;
     const replacementText = 'removePreference(name){return;}';
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
+export function applyConsoleImportPatch(content: string): string | null {
+    // import { userMetrics } from '../host/host.js';
+    const pattern = /import { userMetrics }/g;
+    const replacementText = `import { userMetrics, InspectorFrontendHost }`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
