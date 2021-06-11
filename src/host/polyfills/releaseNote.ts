@@ -4,7 +4,7 @@
 import {devtoolsHighlights, extensionHighlights} from './releaseNoteContent';
 
 export function applyReleaseNotePatch(content: string): string | null {
-    const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+var ReleaseNoteText_edge\s*=/;
+    const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+export\s*{\s*releaseNoteText\s*};/;
     const replacementNotes = `
         export const releaseNoteText = [
             {
@@ -17,7 +17,7 @@ export function applyReleaseNotePatch(content: string): string | null {
             },
         ];
 
-        var ReleaseNoteText_edge =
+        export { releaseNoteText };
     `;
 
     if (releaseNoteTextPattern.exec(content)) {

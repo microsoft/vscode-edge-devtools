@@ -175,25 +175,29 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('core/root/root-legacy.js', toolsOutDir, [
         applyCreateExtensionSettingsLegacyPatch,
     ]);
-    await patchFileForWebViewWrapper('quick_open/quick_open.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('quick_open/CommandMenu_edge.js', toolsOutDir, [
         applyCommandMenuPatch,
+    ]);
+    await patchFileForWebViewWrapper('quick_open/QuickOpen.js', toolsOutDir, [
         applyQuickOpenPatch,
     ]);
-    await patchFileForWebViewWrapper('browser_debugger/browser_debugger.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('panels/browser_debugger/DOMBreakpointsSidebarPane.js', toolsOutDir, [
         applyRemoveBreakOnContextMenuItem,
     ]);
-    await patchFileForWebViewWrapper('themes/themes.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('themes/ThemesImpl.js', toolsOutDir, [
         applyThemePatch,
     ]);
-    await patchFileForWebViewWrapper('help/help.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('panels/help/ReleaseNoteView.js', toolsOutDir, [
         applyAnnouncementNamePatch,
         applyGithubLinksPatch,
+    ]);
+    await patchFileForWebViewWrapper('panels/help/ReleaseNoteText.js', toolsOutDir, [
         applyReleaseNotePatch,
     ]);
-    await patchFileForWebViewWrapper('sdk/sdk.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('core/sdk/ConsoleModel.js', toolsOutDir, [
         applyRerouteConsoleMessagePatch,
     ]);
-    await patchFileForWebViewWrapper('i18n/i18n.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('third_party/i18n/i18n-bundle.js', toolsOutDir, [
         applyThirdPartyI18nLocalesPatch,
     ]);
 }

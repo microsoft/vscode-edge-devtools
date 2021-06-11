@@ -436,9 +436,10 @@ export function applyMoveToContextMenuPatch(content: string): string | null {
 
 export function applyThemePatch(content: string): string | null {
     // Sets the theme of the DevTools
-    const pattern = /const settingDescriptor/;
+    // const themeSetting = Settings.instance().createSetting('uiTheme', EDGE_DEFAULT_THEME);
+    const pattern = /const\s*themeSetting\s*=\s*Settings\.instance\(\)\.createSetting\('uiTheme',\s*EDGE_DEFAULT_THEME\);/;
     const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor';
-    return replaceInSourceCode(content, pattern, replacementText);
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyRemovePreferencePatch(content: string): string | null {
@@ -449,7 +450,7 @@ export function applyRemovePreferencePatch(content: string): string | null {
 }
 
 export function applyRerouteConsoleMessagePatch(content: string): string | null {
-    const pattern = /this\.dispatchEventToListeners\(Events\$h\.MessageAdded,\s*msg\);/g;
+    const pattern = /this\.dispatchEventToListeners\(Events\.MessageAdded,\s*msg\);/g;
     const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
