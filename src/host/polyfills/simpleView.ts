@@ -266,6 +266,7 @@ export function applyAppendTabConditionsPatch(content: string): string | null {
         'accessibility.view',
         'elements.domProperties',
         'elements.eventListeners',
+        'elements.layout',
     ];
 
     const condition = elementsTabs.map(tab => {
