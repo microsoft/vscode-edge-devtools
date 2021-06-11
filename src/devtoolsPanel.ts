@@ -168,7 +168,9 @@ export class DevToolsPanel {
     }
 
     private onSocketConsoleOutput(message: string) {
-        const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
+        console.log(message);
+        const { consoleMessage } = JSON.parse(message) as { consoleMessage : string };
+        console.log(consoleMessage);
         this.consoleOutput.appendLine(consoleMessage);
     }
 

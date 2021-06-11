@@ -3,7 +3,7 @@
 import { IDevToolsWindow } from '../host';
 import { ToolsHost } from '../toolsHost';
 
-declare let InspectorFrontendHost: ToolsHost;
+declare let Host: ToolsHost;
 
 interface IRevealable {
     lineNumber: number;
@@ -52,13 +52,13 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
 }
 
 export function getVscodeSettings(callback: (arg0: Record<string, unknown>) => void): void {
-    InspectorFrontendHost.getVscodeSettings(callback);
+    Host.InspectorFrontendHost.getVscodeSettings(callback);
 }
 
 export function sendToVscodeOutput(message: string): void {
     // Since we are calling InspectorFrontendHost outside of root.js, we need to use Host.InspectorFrontendHost.InspectorFrontendHostInstance
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
+    Host.InspectorFrontendHost.sendToVscodeOutput(message);
 }
 
 export function applyExtensionSettingsInstantiatePatch(content: string): string | null {
@@ -491,13 +491,13 @@ export function applyScreencastTelemetry(content: string): string | null {
     const pattern = /const enabled\s*=\s*!this\._toggleButton\.toggled\(\);/g;
     const replacementText = `
     if (enabled) {
-        InspectorFrontendHost.InspectorFrontendHostInstance.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1, 2);
+        Host.InspectorFrontendHost.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1, 2);
         this._startTime = performance.now();
     } else {
-        InspectorFrontendHost.InspectorFrontendHostInstance.recordEnumeratedHistogram('DevTools.ScreencastToggle', 0, 2);
+        Host.InspectorFrontendHost.recordEnumeratedHistogram('DevTools.ScreencastToggle', 0, 2);
         if (this._startTime) {
             const sessionDuration = performance.now() - this._startTime;
-            InspectorFrontendHost.InspectorFrontendHostInstance.recordPerformanceHistogram('DevTools.ScreencastDuration', sessionDuration);
+            Host.InspectorFrontendHost.recordPerformanceHistogram('DevTools.ScreencastDuration', sessionDuration);
         }
     }`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);

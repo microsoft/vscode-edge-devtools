@@ -16,7 +16,7 @@ import { vscode } from './host';
 export class ToolsHost {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    InspectorFrontendHostInstance: any;
+    InspectorFrontendHost: any;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
@@ -90,6 +90,10 @@ export class ToolsHost {
         const id = this.getHostCallbacksNextId++;
         this.getHostCallbacks.set(id, callback);
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getVscodeSettings', {id});
+    }
+
+    sendToVscodeOutput(consoleMessage: string): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
     }
 
     copyText(clipboardData: string): void {
