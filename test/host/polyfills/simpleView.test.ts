@@ -26,7 +26,7 @@ describe("simpleView", () => {
     it("applyCommonRevealerPatch correctly changes text", async () => {
         const filePath = "core/common/Revealer.js";
         const patch = SimpleView.applyCommonRevealerPatch;
-        const expectedStrings = ["let reveal = function revealInVSCode(revealable, omitFocus) {"];
+        const expectedStrings = ["let reveal = async function revealInVSCode(revealable, omitFocus) {"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -66,7 +66,7 @@ describe("simpleView", () => {
     it("applyInspectorViewCloseDrawerPatch correctly changes _showAppUI text", async () => {
         const filePath = "main/MainImpl.js";
         const patch = SimpleView.applyInspectorViewCloseDrawerPatch;
-        const expectedStrings = ["InspectorView.InspectorView.instance()._closeDrawer();"];
+        const expectedStrings = ["InspectorView.instance()._closeDrawer();"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -130,7 +130,7 @@ describe("simpleView", () => {
     it("applyPersistTabs correctly changes text", async () => {
         const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applyPersistTabs;
-        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;"];
+        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' || id === 'release-note' || id === 'network')?false:closeable;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -226,13 +226,13 @@ describe("simpleView", () => {
     it("applyExtensionSettingsRuntimeObjectPatch correctly changes RuntimeObject to include extensionSettings global const", async () => {
         const filePath = "core/root/Runtime.js";
         const patch = SimpleView.applyExtensionSettingsRuntimeObjectPatch;
-        const expectedStrings = ["vscodeSettings:vscodeSettings"];
+        const expectedStrings = ["__scope.vscodeSettings = vscodeSettings"];
 
         testPatch(filePath, patch, expectedStrings);
     });
 
     it("applyCreateExtensionSettingsLegacyPatch correctly changes root-legacy.js to include extensionSettings glbal const", async () => {
-        const filePath = "root/root-legacy.js";
+        const filePath = "core/root/root-legacy.js";
         const patch = SimpleView.applyCreateExtensionSettingsLegacyPatch;
         const expectedStrings = ["Root.Runtime.vscodeSettings = Runtime.vscodeSettings"];
 
@@ -275,10 +275,10 @@ describe("simpleView", () => {
         const filePath = "panels/elements/StylesSidebarPane_edge.js";
         const patch = SimpleView.applyNoMatchingStylesPatch;
         const expectedStrings = [
-            `const noMatchSelector = ls \`No matching selector or style.\`;`,
-            `const pausedExplanation = ls \`Styles may not be available if target was paused when opening Edge DevTools.\`;`,
-            `const resumePrompt = ls \`Please resume or refresh the target.\`;`,
-            `this._noMatchesElement.innerHTML = \`\${noMatchSelector}<br />\${pausedExplanation}<br />\${resumePrompt}\`;`,
+            `const noMatchSelector = i18nString(UIStrings.noMatchingSelectorOrStyle);`,
+            `const pausedExplanation = i18nString("Styles may not be available if target was paused when opening Edge DevTools.");`,
+            `const resumePrompt = i18nString("Please resume or refresh the target.");`,
+            `this._noMatchesElement.innerHTML = \`\${noMatchSelector}<br />\${pausedExplanation}<br />\${resumePrompt}\`;`
         ];
 
         testPatch(filePath, patch, expectedStrings);

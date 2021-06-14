@@ -5,7 +5,7 @@ import { applySetupTextSelectionPatch } from "../../../src/host/polyfills/textSe
 
 describe("textSelection", () => {
     it("applySetupTextSelectionPatch correctly changes text", async () => {
-        const filePath = "elements/elements.js";
+        const filePath = "panels/elements/ElementsPanel.js";
         const expectedStrings = ["_setupTextSelectionHack() { return;"];
         testPatch(filePath, applySetupTextSelectionPatch, expectedStrings);
     });
