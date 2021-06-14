@@ -37,7 +37,6 @@ import {
     applyScreencastCursorPatch,
     applyScreencastTelemetry,
     applyScreencastHeadlessPatch,
-    // applyScreencastRepaintPatch,
     applySetTabIconPatch,
     applyShowDrawerTabs,
     applyStylesRevealerPatch,
@@ -145,7 +144,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper('screencast/ScreencastView.js', toolsOutDir, [
         applyScreencastCursorPatch,
-        // applyScreencastRepaintPatch,
     ]);
     await patchFileForWebViewWrapper('screencast/ScreencastApp.js', toolsOutDir, [
         applyScreencastTelemetry,
