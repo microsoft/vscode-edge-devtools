@@ -79,14 +79,6 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    // it("applyScreencastAppPatch correctly changes text", async () => {
-    //     const filePath = "main/main.js";
-    //     const patch = SimpleView.applyScreencastAppPatch;
-    //     const expectedStrings = ["Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();"];
-
-    //     await testPatch(filePath, patch, expectedStrings);
-    // });
-
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
         const filePath = "ui/ui.js";
         const patch = SimpleView.applyDrawerTabLocationPatch;

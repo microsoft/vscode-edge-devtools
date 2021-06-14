@@ -206,13 +206,6 @@ export function applyMainViewPatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-// export function applyScreencastAppPatch(content: string): string | null {
-//     // This patch fixes screencasting functionality in version 88
-//     const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
-//     const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
-//     return replaceInSourceCode(content, pattern, replacementText);
-//
-
 export function applyRemoveBreakOnContextMenuItem(content: string): string | null {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
     const replacementText = '';
