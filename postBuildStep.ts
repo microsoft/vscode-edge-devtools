@@ -142,10 +142,12 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyPersistTabs,
         applySetTabIconPatch,
     ]);
+    await patchFileForWebViewWrapper('ui/legacy/InspectorView.js', toolsOutDir, [
+        applyMoveToContextMenuPatch,
+    ]);
     await patchFileForWebViewWrapper('ui/legacy/InspectorView_edge.js', toolsOutDir, [
         applyDrawerTabLocationPatch,
         applyInspectorViewShowDrawerPatch,
-        applyMoveToContextMenuPatch,
     ]);
     await patchFileForWebViewWrapper('ui/legacy/ViewManager.js', toolsOutDir, [
         applyDefaultTabPatch,
