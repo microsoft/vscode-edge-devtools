@@ -122,7 +122,7 @@ describe("simpleView", () => {
     it("applyShowDrawerTabs correctly changes text", async () => {
         const filePath = "ui/legacy/ViewManager.js";
         const patch = SimpleView.applyShowDrawerTabs;
-        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')"];
+        const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls')"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -130,7 +130,7 @@ describe("simpleView", () => {
     it("applyPersistTabs correctly changes text", async () => {
         const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applyPersistTabs;
-        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' || id === 'release-note' || id === 'network')?false:closeable;"];
+        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' || id === 'network')?false:closeable;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
