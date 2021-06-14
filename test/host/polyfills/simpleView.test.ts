@@ -58,7 +58,7 @@ describe("simpleView", () => {
     it("applyInspectorViewShowDrawerPatch correctly changes _showDrawer text", async () => {
         const filePath = "ui/legacy/InspectorView_edge.js";
         const patch = SimpleView.applyInspectorViewShowDrawerPatch;
-        const expectedStrings = ["if (!(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)) {return false;}"];
+        const expectedStrings = ["if (!(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.welcome)) {return false;}"];
 
         await testPatch(filePath, patch, expectedStrings);
     });

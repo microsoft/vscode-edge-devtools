@@ -20,10 +20,10 @@ export class SettingsProvider {
     return themeString;
   }
 
-  getWhatsNewSettings(): boolean {
+  getWelcomeSettings(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const whatsNewEnabled: boolean = settings.get('whatsNew') || false;
-    return whatsNewEnabled;
+    const welcomeEnabled: boolean = settings.get('welcome') || false;
+    return welcomeEnabled;
   }
 
   getHeadlessSettings(): boolean {

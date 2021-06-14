@@ -160,7 +160,7 @@ export class ToolsHost {
         this.fireGetHostCallback(id, {
             enableNetwork: vscodeObject.enableNetwork,
             theme,
-            whatsNew: vscodeObject.whatsNew,
+            welcome: vscodeObject.welcome,
             isHeadless: vscodeObject.isHeadless,
         });
     }

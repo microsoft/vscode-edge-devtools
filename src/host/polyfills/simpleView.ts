@@ -18,7 +18,7 @@ const enum KeepMatchedText {
     AtEnd = 2
 }
 
-const isDrawerEnabled = '(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)';
+const isDrawerEnabled = '(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.welcome)';
 
 function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText): string | null {
     const match = pattern.exec(content);
@@ -219,14 +219,14 @@ export function applyRemoveBreakOnContextMenuItem(content: string): string | nul
 export function applyShowDrawerTabs(content: string): string | null {
     // Appends the Request Blocking tab or Whats New tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
-    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')";
+    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyPersistTabs(content: string): string | null {
     // Removes the close button from the Request blocking and Whats New tab tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-    const replacementText = "this._closeable= (id==='network.blocked-urls' || id === 'release-note' || id === 'network')?false:closeable;";
+    const replacementText = "this._closeable= (id==='network.blocked-urls' || id === 'network')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -270,8 +270,8 @@ export function applyAppendTabConditionsPatch(content: string): string | null {
         appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
             let patchedCondition = ${condition};
             ${applyEnableNetworkPatch()}
-            if(Root.Runtime.vscodeSettings.whatsNew) {
-              patchedCondition = patchedCondition && (id !== "release-note");
+            if(Root.Runtime.vscodeSettings.welcome) {
+              patchedCondition = patchedCondition && (id !== "welcome");
             }
             if (!patchedCondition) {
                 this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);

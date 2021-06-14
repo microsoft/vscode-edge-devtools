@@ -205,9 +205,9 @@
                     "description": "Show service and shared workers in the target list.",
                     "default": false
                 },
-                "vscode-edge-devtools.whatsNew": {
+                "vscode-edge-devtools.welcome": {
                     "type": "boolean",
-                    "description": "Enable What's New panel in the drawer (requires relaunching extension)",
+                    "description": "Enable Welcome panel (requires relaunching extension)",
                     "default": true
                 },
                 "vscode-edge-devtools.headless": {

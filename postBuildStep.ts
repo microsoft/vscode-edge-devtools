@@ -4,7 +4,7 @@ import * as fse from 'fs-extra';
 import path from 'path';
 
 import { applyRuntimeImportScriptPathPrefixPatch } from './src/host/polyfills/runtime';
-import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from './src/host/polyfills/releaseNote';
+import {applyAnnouncementNamePatch, applyReleaseNotePatch, applySettingsCheckboxPatch, applyShowMorePatch} from './src/host/polyfills/releaseNote';
 import {
     applyAppendTabOverridePatch,
     applyAppendTabConditionsPatch,
@@ -179,9 +179,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('themes/ThemesImpl.js', toolsOutDir, [
         applyThemePatch,
     ]);
-    await patchFileForWebViewWrapper('panels/help/ReleaseNoteView.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('welcome/WelcomePanel.js', toolsOutDir, [
         applyAnnouncementNamePatch,
-        applyGithubLinksPatch,
+        applySettingsCheckboxPatch,
     ]);
     await patchFileForWebViewWrapper('panels/help/ReleaseNoteText.js', toolsOutDir, [
         applyReleaseNotePatch,
@@ -192,6 +192,9 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper('third_party/i18n/i18n-bundle.js', toolsOutDir, [
         applyThirdPartyI18nLocalesPatch,
+    ]);
+    await patchFileForWebViewWrapper('welcome/WhatsNewList.js', toolsOutDir, [
+        applyShowMorePatch,
     ]);
 }
 
