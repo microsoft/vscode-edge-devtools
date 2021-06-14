@@ -24,7 +24,7 @@ describe("simpleView", () => {
     });
 
     it("applyCommonRevealerPatch correctly changes text", async () => {
-        const filePath = "common/common.js";
+        const filePath = "core/common/Revealer.js";
         const patch = SimpleView.applyCommonRevealerPatch;
         const expectedStrings = ["let reveal = function revealInVSCode(revealable, omitFocus) {"];
 
@@ -32,7 +32,7 @@ describe("simpleView", () => {
     });
 
     it("applyQuickOpenPatch correctly changes handleAction text for Quick Open", async () => {
-        const filePath = "quick_open/quick_open.js";
+        const filePath = "quick_open/QuickOpen.js";
         const patch = SimpleView.applyQuickOpenPatch;
         const expectedStrings = ["handleAction(context, actionId) { actionId = null; switch(actionId)"];
 
@@ -40,7 +40,7 @@ describe("simpleView", () => {
     });
 
     it("applyQueryParamsObjectPatch correctly changes handleAction text for Quick Open", async () => {
-        const filePath = "root/root.js";
+        const filePath = "core/root/Runtime_edge.js";
         const patch = SimpleView.applyQueryParamsObjectPatch;
         const expectedStrings = ["?ws=trueD&experiments=true&edgeThemes=true"];
 
@@ -48,7 +48,7 @@ describe("simpleView", () => {
     });
 
     it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
-        const filePath = "quick_open/quick_open.js";
+        const filePath = "quick_open/CommandMenu_edge.js";
         const patch = SimpleView.applyCommandMenuPatch;
         const expectedStrings = ["Root.Runtime.vscodeSettings.enableNetwork;"];
 
@@ -56,7 +56,7 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorViewShowDrawerPatch correctly changes _showDrawer text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/InspectorView_edge.js";
         const patch = SimpleView.applyInspectorViewShowDrawerPatch;
         const expectedStrings = ["if (!(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)) {return false;}"];
 
@@ -64,7 +64,7 @@ describe("simpleView", () => {
     });
 
     it("applyInspectorViewCloseDrawerPatch correctly changes _showAppUI text", async () => {
-        const filePath = "main/main.js";
+        const filePath = "main/MainImpl.js";
         const patch = SimpleView.applyInspectorViewCloseDrawerPatch;
         const expectedStrings = ["InspectorView.InspectorView.instance()._closeDrawer();"];
 
@@ -72,7 +72,7 @@ describe("simpleView", () => {
     });
 
     it("applyMainViewPatch correctly changes text", async () => {
-        const filePath = "main/main.js";
+        const filePath = "main/MainImpl.js";
         const patch = SimpleView.applyMainViewPatch;
         const expectedStrings = ["const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };"];
 
@@ -80,7 +80,7 @@ describe("simpleView", () => {
     });
 
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/InspectorView_edge.js";
         const patch = SimpleView.applyDrawerTabLocationPatch;
         const expectedStrings = ["this._showDrawer.bind(this, false), 'drawer-view', true, true, 'network.blocked-urls'"];
 
@@ -88,7 +88,7 @@ describe("simpleView", () => {
     });
 
     it("applySetTabIconPatch correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applySetTabIconPatch;
         const expectedStrings = ["if(!tab){return;}"];
 
@@ -96,7 +96,7 @@ describe("simpleView", () => {
     });
 
     it("applyAppendTabOverridePatch correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applyAppendTabOverridePatch;
         const expectedStrings = ["appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {"];
 
@@ -104,7 +104,7 @@ describe("simpleView", () => {
     });
 
     it("applyAppendTabConditionsPatch correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applyAppendTabConditionsPatch;
         const expectedStrings = ["if (!patchedCondition) {"];
 
@@ -112,7 +112,7 @@ describe("simpleView", () => {
     });
 
     it("applyRemoveBreakOnContextMenuItem correctly changes text", async () => {
-        const filePath = "browser_debugger/browser_debugger.js";
+        const filePath = "panels/browser_debugger/DOMBreakpointsSidebarPane.js";
         const patch = SimpleView.applyRemoveBreakOnContextMenuItem;
         const unexpectedStrings = ["const breakpointsMenu"];
 
@@ -120,7 +120,7 @@ describe("simpleView", () => {
     });
 
     it("applyShowDrawerTabs correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/ViewManager.js";
         const patch = SimpleView.applyShowDrawerTabs;
         const expectedStrings = ["if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')"];
 
@@ -128,7 +128,7 @@ describe("simpleView", () => {
     });
 
     it("applyPersistTabs correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applyPersistTabs;
         const expectedStrings = ["this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;"];
 
@@ -176,7 +176,7 @@ describe("simpleView", () => {
     });
 
     it("applyContextMenuRevealOption correctly changes text", async () => {
-        const filePath = "components/components.js";
+        const filePath = "components/Linkifier.js";
         const patch = SimpleView.applyContextMenuRevealOption;
         const expectedStrings = ['destination = "Visual Studio Code"'];
 
@@ -184,7 +184,7 @@ describe("simpleView", () => {
     });
 
     it("applyMoveToContextMenuPatch correctly changes text", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/InspectorView.js";
         const patch = SimpleView.applyMoveToContextMenuPatch;
         const expectedStrings = ['const locationName = ViewManager.instance().locationNameForViewId(tabId);return;'];
 
@@ -192,7 +192,7 @@ describe("simpleView", () => {
     });
 
     it("applyThemePatch correctly modifies themes to use theme parameter", async () => {
-        const filePath = "themes/themes.js";
+        const filePath = "themes/ThemesImpl.js";
         const patch = SimpleView.applyThemePatch;
         const expectedStrings = ["Root.Runtime.vscodeSettings.theme;"];
 
@@ -200,7 +200,7 @@ describe("simpleView", () => {
     });
 
     it("applyDefaultTabPatch correctly modifies text to prevent usage of TabbedLocation._defaultTab", async () => {
-        const filePath = "ui/ui.js";
+        const filePath = "ui/legacy/ViewManager.js";
         const patch = SimpleView.applyDefaultTabPatch;
         const expectedStrings = ["this._defaultTab=undefined;"];
 
@@ -208,7 +208,7 @@ describe("simpleView", () => {
     });
 
     it("applyRemovePreferencePatch correctly modifes host.js to ignore localStorage deletion", async () => {
-        const filePath = "host/host.js";
+        const filePath = "core/host/InspectorFrontendHost.js";
         const patch = SimpleView.applyRemovePreferencePatch;
         const expectedStrings = ["removePreference(name){return;}"];
 
@@ -216,7 +216,7 @@ describe("simpleView", () => {
     });
 
     it("applyExtensionSettingsInstantiatePatch correctly changes root.js to include extensionSettings global const", async () => {
-        const filePath = "root/root.js";
+        const filePath = "core/root/Runtime.js";
         const patch = SimpleView.applyExtensionSettingsInstantiatePatch;
         const expectedStrings = ["const vscodeSettings={}"];
 
@@ -224,7 +224,7 @@ describe("simpleView", () => {
     });
 
     it("applyExtensionSettingsRuntimeObjectPatch correctly changes RuntimeObject to include extensionSettings global const", async () => {
-        const filePath = "root/root.js";
+        const filePath = "core/root/Runtime.js";
         const patch = SimpleView.applyExtensionSettingsRuntimeObjectPatch;
         const expectedStrings = ["vscodeSettings:vscodeSettings"];
 
@@ -240,7 +240,7 @@ describe("simpleView", () => {
     });
 
     it("applyPortSettingsFunctionCreationPatch correctly changes root.js to create settings function", async () => {
-        const filePath = "root/root.js";
+        const filePath = "core/root/Runtime.js";
         const patch = SimpleView.applyPortSettingsFunctionCreationPatch;
         const expectedStrings = ["InspectorFrontendHost.getVscodeSettings(callback);"];
 
@@ -248,7 +248,7 @@ describe("simpleView", () => {
     });
 
     it("applyPortSettingsFunctionCallPatch correctly changes root.js to call settings function", async () => {
-        const filePath = "root/root.js";
+        const filePath = "core/root/Runtime.js";
         const patch = SimpleView.applyPortSettingsFunctionCallPatch;
         const expectedStrings = ["this.getVscodeSettings"];
 
@@ -256,7 +256,7 @@ describe("simpleView", () => {
     });
 
     it("applyStylesRevealerPatch correctly changes root.js to set extensionSettings map", async () => {
-        const filePath = "elements/elements.js";
+        const filePath = "panels/elements/StylePropertyTreeElement.js";
         const patch = SimpleView.applyStylesRevealerPatch;
         const unexpectedStrings = ["this._navigateToSource(selectElement, true);"];
 
@@ -264,7 +264,7 @@ describe("simpleView", () => {
     });
 
     it("applyStylesToggleFocusPatch correctly changes root.js to set extensionSettings map", async () => {
-        const filePath = "elements/elements.js";
+        const filePath = "panels/elements/StylePropertyTreeElement.js";
         const patch = SimpleView.applyStylesToggleFocusPatch;
         const expectedStrings = ["ARIAUtils.alert('Toggle property and continue editing selected', this.nameElement);"];
 
@@ -272,7 +272,7 @@ describe("simpleView", () => {
     });
 
     it("applyNoMatchingStylesPatch correctly changes elements.js to set No Matching Styles message", async () => {
-        const filePath = "elements/elements.js";
+        const filePath = "panels/elements/StylesSidebarPane_edge.js";
         const patch = SimpleView.applyNoMatchingStylesPatch;
         const expectedStrings = [
             `const noMatchSelector = ls \`No matching selector or style.\`;`,
@@ -285,7 +285,7 @@ describe("simpleView", () => {
     });
 
     it("applyRerouteConsoleMessagePatch correctly changes root.js to set extensionSettings map", async () => {
-        const filePath = "sdk/sdk.js";
+        const filePath = "core/sdk/ConsoleModel.js";
         const patch = SimpleView.applyRerouteConsoleMessagePatch;
         const expectedStrings = ["sendToVscodeOutput"];
 
@@ -293,7 +293,7 @@ describe("simpleView", () => {
     });
 
     it("applyScreencastCursorPatch correctly changes screencast.js text to remove touch cursor", async () => {
-        const filePath = "screencast/screencast.js";
+        const filePath = "screencast/ScreencastView.js";
         const patch = SimpleView.applyScreencastCursorPatch;
         const expectedStrings = ["this._canvasContainerElement.style.cursor = 'unset';"];
 
@@ -301,7 +301,7 @@ describe("simpleView", () => {
     });
 
     it("applyScreencastHeadlessPatch correctly replaces screencast.js text to toggle screencast based on headless settings", async () => {
-        const filePath = "screencast/screencast.js";
+        const filePath = "screencast/ScreencastApp.js";
         const patch = SimpleView.applyScreencastHeadlessPatch;
         const expectedStrings = ["const isHeadless = Root.Runtime.vscodeSettings.isHeadless;"];
 
@@ -309,7 +309,7 @@ describe("simpleView", () => {
     });
 
     it("applyScreencastTelemetry correctly changes screencast.js text to implement screencast telemetry", async () => {
-        const filePath = "screencast/screencast.js";
+        const filePath = "screencast/ScreencastApp.js";
         const patch = SimpleView.applyScreencastTelemetry;
         const expectedStrings = ["DevTools.ScreencastToggle", "DevTools.ScreencastDuration"];
 
