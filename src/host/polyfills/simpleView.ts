@@ -126,6 +126,7 @@ export function applyStylesToggleFocusPatch(content: string): string | null {
 
 export function applyNoMatchingStylesPatch(content: string): string | null {
     // Patch to inform user to refresh/resume target to get CSS information when attaching to a paused target.
+    // Appears in the styles pane if no matching styles are reported by CSS domain.
     // this._noMatchesElement.textContent = i18nString(UIStrings.noMatchingSelectorOrStyle);
     const pattern = /this\._noMatchesElement\.textContent\s*=\s*i18nString\(UIStrings\.noMatchingSelectorOrStyle\);/g;
     const replacementText = `
@@ -395,6 +396,7 @@ export function applyInspectorCommonContextMenuPatch(content: string): string | 
 }
 
 export function applyInspectorCommonCssRightToolbarPatch(content: string): string | null {
+    // Hides the right toolbar that contains the feedback, settings, and more tools icons
     const pattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
     const replacementText =
         `.tabbed-pane-right-toolbar {
