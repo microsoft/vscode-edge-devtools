@@ -202,6 +202,7 @@ export function applyInspectorViewCloseDrawerPatch(content: string): string | nu
 }
 
 export function applyMainViewPatch(content: string): string | null {
+    // Removes the More tools option from the context menu on the toolbar
     const pattern = /const moreTools\s*=\s*[^;]+;/g;
     const replacementText = 'const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };';
     return replaceInSourceCode(content, pattern, replacementText);
