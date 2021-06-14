@@ -3,7 +3,6 @@
 import * as fse from 'fs-extra';
 import path from 'path';
 
-import { applyPaddingInlineCssPatch } from './src/host/polyfills/cssPaddingInline';
 import { applyRuntimeImportScriptPathPrefixPatch } from './src/host/polyfills/runtime';
 import {applyAnnouncementNamePatch, applyGithubLinksPatch, applyReleaseNotePatch} from './src/host/polyfills/releaseNote';
 import {
@@ -115,9 +114,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     await patchFileForWebViewWrapper('components/Linkifier.js', toolsOutDir, [
         applyContextMenuRevealOption,
-    ]);
-    await patchFileForWebViewWrapper('panels/elements/elements_module.js', toolsOutDir, [
-        applyPaddingInlineCssPatch,
     ]);
     // Post built files swap upstream and downstream names
     await patchFileForWebViewWrapper('panels/elements/StylesSidebarPane_edge.js', toolsOutDir, [

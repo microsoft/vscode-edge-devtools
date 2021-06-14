@@ -100,6 +100,7 @@ export function applyPortSettingsFunctionCallPatch(content: string): string | nu
 }
 
 export function applyCommonRevealerPatch(content: string): string | null {
+    // Updates revealers to direct users to VSCode files
     // let reveal = async function (revealable, omitFocus) {
     const pattern = /let\s*reveal\s*=\s*async\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
     const replacementText = `let reveal = async ${revealInVSCode.toString().slice(0, -1)}`;
