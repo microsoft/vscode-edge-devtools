@@ -197,7 +197,7 @@ export function applyInspectorViewCloseDrawerPatch(content: string): string | nu
     // this patch closes the drawer if the network tool is disabled
     // await InspectorView.instance().createToolbars();
     const pattern = /await\s*InspectorView\.instance\(\)\.createToolbars\(\);/g;
-    const replacementText = `if (!${isDrawerEnabled}) {InspectorView.InspectorView.instance()._closeDrawer();}`;
+    const replacementText = `if (!${isDrawerEnabled}) {InspectorView.instance()._closeDrawer();}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
@@ -406,6 +406,7 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string): strin
 }
 
 export function applyInspectorCommonCssTabSliderPatch(content: string): string | null {
+    // Hides the underline indicator that is usually present under the currently active tab
     const pattern = /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g;
     const replacementText =
         `.tabbed-pane-tab-slider {
