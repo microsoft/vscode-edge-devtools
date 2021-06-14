@@ -26,7 +26,7 @@ import {
     applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
     applyMoveToContextMenuPatch,
-    applyPersistDrawerTabs,
+    applyPersistTabs,
     applyQueryParamsObjectPatch,
     applyRemoveBreakOnContextMenuItem,
     applyRerouteConsoleMessagePatch,
@@ -139,7 +139,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('ui/legacy/TabbedPane.js', toolsOutDir, [
         applyAppendTabOverridePatch,
         applyAppendTabConditionsPatch,
-        applyPersistDrawerTabs,
+        applyPersistTabs,
         applySetTabIconPatch,
     ]);
     await patchFileForWebViewWrapper('ui/legacy/InspectorView_edge.js', toolsOutDir, [

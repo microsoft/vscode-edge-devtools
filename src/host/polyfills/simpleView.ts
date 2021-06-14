@@ -108,6 +108,7 @@ export function applyCommonRevealerPatch(content: string): string | null {
 }
 
 export function applyStylesRevealerPatch(content: string): string | null {
+    // Removes a Context menu entry that opens the sources panel.
     const pattern = /this\._navigateToSource\(selectElement,\s*true\);/g;
     const replacementText = '';
     return replaceInSourceCode(content, pattern, replacementText);
@@ -222,10 +223,10 @@ export function applyShowDrawerTabs(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyPersistDrawerTabs(content: string): string | null {
+export function applyPersistTabs(content: string): string | null {
     // Removes the close button from the Request blocking and Whats New tab tab by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-    const replacementText = "this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;";
+    const replacementText = "this._closeable= (id==='network.blocked-urls' || id === 'release-note' || id === 'network')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
