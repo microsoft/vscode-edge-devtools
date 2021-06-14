@@ -211,7 +211,7 @@ export function applyMainViewPatch(content: string): string | null {
 //     const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
 //     const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
 //     return replaceInSourceCode(content, pattern, replacementText);
-// }
+//
 
 export function applyRemoveBreakOnContextMenuItem(content: string): string | null {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
