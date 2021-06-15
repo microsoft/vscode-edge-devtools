@@ -103,8 +103,8 @@ describe("devtoolsPanel", () => {
             const dtp = await import("../src/devtoolsPanel");
             const mockVsCode = jest.requireMock("vscode");
             
-            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "www.google.com", mockRuntimeConfig);
-            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "www.microsoft.com", mockRuntimeConfig);
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.bing.com/", mockRuntimeConfig);
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.microsoft.com/", mockRuntimeConfig);
             expect(mockPanel.onDidDispose).toHaveBeenCalledTimes(2);
             expect(mockVsCode.window.createWebviewPanel).toHaveBeenCalledTimes(2);
         });
