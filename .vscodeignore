@@ -11,4 +11,5 @@ out/edge/
 src/
 scripts/
 startpage/
+!out/startpage/
 test/
