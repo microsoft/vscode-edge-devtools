@@ -66,7 +66,7 @@ async function main() {
   }
   const version = args.devtoolsVersion.toString() || undefined;
   const downloadUrl = fetchDownloadUrl(version);
-  downloadZipFile(downloadUrl);
+  await downloadZipFile(downloadUrl);
 }
 
 main();
