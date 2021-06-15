@@ -44,14 +44,7 @@ const main = async function(){
     const relDir = path.relative(inputDir, path.dirname(file));
     const relPath = path.relative(inputDir, file);
     await fs.ensureDir(path.join(outputDir, relDir), {recursive: true});
-    // if (!file.endsWith('.js')) {
-    //   // Copy file directly to temp
-    //   await fs.copyFile(file, path.join(tempDir, relPath));
-    //   console.log("copying file directly: " + file);
-    //   continue;
-    // }
     const inputCode = fs.readFileSync(file, "utf-8");
-    // console.log(inputCode);
     const code = uglify.minify(
         {file: inputCode},
         uglifyOptions

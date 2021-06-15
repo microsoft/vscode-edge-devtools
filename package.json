@@ -585,7 +585,7 @@
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
-        "vscode:prepublish": "npm run build-min",
+        "vscode:prepublish": "npm run build-min && npm run lint",
         "build": "npm run build-wp && npm run build-post",
         "build-min": "npm run build-wp && npm run build-post && npm run minify-devtools",
         "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
