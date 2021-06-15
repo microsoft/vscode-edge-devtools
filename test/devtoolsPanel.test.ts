@@ -99,6 +99,16 @@ describe("devtoolsPanel", () => {
             expect(mockPanel.onDidDispose).toHaveBeenCalled();
         });
 
+        it("switches targets with active session", async () => {
+            const dtp = await import("../src/devtoolsPanel");
+            const mockVsCode = jest.requireMock("vscode");
+            
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.bing.com/", mockRuntimeConfig);
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.microsoft.com/", mockRuntimeConfig);
+            expect(mockPanel.onDidDispose).toHaveBeenCalledTimes(2);
+            expect(mockVsCode.window.createWebviewPanel).toHaveBeenCalledTimes(2);
+        });
+
         it("calls reveal on existing instance", async () => {
             const dtp = await import("../src/devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
