@@ -53,8 +53,8 @@ async function downloadZipFile(downloadUrl) {
 const usageMessage =
 `
 Script to download the devtools frontend files needed to build the extension
-node scripts/downloadAndExtractEdge --version
-    version: optional version number to build a specific version of devtools.
+node scripts/downloadAndExtractEdge --devtoolsVersion
+    devtoolsVersion: optional version number to build a specific version of devtools.
     Defaults to latest version.
 `;
 
@@ -64,9 +64,9 @@ async function main() {
     console.log(usageMessage);
     return;
   }
-  const version = args.version || undefined;
+  const version = args.devtoolsVersion.toString() || undefined;
   const downloadUrl = fetchDownloadUrl(version);
-  await downloadZipFile(downloadUrl);
+  downloadZipFile(downloadUrl);
 }
 
 main();
