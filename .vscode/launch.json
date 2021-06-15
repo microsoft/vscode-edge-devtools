@@ -17,20 +17,49 @@
             "preLaunchTask": "npm: build"
         },
         {
+            "name": "Launch Extension Without Build",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+        },
+        {
+            "name": "Launch Minified Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+            "preLaunchTask": "npm: build-min"
+        },
+        {
             "name": "Debug postbuild step",
             "type": "node",
             "request": "launch",
-            "cwd": "${workspaceRoot}", 
-            "env": { 
-                "NODE_ENV": "test" 
-            }, 
-            "args": [ 
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "NODE_ENV": "test"
+            },
+            "args": [
                 "${workspaceFolder}/postBuildStep.ts", "debug"
-            ], 
-            "runtimeArgs": [ 
+            ],
+            "runtimeArgs": [
                 "--nolazy", "-r", "ts-node/register" ,
-            ], 
-            "sourceMaps": true, 
+            ],
+            "sourceMaps": true,
             "protocol": "inspector" ,
             "preLaunchTask": "npm: build-wp"
         },

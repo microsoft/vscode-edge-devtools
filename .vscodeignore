@@ -1,0 +1,14 @@
+**/*.ts
+**/tsconfig.json
+**/*.yml
+**/*.js.map
+*ignore
+*.vsix
+package-lock.json
+img/
+node_modules/
+out/edge/
+src/
+scripts/
+startpage/
+test/
