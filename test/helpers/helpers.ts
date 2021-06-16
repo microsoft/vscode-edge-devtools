@@ -78,7 +78,7 @@ export function createFakeVSCode() {
                                 return true;
                             case "themes":
                                 return "System preference";
-                            case "whatsNew":
+                            case "welcome":
                                 return true;
                             case "isHeadless":
                                 return false;
@@ -92,7 +92,7 @@ export function createFakeVSCode() {
                                 return {defaultValue: true};
                             case "themes":
                                 return {defaultValue: "Light"};
-                            case "whatsNew":
+                            case "welcome":
                                 return {defaultValue: false};
                             case "isHeadless":
                                 return {defaultValue: false};
