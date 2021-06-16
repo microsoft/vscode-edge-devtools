@@ -79,6 +79,14 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
+    it("applyExperimentsEnabledPatch correctly changes text", async () => {
+        const filePath = "main/MainImpl.js";
+        const patch = SimpleView.applyExperimentsEnabledPatch;
+        const expectedStrings = ["experiments.enableExperimentsByDefault(['msEdgeDevToolsWelcomeTab', 'msEdgeTooltips']);"];
+
+        await testPatch(filePath, patch, expectedStrings);
+    });
+
     it("applyDrawerTabLocationPatch correctly changes text", async () => {
         const filePath = "ui/legacy/InspectorView_edge.js";
         const patch = SimpleView.applyDrawerTabLocationPatch;

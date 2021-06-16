@@ -211,6 +211,14 @@ export function applyMainViewPatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyExperimentsEnabledPatch(content: string): string | null {
+    // Replaces list of experiements enabled by default
+    //experiments.enableExperimentsByDefault([...]);
+    const pattern = /experiments\.enableExperimentsByDefault\(.*\);/g;
+    const replacementText = `experiments.enableExperimentsByDefault(['msEdgeDevToolsWelcomeTab', 'msEdgeTooltips']);`;
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyRemoveBreakOnContextMenuItem(content: string): string | null {
     const pattern = /const breakpointsMenu\s+=[\s\S]+hasDOMBreakpoint\(.*\);\s+}\s+}/;
     const replacementText = '';

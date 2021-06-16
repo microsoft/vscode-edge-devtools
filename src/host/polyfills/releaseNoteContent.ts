@@ -40,11 +40,6 @@ export const devtoolsHighlights = `[
         link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/02/devtools#improved-css-flexbox-editing-with-visual-flexbox-editor-and-multiple-overlays',
     },
     {
-        title: i18nLazyString("Wavy underlines highlight code issues and improvements in Elements tool"),
-        subtitle: i18nLazyString("In most modern IDEs, wavy underlines under text indicate syntax errors. Now, wavy underlines display under HTML in the DOM view of the Elements tool"),
-        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/04/devtools#wavy-underlines-highlight-code-issues-and-improvements-in-elements-tool',
-    },
-    {
         title: i18nLazyString("Learn about DevTools with informative tooltips"),
         subtitle: i18nLazyString("The DevTools Tooltips feature helps you learn about all the different tools and panes in DevTools. Toggle on with 'CTRL/CMD + SHIFT + H' and Toggle off with 'Esc'"),
         link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/04/devtools#learn-about-devtools-with-informative-tooltips',

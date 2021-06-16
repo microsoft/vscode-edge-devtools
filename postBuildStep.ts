@@ -44,6 +44,7 @@ import {
     applyExtensionSettingExportPatch,
     applyPortSettingsFunctionCreationPatch,
     applyConsoleImportPatch,
+    applyExperimentsEnabledPatch,
 } from './src/host/polyfills/simpleView';
 import { applySetupTextSelectionPatch } from './src/host/polyfills/textSelection';
 import { applyThirdPartyI18nLocalesPatch } from './src/host/polyfills/thirdPartyI18n';
@@ -108,6 +109,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('main/MainImpl.js', toolsOutDir, [
         applyInspectorViewCloseDrawerPatch,
         applyMainViewPatch,
+        applyExperimentsEnabledPatch,
     ]);
     await patchFileForWebViewWrapper('core/common/Revealer.js', toolsOutDir, [
         applyCommonRevealerPatch,
