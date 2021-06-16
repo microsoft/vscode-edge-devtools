@@ -156,6 +156,7 @@ export function applyQueryParamsObjectPatch(content: string): string | null {
 
 export function applyCommandMenuPatch(content: string): string | null {
     // pattern intended to match logic of CommandMenu.attach()
+    // Only attaches Elements, Network, and the Show Welcome commands/actions
     const pattern = /for\s*\(const action of actions\)\s*{\s*const category\s*=\s*action[\s\S]+this\._commands\.sort\(commandComparator\);/;
     const replacementText =
         `const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
@@ -178,7 +179,7 @@ export function applyCommandMenuPatch(content: string): string | null {
         if (networkEnabled) {
             condition = condition && command.category() !== 'Network';
         }
-        if (!condition && command.available()) {
+        if ((!condition || command.title() === 'Show Welcome') && command.available()) {
             this._commands.push(command);
         }
         }
@@ -217,16 +218,16 @@ export function applyRemoveBreakOnContextMenuItem(content: string): string | nul
 }
 
 export function applyShowDrawerTabs(content: string): string | null {
-    // Appends the Request Blocking tab or Whats New tab in the drawer even if it is not open.
+    // Appends the Request Blocking tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
     const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyPersistTabs(content: string): string | null {
-    // Removes the close button from the Request blocking and Welcome tab tab by making the tab non-closeable.
+    // Removes the close button from the Request blocking and Network tabs by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-    const replacementText = "this._closeable= (id==='network.blocked-urls' || id === 'network' || id === 'welcome')?false:closeable;";
+    const replacementText = "this._closeable= (id==='network.blocked-urls' || id === 'network')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 

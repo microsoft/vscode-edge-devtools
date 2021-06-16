@@ -130,7 +130,7 @@ describe("simpleView", () => {
     it("applyPersistTabs correctly changes text", async () => {
         const filePath = "ui/legacy/TabbedPane.js";
         const patch = SimpleView.applyPersistTabs;
-        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' || id === 'network' || id === 'welcome')?false:closeable;"];
+        const expectedStrings = ["this._closeable= (id==='network.blocked-urls' || id === 'network')?false:closeable;"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
