@@ -25,7 +25,7 @@ function fetchJsonFromUrl(url){
 function fetchDownloadUrl(version) {
   const jsonString = fetchJsonFromUrl('https://thirdpartysource.microsoft.com/downloads');
   const jsonObjects = JSON.parse(jsonString);
-  const fullVersion = targetVersionMap.get(version) || TARGET_VERSION;
+  const fullVersion = version ? targetVersionMap.get(version.toString()) : TARGET_VERSION;
 
   console.log(`Downloading Microsoft Edge DevTools version ${fullVersion}`);
   for (let object of jsonObjects) {
@@ -64,7 +64,7 @@ async function main() {
     console.log(usageMessage);
     return;
   }
-  const version = args.devtoolsVersion.toString() || undefined;
+  const version = args.devtoolsVersion || undefined;
   const downloadUrl = fetchDownloadUrl(version);
   await downloadZipFile(downloadUrl);
 }
