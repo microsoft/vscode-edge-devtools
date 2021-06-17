@@ -3,7 +3,7 @@
 
 export const extensionHighlights = `[
     {
-        title: i18nLazyString("DevTools can now switch targets without reloading."),
+        title: i18nLazyString("DevTools can now switch targets without reloading"),
         subtitle:
             i18nLazyString("The active DevTools window can now swtich between targets in the Target's list without needing to close and reopen."),
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/415',
@@ -19,6 +19,12 @@ export const extensionHighlights = `[
         subtitle:
             i18nLazyString("Find our new location for all up-to-date documentation regarding this extension!"),
         link: 'https://microsoft.github.io/vscode-edge-devtools/',
+    },
+    {
+        title: i18nLazyString("Styles pane informs users to refresh if attached to a paused target"),
+        subtitle:
+            i18nLazyString("The styles pane now informs users that a refresh is required to view styles if the devtools is attached to a target that is currently paused."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/410',
     },
 ],`;
 
