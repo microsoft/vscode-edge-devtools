@@ -3,15 +3,15 @@
 
 export const extensionHighlights = `[
     {
-        title: i18nLazyString("Introducing the new 'Welcome' tab!"),
+        title: i18nLazyString("DevTools can now switch targets without reloading."),
         subtitle:
-            i18nLazyString("The 'Welcome' tab has replaced the What's New tab as part of the Edge DevTools version update."),
-        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/01/devtools#whats-new-is-now-welcome',
+            i18nLazyString("The active DevTools window can now swtich between targets in the Target's list without needing to close and reopen."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/415',
     },
     {
         title: i18nLazyString("Major Edge DevTools Version update"),
         subtitle:
-            i18nLazyString("We have updated the DevTools version from 88 to 91.  Check out all the major new features in the section below!"),
+            i18nLazyString("We have updated the DevTools version from 88 to 91. Check out all the major new features in the section below!"),
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/414',
     },
     {
@@ -38,6 +38,12 @@ export const devtoolsHighlights = `[
         title: i18nLazyString("Improved CSS flexbox editing with visual flexbox editor and multiple overlays"),
         subtitle: i18nLazyString("DevTools now has dedicated CSS flexbox debugging tools. If the display: flex or display: inline-flex CSS style is applied to an HTML element, a flex icon displays next to that element in the Elements tool."),
         link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/02/devtools#improved-css-flexbox-editing-with-visual-flexbox-editor-and-multiple-overlays',
+    },
+    {
+        title: i18nLazyString("Introducing the new 'Welcome' tab!"),
+        subtitle:
+            i18nLazyString("The 'Welcome' tab has replaced the What's New tab"),
+        link: 'https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/whats-new/2021/01/devtools#whats-new-is-now-welcome',
     },
     {
         title: i18nLazyString("Learn about DevTools with informative tooltips"),
