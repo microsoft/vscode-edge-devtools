@@ -1,4 +1,4 @@
-## 1.1.10
+## 1.2.0
 * **[Feature]**: The active DevTools window can now swtich between targets in the Target's list without needing to close and reopen. - [PR #415](https://github.com/microsoft/vscode-edge-devtools/pull/415)
 * **[Update]**: Edge DevTools Update - We have updated the DevTools version from 88 to 91. - [PR #414](https://github.com/microsoft/vscode-edge-devtools/pull/414)
 * **[Documentation]**: New home for Microsoft Edge DevTools for VS Code documentation. - [vscode-edge-devtools](https://microsoft.github.io/vscode-edge-devtools/)
