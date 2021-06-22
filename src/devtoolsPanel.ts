@@ -54,9 +54,18 @@ export class DevToolsPanel {
         this.config = config;
         this.timeStart = null;
         this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
-        this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
-        this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
-        this.consoleOutput.appendLine('');
+        if (config.isJsDebugProxiedCDPConnection) {
+            // Direct users to the Debug Console
+            this.consoleOutput.appendLine('// Microsoft Edge Devtools Extension:');
+            this.consoleOutput.appendLine('// You have connected to a target using Visual Studio Code\'s JavaScript Debugger.');
+            this.consoleOutput.appendLine('// Please use the "Debug Console" to view console messages from your webpage and evaluate expressions.');
+        } else {
+            // Provide 1-way console when attached to a target that is not the current debug target
+            this.consoleOutput.appendLine('// Microsoft Edge Devtools Extension:');
+            this.consoleOutput.appendLine('// This Output window displays the DevTools extension\'s console output in text format.');
+            this.consoleOutput.appendLine('// Note that this feature is only unidirectional and cannot communicate back to the DevTools.');
+            this.consoleOutput.appendLine('');
+        }
 
         // Hook up the socket events
         if (this.config.isJsDebugProxiedCDPConnection) {
@@ -77,7 +86,10 @@ export class DevToolsPanel {
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
-        this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
+        if (!config.isJsDebugProxiedCDPConnection){
+            // Provide 1-way console when attached to a target that is not the current debug target
+            this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
+        }
 
         // Handle closing
         this.panel.onDidDispose(() => {
