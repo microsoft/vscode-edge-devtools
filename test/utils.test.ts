@@ -706,7 +706,8 @@ describe("utils", () => {
                 "webpack:///./*": `${testPath}\\*`,
                 "webpack:///./~/*": `${testPath}\\node_modules\\*`,
                 "webpack:///*": "*",
-                "webpack:///src/*": `${testPath}\\*`
+                "webpack:///src/*": `${testPath}\\*`,
+                "webpack://*": `${testPath}\\*`
             };
 
             // Ensure the new values are returned

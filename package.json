@@ -180,6 +180,7 @@
                         "webpack:///src/*": "${webRoot}/*",
                         "webpack:///*": "*",
                         "webpack:///./~/*": "${webRoot}/node_modules/*",
+                        "webpack://*": "${webRoot}/*",
                         "meteor://💻app/*": "${webRoot}/*"
                     }
                 },
@@ -335,6 +336,7 @@
                                     "webpack:///src/*": "${webRoot}/*",
                                     "webpack:///*": "*",
                                     "webpack:///./~/*": "${webRoot}/node_modules/*",
+                                    "webpack://*": "${webRoot}/*",
                                     "meteor://💻app/*": "${webRoot}/*"
                                 }
                             },
@@ -417,6 +419,7 @@
                                     "webpack:///src/*": "${webRoot}/*",
                                     "webpack:///*": "*",
                                     "webpack:///./~/*": "${webRoot}/node_modules/*",
+                                    "webpack://*": "${webRoot}/*",
                                     "meteor://💻app/*": "${webRoot}/*"
                                 }
                             },

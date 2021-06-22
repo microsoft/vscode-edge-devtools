@@ -90,6 +90,7 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
     'webpack:///./*': '${webRoot}/*',
     'webpack:///./~/*': '${webRoot}/node_modules/*',
     'webpack:///src/*': '${webRoot}/*',
+    'webpack://*': '${webRoot}/*',
 };
 export const SETTINGS_DEFAULT_WEB_ROOT = '${workspaceFolder}';
 export const SETTINGS_DEFAULT_SOURCE_MAPS = true;

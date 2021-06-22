@@ -13,6 +13,7 @@ Note: These are the mappings that are included by default out of the box, with e
     "webpack:///./*": "${webRoot}/*",
     "webpack:///*": "*",
     "webpack:///src/*": "${webRoot}/*",
+     "webpack://*": "${webRoot}/*",
     "meteor://💻app/*": "${webRoot}/*"
 }
 ```
@@ -26,15 +27,18 @@ See the following examples for each entry in the default mappings (`webRoot = /U
 Example:
 "webpack:///./~/querystring/index.js"
 -> "/Users/me/project/node_modules/querystring/index.js"
-"webpack:///./*":   "${webRoot}/*" 
+"webpack:///./*":   "${webRoot}/*"
 Example:
 "webpack:///./src/app.js" -> "/Users/me/project/src/app.js"
-"webpack:///*": "*" 
+"webpack:///*": "*"
 Example:
 "webpack:///project/app.ts" -> "/project/app.ts"
-"webpack:///src/*": "${webRoot}/*" 
+"webpack:///src/*": "${webRoot}/*"
 Example:
 "webpack:///src/app.js" -> "/Users/me/project/app.js"
+"webpack://*": "${webRoot}/*"
+Example:
+"webpack://src/app.js" -> "/Users/me/project/src/app.js"
 "meteor://💻app/*": "${webRoot}/*"
 Example:
 "meteor://💻app/main.ts"` -> `"/Users/me/project/main.ts"
