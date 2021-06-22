@@ -180,7 +180,7 @@ export class DevToolsPanel {
     }
 
     private onSocketConsoleOutput(message: string) {
-        const { consoleMessage } = JSON.parse(message) as { consoleMessage: string };
+        const { consoleMessage } = JSON.parse(message) as { consoleMessage : string };
         this.consoleOutput.appendLine(consoleMessage);
     }
 
@@ -230,7 +230,7 @@ export class DevToolsPanel {
         encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
             themeString: SettingsProvider.instance.getThemeSettings(),
-            whatsNew: SettingsProvider.instance.getWhatsNewSettings(),
+            welcome: SettingsProvider.instance.getWelcomeSettings(),
             isHeadless: SettingsProvider.instance.getHeadlessSettings(),
             id });
     }
@@ -375,9 +375,12 @@ export class DevToolsPanel {
         config: IRuntimeConfig): void {
         const column = vscode.ViewColumn.Beside;
 
-        if (DevToolsPanel.instance) {
-            DevToolsPanel.instance.panel.reveal(column);
+        if (DevToolsPanel.instance && DevToolsPanel.instance.targetUrl === targetUrl) {
+                DevToolsPanel.instance.panel.reveal(column);
         } else {
+            if (DevToolsPanel.instance) {
+                DevToolsPanel.instance.dispose();
+            }
             const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME, column, {
                 enableCommandUris: true,
                 enableScripts: true,

@@ -99,6 +99,16 @@ describe("devtoolsPanel", () => {
             expect(mockPanel.onDidDispose).toHaveBeenCalled();
         });
 
+        it("switches targets with active session", async () => {
+            const dtp = await import("../src/devtoolsPanel");
+            const mockVsCode = jest.requireMock("vscode");
+            
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.bing.com/", mockRuntimeConfig);
+            dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.microsoft.com/", mockRuntimeConfig);
+            expect(mockPanel.onDidDispose).toHaveBeenCalledTimes(2);
+            expect(mockVsCode.window.createWebviewPanel).toHaveBeenCalledTimes(2);
+        });
+
         it("calls reveal on existing instance", async () => {
             const dtp = await import("../src/devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
@@ -484,7 +494,7 @@ describe("devtoolsPanel", () => {
 
             it("calls getVscodeSettings", async () => {
                 const expectedId = { id: 0 };
-                const expectedState = { enableNetwork: true, themeString: "System preference", whatsNew: true, isHeadless: false};
+                const expectedState = { enableNetwork: true, themeString: "System preference", welcome: true, isHeadless: false};
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
 
                 const dtp = await import("../src/devtoolsPanel");
@@ -497,7 +507,7 @@ describe("devtoolsPanel", () => {
                     {
                         themeString: expectedState.themeString,
                         enableNetwork: expectedState.enableNetwork,
-                        whatsNew: expectedState.whatsNew,
+                        welcome: expectedState.welcome,
                         isHeadless: expectedState.isHeadless,
                         id: expectedId.id,
                     },

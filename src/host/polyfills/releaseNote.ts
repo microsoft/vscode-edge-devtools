@@ -4,20 +4,30 @@
 import {devtoolsHighlights, extensionHighlights} from './releaseNoteContent';
 
 export function applyReleaseNotePatch(content: string): string | null {
-    const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+var ReleaseNoteText_edge\s*=/;
+    // This patch changes the content for the Welcome tab.
+    const releaseNoteTextPattern = /const releaseNoteText\s*=\s*\[[\s\S]+export\s*{\s*releaseNoteText\s*};/;
     const replacementNotes = `
         export const releaseNoteText = [
             {
             version: 1,
-            header: ls\`Highlights from the latest version of Microsoft Edge Developer Tools for Visual Studio Code\`,
+            header: i18nLazyString('Highlights from the latest version of Microsoft Edge Developer Tools for Visual Studio Code'),
             highlightsEdge: ${extensionHighlights}
             highlights: ${devtoolsHighlights}
-            githubLink: 'https://github.com/microsoft/vscode-edge-devtools',
-            issuesLink: 'https://github.com/microsoft/vscode-edge-devtools/issues',
+            help: [
+                {
+                    title: i18nLazyString("Microsoft Edge DevTools for VS Code Documentation"),
+                    link: 'https://microsoft.github.io/vscode-edge-devtools/',
+                },
+                {
+                    title: i18nLazyString(UIStrings.devToolsForBeginners),
+                    link: 'https://docs.microsoft.com/microsoft-edge/devtools-guide-chromium/beginners/html',
+                },
+                { title: i18nLazyString("Visit our GitHub Page"), link: 'https://www.twitter.com/EdgeDevTools' },
+                { title: i18nLazyString(UIStrings.submitFeedback), link: 'https://github.com/microsoft/vscode-edge-devtools/issues' },
+                { title: i18nLazyString(UIStrings.followOnTwitter), link: 'https://www.twitter.com/EdgeDevTools' },
+            ],
             },
         ];
-
-        var ReleaseNoteText_edge =
     `;
 
     if (releaseNoteTextPattern.exec(content)) {
@@ -27,29 +37,29 @@ export function applyReleaseNotePatch(content: string): string | null {
 
 }
 
-export function applyGithubLinksPatch(content: string): string | null {
-    const linkPattern = /const learnMore\s*=[\s\S]+learnMore\);/g;
-    const linkReplacementText = `
-        const githubLink = XLink.XLink.create(releaseNote.githubLink, ls \`Visit our Github Page\`, 'release-note-link-learn-more');
-        actionContainer.appendChild(githubLink);
-        const issuesContainer = buttonContainer.createChild('div', 'release-note-action-container');
-        const issuesLink = XLink.XLink.create(releaseNote.issuesLink, ls \`Send us feedback\`, 'release-note-link-learn-more');
-        issuesContainer.appendChild(issuesLink);
-    `;
-    if (linkPattern.exec(content)) {
-        return content.replace(linkPattern, linkReplacementText);
+export function applyAnnouncementNamePatch(content: string): string | null {
+    // This patch changes the section headers for the Welcome tab.
+    const chromiumAnnouncement = /UIStrings\.chromiumHighlightsTitle/;
+    if (chromiumAnnouncement.exec(content)) {
+        return content.replace(chromiumAnnouncement, '\'New in Developer Tools\'');
     }
-        return null;
-
+    return null;
 }
 
-export function applyAnnouncementNamePatch(content: string): string | null {
-    const microsoftAnnouncement = /Announcements from the Microsoft Edge DevTools team/;
-    const chromiumAnnouncement = /Announcements from the Chromium project/;
-    if (microsoftAnnouncement.exec(content) && chromiumAnnouncement.exec(content)) {
-        content = content.replace(microsoftAnnouncement, 'New extension features');
-        return content.replace(chromiumAnnouncement, 'New in Developer Tools');
+export function applyShowMorePatch(content: string): string | null {
+    // This patch removes the empty href in the 'Show more' button so that VS Code doesn't try to open a blank web page.
+    const hrefText = /href=""/;
+    if (hrefText.exec(content)) {
+        return content.replace(hrefText, '');
     }
-        return null;
+    return null;
+}
 
+export function applySettingsCheckboxPatch(content: string): string | null {
+    // This patch removes the checkbox on the page to enable/disable the Welcome tool. We already handle that in the extension settings.
+    const hrefText = /titleContainer\.appendChild\(this\.startupCheckBox\);/;
+    if (hrefText.exec(content)) {
+        return content.replace(hrefText, '');
+    }
+    return null;
 }

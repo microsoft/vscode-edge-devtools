@@ -3,7 +3,7 @@
 import { IDevToolsWindow } from '../host';
 import { ToolsHost } from '../toolsHost';
 
-declare let InspectorFrontendHost: ToolsHost;
+declare let Host: ToolsHost;
 
 interface IRevealable {
     lineNumber: number;
@@ -18,7 +18,7 @@ const enum KeepMatchedText {
     AtEnd = 2
 }
 
-const isDrawerEnabled = '(Root.Runtime.vscodeSettings.enableNetwork || Root.Runtime.vscodeSettings.whatsNew)';
+const isDrawerEnabled = 'Root.Runtime.vscodeSettings.enableNetwork';
 
 function replaceInSourceCode(content: string, pattern: RegExp, replacementText: string, keepMatchedText?: KeepMatchedText): string | null {
     const match = pattern.exec(content);
@@ -52,13 +52,13 @@ export function revealInVSCode(revealable: IRevealable | undefined, omitFocus: b
 }
 
 export function getVscodeSettings(callback: (arg0: Record<string, unknown>) => void): void {
-    InspectorFrontendHost.getVscodeSettings(callback);
+    Host.InspectorFrontendHost.getVscodeSettings(callback);
 }
 
 export function sendToVscodeOutput(message: string): void {
-    // Since we are calling InspectorFrontendHost outside of root.js, we need to use InspectorFrontendHost.InspectorFrontendHostInstance
+    // Since we are calling InspectorFrontendHost outside of root.js, we need to use Host.InspectorFrontendHost
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    InspectorFrontendHost.InspectorFrontendHostInstance.sendToVscodeOutput(message);
+    Host.InspectorFrontendHost.sendToVscodeOutput(message);
 }
 
 export function applyExtensionSettingsInstantiatePatch(content: string): string | null {
@@ -68,9 +68,16 @@ export function applyExtensionSettingsInstantiatePatch(content: string): string 
 }
 
 export function applyExtensionSettingsRuntimeObjectPatch(content: string): string | null {
-    const pattern = /experiments:\s*experiments/;
-    const replacementText = ', vscodeSettings:vscodeSettings';
+    const pattern = /__scope\.experiments\s*=\s*experiments;/;
+    const replacementText = '__scope.vscodeSettings = vscodeSettings';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
+}
+
+export function applyExtensionSettingExportPatch(content: string): string | null {
+    // export { Experiment, ExperimentsSupport, Runtime, experiments, loadResourcePromise, loadScriptPromise };
+    const pattern = /export { Experiment, ExperimentsSupport, Runtime, experiments, loadResourcePromise, loadScriptPromise }/;
+    const replacementText = 'export { Experiment, ExperimentsSupport, Runtime, experiments, vscodeSettings, loadResourcePromise, loadScriptPromise }';
+    return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyCreateExtensionSettingsLegacyPatch(content: string): string | null {
@@ -80,24 +87,28 @@ export function applyCreateExtensionSettingsLegacyPatch(content: string): string
 }
 
 export function applyPortSettingsFunctionCreationPatch(content: string): string | null {
-    const pattern = /static instance/g;
+    const pattern = /static isDescriptorEnabled/g;
     const replacementText = getVscodeSettings.toString().slice(9);
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyPortSettingsFunctionCallPatch(content: string): string | null {
-    const pattern = /this._descriptorsMap\s*=\s*{};/g;
+    // super(descriptors);
+    const pattern = /super\(descriptors\);/g;
     const replacementText = 'this.getVscodeSettings((vscodeSettingsObject) => {Object.assign(vscodeSettings, vscodeSettingsObject);});';
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyCommonRevealerPatch(content: string): string | null {
-    const pattern = /let reveal\s*=\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
-    const replacementText = `let reveal = ${revealInVSCode.toString().slice(0, -1)}`;
+    // Updates revealers to direct users to VSCode files
+    // let reveal = async function (revealable, omitFocus) {
+    const pattern = /let\s*reveal\s*=\s*async\s*function\s*\(revealable,\s*omitFocus\)\s*{/g;
+    const replacementText = `let reveal = async ${revealInVSCode.toString().slice(0, -1)}`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
 export function applyStylesRevealerPatch(content: string): string | null {
+    // Removes a Context menu entry that opens the sources panel.
     const pattern = /this\._navigateToSource\(selectElement,\s*true\);/g;
     const replacementText = '';
     return replaceInSourceCode(content, pattern, replacementText);
@@ -105,10 +116,11 @@ export function applyStylesRevealerPatch(content: string): string | null {
 
 export function applyStylesToggleFocusPatch(content: string): string | null {
     // Patch to fix accessibility focus issue when toggling a property with context menu option.
-    const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(ls\s*`Toggle property[\s\S]+.const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
+    const pattern = /contextMenu\.defaultSection\(\)\.appendCheckboxItem\(\s*.*\s*const sectionIndex = this\._parentPane\.focusedSectionIndex\(\);/g;
     const replacementText = `
         const sectionIndex = this._parentPane.focusedSectionIndex();
-        contextMenu.defaultSection().appendCheckboxItem(ls \`Toggle property and continue editing\`, async () => {
+        contextMenu.defaultSection().appendCheckboxItem(
+            i18nString(UIStrings.togglePropertyAndContinueEditing), async () => {
             ARIAUtils.alert('Toggle property and continue editing selected', this.nameElement);
     `;
     return replaceInSourceCode(content, pattern, replacementText);
@@ -116,11 +128,13 @@ export function applyStylesToggleFocusPatch(content: string): string | null {
 
 export function applyNoMatchingStylesPatch(content: string): string | null {
     // Patch to inform user to refresh/resume target to get CSS information when attaching to a paused target.
-    const pattern = /this\._noMatchesElement\.textContent\s*=\s*(ls\s*`No matching selector or style`);/g;
+    // Appears in the styles pane if no matching styles are reported by CSS domain.
+    // this._noMatchesElement.textContent = i18nString(UIStrings.noMatchingSelectorOrStyle);
+    const pattern = /this\._noMatchesElement\.textContent\s*=\s*i18nString\(UIStrings\.noMatchingSelectorOrStyle\);/g;
     const replacementText = `
-       const noMatchSelector = ls \`No matching selector or style.\`;
-       const pausedExplanation = ls \`Styles may not be available if target was paused when opening Edge DevTools.\`;
-       const resumePrompt = ls \`Please resume or refresh the target.\`;
+       const noMatchSelector = i18nString(UIStrings.noMatchingSelectorOrStyle);
+       const pausedExplanation = i18nString("Styles may not be available if target was paused when opening Edge DevTools.");
+       const resumePrompt = i18nString("Please resume or refresh the target.");
        this._noMatchesElement.innerHTML = \`\${noMatchSelector}<br />\${pausedExplanation}<br />\${resumePrompt}\`;
     `;
     return replaceInSourceCode(content, pattern, replacementText);
@@ -142,6 +156,7 @@ export function applyQueryParamsObjectPatch(content: string): string | null {
 
 export function applyCommandMenuPatch(content: string): string | null {
     // pattern intended to match logic of CommandMenu.attach()
+    // Only attaches Elements, Network, and the Show Welcome commands/actions
     const pattern = /for\s*\(const action of actions\)\s*{\s*const category\s*=\s*action[\s\S]+this\._commands\.sort\(commandComparator\);/;
     const replacementText =
         `const networkEnabled = Root.Runtime.vscodeSettings.enableNetwork;
@@ -164,7 +179,7 @@ export function applyCommandMenuPatch(content: string): string | null {
         if (networkEnabled) {
             condition = condition && command.category() !== 'Network';
         }
-        if (!condition && command.available()) {
+        if ((!condition || command.title() === 'Show Welcome') && command.available()) {
             this._commands.push(command);
         }
         }
@@ -183,28 +198,24 @@ export function applyInspectorViewShowDrawerPatch(content: string): string | nul
 
 export function applyInspectorViewCloseDrawerPatch(content: string): string | null {
     // this patch closes the drawer if the network tool is disabled
-    const pattern = /InspectorView\.InspectorView\.instance\(\)\.createToolbars\(\);/g;
-    const replacementText = `if (!${isDrawerEnabled}) {InspectorView.InspectorView.instance()._closeDrawer();}`;
+    // await InspectorView.instance().createToolbars();
+    const pattern = /await\s*InspectorView\.instance\(\)\.createToolbars\(\);/g;
+    const replacementText = `if (!${isDrawerEnabled}) {InspectorView.instance()._closeDrawer();}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyMainViewPatch(content: string): string | null {
+    // Removes the More tools option from the context menu on the toolbar
     const pattern = /const moreTools\s*=\s*[^;]+;/g;
     const replacementText = 'const moreTools = { defaultSection: () => ({ appendItem: () => {} }) };';
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyScreencastAppPatch(content: string): string | null {
-    // This patch fixes screencasting functionality in version 88
-    const pattern = /this\._getAppProviderInstance\('Main.SimpleAppProvider'\);/g;
-    const replacementText = 'Runtime.Runtime.instance().extension(AppProvider.AppProvider).instance();';
-    return replaceInSourceCode(content, pattern, replacementText);
-}
-
-export function applyScreencastRepaintPatch(content: string): string | null {
-    // This patch removes a condition that calls repaint to restore scroll functionality
-    const pattern = /\(this._highlightNode\)/g;
-    const replacementText = '(true)';
+export function applyExperimentsEnabledPatch(content: string): string | null {
+    // Replaces list of experiements enabled by default
+    //experiments.enableExperimentsByDefault([...]);
+    const pattern = /experiments\.enableExperimentsByDefault\(.*\);/g;
+    const replacementText = `experiments.enableExperimentsByDefault(['msEdgeDevToolsWelcomeTab', 'msEdgeTooltips']);`;
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -215,16 +226,16 @@ export function applyRemoveBreakOnContextMenuItem(content: string): string | nul
 }
 
 export function applyShowDrawerTabs(content: string): string | null {
-    // Appends the Request Blocking tab or Whats New tab in the drawer even if it is not open.
+    // Appends the Request Blocking tab in the drawer even if it is not open.
     const pattern = /if\s*\(!view\.isCloseable\(\)\)/;
-    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls'||id==='release-note')";
+    const replacementText = "if(!view.isCloseable()||id==='network.blocked-urls')";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
-export function applyPersistDrawerTabs(content: string): string | null {
-    // Removes the close button from the Request blocking and Whats New tab tab by making the tab non-closeable.
+export function applyPersistTabs(content: string): string | null {
+    // Removes the close button from the Request blocking and Network tabs by making the tab non-closeable.
     const pattern = /this\._closeable\s*=\s*closeable;/;
-    const replacementText = "this._closeable= (id==='network.blocked-urls' | id === 'release-note')?false:closeable;";
+    const replacementText = "this._closeable= (id==='network.blocked-urls' || id === 'network')?false:closeable;";
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
@@ -254,6 +265,7 @@ export function applyAppendTabConditionsPatch(content: string): string | null {
         'accessibility.view',
         'elements.domProperties',
         'elements.eventListeners',
+        'elements.layout',
     ];
 
     const condition = elementsTabs.map(tab => {
@@ -267,8 +279,8 @@ export function applyAppendTabConditionsPatch(content: string): string | null {
         appendTab(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index) {
             let patchedCondition = ${condition};
             ${applyEnableNetworkPatch()}
-            if(Root.Runtime.vscodeSettings.whatsNew) {
-              patchedCondition = patchedCondition && (id !== "release-note");
+            if (Root.Runtime.vscodeSettings.welcome) {
+              patchedCondition = patchedCondition && (id !== "welcome");
             }
             if (!patchedCondition) {
                 this.appendTabOverride(id, tabTitle, view, tabTooltip, userGesture, isCloseable, index);
@@ -340,9 +352,9 @@ export function applyInspectorCommonCssPatch(content: string): string | null {
         hideMoreToolsBtn +
         unHideScreenCastBtn;
 
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    const replacementText = `${topHeaderCSS}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText);
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${topHeaderCSS}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyInspectorCommonNetworkPatch(content: string): string | null {
@@ -370,9 +382,9 @@ export function applyInspectorCommonNetworkPatch(content: string): string | null
         hidePrettyPrintBtn +
         unHideSearchCloseButton;
 
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    const replacementText = `${networkCSS}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText);
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${networkCSS}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyInspectorCommonContextMenuPatch(content: string): string | null {
@@ -389,13 +401,14 @@ export function applyInspectorCommonContextMenuPatch(content: string): string | 
         .soft-context-menu-item[aria-label='Save as...'] {
             display: none !important;
         }`.replace(/\n/g, separator);
-
-    const pattern = /(:host-context\(\.platform-mac\)\s*\.monospace,)/g;
-    const replacementText = `${hideContextMenuItems}${separator} $1`;
-    return replaceInSourceCode(content, pattern, replacementText);
+        //platform-mac,\n:host-context(.platform-mac)
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${hideContextMenuItems}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 
 export function applyInspectorCommonCssRightToolbarPatch(content: string): string | null {
+    // Hides the right toolbar that contains the feedback, settings, and more tools icons
     const pattern = /(\.tabbed-pane-right-toolbar\s*\{([^\}]*)?\})/g;
     const replacementText =
         `.tabbed-pane-right-toolbar {
@@ -405,6 +418,7 @@ export function applyInspectorCommonCssRightToolbarPatch(content: string): strin
 }
 
 export function applyInspectorCommonCssTabSliderPatch(content: string): string | null {
+    // Hides the underline indicator that is usually present under the currently active tab
     const pattern = /(\.tabbed-pane-tab-slider\s*\{([^\}]*)?\})/g;
     const replacementText =
         `.tabbed-pane-tab-slider {
@@ -414,9 +428,10 @@ export function applyInspectorCommonCssTabSliderPatch(content: string): string |
 }
 
 export function applyContextMenuRevealOption(content: string): string | null {
-    const pattern = /const destination\s*=\s*Revealer\.revealDestination\(revealable\);/;
+    // const destination = revealDestination(revealable);
+    const pattern = /const destination\s*=\s*revealDestination\(revealable\);/;
     const replacementText = `
-        let destination = Revealer.revealDestination(revealable);
+        let destination = revealDestination(revealable);
         if (destination==="Sources panel") {
             destination = "Visual Studio Code";
         };`;
@@ -431,9 +446,10 @@ export function applyMoveToContextMenuPatch(content: string): string | null {
 
 export function applyThemePatch(content: string): string | null {
     // Sets the theme of the DevTools
-    const pattern = /const settingDescriptor/;
-    const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);} const settingDescriptor';
-    return replaceInSourceCode(content, pattern, replacementText);
+    // const themeSetting = Settings.instance().createSetting('uiTheme', EDGE_DEFAULT_THEME);
+    const pattern = /const\s*themeSetting\s*=\s*Settings\.instance\(\)\.createSetting\('uiTheme',\s*EDGE_DEFAULT_THEME\);/;
+    const replacementText = 'const theme = Root.Runtime.vscodeSettings.theme;if(theme){themeSetting.set(theme);}';
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyRemovePreferencePatch(content: string): string | null {
@@ -443,15 +459,22 @@ export function applyRemovePreferencePatch(content: string): string | null {
     return replaceInSourceCode(content, pattern, replacementText);
 }
 
+export function applyConsoleImportPatch(content: string): string | null {
+    // import { userMetrics } from '../host/host.js';
+    const pattern = /import { userMetrics }/g;
+    const replacementText = `import { userMetrics, InspectorFrontendHost }`;
+    return replaceInSourceCode(content, pattern, replacementText);
+}
+
 export function applyRerouteConsoleMessagePatch(content: string): string | null {
-    const pattern = /this\.dispatchEventToListeners\(Events\$h\.MessageAdded,\s*msg\);/g;
+    const pattern = /this\.dispatchEventToListeners\(Events\.MessageAdded,\s*msg\);/g;
     const replacementText = `sendToVscodeOutput(msg.level + ': ' + msg.messageText); ${sendToVscodeOutput.toString()}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
 
 export function applyScreencastCursorPatch(content: string): string | null {
     // This patch removes the touch cursor from the screencast view
-    const pattern = /\('div',\s*'screencast-canvas-container'\)\);/g;
+    const pattern = /\('div',\s*'screencast-canvas-container'\);/g;
     const replacementText = "this._canvasContainerElement.style.cursor = 'unset';";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
@@ -459,7 +482,8 @@ export function applyScreencastCursorPatch(content: string): string | null {
 export function applyScreencastHeadlessPatch(content: string): string | null {
     // This patch will toggle the DevTools screencast on or off based on if the user is using headless or non-headless mode.
     // This patch also marks a time stamp if the setting is enabled.
-    const pattern = /this\._enabledSetting\s*=\s*Settings\.Settings\.instance\(\)\.createSetting\('screencastEnabled',\s*true\);/g;
+    // this._enabledSetting = Settings.instance().createSetting('screencastEnabled', true);
+    const pattern = /this\._enabledSetting\s*=\s*Settings\.instance\(\)\.createSetting\('screencastEnabled',\s*true\);/g;
     const replacementText = "const isHeadless = Root.Runtime.vscodeSettings.isHeadless; this._enabledSetting.set(isHeadless); this._startTime = isHeadless ? performance.now() : null;";
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);
 }
@@ -469,13 +493,13 @@ export function applyScreencastTelemetry(content: string): string | null {
     const pattern = /const enabled\s*=\s*!this\._toggleButton\.toggled\(\);/g;
     const replacementText = `
     if (enabled) {
-        InspectorFrontendHost.InspectorFrontendHostInstance.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1, 2);
+        Host.InspectorFrontendHost.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1, 2);
         this._startTime = performance.now();
     } else {
-        InspectorFrontendHost.InspectorFrontendHostInstance.recordEnumeratedHistogram('DevTools.ScreencastToggle', 0, 2);
+        Host.InspectorFrontendHost.recordEnumeratedHistogram('DevTools.ScreencastToggle', 0, 2);
         if (this._startTime) {
             const sessionDuration = performance.now() - this._startTime;
-            InspectorFrontendHost.InspectorFrontendHostInstance.recordPerformanceHistogram('DevTools.ScreencastDuration', sessionDuration);
+            Host.InspectorFrontendHost.recordPerformanceHistogram('DevTools.ScreencastDuration', sessionDuration);
         }
     }`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.InFront);

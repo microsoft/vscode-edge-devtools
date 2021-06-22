@@ -5,7 +5,7 @@ import { applyThirdPartyI18nLocalesPatch } from "../../../src/host/polyfills/thi
 
 describe("override i18n locales", () => {
     it("applyThirdPartyI18nLocalesPatch correctly changes text", async () => {
-        const filePath = "i18n/i18n.js";
+        const filePath = "third_party/i18n/i18n-bundle.js";
         const expectedStrings = ["const locales = {'en-US': {'title': 'value'},};"];
         testPatch(filePath, applyThirdPartyI18nLocalesPatch, expectedStrings);
     });

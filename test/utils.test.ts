@@ -706,7 +706,8 @@ describe("utils", () => {
                 "webpack:///./*": `${testPath}\\*`,
                 "webpack:///./~/*": `${testPath}\\node_modules\\*`,
                 "webpack:///*": "*",
-                "webpack:///src/*": `${testPath}\\*`
+                "webpack:///src/*": `${testPath}\\*`,
+                "webpack://*": `${testPath}\\*`
             };
 
             // Ensure the new values are returned
@@ -997,7 +998,7 @@ describe("utils", () => {
                     fillerPropertyOne: 'Need to add filler values since the extension related telemetry functions removes the first 4 entries to create an array of extension settings',
                     fillerPropertyTwo: 'The first 4 entries for a workspaceConfiguration object are class related functions, the rest are all extension related settings.',
                     themes: 'System preference',
-                    whatsNew: 'true',
+                    welcome: 'true',
                     enableNetwork: 'false',
                 }
             });
@@ -1009,7 +1010,7 @@ describe("utils", () => {
         it('correctly records all changed extension settings', async () => {
             const reporter = createFakeTelemetryReporter();
             utils.reportExtensionSettings(reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { themes: 'System preference', whatsNew: 'true', enableNetwork: 'false' });
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { themes: 'System preference', welcome: 'true', enableNetwork: 'false' });
         });
 
         it('correctly sends telemetry event for changed event', async () => {

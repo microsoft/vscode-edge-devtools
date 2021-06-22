@@ -5,7 +5,7 @@ import { applyRuntimeImportScriptPathPrefixPatch } from "../../../src/host/polyf
 
 describe("importScriptPathPrefix replacement", () => {
     it("verifies that importScriptPathPrefix is exposed as a module variable", async () => {
-        const filePath = "root/root.js";
+        const filePath = "core/root/Runtime_edge.js";
         const expectedStrings = ["self.importScriptPathPrefix=baseUrl.substring(0,baseUrl.lastIndexOf('/')+1);})();"];
         const unexpectedStrings = ["let importScriptPathPrefix"]
 

@@ -176,12 +176,11 @@
                     "type": "object",
                     "description": "A set of mappings to override the locations of source map files.",
                     "default": {
-                        "webpack://./*": "${webRoot}/*",
-                        "webpack://*": "${webRoot}/*",
                         "webpack:///./*": "${webRoot}/*",
                         "webpack:///src/*": "${webRoot}/*",
                         "webpack:///*": "*",
                         "webpack:///./~/*": "${webRoot}/node_modules/*",
+                        "webpack://*": "${webRoot}/*",
                         "meteor://💻app/*": "${webRoot}/*"
                     }
                 },
@@ -205,9 +204,9 @@
                     "description": "Show service and shared workers in the target list.",
                     "default": false
                 },
-                "vscode-edge-devtools.whatsNew": {
+                "vscode-edge-devtools.welcome": {
                     "type": "boolean",
-                    "description": "Enable What's New panel in the drawer (requires relaunching extension)",
+                    "description": "Enable Welcome panel (requires relaunching extension)",
                     "default": true
                 },
                 "vscode-edge-devtools.headless": {
@@ -337,6 +336,7 @@
                                     "webpack:///src/*": "${webRoot}/*",
                                     "webpack:///*": "*",
                                     "webpack:///./~/*": "${webRoot}/node_modules/*",
+                                    "webpack://*": "${webRoot}/*",
                                     "meteor://💻app/*": "${webRoot}/*"
                                 }
                             },
@@ -419,6 +419,7 @@
                                     "webpack:///src/*": "${webRoot}/*",
                                     "webpack:///*": "*",
                                     "webpack:///./~/*": "${webRoot}/node_modules/*",
+                                    "webpack://*": "${webRoot}/*",
                                     "meteor://💻app/*": "${webRoot}/*"
                                 }
                             },
@@ -585,8 +586,9 @@
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
-        "vscode:prepublish": "npm run build-and-lint",
+        "vscode:prepublish": "npm run build-min && npm run lint",
         "build": "npm run build-wp && npm run build-post",
+        "build-min": "npm run build-wp && npm run build-post && npm run minify-devtools",
         "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
         "build-wp": "webpack",
         "build-post": "ts-node postBuildStep.ts",
@@ -596,7 +598,8 @@
         "watch-wp": "webpack --watch",
         "lint": "eslint -c .eslintrc.js */*.ts",
         "test": "npm run lint && jest --config package.json --runInBand",
-        "download-edge": "node scripts/downloadAndExtractEdge.js"
+        "download-edge": "node scripts/downloadAndExtractEdge.js",
+        "minify-devtools": "node scripts/minifyDevtools.js"
     },
     "dependencies": {
         "bufferutil": "4.0.1",
@@ -630,7 +633,8 @@
         "ts-node": "9.1.1",
         "typescript": "4.2.4",
         "unzipper": "0.10.11",
-        "vsce": "1.88.0",
+        "uglify-js": "3.13.9",
+        "vsce": "1.93.0",
         "vscode-test": "1.5.2",
         "webpack": "5.36.2",
         "webpack-cli": "4.7.0"
