@@ -13,7 +13,7 @@
     "author": {
         "name": "Microsoft Corporation"
     },
-    "homepage": "https://github.com/Microsoft/vscode-edge-devtools/blob/master/README.md",
+    "homepage": "https://github.com/Microsoft/vscode-edge-devtools/blob/main/README.md",
     "repository": {
         "type": "git",
         "url": "https://github.com/Microsoft/vscode-edge-devtools"

@@ -22,7 +22,7 @@ This project welcomes contributions and suggestions.  Most contributions require
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit [https://cla.microsoft.com](https://cla.microsoft.com).
 
-See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/master/CONTRIBUTING.md) for more information.
+See [CONTRIBUTING.md](https://github.com/Microsoft/vscode-edge-devtools/blob/main/CONTRIBUTING.md) for more information.
 
 ## Other information
 
