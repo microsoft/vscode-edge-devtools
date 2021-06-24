@@ -154,7 +154,7 @@ describe("simpleView", () => {
     it("applyInspectorCommonNetworkPatch correctly changes text", async () => {
         const filePath = "shell.js";
         const patch = SimpleView.applyInspectorCommonNetworkPatch;
-        const expectedStrings = [".toolbar-button[aria-label='Export HAR...']", ".toolbar-button[aria-label='Pretty print']", ".toolbar-button[aria-label='Close']"];
+        const expectedStrings = [".toolbar-button[aria-label='Export HAR...']", ".toolbar-button[aria-label='Pretty print']"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
@@ -171,6 +171,14 @@ describe("simpleView", () => {
         const filePath = "shell.js";
         const patch = SimpleView.applyInspectorCommonCssRightToolbarPatch;
         const expectedStrings = [".tabbed-pane-right-toolbar {\\n            visibility: hidden !important;\\n        }"];
+
+        await testPatch(filePath, patch, expectedStrings);
+    });
+
+    it("applyUnhideRightToolbarElementsPatch correctly changes tabbed-pane-right-toolbar", async () => {
+        const filePath = "shell.js";
+        const patch = SimpleView.applyUnhideRightToolbarElementsPatch;
+        const expectedStrings = [".toolbar-button[aria-label='Close']", ".toolbar-button[aria-label='Close drawer']"];
 
         await testPatch(filePath, patch, expectedStrings);
     });
