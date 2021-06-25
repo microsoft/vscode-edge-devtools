@@ -2,9 +2,9 @@
 
 name: Sync Issue with ADO
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push or pull request events but only for the main branch
   issues:
     types: [labeled, closed, reopened, edited]
   issue_comment:
@@ -15,10 +15,10 @@ jobs:
   alert:
     runs-on: ubuntu-latest
     name: ADOSync workflow
-    steps:       
+    steps:
     - uses: jasonstephen15/github-actions-issue-to-work-item@master
       env:
-        github_token: "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}"  
+        github_token: "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}"
         ado_token: '${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}'
         ado_organization: 'microsoft'
         ado_project: 'Edge'

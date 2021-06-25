@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.1.9",
+    "version": "1.2.0",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -13,7 +13,7 @@
     "author": {
         "name": "Microsoft Corporation"
     },
-    "homepage": "https://github.com/Microsoft/vscode-edge-devtools/blob/master/README.md",
+    "homepage": "https://github.com/Microsoft/vscode-edge-devtools/blob/main/README.md",
     "repository": {
         "type": "git",
         "url": "https://github.com/Microsoft/vscode-edge-devtools"
