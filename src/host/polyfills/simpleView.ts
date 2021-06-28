@@ -343,14 +343,14 @@ export function applyInspectorCommonCssPatch(content: string): string | null {
             display: none !important;
         }`.replace(/\n/g, separator);
 
-    const unHideScreenCastBtn =
+    const unhideScreenCastBtn =
         `.toolbar-button[aria-label='Toggle screencast'] {
             visibility: visible !important;
         }`.replace(/\n/g, separator);
 
     const topHeaderCSS =
         hideMoreToolsBtn +
-        unHideScreenCastBtn;
+        unhideScreenCastBtn;
 
     const pattern = /\.platform-mac,/g;
     const replacementText = `${topHeaderCSS}${separator}`;
@@ -358,7 +358,7 @@ export function applyInspectorCommonCssPatch(content: string): string | null {
 }
 
 export function applyInspectorCommonNetworkPatch(content: string): string | null {
-    // Hides export HAR button and pretty print button and reveals the Network search close button in the Network Panel.
+    // Hides export HAR button and pretty print button.
     const separator = '\\n';
 
     const hideExportHarBtn =
@@ -371,19 +371,34 @@ export function applyInspectorCommonNetworkPatch(content: string): string | null
             display: none !important;
         }`.replace(/\n/g, separator);
 
-    // Search close button initially hidden by applyInspectorCommonCssRightToolbarPatch
-    const unHideSearchCloseButton =
+    const networkCSS =
+        hideExportHarBtn +
+        hidePrettyPrintBtn;
+
+    const pattern = /\.platform-mac,/g;
+    const replacementText = `${networkCSS}${separator}`;
+    return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
+}
+
+export function applyUnhideRightToolbarElementsPatch(content: string): string | null {
+    // This patch unhides certain elements that were hidden with the blanket applyInspectorCommonCssRightToolbarPatch.
+    const separator = '\\n';
+    const unhideSearchCloseButton =
         `.toolbar-button[aria-label='Close'] {
             visibility: visible !important;
         }`.replace(/\n/g, separator);
 
-    const networkCSS =
-        hideExportHarBtn +
-        hidePrettyPrintBtn +
-        unHideSearchCloseButton;
+    const unhideDrawerCloseButton =
+    `.toolbar-button[aria-label='Close drawer'] {
+        visibility: visible !important;
+    }`.replace(/\n/g, separator);
+
+    const unhideCSS =
+        unhideSearchCloseButton +
+        unhideDrawerCloseButton;
 
     const pattern = /\.platform-mac,/g;
-    const replacementText = `${networkCSS}${separator}`;
+    const replacementText = `${unhideCSS}${separator}`;
     return replaceInSourceCode(content, pattern, replacementText, KeepMatchedText.AtEnd);
 }
 

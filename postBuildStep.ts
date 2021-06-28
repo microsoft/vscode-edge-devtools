@@ -20,6 +20,7 @@ import {
     applyInspectorCommonContextMenuPatch,
     applyInspectorCommonCssPatch,
     applyInspectorCommonCssRightToolbarPatch,
+    applyUnhideRightToolbarElementsPatch,
     applyInspectorCommonCssTabSliderPatch,
     applyInspectorCommonNetworkPatch,
     applyInspectorViewCloseDrawerPatch,
@@ -102,6 +103,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('shell.js', toolsOutDir, [
         applyInspectorCommonContextMenuPatch,
         applyInspectorCommonCssRightToolbarPatch,
+        applyUnhideRightToolbarElementsPatch,
         applyInspectorCommonCssPatch,
         applyInspectorCommonNetworkPatch,
         applyInspectorCommonCssTabSliderPatch,
