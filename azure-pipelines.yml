@@ -74,7 +74,7 @@ jobs:
     vmImage: 'windows-latest'
   steps:
   - script: |
-      git config core.autocrlf true
+      git config --global core.autocrlf true
     displayName: Configuring Git
   - checkout: self
   - task: NodeTool@0
