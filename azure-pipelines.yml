@@ -75,7 +75,7 @@ jobs:
   steps:
   - script: |
       git config --global core.autocrlf false
-    displayName: Configuring Git
+    displayName: Configuring Git LF Settings
   - checkout: self
   - task: NodeTool@0
     inputs:
