@@ -982,7 +982,7 @@ describe("utils", () => {
         it('correctly lists extension types in the workspace', async () => {
             const reporter = createFakeTelemetryReporter();
             await utils.reportFileExtensionTypes(reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('workspace/metadata', undefined, {"css": 1, "js": 1, "json": 1, "jsx": 1, "total": 4});
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('workspace/metadata', undefined, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "scss": 0, "totalWorkspaceSize": 4, "ts": 0});
         });
     });
 

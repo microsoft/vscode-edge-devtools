@@ -682,19 +682,26 @@ export function reportUrlType(url: string, telemetryReporter: Readonly<Telemetry
 
 export async function reportFileExtensionTypes(telemetryReporter: Readonly<TelemetryReporter>): Promise<void> {
     const files = await vscode.workspace.findFiles('**/*.*', '**/node_modules/**');
-    const extensionMap: Map<string, number> = new Map<string, number>();
+    const extensionMap: Map<string, number> = new Map<string, number>([
+        ['html', 0],
+        ['css', 0],
+        ['js', 0],
+        ['ts', 0],
+        ['jsx', 0],
+        ['scss', 0],
+        ['json', 0],
+        ['mjs', 0],
+    ]);
     for (const file of files) {
         const extension: string | undefined = file.path.split('.').pop();
-        if (extension) {
+        if (extension && extensionMap.has(extension)) {
             const currentValue = extensionMap.get(extension);
-            if (currentValue) {
+            if (currentValue !== undefined) {
                 extensionMap.set(extension, currentValue + 1);
-            } else {
-                extensionMap.set(extension, 1);
             }
         }
     }
-    extensionMap.set('total', files.length);
+    extensionMap.set('totalWorkspaceSize', files.length);
 
     // Creates Object from map
     const fileTypes: {[key: string]: number} = {};
