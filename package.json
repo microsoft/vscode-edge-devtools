@@ -43,6 +43,12 @@
         "onView:vscode-edge-devtools-view.targets",
         "onDebug"
     ],
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": "limited",
+            "description": "Workspace trust is needed to configure and debug projects"
+        }
+    },
     "contributes": {
         "commands": [
             {
@@ -118,13 +124,13 @@
             {
                 "command": "vscode-edge-devtools-view.configureLaunchJson",
                 "category": "Microsoft Edge Tools",
-                "enablement": "titleCommandsRegistered",
+                "enablement": "titleCommandsRegistered && isWorkspaceTrusted",
                 "title": "Configure launch.json file"
             },
             {
                 "command": "vscode-edge-devtools-view.launchProject",
                 "category": "Microsoft Edge Tools",
-                "enablement": "titleCommandsRegistered",
+                "enablement": "titleCommandsRegistered && isWorkspaceTrusted",
                 "title": "Launch project"
             }
         ],
@@ -552,17 +558,17 @@
             {
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Customize your launch experience by adding a launch.json file to your project.\n[Generate launch.json](command:vscode-edge-devtools-view.configureLaunchJson)",
-                "when": "workbenchState != empty && launchJsonStatus == None"
+                "when": "workbenchState != empty && launchJsonStatus == None && isWorkspaceTrusted"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Customize your launch experience by adding a debug configuration to your launch.json file.\n[Configure launch.json](command:vscode-edge-devtools-view.configureLaunchJson)",
-                "when": "launchJsonStatus == Unsupported"
+                "when": "launchJsonStatus == Unsupported && isWorkspaceTrusted"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launchProject)",
-                "when": "launchJsonStatus == Supported"
+                "when": "launchJsonStatus == Supported && isWorkspaceTrusted"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
@@ -632,8 +638,8 @@
         "ts-loader": "9.1.2",
         "ts-node": "9.1.1",
         "typescript": "4.2.4",
-        "unzipper": "0.10.11",
         "uglify-js": "3.13.9",
+        "unzipper": "0.10.11",
         "vsce": "1.93.0",
         "vscode-test": "1.5.2",
         "webpack": "5.36.2",
