@@ -691,17 +691,25 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
         ['scss', 0],
         ['json', 0],
         ['mjs', 0],
+        ['other', 0],
     ]);
     for (const file of files) {
         const extension: string | undefined = file.path.split('.').pop();
-        if (extension && extensionMap.has(extension)) {
-            const currentValue = extensionMap.get(extension);
-            if (currentValue !== undefined) {
-                extensionMap.set(extension, currentValue + 1);
+        if (extension) {
+            if (extensionMap.has(extension)) {
+                const currentValue = extensionMap.get(extension);
+                if (currentValue !== undefined) {
+                    extensionMap.set(extension, currentValue + 1);
+                }
+            } else {
+                const otherCount = extensionMap.get('other');
+                if (otherCount !== undefined) {
+                    extensionMap.set('other', otherCount + 1);
+                }
             }
         }
     }
-    extensionMap.set('totalWorkspaceSize', files.length);
+    extensionMap.set('total', files.length);
 
     // Creates Object from map
     const fileTypes: {[key: string]: number} = {};
