@@ -47,7 +47,8 @@
         "untrustedWorkspaces": {
             "supported": "limited",
             "description": "Workspace trust is needed to configure and debug projects"
-        }
+        },
+        "virtualWorkspaces": false
     },
     "contributes": {
         "commands": [
