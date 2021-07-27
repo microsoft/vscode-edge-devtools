@@ -3,6 +3,7 @@
 import * as fse from 'fs-extra';
 import path from 'path';
 
+import { applyContentSecurityPolicyPatch } from './src/host/polyfills/inspectorContentPolicy';
 import { applyRuntimeImportScriptPathPrefixPatch } from './src/host/polyfills/runtime';
 import {applyAnnouncementNamePatch, applyReleaseNotePatch, applySettingsCheckboxPatch, applyShowMorePatch} from './src/host/polyfills/releaseNote';
 import {
@@ -27,8 +28,6 @@ import {
     applyInspectorViewShowDrawerPatch,
     applyMainViewPatch,
     applyMoveToContextMenuPatch,
-    applyPersistTabs,
-    applyQueryParamsObjectPatch,
     applyRemoveBreakOnContextMenuItem,
     applyRerouteConsoleMessagePatch,
     applyContextMenuRevealOption,
@@ -133,7 +132,10 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('core/host/InspectorFrontendHost.js', toolsOutDir, [
         applyRemovePreferencePatch,
     ]);
-    await patchFileForWebViewWrapper('screencast/ScreencastView.js', toolsOutDir, [
+    await patchFileForWebViewWrapper('inspector.html', toolsOutDir, [
+        applyContentSecurityPolicyPatch,
+    ]);
+    await patchFileForWebViewWrapper('screencast/screencast.js', toolsOutDir, [
         applyScreencastCursorPatch,
     ]);
     await patchFileForWebViewWrapper('screencast/ScreencastApp.js', toolsOutDir, [
@@ -143,7 +145,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
     await patchFileForWebViewWrapper('ui/legacy/TabbedPane.js', toolsOutDir, [
         applyAppendTabOverridePatch,
         applyAppendTabConditionsPatch,
-        applyPersistTabs,
         applySetTabIconPatch,
     ]);
     await patchFileForWebViewWrapper('ui/legacy/InspectorView.js', toolsOutDir, [
@@ -158,7 +159,6 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyShowDrawerTabs,
     ]);
     await patchFileForWebViewWrapper('core/root/Runtime_edge.js', toolsOutDir, [
-        applyQueryParamsObjectPatch,
         applyRuntimeImportScriptPathPrefixPatch,
     ]);
     await patchFileForWebViewWrapper('core/root/Runtime.js', toolsOutDir, [
@@ -167,6 +167,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
         applyExtensionSettingExportPatch,
         applyPortSettingsFunctionCallPatch,
         applyPortSettingsFunctionCreationPatch,
+        applyRuntimeImportScriptPathPrefixPatch,
     ]);
     await patchFileForWebViewWrapper('core/root/root-legacy.js', toolsOutDir, [
         applyCreateExtensionSettingsLegacyPatch,

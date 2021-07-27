@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import { encodeMessageForChannel } from '../common/webviewEvents';
-import { vscode } from './host';
 
 export interface IRuntimeResourceLoader {
     loadResourcePromise: (url: string) => Promise<string>;
@@ -33,7 +32,7 @@ export class ToolsResourceLoader {
             const id = this.urlLoadNextId++;
             return new Promise((resolve: (url: string) => void) => {
                 this.urlLoadResolvers.set(id, resolve);
-                encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getUrl', { id, url });
+                encodeMessageForChannel(msg => window.parent.postMessage(msg, '*'), 'getUrl', { id, url });
             });
         }
 

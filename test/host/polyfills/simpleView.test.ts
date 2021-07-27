@@ -39,14 +39,6 @@ describe("simpleView", () => {
         await testPatch(filePath, patch, expectedStrings);
     });
 
-    it("applyQueryParamsObjectPatch correctly changes handleAction text for Quick Open", async () => {
-        const filePath = "core/root/Runtime_edge.js";
-        const patch = SimpleView.applyQueryParamsObjectPatch;
-        const expectedStrings = ["?ws=trueD&experiments=true&edgeThemes=true"];
-
-        await testPatch(filePath, patch, expectedStrings);
-    });
-
     it("applyCommandMenuPatch correctly changes attach text for command menu", async () => {
         const filePath = "quick_open/CommandMenu_edge.js";
         const patch = SimpleView.applyCommandMenuPatch;

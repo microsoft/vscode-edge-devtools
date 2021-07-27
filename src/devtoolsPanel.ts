@@ -324,42 +324,31 @@ export class DevToolsPanel {
     }
 
     private getHtmlForWebview() {
-        // inspectorUri is the file that used to be loaded in inspector.html
-        // They are being loaded directly into the webview.
-        // local resource loading inside iframes was deprecated in these commits:
-        // https://github.com/microsoft/vscode/commit/de9887d9e0eaf402250d2735b3db5dc340184b74
-        // https://github.com/microsoft/vscode/commit/d05ded6d3b64fed4a3cc74106f9b6c72243b18de
+        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.html'));
+        const htmlUri = this.panel.webview.asWebviewUri(htmlPath);
 
-        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
-        const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
-
-        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
-        const hostUri = this.panel.webview.asWebviewUri(hostPath);
+        const scriptPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'messaging.bundle.js'));
+        const scriptUri = this.panel.webview.asWebviewUri(scriptPath);
 
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
-        // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
             <!doctype html>
             <html>
             <head>
-                <base href="${inspectorUri}">
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
                 <meta http-equiv="Content-Security-Policy"
-                    content="default-src;
-                    img-src 'self' data: ${this.panel.webview.cspSource};
-                    style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
-                    script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src 'self' ${this.panel.webview.cspSource};
-                    connect-src 'self' data: ${this.panel.webview.cspSource};
-                ">
-                <meta name="referrer" content="no-referrer">
+                    content="default-src 'none';
+                    frame-src ${this.panel.webview.cspSource};
+                    script-src ${this.panel.webview.cspSource};
+                    style-src ${this.panel.webview.cspSource};
+                    ">
                 <link href="${stylesUri}" rel="stylesheet"/>
-                <script src="${hostUri}"></script>
-                <script type="module" src="${inspectorUri}"></script>
+                <script src="${scriptUri}"></script>
             </head>
             <body>
+                <iframe id="host" frameBorder="0" src="${htmlUri}?ws=trueD&experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;
