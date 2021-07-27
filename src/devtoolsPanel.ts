@@ -324,8 +324,8 @@ export class DevToolsPanel {
     }
 
     private getHtmlForWebview() {
-        const htmlPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.html'));
-        const htmlUri = this.panel.webview.asWebviewUri(htmlPath);
+        // const htmlPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.html'));
+        // const htmlUri = this.panel.webview.asWebviewUri(htmlPath);
 
         const scriptPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'messaging.bundle.js'));
         const scriptUri = this.panel.webview.asWebviewUri(scriptPath);
@@ -348,7 +348,7 @@ export class DevToolsPanel {
                 <script src="${scriptUri}"></script>
             </head>
             <body>
-                <iframe id="host" frameBorder="0" src="${htmlUri}?ws=trueD&experiments=true&edgeThemes=true"></iframe>
+                <iframe id="host" frameBorder="0" src="http://localhost:3000/vscode_app.html?ws://localhost:9222/devtools/page/9C297185D08AF434867E351263508897&experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;
