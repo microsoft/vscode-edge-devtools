@@ -338,17 +338,11 @@ export class DevToolsPanel {
             <html>
             <head>
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-                <meta http-equiv="Content-Security-Policy"
-                    content="default-src 'none';
-                    frame-src ${this.panel.webview.cspSource};
-                    script-src ${this.panel.webview.cspSource};
-                    style-src ${this.panel.webview.cspSource};
-                    ">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${scriptUri}"></script>
             </head>
             <body>
-                <iframe id="host" frameBorder="0" src="http://localhost:3000/vscode_app.html?ws://localhost:9222/devtools/page/9C297185D08AF434867E351263508897&experiments=true&edgeThemes=true"></iframe>
+                <iframe id="host" frameBorder="0" src="http://localhost:3000/vscode_app.html?ws=localhost:9222/devtools/page/9C297185D08AF434867E351263508897&experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;
