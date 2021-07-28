@@ -10,7 +10,7 @@ describe("mainMessaging", () => {
             };
         });
 
-        await import("./mainMessaging");
+        await import("../../src/host/mainMessaging");
         expect(mockInit).toHaveBeenCalled();
     });
 });
