@@ -3,7 +3,6 @@
 
 import { FrameToolsEvent, parseMessageFromChannel } from '../common/webviewEvents';
 import { ToolsHost } from './toolsHost';
-import { IRuntimeResourceLoader } from './toolsResourceLoader';
 import { ToolsWebSocket } from './toolsWebSocket';
 
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
@@ -12,12 +11,6 @@ export const vscode = acquireVsCodeApi();
 export interface IDevToolsWindow extends Window {
     InspectorFrontendHost: ToolsHost;
     WebSocket: typeof ToolsWebSocket;
-    Root: IRoot;
-    importScriptPathPrefix: string;
-}
-
-export interface IRoot {
-    Runtime: IRuntimeResourceLoader;
 }
 
 export function initialize(dtWindow: IDevToolsWindow): void {
@@ -42,9 +35,9 @@ export function initialize(dtWindow: IDevToolsWindow): void {
         dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
     // Listen for messages from the extension and forward to the tools
     dtWindow.addEventListener('message', messageEvent => {
-        const fromDevtools = messageEvent.origin === 'http://localhost:3000';
+        const fromExtension = messageEvent.origin.startsWith('vscode-webview://');
         console.log(messageEvent.origin)
-        if (fromDevtools) {
+        if (!fromExtension) {
             // Call the right handler to send message to extension
             dtWindow.InspectorFrontendHost.onMessageFromFrame(messageEvent.data.method as FrameToolsEvent, messageEvent.data.args as any[]);
         } else if (toolsWindow) {

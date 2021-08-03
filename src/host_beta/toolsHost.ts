@@ -10,7 +10,6 @@ import {
     WebSocketEvent,
     WebviewEvent,
 } from '../common/webviewEvents';
-import { ToolsResourceLoader } from './toolsResourceLoader';
 import { vscode } from './host';
 
 export class ToolsHost {
@@ -18,14 +17,9 @@ export class ToolsHost {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     InspectorFrontendHost: any;
     private toolsWindow: Window | undefined;
-    private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
         new Map<number,(preferences: Record<string, unknown>) => void>();
-
-    setResourceLoader(resourceLoader: Readonly<ToolsResourceLoader>): void {
-        this.resourceLoader = resourceLoader;
-    }
 
     isHostedMode(): boolean {
         // DevTools will always be inside a webview
@@ -125,12 +119,6 @@ export class ToolsHost {
                 break;
             }
 
-            case 'getUrl': {
-                const { id, content } = JSON.parse(args) as {id: number, content: string};
-                this.fireGetUrlCallback(id, content);
-                break;
-            }
-
             case 'websocket': {
                 const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
                 this.fireWebSocketCallback(event, message);
@@ -185,13 +173,6 @@ export class ToolsHost {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.getHostCallbacks.get(id)!(args);
             this.getHostCallbacks.delete(id);
-        }
-    }
-
-    private fireGetUrlCallback(id: number, content: string) {
-        // Send response content to DevTools
-        if (this.resourceLoader) {
-            this.resourceLoader.onResolvedUrlFromChannel(id, content);
         }
     }
 
