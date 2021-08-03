@@ -197,7 +197,7 @@ export class ToolsHost {
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
         // Send response message to DevTools
-        if (this.toolsWindow) {
+        if (this.toolsWindow && e === 'message') {
             this.toolsWindow.postMessage({method: 'dispatchMessage', args: [message]}, '*');
         }
     }
