@@ -320,7 +320,7 @@ export class DevToolsPanel {
     }
 
     private update() {
-        this.panel.webview.html = this.getHtmlForWebview();
+        this.panel.webview.html = this.config.isCDNHostedTools ? this.getCDNHtmlForWebview() : this.getHtmlForWebview();
     }
 
     private getHtmlForWebview() {
@@ -360,6 +360,36 @@ export class DevToolsPanel {
                 <script type="module" src="${inspectorUri}"></script>
             </head>
             <body>
+            </body>
+            </html>
+            `;
+    }
+
+    private getCDNHtmlForWebview() {
+        // inspectorUri is the file that used to be loaded in inspector.html
+        // They are being loaded directly into the webview.
+        // local resource loading inside iframes was deprecated in these commits:
+        // https://github.com/microsoft/vscode/commit/de9887d9e0eaf402250d2735b3db5dc340184b74
+        // https://github.com/microsoft/vscode/commit/d05ded6d3b64fed4a3cc74106f9b6c72243b18de
+
+        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
+        const hostUri = this.panel.webview.asWebviewUri(hostPath);
+
+        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
+        const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
+
+        // the added fields for "Content-Security-Policy" allow resource loading for other file types
+        return `
+            <!doctype html>
+            <html>
+            <head>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8">
+                <meta name="referrer" content="no-referrer">
+                <link href="${stylesUri}" rel="stylesheet"/>
+                <script src="${hostUri}"></script>
+            </head>
+            <body>
+                <iframe id="host" frameBorder="0" src="http://localhost:3000/vscode_app.html?experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;

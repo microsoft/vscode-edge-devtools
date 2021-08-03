@@ -56,6 +56,7 @@ export interface IRuntimeConfig {
     sourceMaps: boolean;
     webRoot: string;
     isJsDebugProxiedCDPConnection: boolean;
+    isCDNHostedTools: boolean;
 }
 export interface IStringDictionary<T> {
     [name: string]: T;
@@ -445,6 +446,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         sourceMaps,
         webRoot: resolvedWebRoot,
         isJsDebugProxiedCDPConnection: false,
+        isCDNHostedTools: false,
     };
 }
 

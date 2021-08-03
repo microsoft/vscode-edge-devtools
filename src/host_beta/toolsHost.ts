@@ -3,6 +3,7 @@
 
 import {
     encodeMessageForChannel,
+    FrameToolsEvent,
     IOpenEditorData,
     TelemetryData,
     ThemeString,
@@ -10,13 +11,13 @@ import {
     WebviewEvent,
 } from '../common/webviewEvents';
 import { ToolsResourceLoader } from './toolsResourceLoader';
-import { ToolsWebSocket } from './toolsWebSocket';
 import { vscode } from './host';
 
 export class ToolsHost {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     InspectorFrontendHost: any;
+    private toolsWindow: Window | undefined;
     private resourceLoader: Readonly<ToolsResourceLoader> | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
@@ -96,26 +97,24 @@ export class ToolsHost {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
     }
 
-    copyText(clipboardData: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'copyText', {clipboardData});
-    }
-
     openInNewTab(url: string): void {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', {url});
-    }
-
-    focusEditor(next: boolean): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'focusEditor', {next});
-    }
-
-    focusEditorGroup(next: boolean): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'focusEditorGroup', {next});
     }
 
     sendMessageToBackend(message: string): void {
         console.log('hit send message')
         // Inform the extension of the DevTools telemetry event
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
+    }
+
+    onMessageFromFrame(e: FrameToolsEvent, args: any[]): boolean {
+        switch(e) {
+            case 'sendMessageToBackend':
+                this.sendMessageToBackend(args[0]);
+                return true;
+            default:
+                return false;
+        }
     }
 
     onMessageFromChannel(e: WebviewEvent, args: string): boolean {
@@ -142,8 +141,13 @@ export class ToolsHost {
                 const parsedArgs = JSON.parse(args) as {parsedArgs: Record<string, unknown>};
                 this.parseVscodeSettingsObject(parsedArgs);
             }
+
         }
         return true;
+    }
+
+    setToolsWindow(tw: Window) {
+        this.toolsWindow = tw;
     }
 
     private parseVscodeSettingsObject(vscodeObject: Record<string, unknown>) {
@@ -193,6 +197,8 @@ export class ToolsHost {
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
         // Send response message to DevTools
-        ToolsWebSocket.instance.onMessageFromChannel(e, message);
+        if (this.toolsWindow) {
+            this.toolsWindow.postMessage({method: 'dispatchMessage', args: [message]}, '*');
+        }
     }
 }

@@ -33,6 +33,17 @@ module.exports = [
     {
         ...commonConfig,
         entry: {
+            host: './src/host_beta/mainHost.ts',
+        },
+        name: 'host',
+        output: {
+            filename: '[name].bundle.js',
+            path: path.resolve(__dirname, 'out/host_beta'),
+        },
+    },
+    {
+        ...commonConfig,
+        entry: {
             extension: './src/extension.ts',
         },
         externals: {

@@ -7,7 +7,7 @@ import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
-import { DevToolsPanel } from './devtoolsPanel';
+import { DevToolsPanel } from './DevToolsPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
 import {
     buttonCode,
@@ -243,6 +243,7 @@ export async function attach(
                 const selection = await vscode.window.showQuickPick(items);
                 if (selection && selection.detail) {
                     const runtimeConfig = getRuntimeConfig(config);
+                    runtimeConfig.isCDNHostedTools = true
                     DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
                 }
             }
