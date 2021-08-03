@@ -33,6 +33,9 @@ export function initialize(dtWindow: IDevToolsWindow): void {
 
     window.addEventListener('DOMContentLoaded', () => {
         toolsWindow = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
+        if (toolsWindow) {
+            dtWindow.InspectorFrontendHost.setToolsWindow(toolsWindow);
+        }
     });
 
     const messageCallback =
