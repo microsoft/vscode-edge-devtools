@@ -5,6 +5,7 @@ import {
     encodeMessageForChannel,
     FrameToolsEvent,
     IOpenEditorData,
+    parseMessageFromChannel,
     TelemetryData,
     ThemeString,
     WebSocketEvent,
@@ -14,17 +15,52 @@ import {
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 const vscode = acquireVsCodeApi();
 
+/**
+ * Both the DevTools iframe and the Extension (which owns the ws connection to the browser) will
+ * post messages to the Webview window for communication between the two. This class routes message
+ * to the correct location based on the origin and type of message posted.
+ *
+ */
 export class MessageRouter {
-    // We need to add a dummy property to get around build errors for sendToVscodeOutput.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private toolsWindow: Window | undefined;
+    private toolsFrameWindow: Window | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
         new Map<number,(preferences: Record<string, unknown>) => void>();
 
-    isHostedMode(): boolean {
-        // DevTools will always be inside a webview
-        return true;
+    constructor(webviewWindow: Window | null) {
+        if (!webviewWindow) {
+            return;
+        }
+
+        webviewWindow.addEventListener('DOMContentLoaded', () => {
+            const tw = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
+            this.toolsFrameWindow = tw || undefined;
+        });
+
+
+        const extensionMessageCallback = this.onMessageFromChannel.bind(this);
+
+        // Both the DevTools iframe and the extension will post messages to the webview
+        // Listen for messages and forward to correct recipient based on origin
+        webviewWindow.addEventListener('message', messageEvent => {
+            const fromExtension = messageEvent.origin.startsWith('vscode-webview://');
+            if (!fromExtension) {
+                // Send message from DevTools to Extension
+                this.onMessageFromFrame(messageEvent.data.method as FrameToolsEvent, messageEvent.data.args as any[]);
+            } else if (this.toolsFrameWindow) {
+                // Send message from Extension to DevTools
+                parseMessageFromChannel(
+                    messageEvent.data,
+                    extensionMessageCallback,
+                );
+                messageEvent.preventDefault();
+                messageEvent.stopImmediatePropagation();
+                return false;
+            }
+        }, true);
+
+        // Inform the extension we are ready to receive messages
+        this.sendReady();
     }
 
     sendReady() {
@@ -138,10 +174,6 @@ export class MessageRouter {
         return true;
     }
 
-    setToolsWindow(tw: Window) {
-        this.toolsWindow = tw;
-    }
-
     private parseVscodeSettingsObject(vscodeObject: Record<string, unknown>) {
         const id: number = vscodeObject.id as number;
         const themeString: ThemeString = vscodeObject.themeString as ThemeString;
@@ -182,8 +214,8 @@ export class MessageRouter {
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
         // Send response message to DevTools
-        if (this.toolsWindow && e === 'message') {
-            this.toolsWindow.postMessage({method: 'dispatchMessage', args: [message]}, '*');
+        if (this.toolsFrameWindow && e === 'message') {
+            this.toolsFrameWindow.postMessage({method: 'dispatchMessage', args: [message]}, '*');
         }
     }
 }
