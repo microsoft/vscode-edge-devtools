@@ -13,9 +13,6 @@ export class Host {
             return;
         }
 
-        // Inform the extension we are ready to receive messages
-        this.messageRouter.sendReady();
-
         // let toolsWindow: Window | null;
         dtWindow.addEventListener('DOMContentLoaded', () => {
             this.toolsWindow = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
@@ -46,6 +43,9 @@ export class Host {
                 return false;
             }
         }, true);
+
+        // Inform the extension we are ready to receive messages
+        this.messageRouter.sendReady();
 
     }
 }
