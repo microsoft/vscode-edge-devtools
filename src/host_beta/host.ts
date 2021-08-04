@@ -13,7 +13,6 @@ export class Host {
             return;
         }
 
-        // let toolsWindow: Window | null;
         dtWindow.addEventListener('DOMContentLoaded', () => {
             this.toolsWindow = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
             if (this.toolsWindow) {
@@ -22,7 +21,7 @@ export class Host {
         });
 
 
-        const messageCallback =
+        const extensionMessageCallback =
             this.messageRouter.onMessageFromChannel.bind(this.messageRouter);
 
         // Both the DevTools iframe and the extension will post messages to the webview
@@ -36,7 +35,7 @@ export class Host {
                 // Send message from Extension to DevTools
                 parseMessageFromChannel(
                     messageEvent.data,
-                    messageCallback,
+                    extensionMessageCallback,
                 );
                 messageEvent.preventDefault();
                 messageEvent.stopImmediatePropagation();
@@ -46,6 +45,5 @@ export class Host {
 
         // Inform the extension we are ready to receive messages
         this.messageRouter.sendReady();
-
     }
 }
