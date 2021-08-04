@@ -1,56 +1,51 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, FrameToolsEvent, parseMessageFromChannel } from '../common/webviewEvents';
-import { ToolsHost } from './toolsHost';
+import { FrameToolsEvent, parseMessageFromChannel } from '../common/webviewEvents';
+import { MessageRouter } from './messageRouter';
 
-declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
-export const vscode = acquireVsCodeApi();
+export class Host {
+    private messageRouter: MessageRouter = new MessageRouter();
+    private toolsWindow: Window | null | undefined;
 
-export interface IDevToolsWindow extends Window {
-    InspectorFrontendHost: ToolsHost;
-}
+    constructor(dtWindow: Window) {
+        if (!dtWindow) {
+            return;
+        }
 
-export function initialize(dtWindow: IDevToolsWindow): void {
-    if (!dtWindow) {
-        return;
+        // Inform the extension we are ready to receive messages
+        this.messageRouter.sendReady();
+
+        // let toolsWindow: Window | null;
+        dtWindow.addEventListener('DOMContentLoaded', () => {
+            this.toolsWindow = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
+            if (this.toolsWindow) {
+                this.messageRouter.setToolsWindow(this.toolsWindow);
+            }
+        });
+
+
+        const messageCallback =
+            this.messageRouter.onMessageFromChannel.bind(this.messageRouter);
+
+        // Both the DevTools iframe and the extension will post messages to the webview
+        // Listen for messages and forward to correct recipient based on origin
+        dtWindow.addEventListener('message', messageEvent => {
+            const fromExtension = messageEvent.origin.startsWith('vscode-webview://');
+            if (!fromExtension) {
+                // Send message from DevTools to Extension
+                this.messageRouter.onMessageFromFrame(messageEvent.data.method as FrameToolsEvent, messageEvent.data.args as any[]);
+            } else if (this.toolsWindow) {
+                // Send message from Extension to DevTools
+                parseMessageFromChannel(
+                    messageEvent.data,
+                    messageCallback,
+                );
+                messageEvent.preventDefault();
+                messageEvent.stopImmediatePropagation();
+                return false;
+            }
+        }, true);
+
     }
-
-    // Setup the global objects that must exist at load time
-    dtWindow.InspectorFrontendHost = new ToolsHost();
-    encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
-
-
-    let toolsWindow: Window | null;
-
-    window.addEventListener('DOMContentLoaded', () => {
-        toolsWindow = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
-        if (toolsWindow) {
-            dtWindow.InspectorFrontendHost.setToolsWindow(toolsWindow);
-        }
-    });
-
-
-    const messageCallback =
-        dtWindow.InspectorFrontendHost.onMessageFromChannel.bind(dtWindow.InspectorFrontendHost);
-
-    // Both the DevTools iframe and the extension will post messages to the webview
-    // Listen for messages and forward to correct recipient based on origin
-    dtWindow.addEventListener('message', messageEvent => {
-        const fromExtension = messageEvent.origin.startsWith('vscode-webview://');
-        console.log(messageEvent.origin)
-        if (!fromExtension) {
-            // Send message from DevTools to Extension
-            dtWindow.InspectorFrontendHost.onMessageFromFrame(messageEvent.data.method as FrameToolsEvent, messageEvent.data.args as any[]);
-        } else if (toolsWindow) {
-            // Send message from Extension to DevTools
-            parseMessageFromChannel(
-                messageEvent.data,
-                messageCallback,
-            );
-            messageEvent.preventDefault();
-            messageEvent.stopImmediatePropagation();
-            return false;
-        }
-    }, true);
 }

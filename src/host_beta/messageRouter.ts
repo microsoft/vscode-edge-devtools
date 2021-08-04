@@ -10,12 +10,13 @@ import {
     WebSocketEvent,
     WebviewEvent,
 } from '../common/webviewEvents';
-import { vscode } from './host';
 
-export class ToolsHost {
+declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
+const vscode = acquireVsCodeApi();
+
+export class MessageRouter {
     // We need to add a dummy property to get around build errors for sendToVscodeOutput.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    InspectorFrontendHost: any;
     private toolsWindow: Window | undefined;
     private getHostCallbacksNextId = 0;
     private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
@@ -24,6 +25,11 @@ export class ToolsHost {
     isHostedMode(): boolean {
         // DevTools will always be inside a webview
         return true;
+    }
+
+    sendReady() {
+        // Inform the extension we are ready to receive messages
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
     }
 
     getPreferences(callback: (preferences: Record<string, unknown>) => void): void {
@@ -96,8 +102,6 @@ export class ToolsHost {
     }
 
     sendMessageToBackend(message: string): void {
-        console.log('hit send message')
-        // Inform the extension of the DevTools telemetry event
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
     }
 
