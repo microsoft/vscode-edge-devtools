@@ -147,6 +147,7 @@ export class MessageRouter {
                 this.sendMessageToBackend(args[0]);
                 return true;
             default:
+                // TODO: handle other types of messages from devtools
                 return false;
         }
     }
