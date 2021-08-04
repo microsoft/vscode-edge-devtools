@@ -243,7 +243,6 @@ export async function attach(
                 const selection = await vscode.window.showQuickPick(items);
                 if (selection && selection.detail) {
                     const runtimeConfig = getRuntimeConfig(config);
-                    runtimeConfig.isCDNHostedTools = true
                     DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
                 }
             }
