@@ -57,6 +57,8 @@ export interface IRuntimeConfig {
     webRoot: string;
     isJsDebugProxiedCDPConnection: boolean;
     isCDNHostedTools: boolean;
+    useLocalEdgeWatch: boolean;
+    devtoolsBaseUri?: string;
 }
 export interface IStringDictionary<T> {
     [name: string]: T;
@@ -101,6 +103,10 @@ export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
+
+/** Build-specified flags. */
+declare const DEBUG: boolean;
+declare const DEVTOOLS_BASE_URI: string | undefined;
 
 export interface IRemoteTargetJson {
     [index: string]: string;
@@ -446,7 +452,9 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         sourceMaps,
         webRoot: resolvedWebRoot,
         isJsDebugProxiedCDPConnection: false,
-        isCDNHostedTools: false,
+        isCDNHostedTools: DEBUG || false,
+        useLocalEdgeWatch: DEBUG,
+        devtoolsBaseUri: DEVTOOLS_BASE_URI,
     };
 }
 

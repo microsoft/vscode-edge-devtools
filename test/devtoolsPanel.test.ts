@@ -44,6 +44,7 @@ describe("devtoolsPanel", () => {
             webRoot: "",
             isJsDebugProxiedCDPConnection: false,
             isCDNHostedTools: false,
+            useLocalEdgeWatch: false,
         };
 
         mockPanel = {
