@@ -163,7 +163,8 @@ export class MessageRouter {
                 this.reportError(type, message, stack, filename, sourceUrl, lineno, colno);
                 return true;
             case 'sendMessageToBackend':
-                this.sendMessageToBackend(args[0]);
+                const [cdpMessage] = args;
+                this.sendMessageToBackend(cdpMessage);
                 return true;
             default:
                 // TODO: handle other types of messages from devtools
