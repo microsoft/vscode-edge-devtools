@@ -7,7 +7,7 @@ import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
-import { DevToolsPanel } from './DevToolsPanel';
+import { DevToolsPanel } from './devToolsPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
 import {
     buttonCode,

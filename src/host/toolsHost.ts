@@ -112,12 +112,6 @@ export class ToolsHost {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'focusEditorGroup', {next});
     }
 
-    sendMessageToBackend(message: string): void {
-        console.log('hit send message')
-        // Inform the extension of the DevTools telemetry event
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
-    }
-
     onMessageFromChannel(e: WebviewEvent, args: string): boolean {
         switch (e) {
             case 'getState': {
