@@ -143,6 +143,25 @@ export class MessageRouter {
 
     onMessageFromFrame(e: FrameToolsEvent, args: any[]): boolean {
         switch(e) {
+            case 'openInEditor':
+                const [url, line, column, ignoreTabChanges] = args;
+                this.openInEditor(url, line, column, ignoreTabChanges);
+                return true;
+            case 'openInNewTab':
+                this.openInNewTab(args[0]);
+                return true;
+            case 'recordEnumeratedHistogram':
+                const [actionName, actionCode, bucketSize] = args;
+                this.recordEnumeratedHistogram(actionName, actionCode, bucketSize);
+                return true;
+            case 'recordPerformanceHistogram':
+                const [histogramName, duration] = args;
+                this.recordPerformanceHistogram(histogramName, duration);
+                return true;
+            case 'reportError':
+                const [type, message, stack, filename, sourceUrl, lineno, colno] = args;
+                this.reportError(type, message, stack, filename, sourceUrl, lineno, colno);
+                return true;
             case 'sendMessageToBackend':
                 this.sendMessageToBackend(args[0]);
                 return true;
