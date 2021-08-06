@@ -56,7 +56,7 @@ export interface IRuntimeConfig {
     sourceMaps: boolean;
     webRoot: string;
     isJsDebugProxiedCDPConnection: boolean;
-    isCDNHostedTools: boolean;
+    isCdnHostedTools: boolean;
     useLocalEdgeWatch: boolean;
     devtoolsBaseUri?: string;
 }
@@ -452,7 +452,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         sourceMaps,
         webRoot: resolvedWebRoot,
         isJsDebugProxiedCDPConnection: false,
-        isCDNHostedTools: DEBUG || false,
+        isCdnHostedTools: DEBUG || false,
         useLocalEdgeWatch: DEBUG,
         devtoolsBaseUri: DEVTOOLS_BASE_URI,
     };

@@ -43,7 +43,7 @@ describe("devtoolsPanel", () => {
             sourceMaps: true,
             webRoot: "",
             isJsDebugProxiedCDPConnection: false,
-            isCDNHostedTools: false,
+            isCdnHostedTools: false,
             useLocalEdgeWatch: false,
         };
 

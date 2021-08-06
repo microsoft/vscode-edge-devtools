@@ -320,7 +320,7 @@ export class DevToolsPanel {
     }
 
     private update() {
-        this.panel.webview.html = this.config.isCDNHostedTools ? this.getCDNHtmlForWebview() : this.getHtmlForWebview();
+        this.panel.webview.html = this.config.isCdnHostedTools ? this.getCdnHtmlForWebview() : this.getHtmlForWebview();
     }
 
     private getHtmlForWebview() {
@@ -365,7 +365,7 @@ export class DevToolsPanel {
             `;
     }
 
-    private getCDNHtmlForWebview() {
+    private getCdnHtmlForWebview() {
         let cdnBaseUrl = this.config.devtoolsBaseUri;
         if (!cdnBaseUrl) {
             // Not provided, calculate based on config
