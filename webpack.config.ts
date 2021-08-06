@@ -68,6 +68,7 @@ module.exports = (env: any) => {
                     { from: 'icon.png', to: 'icon.png'},
                     ],
                 }),
+                // These must also be defined in the jest section of package.json for tests to pass
                 new DefinePlugin({
                     DEBUG: JSON.stringify(env && env.debug || false),
                     DEVTOOLS_BASE_URI: JSON.stringify(env && env.devtoolsBaseUri || undefined),

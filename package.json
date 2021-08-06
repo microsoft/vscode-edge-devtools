@@ -589,7 +589,11 @@
             "jsx",
             "json",
             "node"
-        ]
+        ],
+        "globals": {
+            "DEBUG": false,
+            "DEVTOOLS_BASE_URI": "https://test.invalid"
+          }
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
