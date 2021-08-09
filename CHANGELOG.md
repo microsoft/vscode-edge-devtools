@@ -1,5 +1,5 @@
 ## 1.2.1
-* **[Feature]**: The Extension now has limited support for Visual Studion Code's Workspace Trust Feature - [PR #431](https://github.com/microsoft/vscode-edge-devtools/pull/431)
+* **[Feature]**: The Extension now has limited support for Visual Studio Code's Workspace Trust Feature - [PR #431](https://github.com/microsoft/vscode-edge-devtools/pull/431)
 * **[Bug Fix]**: DevTools Drawer now shows close button - [PR #426](https://github.com/microsoft/vscode-edge-devtools/pull/426)
 * **[Bug Fix]**: Add support for JavaScript Debugger connections on remote workspaces - [PR #444](https://github.com/microsoft/vscode-edge-devtools/pull/444)
 * **[Documentation]**: Updated Github default branch and documentation to main - [PR #425](https://github.com/microsoft/vscode-edge-devtools/pull/425)
