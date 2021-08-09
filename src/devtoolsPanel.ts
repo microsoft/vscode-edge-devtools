@@ -42,6 +42,7 @@ export class DevToolsPanel {
     private consoleOutput: vscode.OutputChannel;
     private timeStart: number | null;
     private devtoolsBaseUri: string | null;
+    private isHeadless: boolean;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -57,6 +58,7 @@ export class DevToolsPanel {
         this.config = config;
         this.timeStart = null;
         this.devtoolsBaseUri = this.config.devtoolsBaseUri || null;
+        this.isHeadless = false;
         this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
         if (config.isJsDebugProxiedCDPConnection) {
             // Direct users to the Debug Console
@@ -99,7 +101,7 @@ export class DevToolsPanel {
         // The browser version is used to select between CDN and bundled tools
         // Future versions of the extension will remove this socket and only use CDN
         this.versionDetectionSocket = new BrowserVersionDetectionSocket(this.targetUrl);
-        this.versionDetectionSocket.on('setBrowserRevision', revision => this.setBrowserRevision(revision));
+        this.versionDetectionSocket.on('setCdnParameters', msg => this.setCdnParameters(msg));
 
 
         // Handle closing
@@ -423,20 +425,21 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}"></iframe>
             </body>
             </html>
             `;
     }
 
-    private setBrowserRevision(revision: string) {
-        if (revision !== '') {
+    private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
+        if (msg.revision !== '') {
             this.config.isCdnHostedTools = true;
-            this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${revision}/vscode_app.html`;
+            this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision}/vscode_app.html`;
         } else {
             this.config.isCdnHostedTools = false;
             this.devtoolsBaseUri = '';
         }
+        this.isHeadless = msg.isHeadless;
         this.update();
     }
 
