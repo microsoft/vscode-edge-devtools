@@ -279,9 +279,13 @@ export function getActiveDebugSessionId(): string|undefined {
  */
 export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Promise<string|Error|undefined> {
     try {
+        // TODO: update to query location when workspace support added
+        // https://github.com/microsoft/vscode-edge-devtools/issues/383
+        const forwardToUi = true;
         const addr: IRequestCDPProxyResult|undefined = await vscode.commands.executeCommand(
         'extension.js-debug.requestCDPProxy',
         debugSessionId,
+        forwardToUi
         );
         if (addr) {
             return `ws://${addr.host}:${addr.port}${addr.path || ''}`;
