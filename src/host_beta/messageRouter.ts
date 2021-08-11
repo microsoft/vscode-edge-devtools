@@ -63,26 +63,41 @@ export class MessageRouter {
         switch(e) {
             case 'openInEditor':
                 const [url, line, column, ignoreTabChanges] = args;
-                this.openInEditor(url, line, column, ignoreTabChanges);
+                const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
+                encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
                 return true;
             case 'openInNewTab':
-                this.openInNewTab(args[0]);
+                const uri = args[0];
+                encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', { url: uri });
                 return true;
             case 'recordEnumeratedHistogram':
-                const [actionName, actionCode, bucketSize] = args;
-                this.recordEnumeratedHistogram(actionName, actionCode, bucketSize);
+                const [actionName, actionCode] = args;
+                this.sendTelemetry({
+                    data: actionCode,
+                    event: 'enumerated',
+                    name: actionName,
+                });
                 return true;
             case 'recordPerformanceHistogram':
                 const [histogramName, duration] = args;
-                this.recordPerformanceHistogram(histogramName, duration);
+                this.sendTelemetry({
+                    data: duration,
+                    event: 'performance',
+                    name: histogramName,
+                });
                 return true;
             case 'reportError':
                 const [type, message, stack, filename, sourceUrl, lineno, colno] = args;
-                this.reportError(type, message, stack, filename, sourceUrl, lineno, colno);
+                const data = { message, stack, filename, sourceUrl, lineno, colno };
+                this.sendTelemetry({
+                    data,
+                    event: 'error',
+                    name: type,
+                });
                 return true;
             case 'sendMessageToBackend':
                 const [cdpMessage] = args;
-                this.sendMessageToBackend(cdpMessage);
+                encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message: cdpMessage });
                 return true;
             default:
                 // TODO: handle other types of messages from devtools
@@ -102,57 +117,6 @@ export class MessageRouter {
     private sendReady() {
         // Inform the extension we are ready to receive messages
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
-    }
-
-    private recordEnumeratedHistogram(actionName: string, actionCode: number, _bucketSize: number): void {
-        // Inform the extension of the DevTools telemetry event
-        this.sendTelemetry({
-            data: actionCode,
-            event: 'enumerated',
-            name: actionName,
-        });
-    }
-
-    private recordPerformanceHistogram(histogramName: string, duration: number): void {
-        // Inform the extension of the DevTools telemetry event
-        this.sendTelemetry({
-            data: duration,
-            event: 'performance',
-            name: histogramName,
-        });
-    }
-
-    private reportError(
-        type: string,
-        message: string,
-        stack: string,
-        filename: string,
-        sourceUrl: string,
-        lineno: number,
-        colno: number): void {
-        // Package up the error info to send to the extension
-        const data = { message, stack, filename, sourceUrl, lineno, colno };
-
-        // Inform the extension of the DevTools telemetry event
-        this.sendTelemetry({
-            data,
-            event: 'error',
-            name: type,
-        });
-    }
-
-    private openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean): void {
-        // Forward the data to the extension
-        const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
-    }
-
-    private openInNewTab(url: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', {url});
-    }
-
-    private sendMessageToBackend(message: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
     }
 
     private sendTelemetry(telemetry: TelemetryData) {
