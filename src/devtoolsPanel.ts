@@ -387,6 +387,14 @@ export class DevToolsPanel {
                 <meta name="referrer" content="no-referrer">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script src="${hostUri}"></script>
+                <meta http-equiv="Content-Security-Policy"
+                    content="default-src;
+                    img-src 'self' data: ${this.panel.webview.cspSource};
+                    style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
+                    script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
+                    frame-src 'self' ${this.panel.webview.cspSource} ${cdnBaseUrl};
+                    connect-src 'self' data: ${this.panel.webview.cspSource};
+                ">
             </head>
             <body>
                 <iframe id="host" frameBorder="0" src="${cdnBaseUrl}?experiments=true&edgeThemes=true"></iframe>

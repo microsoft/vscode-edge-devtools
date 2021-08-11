@@ -7,7 +7,6 @@ import {
     IOpenEditorData,
     parseMessageFromChannel,
     TelemetryData,
-    ThemeString,
     WebSocketEvent,
     WebviewEvent,
 } from '../common/webviewEvents';
@@ -23,9 +22,6 @@ const vscode = acquireVsCodeApi();
  */
 export class MessageRouter {
     private toolsFrameWindow: Window | undefined;
-    private getHostCallbacksNextId = 0;
-    private getHostCallbacks: Map<number, (preferences: Record<string, unknown>) => void> =
-        new Map<number,(preferences: Record<string, unknown>) => void>();
 
     constructor(webviewWindow: Window | null) {
         if (!webviewWindow) {
@@ -63,84 +59,6 @@ export class MessageRouter {
         this.sendReady();
     }
 
-    sendReady() {
-        // Inform the extension we are ready to receive messages
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
-    }
-
-    getPreferences(callback: (preferences: Record<string, unknown>) => void): void {
-        // Load the preference via the extension workspaceState
-        const id = this.getHostCallbacksNextId++;
-        this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getState', { id });
-    }
-
-    setPreference(name: string, value: string): void {
-        // Save the preference via the extension workspaceState
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'setState', { name, value });
-    }
-
-    recordEnumeratedHistogram(actionName: string, actionCode: number, _bucketSize: number): void {
-        // Inform the extension of the DevTools telemetry event
-        this.sendTelemetry({
-            data: actionCode,
-            event: 'enumerated',
-            name: actionName,
-        });
-    }
-
-    recordPerformanceHistogram(histogramName: string, duration: number): void {
-        // Inform the extension of the DevTools telemetry event
-        this.sendTelemetry({
-            data: duration,
-            event: 'performance',
-            name: histogramName,
-        });
-    }
-
-    reportError(
-        type: string,
-        message: string,
-        stack: string,
-        filename: string,
-        sourceUrl: string,
-        lineno: number,
-        colno: number): void {
-        // Package up the error info to send to the extension
-        const data = { message, stack, filename, sourceUrl, lineno, colno };
-
-        // Inform the extension of the DevTools telemetry event
-        this.sendTelemetry({
-            data,
-            event: 'error',
-            name: type,
-        });
-    }
-
-    openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean): void {
-        // Forward the data to the extension
-        const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
-    }
-
-    getVscodeSettings(callback: (arg0: Record<string, unknown>) => void): void {
-        const id = this.getHostCallbacksNextId++;
-        this.getHostCallbacks.set(id, callback);
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getVscodeSettings', {id});
-    }
-
-    sendToVscodeOutput(consoleMessage: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'consoleOutput', {consoleMessage});
-    }
-
-    openInNewTab(url: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', {url});
-    }
-
-    sendMessageToBackend(message: string): void {
-        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
-    }
-
     onMessageFromFrame(e: FrameToolsEvent, args: any[]): boolean {
         switch(e) {
             case 'openInEditor':
@@ -173,64 +91,73 @@ export class MessageRouter {
     }
 
     onMessageFromChannel(e: WebviewEvent, args: string): boolean {
-        switch (e) {
-            case 'getState': {
-                const { id, preferences } = JSON.parse(args) as {id: number, preferences: Record<string, unknown>};
-                this.fireGetHostCallback(id, preferences);
-                break;
-            }
-
-            case 'websocket': {
-                const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
-                this.fireWebSocketCallback(event, message);
-                break;
-            }
-
-            case 'getVscodeSettings': {
-                const parsedArgs = JSON.parse(args) as {parsedArgs: Record<string, unknown>};
-                this.parseVscodeSettingsObject(parsedArgs);
-            }
-
+        if (e !== 'websocket') {
+            return false;
         }
+        const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
+        this.fireWebSocketCallback(event, message);
         return true;
     }
 
-    private parseVscodeSettingsObject(vscodeObject: Record<string, unknown>) {
-        const id: number = vscodeObject.id as number;
-        const themeString: ThemeString = vscodeObject.themeString as ThemeString;
-        let theme;
-        switch (themeString) {
-            case 'System preference':
-                theme = 'systemPreferred';
-                break;
-            case 'Light':
-                theme = 'default';
-                break;
-            case 'Dark':
-                theme = 'dark';
-                break;
-            default:
-                theme = null;
-        }
-        this.fireGetHostCallback(id, {
-            enableNetwork: vscodeObject.enableNetwork,
-            theme,
-            welcome: vscodeObject.welcome,
-            isHeadless: vscodeObject.isHeadless,
+    private sendReady() {
+        // Inform the extension we are ready to receive messages
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'ready');
+    }
+
+    private recordEnumeratedHistogram(actionName: string, actionCode: number, _bucketSize: number): void {
+        // Inform the extension of the DevTools telemetry event
+        this.sendTelemetry({
+            data: actionCode,
+            event: 'enumerated',
+            name: actionName,
         });
+    }
+
+    private recordPerformanceHistogram(histogramName: string, duration: number): void {
+        // Inform the extension of the DevTools telemetry event
+        this.sendTelemetry({
+            data: duration,
+            event: 'performance',
+            name: histogramName,
+        });
+    }
+
+    private reportError(
+        type: string,
+        message: string,
+        stack: string,
+        filename: string,
+        sourceUrl: string,
+        lineno: number,
+        colno: number): void {
+        // Package up the error info to send to the extension
+        const data = { message, stack, filename, sourceUrl, lineno, colno };
+
+        // Inform the extension of the DevTools telemetry event
+        this.sendTelemetry({
+            data,
+            event: 'error',
+            name: type,
+        });
+    }
+
+    private openInEditor(url: string, line: number, column: number, ignoreTabChanges: boolean): void {
+        // Forward the data to the extension
+        const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
+    }
+
+    private openInNewTab(url: string): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', {url});
+    }
+
+    private sendMessageToBackend(message: string): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
     }
 
     private sendTelemetry(telemetry: TelemetryData) {
         // Forward the data to the extension
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', telemetry);
-    }
-
-    private fireGetHostCallback(id: number, args: Record<string, unknown>) {
-        if (this.getHostCallbacks.has(id)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this.getHostCallbacks.get(id)!(args);
-            this.getHostCallbacks.delete(id);
-        }
     }
 
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
