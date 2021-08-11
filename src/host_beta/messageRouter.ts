@@ -29,7 +29,7 @@ export class MessageRouter {
         }
 
         webviewWindow.addEventListener('DOMContentLoaded', () => {
-            const tw = (document.getElementById('host') as HTMLIFrameElement).contentWindow;
+            const tw = (document.getElementById('devtools-frame') as HTMLIFrameElement).contentWindow;
             this.toolsFrameWindow = tw || undefined;
         });
 

@@ -397,7 +397,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="host" frameBorder="0" src="${cdnBaseUrl}?experiments=true&edgeThemes=true"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUrl}?experiments=true&edgeThemes=true"></iframe>
             </body>
             </html>
             `;
