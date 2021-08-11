@@ -2,4 +2,4 @@
 // Licensed under the MIT License.
 
 import { MessageRouter } from './messageRouter';
-export let messageRouter = new MessageRouter(window as unknown as Window);
+export const messageRouter = new MessageRouter(window);

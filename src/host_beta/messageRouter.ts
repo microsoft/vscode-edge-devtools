@@ -21,18 +21,12 @@ const vscode = acquireVsCodeApi();
  *
  */
 export class MessageRouter {
-    private toolsFrameWindow: Window | undefined;
+    private toolsFrameWindow: Window | null | undefined;
 
-    constructor(webviewWindow: Window | null) {
-        if (!webviewWindow) {
-            return;
-        }
-
+    constructor(webviewWindow: Window) {
         webviewWindow.addEventListener('DOMContentLoaded', () => {
-            const tw = (document.getElementById('devtools-frame') as HTMLIFrameElement).contentWindow;
-            this.toolsFrameWindow = tw || undefined;
+            this.toolsFrameWindow = (document.getElementById('devtools-frame') as HTMLIFrameElement).contentWindow;
         });
-
 
         const extensionMessageCallback = this.onMessageFromChannel.bind(this);
 
@@ -51,7 +45,6 @@ export class MessageRouter {
                 );
                 messageEvent.preventDefault();
                 messageEvent.stopImmediatePropagation();
-                return false;
             }
         }, true);
 
