@@ -589,7 +589,11 @@
             "jsx",
             "json",
             "node"
-        ]
+        ],
+        "globals": {
+            "DEBUG": false,
+            "DEVTOOLS_BASE_URI": "https://test.invalid"
+          }
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
@@ -597,6 +601,7 @@
         "build": "npm run build-wp && npm run build-post",
         "build-min": "npm run build-wp && npm run build-post && npm run minify-devtools",
         "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
+        "build-edge-watch": "webpack --env debug",
         "build-wp": "webpack",
         "build-post": "ts-node postBuildStep.ts",
         "build-watch": "npm run build && npm run watch",

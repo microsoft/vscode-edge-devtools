@@ -1,5 +1,6 @@
 import copyPlugin from 'copy-webpack-plugin';
 import path from 'path';
+import { DefinePlugin } from 'webpack';
 
 const commonConfig = {
     devtool: 'source-map',
@@ -18,43 +19,61 @@ const commonConfig = {
     },
 };
 
-module.exports = [
-    {
-        ...commonConfig,
-        entry: {
-            host: './src/host/mainHost.ts',
+module.exports = (env: any) => {
+    return [
+        {
+            ...commonConfig,
+            entry: {
+                host: './src/host/mainHost.ts',
+            },
+            name: 'host',
+            output: {
+                filename: '[name].bundle.js',
+                path: path.resolve(__dirname, 'out/host'),
+            },
         },
-        name: 'host',
-        output: {
-            filename: '[name].bundle.js',
-            path: path.resolve(__dirname, 'out/host'),
+        {
+            ...commonConfig,
+            entry: {
+                host: './src/host_beta/mainHost.ts',
+            },
+            name: 'host',
+            output: {
+                filename: '[name].bundle.js',
+                path: path.resolve(__dirname, 'out/host_beta'),
+            },
         },
-    },
-    {
-        ...commonConfig,
-        entry: {
-            extension: './src/extension.ts',
+        {
+            ...commonConfig,
+            entry: {
+                extension: './src/extension.ts',
+            },
+            externals: {
+                vscode: 'commonjs vscode',
+            },
+            name: 'extension',
+            output: {
+                devtoolModuleFilenameTemplate: '../[resource-path]',
+                filename: '[name].js',
+                libraryTarget: 'commonjs2',
+                path: path.resolve(__dirname, 'out'),
+            },
+            stats: 'errors-only', // Bug ws package includes dev-dependencies which webpack will report as warnings
+            target: 'node',
+            // Copy startpage html to output bundle
+            plugins: [
+                new copyPlugin({
+                    patterns: [
+                    { from: 'startpage', to: 'startpage'},
+                    { from: 'icon.png', to: 'icon.png'},
+                    ],
+                }),
+                // These must also be defined in the jest section of package.json for tests to pass
+                new DefinePlugin({
+                    DEBUG: JSON.stringify(env && env.debug || false),
+                    DEVTOOLS_BASE_URI: JSON.stringify(env && env.devtoolsBaseUri || undefined),
+                })
+            ],
         },
-        externals: {
-            vscode: 'commonjs vscode',
-        },
-        name: 'extension',
-        output: {
-            devtoolModuleFilenameTemplate: '../[resource-path]',
-            filename: '[name].js',
-            libraryTarget: 'commonjs2',
-            path: path.resolve(__dirname, 'out'),
-        },
-        stats: 'errors-only', // Bug ws package includes dev-dependencies which webpack will report as warnings
-        target: 'node',
-        // Copy startpage html to output bundle
-        plugins: [
-            new copyPlugin({
-                patterns: [
-                  { from: 'startpage', to: 'startpage'},
-                  { from: 'icon.png', to: 'icon.png'},
-                ],
-            }),
-        ],
-    },
-];
+    ]
+};

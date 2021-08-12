@@ -19,6 +19,17 @@ export const webviewEventNames: WebviewEvent[] = [
     'consoleOutput',
 ];
 
+export type FrameToolsEvent = 'sendMessageToBackend' | 'openInNewTab' | 'recordEnumeratedHistogram' |
+'recordPerformanceHistogram' | 'reportError' | 'openInEditor';
+export const FrameToolsEventNames: FrameToolsEvent[] = [
+    'sendMessageToBackend',
+    'openInNewTab',
+    'openInEditor',
+    'recordEnumeratedHistogram',
+    'recordPerformanceHistogram',
+    'reportError',
+];
+
 export type WebSocketEvent = 'open' | 'close' | 'error' | 'message';
 export const webSocketEventNames: WebSocketEvent[] = [
     'open',
