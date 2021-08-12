@@ -4,6 +4,25 @@ import * as vscode from 'vscode';
 import { SETTINGS_STORE_NAME } from '../utils';
 import { ThemeString } from './webviewEvents';
 
+const SUPPORTED_THEMES = new Map<string, string>([
+  ['Default Light+', 'light'],
+  ['Visual Studio Light', 'light'],
+  ['Default Dark+', 'dark'],
+  ['Visual Studio Dark', 'dark'],
+  ['Monokai', 'vscode-monokai'],
+  ['Monokai Dimmed', 'vscode-monokai-dimmed'],
+  ['Solarized Dark', 'vscode-solarized-dark'],
+  ['Solarized Light', 'vscode-solarized-light'],
+  ['Red', 'vscode-red'],
+  ['Quiet Light', 'vscode-quietlight'],
+  ['Abyss', 'vscode-abyss'],
+  ['Kimbie Dark', 'vscode-kimbie-dark'],
+  ['Tomorrow Night Blue', 'vscode-tomorrow-night-blue'],
+  // Legacy Theme string mappings
+  ['Light', 'light'],
+  ['Dark', 'dark'],
+  ['System Preference', 'systemPreference'],
+]);
 export class SettingsProvider {
 
   private static singletonInstance: SettingsProvider;
@@ -18,6 +37,12 @@ export class SettingsProvider {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const themeString: ThemeString = settings.get('themes') || 'System preference';
     return themeString;
+  }
+
+  getNewThemeSettings(): string {
+      const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme');
+      const legacySetting = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('themes');
+      return SUPPORTED_THEMES.get((themeSetting || legacySetting) as string) || 'systemPreference';
   }
 
   getWelcomeSettings(): boolean {
