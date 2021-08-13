@@ -109,7 +109,9 @@ export class DevToolsPanel {
         }, this, this.disposables);
 
         vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('workbench.colorTheme') && this.panel.visible) {
+            if (this.config.isCdnHostedTools &&
+            e.affectsConfiguration('workbench.colorTheme') &&
+            this.panel.visible) {
                 this.update();
             }
         });
