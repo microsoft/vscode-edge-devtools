@@ -108,6 +108,7 @@ export class DevToolsPanel {
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
 
+        // Update DevTools theme if user changes global theme
         vscode.workspace.onDidChangeConfiguration(e => {
             if (this.config.isCdnHostedTools &&
             e.affectsConfiguration('workbench.colorTheme') &&
