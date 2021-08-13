@@ -33,13 +33,18 @@ export class SettingsProvider {
     return networkEnabled;
   }
 
+  // Legacy only: this function returns the theme for the legacy bundled DevTools
   getThemeSettings(): ThemeString {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const themeString: ThemeString = settings.get('themes') || 'System preference';
     return themeString;
   }
 
-  getNewThemeSettings(): string {
+  // This function returns the theme for the new frame hosted DevTools by:
+  // 1. Fetching the User configured Global VSCode theme, return it if supported
+  // 2. Fall back to the extension Theme setting selector (light, dark, system preference)
+  // 3. Fall back to system preference
+  getThemeFromUserSetting(): string {
       const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme');
       const legacySetting = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('themes');
       return SUPPORTED_THEMES.get((themeSetting || legacySetting) as string) || 'systemPreference';

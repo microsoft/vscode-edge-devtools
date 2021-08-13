@@ -384,7 +384,7 @@ export class DevToolsPanel {
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
-        const theme = SettingsProvider.instance.getNewThemeSettings();
+        const theme = SettingsProvider.instance.getThemeFromUserSetting();
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
