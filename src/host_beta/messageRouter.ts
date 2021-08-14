@@ -77,6 +77,9 @@ export class MessageRouter {
                 const [cdpMessage] = args;
                 this.sendMessageToBackend(cdpMessage);
                 return true;
+            case 'getVscodeSettings':
+                this.getVsCodeSettings();
+                return true;
             default:
                 // TODO: handle other types of messages from devtools
                 return false;
@@ -84,6 +87,12 @@ export class MessageRouter {
     }
 
     onMessageFromChannel(e: WebviewEvent, args: string): boolean {
+        if (e === 'getVscodeSettings') {
+            // Reply a request from the devtools to get the VS Code settings.
+            this.sendWebviewEventReply(e, args);
+            return false;
+        }
+
         if (e !== 'websocket') {
             return false;
         }
@@ -140,6 +149,11 @@ export class MessageRouter {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
     }
 
+    private getVsCodeSettings(): void {
+        // Ask the extension about VS Code settings.
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'getVscodeSettings', {});
+    }
+
     private openInNewTab(url: string): void {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openUrl', {url});
     }
@@ -157,6 +171,12 @@ export class MessageRouter {
         // Send response message to DevTools
         if (this.toolsFrameWindow && e === 'message') {
             this.toolsFrameWindow.postMessage({method: 'dispatchMessage', args: [message]}, '*');
+        }
+    }
+
+    private sendWebviewEventReply(e: WebviewEvent, message: string) {
+        if (this.toolsFrameWindow && e) {
+            this.toolsFrameWindow.postMessage({ method: e, args: [message] }, '*');
         }
     }
 }

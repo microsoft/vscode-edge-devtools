@@ -226,13 +226,24 @@ export class DevToolsPanel {
     }
 
     private onSocketGetVscodeSettings(message: string) {
-        const { id } = JSON.parse(message) as { id: number };
-        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
-            enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
-            themeString: SettingsProvider.instance.getThemeSettings(),
-            welcome: SettingsProvider.instance.getWelcomeSettings(),
-            isHeadless: SettingsProvider.instance.getHeadlessSettings(),
-            id });
+        // TODO: When non CDN version is removed it is safe to delete the
+        // the second path.
+        if (this.config.isCdnHostedTools) {
+            encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings',
+                {
+                    themeString: SettingsProvider.instance.getThemeSettings(),
+                    isHeadless: SettingsProvider.instance.getHeadlessSettings()
+                });
+        } else {
+            const { id } = JSON.parse(message) as { id: number };
+            encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
+                enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
+                themeString: SettingsProvider.instance.getThemeSettings(),
+                welcome: SettingsProvider.instance.getWelcomeSettings(),
+                isHeadless: SettingsProvider.instance.getHeadlessSettings(),
+                id
+            });
+        }
     }
 
     private onSocketSetState(message: string) {
