@@ -232,7 +232,7 @@ export class DevToolsPanel {
             encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings',
                 {
                     themeString: SettingsProvider.instance.getThemeSettings(),
-                    isHeadless: SettingsProvider.instance.getHeadlessSettings()
+                    isHeadless: SettingsProvider.instance.getHeadlessSettings(),
                 });
         } else {
             const { id } = JSON.parse(message) as { id: number };
@@ -241,7 +241,7 @@ export class DevToolsPanel {
                 themeString: SettingsProvider.instance.getThemeSettings(),
                 welcome: SettingsProvider.instance.getWelcomeSettings(),
                 isHeadless: SettingsProvider.instance.getHeadlessSettings(),
-                id
+                id,
             });
         }
     }
