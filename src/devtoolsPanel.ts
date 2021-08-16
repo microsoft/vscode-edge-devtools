@@ -107,6 +107,15 @@ export class DevToolsPanel {
         this.panel.webview.onDidReceiveMessage(message => {
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
+
+        // Update DevTools theme if user changes global theme
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (this.config.isCdnHostedTools &&
+            e.affectsConfiguration('workbench.colorTheme') &&
+            this.panel.visible) {
+                this.update();
+            }
+        });
     }
 
     dispose(): void {
@@ -378,6 +387,8 @@ export class DevToolsPanel {
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
+        const theme = SettingsProvider.instance.getThemeFromUserSetting();
+
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
             <!doctype html>
@@ -397,7 +408,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUrl}?experiments=true&edgeThemes=true"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUrl}?experiments=true&theme=${theme}"></iframe>
             </body>
             </html>
             `;
