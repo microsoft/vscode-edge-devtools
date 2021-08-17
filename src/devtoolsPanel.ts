@@ -61,6 +61,7 @@ export class DevToolsPanel {
         this.consoleOutput.appendLine('// The Microsoft Edge DevTools Extension will be deprecating console output in the next update.');
         this.consoleOutput.appendLine('// To receive full REPL console functionality, please use Visual Studio Code\'s included JavaScript Debugger to attach to your target.');
         this.consoleOutput.appendLine('// Then use the "Debug Console" to view console messages from your webpage and evaluate expressions.');
+        this.consoleOutput.appendLine('// For more information, visit https://docs.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension#browser-debugging-with-microsoft-edge-developer-tools-integration-in-visual-studio-code');
 
         // Hook up the socket events
         if (this.config.isJsDebugProxiedCDPConnection) {
