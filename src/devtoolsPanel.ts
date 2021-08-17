@@ -110,7 +110,7 @@ export class DevToolsPanel {
         // Handle view change
         this.panel.onDidChangeViewState(_e => {
             if (this.panel.visible) {
-                if (this.panelSocket.isConnectedToTarget || this.config.devtoolsBaseUri) {
+                if (this.panelSocket.isConnectedToTarget) {
                     // Connection type determined already
                     this.update();
                 } else {
