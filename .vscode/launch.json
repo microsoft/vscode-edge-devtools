@@ -17,6 +17,21 @@
             "preLaunchTask": "npm: build"
         },
         {
+            "name": "Launch Extension Edge Watch",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+            "preLaunchTask": "npm: build-edge-watch"
+        },
+        {
             "name": "Launch Extension Without Build",
             "type": "extensionHost",
             "request": "launch",

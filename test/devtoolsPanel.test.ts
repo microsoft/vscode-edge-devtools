@@ -43,6 +43,8 @@ describe("devtoolsPanel", () => {
             sourceMaps: true,
             webRoot: "",
             isJsDebugProxiedCDPConnection: false,
+            isCdnHostedTools: false,
+            useLocalEdgeWatch: false,
         };
 
         mockPanel = {
@@ -102,7 +104,7 @@ describe("devtoolsPanel", () => {
         it("switches targets with active session", async () => {
             const dtp = await import("../src/devtoolsPanel");
             const mockVsCode = jest.requireMock("vscode");
-            
+
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.bing.com/", mockRuntimeConfig);
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "https://www.microsoft.com/", mockRuntimeConfig);
             expect(mockPanel.onDidDispose).toHaveBeenCalledTimes(2);

@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -589,7 +589,11 @@
             "jsx",
             "json",
             "node"
-        ]
+        ],
+        "globals": {
+            "DEBUG": false,
+            "DEVTOOLS_BASE_URI": "https://test.invalid"
+          }
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
@@ -597,6 +601,7 @@
         "build": "npm run build-wp && npm run build-post",
         "build-min": "npm run build-wp && npm run build-post && npm run minify-devtools",
         "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
+        "build-edge-watch": "webpack --env debug",
         "build-wp": "webpack",
         "build-post": "ts-node postBuildStep.ts",
         "build-watch": "npm run build && npm run watch",

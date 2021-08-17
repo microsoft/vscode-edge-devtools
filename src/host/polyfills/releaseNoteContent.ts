@@ -3,28 +3,28 @@
 
 export const extensionHighlights = `[
     {
-        title: i18nLazyString("DevTools can now switch targets without reloading"),
+        title: i18nLazyString("Workspace Trust Support"),
         subtitle:
-            i18nLazyString("The active DevTools window can now swtich between targets in the Target's list without needing to close and reopen."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/415',
+            i18nLazyString("The Extension now has limited support for Visual Studio Code Workspace Trust."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/431',
     },
     {
-        title: i18nLazyString("Major Edge DevTools Version update"),
+        title: i18nLazyString("DevTools Drawer Close Button"),
         subtitle:
-            i18nLazyString("We have updated the DevTools version from 88 to 91. Check out all the major new features in the section below!"),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/414',
+            i18nLazyString("When enabled in settings, the DevTools drawer now properly shows a close button."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/426',
     },
     {
-        title: i18nLazyString("New home for Microsoft Edge DevTools for VS Code documentation"),
+        title: i18nLazyString("Remote JavaScript Debugger Workspace Connections"),
         subtitle:
-            i18nLazyString("Find our new location for all up-to-date documentation regarding this extension!"),
-        link: 'https://microsoft.github.io/vscode-edge-devtools/',
+            i18nLazyString("The DevTools now supports connecting to JavaScript Debugging targets provided by remote workspaces"),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/444',
     },
     {
-        title: i18nLazyString("Styles pane informs users to refresh if attached to a paused target"),
+        title: i18nLazyString("New main default branch"),
         subtitle:
-            i18nLazyString("The styles pane now informs users that a refresh is required to view styles if the devtools is attached to a target that is currently paused."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/410',
+            i18nLazyString("We have updated the default branch and the documentation of the extension to a new 'main' branch."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/425',
     },
 ],`;
 

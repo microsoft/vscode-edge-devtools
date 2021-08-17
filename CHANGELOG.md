@@ -1,3 +1,9 @@
+## 1.2.1
+* **[Feature]**: The Extension now has limited support for Visual Studio Code's Workspace Trust Feature - [PR #431](https://github.com/microsoft/vscode-edge-devtools/pull/431)
+* **[Bug Fix]**: DevTools Drawer now shows close button - [PR #426](https://github.com/microsoft/vscode-edge-devtools/pull/426)
+* **[Bug Fix]**: Add support for JavaScript Debugger connections on remote workspaces - [PR #444](https://github.com/microsoft/vscode-edge-devtools/pull/444)
+* **[Documentation]**: Updated Github default branch and documentation to main - [PR #425](https://github.com/microsoft/vscode-edge-devtools/pull/425)
+
 ## 1.2.0
 * **[Feature]**: The active DevTools window can now swtich between targets in the Target's list without needing to close and reopen. - [PR #415](https://github.com/microsoft/vscode-edge-devtools/pull/415)
 * **[Update]**: Edge DevTools Update - We have updated the DevTools version from 88 to 91. - [PR #414](https://github.com/microsoft/vscode-edge-devtools/pull/414)
