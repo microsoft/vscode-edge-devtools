@@ -9,6 +9,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
+    ICssMirrroContentData,
     IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
@@ -82,6 +83,7 @@ export class DevToolsPanel {
         this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg) as unknown as void);
         this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg) as unknown as void);
         this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg) as unknown as void);
+        this.panelSocket.on('cssMirrorContent', msg => this.onSocketCssMirrorContent(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
@@ -287,6 +289,43 @@ export class DevToolsPanel {
             return;
         }
 
+        const uri = await this.parseUrlToUri(url);
+
+        // Finally open the document if it exists
+        if (uri) {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            void vscode.window.showTextDocument(
+                doc,
+                {
+                    preserveFocus: true,
+                    selection: new vscode.Range(line, column, line, column),
+                    viewColumn: vscode.ViewColumn.One,
+                });
+        } else {
+            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
+        }
+    }
+
+    private async onSocketCssMirrorContent(message: string) {
+        // Report usage telemetry
+        this.telemetryReporter.sendTelemetryEvent('extension/cssMirrorContent');
+
+        // Parse message and open the requested file
+        const { url, newContent } = JSON.parse(message) as ICssMirrroContentData;
+
+        const uri = await this.parseUrlToUri(url);
+
+        // Finally open the document if it exists
+        if (uri) {
+            const enc = new TextEncoder();
+            const encodedNewContent = enc.encode(newContent);
+            void vscode.workspace.fs.writeFile(uri, encodedNewContent);
+        } else {
+            void vscode.window.showErrorMessage(`Could not mirror css changes to document. No workspace mapping was found for '${url}'.`);
+        }
+    }
+
+    private async parseUrlToUri(url: string): Promise<vscode.Uri | undefined> {
         // Convert the devtools url into a local one
         let sourcePath = url;
         if (this.config.sourceMaps) {
@@ -312,20 +351,7 @@ export class DevToolsPanel {
                 uri = undefined;
             }
         }
-
-        // Finally open the document if it exists
-        if (uri) {
-            const doc = await vscode.workspace.openTextDocument(uri);
-            void vscode.window.showTextDocument(
-                doc,
-                {
-                    preserveFocus: true,
-                    selection: new vscode.Range(line, column, line, column),
-                    viewColumn: vscode.ViewColumn.One,
-                });
-        } else {
-            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
-        }
+        return uri;
     }
 
     private update() {

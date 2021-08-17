@@ -494,6 +494,30 @@ describe("devtoolsPanel", () => {
                 expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
             });
 
+            it("calls writeFile for onSocketCssMirrorContent", async () => {
+                const expectedRequest = {
+                    url: "app.js",
+                    newContent: ".body{color: blue;}"
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
+
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+
+                const dtp = await import("../src/devtoolsPanel");
+                const { TextEncoder } = require('util'); 
+                global.TextEncoder = TextEncoder
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("cssMirrorContent")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.workspace.fs.writeFile).toHaveBeenCalled();
+            });
+
             it("calls getVscodeSettings", async () => {
                 const expectedId = { id: 0 };
                 const expectedState = { enableNetwork: true, themeString: "System preference", welcome: true, isHeadless: false};
