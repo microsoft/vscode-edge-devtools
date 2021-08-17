@@ -9,6 +9,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
+    ICssMirrroContentData,
     IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
@@ -86,6 +87,7 @@ export class DevToolsPanel {
         this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg) as unknown as void);
         this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg) as unknown as void);
         this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg) as unknown as void);
+        this.panelSocket.on('cssMirrorContent', msg => this.onSocketCssMirrorContent(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
@@ -304,6 +306,32 @@ export class DevToolsPanel {
             return;
         }
 
+        const uri = await this.parseUrlToUri(url);
+        if (uri) {
+            void this.openInEditor(uri, line, column);
+        }
+    }
+
+    private async onSocketCssMirrorContent(message: string) {
+        // Report usage telemetry
+        this.telemetryReporter.sendTelemetryEvent('extension/cssMirrorContent');
+
+        // Parse message and open the requested file
+        const { url, newContent } = JSON.parse(message) as ICssMirrroContentData;
+
+        const uri = await this.parseUrlToUri(url);
+
+        // Finally open the document if it exists
+        if (uri) {
+            const enc = new TextEncoder();
+            const encodedNewContent = enc.encode(newContent);
+            void vscode.workspace.fs.writeFile(uri, encodedNewContent);
+        } else {
+            void vscode.window.showErrorMessage(`Could not mirror css changes to document. No workspace mapping was found for '${url}'.`);
+        }
+    }
+
+    private async parseUrlToUri(url: string): Promise<vscode.Uri | undefined> {
         // Convert the devtools url into a local one
         let sourcePath = url;
         let appendedEntryPoint = false;
@@ -340,17 +368,16 @@ export class DevToolsPanel {
         if (!localSource.origin) {
             // Convert the workspace path into a VS Code url
             const uri = vscode.Uri.file(localSource.path);
-            await this.openInEditor(uri, line, column);
-        } else {
-            // If failed to resolve origin, it's possible entrypoint needs to be updated.
-            // Space at beginning to allow insertion in message below
-            const entryPointErrorMessage = ` Consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
-            await ErrorReporter.showInformationDialog({
-                errorCode: ErrorCodes.Error,
-                title: 'Unable to open file in editor.',
-                message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
-            });
+            return uri;
         }
+        // If failed to resolve origin, it's possible entrypoint needs to be updated.
+        // Space at beginning to allow insertion in message below
+        const entryPointErrorMessage = ` Consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
+        await ErrorReporter.showInformationDialog({
+            errorCode: ErrorCodes.Error,
+            title: 'Unable to open file in editor.',
+            message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
+        });
     }
 
     private async openInEditor(uri:vscode.Uri, line: number, column: number){

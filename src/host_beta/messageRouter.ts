@@ -4,6 +4,7 @@
 import {
     encodeMessageForChannel,
     FrameToolsEvent,
+    ICssMirrroContentData,
     IOpenEditorData,
     parseMessageFromChannel,
     TelemetryData,
@@ -69,6 +70,10 @@ export class MessageRouter {
             case 'openInEditor':
                 const [url, line, column, ignoreTabChanges] = args;
                 this.openInEditor(url, line, column, ignoreTabChanges);
+                return true;
+            case 'cssMirrorContent':
+                const [cssUrl = url, newContent] = args;
+                this.cssMirrorContent(cssUrl, newContent);
                 return true;
             case 'openInNewTab':
                 this.openInNewTab(args[0]);
@@ -150,6 +155,12 @@ export class MessageRouter {
         // Forward the data to the extension
         const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
+    }
+
+    private cssMirrorContent(url: string, newContent: string): void {
+        // Forward the data to the extension
+        const request: ICssMirrroContentData = { url, newContent };
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'cssMirrorContent', request);
     }
 
     private openInNewTab(url: string): void {

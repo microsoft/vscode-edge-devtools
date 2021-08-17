@@ -116,7 +116,10 @@ export function createFakeVSCode() {
                 {
                     uri:  'file:///g%3A/GIT/testPage'
                 }
-            ]
+            ],
+            fs: {
+                writeFile: jest.fn()
+            }
         },
     };
 }
