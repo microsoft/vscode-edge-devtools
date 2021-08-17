@@ -107,6 +107,15 @@ export class DevToolsPanel {
         this.panel.webview.onDidReceiveMessage(message => {
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
+
+        // Update DevTools theme if user changes global theme
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (this.config.isCdnHostedTools &&
+            e.affectsConfiguration('workbench.colorTheme') &&
+            this.panel.visible) {
+                this.update();
+            }
+        });
     }
 
     dispose(): void {
@@ -320,7 +329,7 @@ export class DevToolsPanel {
     }
 
     private update() {
-        this.panel.webview.html = this.getHtmlForWebview();
+        this.panel.webview.html = this.config.isCdnHostedTools ? this.getCdnHtmlForWebview() : this.getHtmlForWebview();
     }
 
     private getHtmlForWebview() {
@@ -360,6 +369,46 @@ export class DevToolsPanel {
                 <script type="module" src="${inspectorUri}"></script>
             </head>
             <body>
+            </body>
+            </html>
+            `;
+    }
+
+    private getCdnHtmlForWebview() {
+        let cdnBaseUrl = this.config.devtoolsBaseUri;
+        if (!cdnBaseUrl) {
+            // Not provided, calculate based on config
+            // TODO: CDP call to determine actual hash and stuff
+            cdnBaseUrl = this.config.useLocalEdgeWatch ? 'http://localhost:3000/vscode_app.html' : 'https://devtools.invalid';
+        }
+        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
+        const hostUri = this.panel.webview.asWebviewUri(hostPath);
+
+        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
+        const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
+
+        const theme = SettingsProvider.instance.getThemeFromUserSetting();
+
+        // the added fields for "Content-Security-Policy" allow resource loading for other file types
+        return `
+            <!doctype html>
+            <html>
+            <head>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8">
+                <meta name="referrer" content="no-referrer">
+                <link href="${stylesUri}" rel="stylesheet"/>
+                <script src="${hostUri}"></script>
+                <meta http-equiv="Content-Security-Policy"
+                    content="default-src;
+                    img-src 'self' data: ${this.panel.webview.cspSource};
+                    style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
+                    script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
+                    frame-src 'self' ${this.panel.webview.cspSource} ${cdnBaseUrl};
+                    connect-src 'self' data: ${this.panel.webview.cspSource};
+                ">
+            </head>
+            <body>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUrl}?experiments=true&theme=${theme}"></iframe>
             </body>
             </html>
             `;
