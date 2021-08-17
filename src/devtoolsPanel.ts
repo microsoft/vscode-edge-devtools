@@ -41,6 +41,7 @@ export class DevToolsPanel {
     private versionDetectionSocket: BrowserVersionDetectionSocket;
     private consoleOutput: vscode.OutputChannel;
     private timeStart: number | null;
+    private devtoolsBaseUri: string | null;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -55,6 +56,7 @@ export class DevToolsPanel {
         this.targetUrl = targetUrl;
         this.config = config;
         this.timeStart = null;
+        this.devtoolsBaseUri = this.config.devtoolsBaseUri || null;
         this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
         if (config.isJsDebugProxiedCDPConnection) {
             // Direct users to the Debug Console
@@ -108,7 +110,7 @@ export class DevToolsPanel {
         // Handle view change
         this.panel.onDidChangeViewState(_e => {
             if (this.panel.visible) {
-                if (this.panelSocket.isConnectedToTarget) {
+                if (this.panelSocket.isConnectedToTarget || this.config.devtoolsBaseUri) {
                     // Connection type determined already
                     this.update();
                 } else {
@@ -392,7 +394,6 @@ export class DevToolsPanel {
     }
 
     private getCdnHtmlForWebview() {
-        const cdnBaseUrl = this.config.devtoolsBaseUri;
         const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
         const hostUri = this.panel.webview.asWebviewUri(hostPath);
 
@@ -415,12 +416,12 @@ export class DevToolsPanel {
                     img-src 'self' data: ${this.panel.webview.cspSource};
                     style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
                     script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src 'self' ${this.panel.webview.cspSource} ${cdnBaseUrl};
+                    frame-src 'self' ${this.panel.webview.cspSource} ${this.devtoolsBaseUri};
                     connect-src 'self' data: ${this.panel.webview.cspSource};
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUrl}?experiments=true&theme=${theme}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${this.devtoolsBaseUri}?experiments=true&theme=${theme}"></iframe>
             </body>
             </html>
             `;
@@ -429,9 +430,10 @@ export class DevToolsPanel {
     private setBrowserRevision(revision: string) {
         if (revision !== '') {
             this.config.isCdnHostedTools = true;
-            this.config.devtoolsBaseUri = this.config.devtoolsBaseUri || `https://devtools.azureedge.net/serve_file/${revision}/vscode_app.html`;
+            this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${revision}/vscode_app.html`;
         } else {
             this.config.isCdnHostedTools = false;
+            this.devtoolsBaseUri = '';
         }
         this.update();
     }
