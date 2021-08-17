@@ -394,6 +394,8 @@ export class DevToolsPanel {
     }
 
     private getCdnHtmlForWebview() {
+        // Default to config provided base uri
+        const cdnBaseUri = this.config.devtoolsBaseUri || this.devtoolsBaseUri;
         const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
         const hostUri = this.panel.webview.asWebviewUri(hostPath);
 
@@ -416,12 +418,12 @@ export class DevToolsPanel {
                     img-src 'self' data: ${this.panel.webview.cspSource};
                     style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
                     script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src 'self' ${this.panel.webview.cspSource} ${this.devtoolsBaseUri};
+                    frame-src 'self' ${this.panel.webview.cspSource} ${cdnBaseUri};
                     connect-src 'self' data: ${this.panel.webview.cspSource};
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${this.devtoolsBaseUri}?experiments=true&theme=${theme}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}"></iframe>
             </body>
             </html>
             `;
