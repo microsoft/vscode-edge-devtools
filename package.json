@@ -256,6 +256,11 @@
                         "Microsoft Edge Tools for VS Code will use the Edge DevTools light theme",
                         "Microsoft Edge Tools for VS Code will use the Edge DevTools dark theme"
                     ]
+                },
+                "vscode-edge-devtools.mirrorEdits": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable edits in the styles pane to be automaticallly applied to the corresponding stylesheet in the workspace."
                 }
             }
         },
