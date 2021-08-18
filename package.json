@@ -577,7 +577,15 @@
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
-                "contents": "[Documentation](command:vscode-edge-devtools-view.viewDocumentation)\n[File an Issue](https://github.com/microsoft/vscode-edge-devtools/issues/new)"
+                "contents": "[Documentation](command:vscode-edge-devtools-view.viewDocumentation)"
+            },
+            {
+                "view": "vscode-edge-devtools-view.help-links",
+                "contents": "[Report a Bug](https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.md)"
+            },
+            {
+                "view": "vscode-edge-devtools-view.help-links",
+                "contents": "[Request a Feature](https://github.com/microsoft/vscode-edge-devtools/issues/new?template=feature_request.md)"
             }
         ]
     },
