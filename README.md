@@ -14,7 +14,7 @@ You can use the extension either in an own window or embedded in your editor.
 
 ## Documentation
 
-For more details on how to use and customize the extension, [refer to the documentation](https://microsoft.github.io/vscode-edge-devtools/index).
+For more details on how to use and customize the extension, [refer to the documentation](https://docs.microsoft.com/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension).
 
 ## Contributing
 

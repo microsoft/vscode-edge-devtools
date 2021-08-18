@@ -73,14 +73,13 @@
         <p>You can now use the <a href="https://docs.microsoft.com/microsoft-edge/devtools-guide-chromium">Edge Developer Tools</a> inside your editor to inspect, change and debug any web project using the Elements and Network tool.</p>
         <p>Simply navigate to the project you want to change using the URL bar above or start changing the styles of this document.</p>
         <p id="headless"></p>
-        <p><a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/console/">Console messages</a> appear in the output tab of the Visual Studio Code Terminal. Make sure to select "DevTools Console" from the dropdown. You should already see a message in there right now.</p>
         <p>If you have any questions or concerns, please head over to the <a href="https://github.com/microsoft/vscode-edge-devtools/issues">GitHub repository</a>, read up on how to use the extension or report us your problems and ideas. We're happy to listen! 
         </p>
     </section>
     <script>
         console.info('Hello from the startpage!')
         if (!window.chrome) {
-            document.querySelector('#headless').innerHTML = 'As you are using the browser without a window  you can use the URL bar in the extension for that.'
+            document.querySelector('#headless').innerHTML = 'As you are using the browser without a window you can use the URL bar in the extension for that.'
         }
     </script>
 </body>
