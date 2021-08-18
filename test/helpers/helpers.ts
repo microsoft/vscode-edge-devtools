@@ -90,6 +90,8 @@ export function createFakeVSCode() {
                                 return true;
                             case "isHeadless":
                                 return false;
+                            case "mirrorEdits":
+                                return true;
                             default:
                                 return undefined;
                         }
