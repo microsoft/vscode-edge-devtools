@@ -55,32 +55,34 @@ export class BrowserVersionDetectionSocket extends EventEmitter {
     private onMessage(message: { data: WebSocket.Data }) {
         // Determine if this is the browser.getVersion response and send revision hash to devtoolsPanel
         const data = JSON.parse(message.data.toString()) as BrowserVersionCdpResponse;
-        this.emit('setBrowserRevision', this.calcBrowserRevision(data));
+        this.emit('setCdnParameters', this.calcBrowserRevision(data));
         // Dispose socket after version is determined
         this.dispose();
         return;
     }
 
-    private calcBrowserRevision(data: BrowserVersionCdpResponse): string {
+    private calcBrowserRevision(data: BrowserVersionCdpResponse): {revision: string, isHeadless: boolean} {
         if (data.id !== 0 || !data.result || !data.result.product && !data.result.revision) {
-            return '';
+            return {revision: '', isHeadless: false};
         }
         // product in the form [Edg, HeadlessEdg]/#.#.#.#
-        const versionNum = (data.result.product as string).split('/')[1];
+        const productParts = (data.result.product as string).split('/');
+        const isHeadless = productParts[0].includes('Headless');
+        const versionNum = productParts[1];
         const currentVersion = versionNum.split('.');
         const minSupportedVersion = MIN_SUPPORTED_VERSION.split('.');
         const currentRevision = data.result.revision || '';
         for (let i = 0; i < currentVersion.length; i++) {
             // Loop through from Major to minor numbers
             if (currentVersion[i] > minSupportedVersion[i]) {
-                return currentRevision;
+                return {revision: currentRevision, isHeadless};
             }
             if (currentVersion[i] < minSupportedVersion[i]) {
-                return '';
+                return {revision: '', isHeadless};
             }
             // Continue to the next number
         }
         // All numbers matched, return supported revision
-        return currentRevision;
+        return {revision: currentRevision, isHeadless};
     }
 }
