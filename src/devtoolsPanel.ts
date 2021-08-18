@@ -17,6 +17,7 @@ import {
 } from './common/webviewEvents';
 import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
+import { BrowserVersionDetectionSocket } from './versionSocketConnection';
 import {
     applyPathMapping,
     fetchUri,
@@ -37,8 +38,10 @@ export class DevToolsPanel {
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
+    private versionDetectionSocket: BrowserVersionDetectionSocket;
     private consoleOutput: vscode.OutputChannel;
     private timeStart: number | null;
+    private devtoolsBaseUri: string | null;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -53,6 +56,7 @@ export class DevToolsPanel {
         this.targetUrl = targetUrl;
         this.config = config;
         this.timeStart = null;
+        this.devtoolsBaseUri = this.config.devtoolsBaseUri || null;
         this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
         if (config.isJsDebugProxiedCDPConnection) {
             // Direct users to the Debug Console
@@ -91,6 +95,13 @@ export class DevToolsPanel {
             this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
         }
 
+        // This Websocket is only used on initial connection to determine the browser version.
+        // The browser version is used to select between CDN and bundled tools
+        // Future versions of the extension will remove this socket and only use CDN
+        this.versionDetectionSocket = new BrowserVersionDetectionSocket(this.targetUrl);
+        this.versionDetectionSocket.on('setBrowserRevision', revision => this.setBrowserRevision(revision));
+
+
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
@@ -99,7 +110,13 @@ export class DevToolsPanel {
         // Handle view change
         this.panel.onDidChangeViewState(_e => {
             if (this.panel.visible) {
-                this.update();
+                if (this.panelSocket.isConnectedToTarget) {
+                    // Connection type determined already
+                    this.update();
+                } else {
+                    // Use version socket to determine which Webview/Tools to use
+                    this.versionDetectionSocket.detectVersion();
+                }
             }
         }, this, this.disposables);
 
@@ -124,6 +141,7 @@ export class DevToolsPanel {
         this.panel.dispose();
         this.panelSocket.dispose();
         this.consoleOutput.dispose();
+        this.versionDetectionSocket.dispose();
         if (this.timeStart !== null) {
             const timeEnd = performance.now();
             const sessionTime = timeEnd - this.timeStart;
@@ -329,7 +347,8 @@ export class DevToolsPanel {
     }
 
     private update() {
-        this.panel.webview.html = this.config.isCdnHostedTools ? this.getCdnHtmlForWebview() : this.getHtmlForWebview();
+        // Check to see which version of devtools we need to launch
+        this.panel.webview.html = (this.config.isCdnHostedTools || this.config.useLocalEdgeWatch) ? this.getCdnHtmlForWebview() : this.getHtmlForWebview();
     }
 
     private getHtmlForWebview() {
@@ -375,12 +394,8 @@ export class DevToolsPanel {
     }
 
     private getCdnHtmlForWebview() {
-        let cdnBaseUrl = this.config.devtoolsBaseUri;
-        if (!cdnBaseUrl) {
-            // Not provided, calculate based on config
-            // TODO: CDP call to determine actual hash and stuff
-            cdnBaseUrl = this.config.useLocalEdgeWatch ? 'http://localhost:3000/vscode_app.html' : 'https://devtools.invalid';
-        }
+        // Default to config provided base uri
+        const cdnBaseUri = this.config.devtoolsBaseUri || this.devtoolsBaseUri;
         const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
         const hostUri = this.panel.webview.asWebviewUri(hostPath);
 
@@ -403,16 +418,28 @@ export class DevToolsPanel {
                     img-src 'self' data: ${this.panel.webview.cspSource};
                     style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
                     script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src 'self' ${this.panel.webview.cspSource} ${cdnBaseUrl};
+                    frame-src 'self' ${this.panel.webview.cspSource} ${cdnBaseUri};
                     connect-src 'self' data: ${this.panel.webview.cspSource};
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUrl}?experiments=true&theme=${theme}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}"></iframe>
             </body>
             </html>
             `;
     }
+
+    private setBrowserRevision(revision: string) {
+        if (revision !== '') {
+            this.config.isCdnHostedTools = true;
+            this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${revision}/vscode_app.html`;
+        } else {
+            this.config.isCdnHostedTools = false;
+            this.devtoolsBaseUri = '';
+        }
+        this.update();
+    }
+
 
     static createOrShow(
         context: vscode.ExtensionContext,
