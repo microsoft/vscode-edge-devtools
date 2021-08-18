@@ -547,6 +547,10 @@
                 {
                     "id": "vscode-edge-devtools-view.targets",
                     "name": "Targets"
+                },
+                {
+                    "id": "vscode-edge-devtools-view.help-links",
+                    "name": "Helpful links"
                 }
             ]
         },
@@ -577,8 +581,16 @@
                 "when": "launchJsonStatus == Supported && isWorkspaceTrusted"
             },
             {
-                "view": "vscode-edge-devtools-view.targets",
-                "contents": "If you have any questions or want to learn more, check the [docs on GitHub](command:vscode-edge-devtools-view.viewDocumentation)."
+                "view": "vscode-edge-devtools-view.help-links",
+                "contents": "[Documentation](command:vscode-edge-devtools-view.viewDocumentation)"
+            },
+            {
+                "view": "vscode-edge-devtools-view.help-links",
+                "contents": "[Report a Bug](https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.md)"
+            },
+            {
+                "view": "vscode-edge-devtools-view.help-links",
+                "contents": "[Request a Feature](https://github.com/microsoft/vscode-edge-devtools/issues/new?template=feature_request.md)"
             }
         ]
     },
@@ -606,7 +618,7 @@
         "build": "npm run build-wp && npm run build-post",
         "build-min": "npm run build-wp && npm run build-post && npm run minify-devtools",
         "build-debug": "npm run build-wp && ts-node postBuildStep.ts debug",
-        "build-edge-watch": "webpack --env debug",
+        "build-edge-watch": "webpack --env debug --env devtoolsBaseUri=http://localhost:3000/vscode_app.html",
         "build-wp": "webpack",
         "build-post": "ts-node postBuildStep.ts",
         "build-watch": "npm run build && npm run watch",
