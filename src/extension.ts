@@ -164,7 +164,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }));
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewDocumentation`, () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.viewDocumentation });
-            void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/main/README.md'));
+            void vscode.env.openExternal(vscode.Uri.parse('https://docs.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension'));
         }));
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     void reportFileExtensionTypes(telemetryReporter);
