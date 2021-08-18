@@ -313,15 +313,16 @@ export class DevToolsPanel {
     }
 
     private async onSocketCssMirrorContent(message: string) {
-        // Report usage telemetry
-        this.telemetryReporter.sendTelemetryEvent('extension/cssMirrorContent');
+        if (!vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('mirrorEdits')) {
+            return;
+        }
 
         // Parse message and open the requested file
         const { url, newContent } = JSON.parse(message) as ICssMirrroContentData;
 
         const uri = await this.parseUrlToUri(url);
 
-        // Finally open the document if it exists
+        // Finally open and edit the document if it exists
         if (uri) {
             const enc = new TextEncoder();
             const encodedNewContent = enc.encode(newContent);
