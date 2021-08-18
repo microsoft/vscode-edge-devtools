@@ -67,7 +67,7 @@ export class PanelSocket extends EventEmitter {
         return this.emit(eventName, args);
     }
 
-    private connectToTarget() {
+    private connectToTarget(): void {
         // Create the websocket
         this.socket = new WebSocket(this.targetUrl);
         this.socket.onopen = () => this.onOpen();

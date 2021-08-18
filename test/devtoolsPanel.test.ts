@@ -18,6 +18,7 @@ import {
     Writable,
 } from "./helpers/helpers";
 import { IRuntimeConfig, SETTINGS_PREF_DEFAULTS, SETTINGS_PREF_NAME } from "../src/utils";
+import { BrowserVersionDetectionSocket } from "../src/versionSocketConnection";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 
@@ -29,6 +30,8 @@ describe("devtoolsPanel", () => {
     let mockPanelSocketFactory: { PanelSocket: jest.Mock };
     let mockJsDebugProxyPanelSocket: Mocked<JsDebugProxyPanelSocket>;
     let mockJsDebugProxyPanelSocketFactory: { JsDebugProxyPanelSocket: jest.Mock };
+    let mockVersionDetectionSocket: Mocked<BrowserVersionDetectionSocket>;
+    let mockVersionDetectionSocketFactory: { BrowserVersionDetectionSocket: jest.Mock };
     let mockWebviewEvents: { encodeMessageForChannel: jest.Mock };
     let mockRuntimeConfig: IRuntimeConfig;
 
@@ -81,6 +84,17 @@ describe("devtoolsPanel", () => {
             JsDebugProxyPanelSocket: jest.fn(() => mockJsDebugProxyPanelSocket),
         };
         jest.doMock("../src/JsDebugProxyPanelSocket", () => mockJsDebugProxyPanelSocketFactory);
+
+        mockVersionDetectionSocket = {
+            dispose: jest.fn(),
+            on: jest.fn(),
+            detectVersion: jest.fn(),
+        } as Mocked<BrowserVersionDetectionSocket>;
+
+        mockVersionDetectionSocketFactory = {
+            BrowserVersionDetectionSocket: jest.fn(() => mockVersionDetectionSocket),
+        };
+        jest.doMock("../src/versionSocketConnection", () => mockVersionDetectionSocketFactory);
 
         mockWebviewEvents = {
             encodeMessageForChannel: jest.fn(),
@@ -157,7 +171,7 @@ describe("devtoolsPanel", () => {
     });
 
     describe("update", () => {
-        it("adds html to the webview only when visible", async () => {
+        it("adds attempts to detect browser version only when visible", async () => {
             const dtp = await import("../src/devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
             expect(mockPanel.onDidChangeViewState).toHaveBeenCalled();
@@ -171,10 +185,9 @@ describe("devtoolsPanel", () => {
             callback.call(thisObj);
             expect(mockPanel.webview.html).toBeUndefined();
 
-            // Visible
             testPanel.visible = true;
             callback.call(thisObj);
-            expect(mockPanel.webview.html).toBeDefined();
+            expect(mockVersionDetectionSocket.on).toHaveBeenCalledTimes(1);
         });
     });
 
