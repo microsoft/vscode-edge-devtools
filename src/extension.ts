@@ -166,6 +166,20 @@ export function activate(context: vscode.ExtensionContext): void {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.viewDocumentation });
             void vscode.env.openExternal(vscode.Uri.parse('https://docs.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension'));
         }));
+
+    const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const mirrorEditsEnabled = settingsConfig.get('mirrorEdits');
+    void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', mirrorEditsEnabled);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.toggleMirrorEditingOn`, () => {
+            settingsConfig.update('mirrorEdits', true, true);
+            void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', true);
+        }));
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.toggleMirrorEditingOff`, () => {
+        settingsConfig.update('mirrorEdits', false, true);
+        void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', false);
+        }));
+    settingsConfig.update('mirrorEdits', true, true);
+    void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', true);
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     void reportFileExtensionTypes(telemetryReporter);
     reportExtensionSettings(telemetryReporter);

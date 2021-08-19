@@ -133,6 +133,18 @@
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered && isWorkspaceTrusted",
                 "title": "Launch project"
+            },
+            {
+                "command": "vscode-edge-devtools-view.toggleMirrorEditingOn",
+                "category": "Microsoft Edge Tools",
+                "enablement": "!mirrorEditingEnabled && titleCommandsRegistered",
+                "title": "Toggle mirror editing on for CSS files in workspace"
+            },
+            {
+                "command": "vscode-edge-devtools-view.toggleMirrorEditingOff",
+                "category": "Microsoft Edge Tools",
+                "enablement": "mirrorEditingEnabled && titleCommandsRegistered",
+                "title": "Toggle mirror editing off for CSS files in workspace"
             }
         ],
         "configuration": {
@@ -259,7 +271,7 @@
                 },
                 "vscode-edge-devtools.mirrorEdits": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Enable edits in the styles pane to be automaticallly applied to the corresponding stylesheet in the workspace."
                 }
             }
