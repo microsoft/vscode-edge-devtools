@@ -9,3 +9,15 @@ html, body, iframe {
     margin: 0;
     overflow: hidden;
 }
+
+#error-message {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    margin: 10px;
+    z-index: 2;
+}
+
+#error-message.hidden {
+    display: none;
+}
