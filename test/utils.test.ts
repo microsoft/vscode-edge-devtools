@@ -995,8 +995,6 @@ describe("utils", () => {
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return {
                     ...originalWorkspaceMockConfig,
-                    fillerPropertyOne: 'Need to add filler values since the extension related telemetry functions removes the first 4 entries to create an array of extension settings',
-                    fillerPropertyTwo: 'The first 4 entries for a workspaceConfiguration object are class related functions, the rest are all extension related settings.',
                     themes: 'System preference',
                     welcome: 'true',
                     enableNetwork: 'false',

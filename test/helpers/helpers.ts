@@ -101,7 +101,9 @@ export function createFakeVSCode() {
                             default:
                                 return {defaultValue: undefined};
                         }
-                    }
+                    },
+                    update: jest.fn(),
+                    has: jest.fn()
                 };
             }),
             onDidChangeConfiguration: jest.fn(),
