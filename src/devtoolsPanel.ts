@@ -100,7 +100,6 @@ export class DevToolsPanel {
         this.versionDetectionSocket = new BrowserVersionDetectionSocket(this.targetUrl);
         this.versionDetectionSocket.on('setCdnParameters', msg => this.setCdnParameters(msg));
 
-
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
@@ -426,6 +425,15 @@ export class DevToolsPanel {
             </head>
             <body>
                 <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}"></iframe>
+                <div id="error-message" class="hidden">
+                    <h1>Unable to download DevTools for the current target.</h1>
+                    <p>Try these troubleshooting steps:</p>
+                    <ol>
+                    <li>Check your network connection</li>
+                    <li>Close and re-launch the DevTools</li>
+                    </ol>
+                    <p>If this problem continues, please <a target="_blank" href="https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.md">file an issue.</a></p>
+                </div>
             </body>
             </html>
             `;

@@ -15,7 +15,8 @@ export interface BrowserVersionCdpResponse {
    }
 }
 
-const MIN_SUPPORTED_VERSION = '94.0.975.0';
+// Minimum supported version of Edge for new CDN system
+export const MIN_SUPPORTED_VERSION = '94.0.988.0';
 
 export class BrowserVersionDetectionSocket extends EventEmitter {
     private readonly targetUrl: string;
