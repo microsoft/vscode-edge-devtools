@@ -172,14 +172,14 @@ export function activate(context: vscode.ExtensionContext): void {
     const mirrorEditsEnabled = settingsConfig.get('mirrorEdits');
     void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', mirrorEditsEnabled);
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.toggleMirrorEditingOn`, () => {
-            settingsConfig.update('mirrorEdits', true, true);
+            void settingsConfig.update('mirrorEdits', true, true);
             void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', true);
         }));
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.toggleMirrorEditingOff`, () => {
-        settingsConfig.update('mirrorEdits', false, true);
+        void settingsConfig.update('mirrorEdits', false, true);
         void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', false);
         }));
-    settingsConfig.update('mirrorEdits', true, true);
+    void settingsConfig.update('mirrorEdits', true, true);
     void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', true);
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     void reportFileExtensionTypes(telemetryReporter);
