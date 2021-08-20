@@ -27,6 +27,7 @@ import {
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
 } from './utils';
+import { ErrorCodes, ErrorReporter } from './errorReporter';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -321,27 +322,30 @@ export class DevToolsPanel {
         let uri: vscode.Uri | undefined;
         try {
             uri = vscode.Uri.file(sourcePath);
+            await this.openInEditor(uri, line, column);
         } catch {
             try {
                 uri = vscode.Uri.parse(sourcePath, true);
-            } catch {
-                uri = undefined;
+                await this.openInEditor(uri, line, column);
+            } catch(error) {
+                ErrorReporter.showErrorDialog({
+                    errorCode: ErrorCodes.Error,
+                    title: "Error while opening file",
+                    message: error
+                });
             }
         }
+    }
 
-        // Finally open the document if it exists
-        if (uri) {
-            const doc = await vscode.workspace.openTextDocument(uri);
-            void vscode.window.showTextDocument(
-                doc,
-                {
-                    preserveFocus: true,
-                    selection: new vscode.Range(line, column, line, column),
-                    viewColumn: vscode.ViewColumn.One,
-                });
-        } else {
-            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
-        }
+    private async openInEditor(uri:vscode.Uri, line: number, column: number){
+        const doc = await vscode.workspace.openTextDocument(uri);
+        void vscode.window.showTextDocument(
+            doc,
+            {
+                preserveFocus: true,
+                selection: new vscode.Range(line, column, line, column),
+                viewColumn: vscode.ViewColumn.One,
+            });
     }
 
     private update() {
