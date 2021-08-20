@@ -39,7 +39,6 @@ export class DevToolsPanel {
     private readonly targetUrl: string;
     private panelSocket: PanelSocket;
     private versionDetectionSocket: BrowserVersionDetectionSocket;
-    private consoleOutput: vscode.OutputChannel;
     private timeStart: number | null;
     private devtoolsBaseUri: string | null;
     private isHeadless: boolean;
@@ -59,15 +58,6 @@ export class DevToolsPanel {
         this.timeStart = null;
         this.devtoolsBaseUri = this.config.devtoolsBaseUri || null;
         this.isHeadless = false;
-        this.consoleOutput = vscode.window.createOutputChannel('DevTools Console');
-
-        // Deprecated console
-        // Direct users to the Debug Console. This message with be removed in a the next update
-        this.consoleOutput.appendLine('// Microsoft Edge Devtools Extension:');
-        this.consoleOutput.appendLine('// The Microsoft Edge DevTools Extension will be deprecating console output in the next update.');
-        this.consoleOutput.appendLine('// To receive full REPL console functionality, please use Visual Studio Code\'s included JavaScript Debugger to attach to your target.');
-        this.consoleOutput.appendLine('// Then use the "Debug Console" to view console messages from your webpage and evaluate expressions.');
-        this.consoleOutput.appendLine('// For more information, visit https://docs.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension#browser-debugging-with-microsoft-edge-developer-tools-integration-in-visual-studio-code');
 
         // Hook up the socket events
         if (this.config.isJsDebugProxiedCDPConnection) {
@@ -88,10 +78,6 @@ export class DevToolsPanel {
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
-        if (!config.isJsDebugProxiedCDPConnection){
-            // Provide 1-way console when attached to a target that is not the current debug target
-            this.panelSocket.on('consoleOutput', msg => this.onSocketConsoleOutput(msg));
-        }
 
         // This Websocket is only used on initial connection to determine the browser version.
         // The browser version is used to select between CDN and bundled tools
@@ -137,7 +123,6 @@ export class DevToolsPanel {
 
         this.panel.dispose();
         this.panelSocket.dispose();
-        this.consoleOutput.dispose();
         this.versionDetectionSocket.dispose();
         if (this.timeStart !== null) {
             const timeEnd = performance.now();
@@ -201,11 +186,6 @@ export class DevToolsPanel {
         } else {
             void vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
-    }
-
-    private onSocketConsoleOutput(message: string) {
-        const { consoleMessage } = JSON.parse(message) as { consoleMessage : string };
-        this.consoleOutput.appendLine(consoleMessage);
     }
 
     private onSocketTelemetry(message: string) {
