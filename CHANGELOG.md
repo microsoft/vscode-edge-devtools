@@ -1,3 +1,9 @@
+## 1.3.0
+* **[Feature]**: The Extension now retrieves DevTools that directly match supported browser targets - Microsoft Edge 94.0.988.0 and newer. - [PR #449](https://github.com/microsoft/vscode-edge-devtools/pull/449)
+* **[Feature]**: Targeting Microsoft Edge Version 94.0.988.0 and newer now supports automatically changing themes to match built in Visual Studio Code themes. - [PR #445](https://github.com/microsoft/vscode-edge-devtools/pull/445)
+* **[Deprecation]**: The Extension's DevTools Console output has been deprecated in favor of Visual Studio Code's Debug Console. - [PR #460](https://github.com/microsoft/vscode-edge-devtools/pull/460)
+* **[Documentation]**: The Extension sidebar now provides direct links to our documentation and issue pages. - [PR #459](https://github.com/microsoft/vscode-edge-devtools/pull/459)
+
 ## 1.2.1
 * **[Feature]**: The Extension now has limited support for Visual Studio Code's Workspace Trust Feature - [PR #431](https://github.com/microsoft/vscode-edge-devtools/pull/431)
 * **[Bug Fix]**: DevTools Drawer now shows close button - [PR #426](https://github.com/microsoft/vscode-edge-devtools/pull/426)
