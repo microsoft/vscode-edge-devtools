@@ -326,11 +326,11 @@ export class DevToolsPanel {
             try {
                 uri = vscode.Uri.parse(sourcePath, true);
                 await this.openInEditor(uri, line, column);
-            } catch(error) {
-                ErrorReporter.showErrorDialog({
+            } catch (error: unknown) {
+                void ErrorReporter.showErrorDialog({
                     errorCode: ErrorCodes.Error,
-                    title: "Error while opening file",
-                    message: error
+                    title: 'Error while opening file',
+                    message: error,
                 });
             }
         }
