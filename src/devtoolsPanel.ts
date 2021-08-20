@@ -19,6 +19,7 @@ import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
 import { BrowserVersionDetectionSocket } from './versionSocketConnection';
 import {
+    addEntrypointIfNeeded,
     applyPathMapping,
     fetchUri,
     IRuntimeConfig,
@@ -305,6 +306,17 @@ export class DevToolsPanel {
 
         // Convert the devtools url into a local one
         let sourcePath = url;
+        let appendedEntryPoint = false;
+        if (this.config.defaultEntrypoint) {
+            // If sourcePath is just a baseUrl, append to default entrypoint
+            try {
+                sourcePath = addEntrypointIfNeeded(sourcePath, this.config.defaultEntrypoint);
+                appendedEntryPoint = true;
+            } catch (e) {
+                void vscode.window.showErrorMessage(`Could not open document. '${sourcePath}' is not a valid url.`);
+                return;
+            }
+        }
         if (this.config.sourceMaps) {
             sourcePath = applyPathMapping(sourcePath, this.config.sourceMapPathOverrides);
         }
@@ -335,14 +347,23 @@ export class DevToolsPanel {
 
     private async openInEditor(uri:vscode.Uri, line: number, column: number){
         try {
-            const doc = await vscode.workspace.openTextDocument(uri);
-            void vscode.window.showTextDocument(
-                doc,
-                {
-                    preserveFocus: true,
-                    selection: new vscode.Range(line, column, line, column),
-                    viewColumn: vscode.ViewColumn.One,
-            });
+        // Finally open the document if it exists
+            if (!uri.path?.startsWith('/http:')) {
+                const doc = await vscode.workspace.openTextDocument(uri);
+                void vscode.window.showTextDocument(
+                    doc,
+                    {
+                        preserveFocus: true,
+                        selection: new vscode.Range(line, column, line, column),
+                        viewColumn: vscode.ViewColumn.One,
+                });
+            }else {
+                // workspace mapping failure and append attemtped to be set TODO fix
+                 // let errorMessage = `Could not open document. No workspace mapping was found for '${url}'.`;
+            // if (appendedEntryPoint) {
+            //     errorMessage += `If ${url} is the entrypoint to your site, consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
+            // }
+            }
         } catch (e) {
             await ErrorReporter.showErrorDialog({
                 errorCode: ErrorCodes.Error,
