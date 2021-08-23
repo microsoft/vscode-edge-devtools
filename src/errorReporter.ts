@@ -36,17 +36,26 @@ export class ErrorReporter {
       let base = 'https://github.com/microsoft/vscode-edge-devtools/issues/new?';
       const params: Map<string, string> = new Map<string, string>();
 
-      params.set('title', `[${error.errorCode}] ${encodeURIComponent(error.title)}`);
+      params.set('title',encodeURIComponent(`[${error.errorCode}] ${error.title}`));
       params.set('body', encodeURIComponent(template));
       params.set('labels', 'bug');
 
       // As this are GET request params there is no need to take out the last
       // ampersand
-      params.forEach((key, value) => {
+      params.forEach((value, key) => {
         base += `${key}=${value}&`;
       });
 
       void vscode.env.openExternal(vscode.Uri.parse(base));
     }
+  }
+
+  static async showInformationDialog(
+    error: ErrorEventInterface): Promise<void> {
+    // cannot do multiline due to:
+    // https://github.com/Microsoft/vscode/issues/48900
+    await vscode.window.showInformationMessage(
+      `${error.title}\n${error.message}`
+    );
   }
 }
