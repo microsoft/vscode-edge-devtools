@@ -561,6 +561,11 @@
                     "name": "Targets"
                 },
                 {
+                    "id": "vscode-edge-devtools-view.mirror-editing",
+                    "name": "CSS Mirror Editing",
+                    "when": "config.vscode-edge-devtools.browserFlavor == Canary"
+                },
+                {
                     "id": "vscode-edge-devtools-view.help-links",
                     "name": "Helpful links"
                 }
@@ -591,6 +596,24 @@
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launchProject)",
                 "when": "launchJsonStatus == Supported && isWorkspaceTrusted"
+            },
+            {
+                "view": "vscode-edge-devtools-view.mirror-editing",
+                "contents": "CSS mirror editing is an experimental feature that automatically applies changes made in the DevTools panel to CSS files in your workspace."
+            },
+            {
+                "view": "vscode-edge-devtools-view.mirror-editing",
+                "contents": "[Toggle Mirror Editing ON](command:vscode-edge-devtools-view.toggleMirrorEditingOn)",
+                "when": "!config.vscode-edge-devtools.mirrorEdits"
+            },
+            {
+                "view": "vscode-edge-devtools-view.mirror-editing",
+                "contents": "[Toggle Mirror Editing OFF](command:vscode-edge-devtools-view.toggleMirrorEditingOff)",
+                "when": "config.vscode-edge-devtools.mirrorEdits"
+            },
+            {
+                "view": "vscode-edge-devtools-view.mirror-editing",
+                "contents": "Please help us improve this feature by [leaving feedback here](https://github.com/microsoft/vscode-edge-devtools/issues/new?title=[CSS%20Mirror%20Editing])."
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
