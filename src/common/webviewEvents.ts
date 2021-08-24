@@ -66,7 +66,7 @@ export interface IOpenEditorData {
     ignoreTabChanges: boolean;
 }
 
-export interface ICssMirrroContentData {
+export interface ICssMirrorContentData {
     url: string;
     newContent: string;
 }

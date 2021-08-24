@@ -492,7 +492,6 @@ describe("devtoolsPanel", () => {
                 };
 
                 const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
 
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
@@ -514,8 +513,6 @@ describe("devtoolsPanel", () => {
                 };
 
                 const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
-
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
@@ -523,8 +520,8 @@ describe("devtoolsPanel", () => {
                 jest.doMock("../src/utils", () => mockUtils);
 
                 const dtp = await import("../src/devtoolsPanel");
-                const { TextEncoder } = require('util'); 
-                global.TextEncoder = TextEncoder
+                const { TextEncoder } = require('util');
+                global.TextEncoder = TextEncoder;
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("cssMirrorContent")!(JSON.stringify(expectedRequest));

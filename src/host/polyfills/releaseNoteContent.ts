@@ -3,28 +3,28 @@
 
 export const extensionHighlights = `[
     {
-        title: i18nLazyString("Workspace Trust Support"),
+        title: i18nLazyString("DevTools Built for Specific Target"),
         subtitle:
-            i18nLazyString("The Extension now has limited support for Visual Studio Code Workspace Trust."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/431',
+            i18nLazyString("The Extension now retrieves DevTools that directly match supported browser targets - Microsoft Edge 94.0.988.0 and newer."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/449',
     },
     {
-        title: i18nLazyString("DevTools Drawer Close Button"),
+        title: i18nLazyString("Automatic Theme changes"),
         subtitle:
-            i18nLazyString("When enabled in settings, the DevTools drawer now properly shows a close button."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/426',
+            i18nLazyString("Targeting Microsoft Edge Version 94.0.988.0 and newer now supports automatically changing themes to match built in Visual Studio Code themes."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/445',
     },
     {
-        title: i18nLazyString("Remote JavaScript Debugger Workspace Connections"),
+        title: i18nLazyString("DevTools Console Output Deprecation"),
         subtitle:
-            i18nLazyString("The DevTools now supports connecting to JavaScript Debugging targets provided by remote workspaces"),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/444',
+            i18nLazyString("The Extension's DevTools Console output has been deprecated in favor of Visual Studio Code's Debug Console."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/460',
     },
     {
-        title: i18nLazyString("New main default branch"),
+        title: i18nLazyString("Documentation and Issue Links"),
         subtitle:
-            i18nLazyString("We have updated the default branch and the documentation of the extension to a new 'main' branch."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/425',
+            i18nLazyString("The Extension sidebar now provides direct links to our documentation and issue pages."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/459',
     },
 ],`;
 

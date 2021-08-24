@@ -9,7 +9,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
-    ICssMirrroContentData,
+    ICssMirrorContentData,
     IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
@@ -100,7 +100,6 @@ export class DevToolsPanel {
         // Future versions of the extension will remove this socket and only use CDN
         this.versionDetectionSocket = new BrowserVersionDetectionSocket(this.targetUrl);
         this.versionDetectionSocket.on('setCdnParameters', msg => this.setCdnParameters(msg));
-
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -328,7 +327,7 @@ export class DevToolsPanel {
         }
 
         // Parse message and open the requested file
-        const { url, newContent } = JSON.parse(message) as ICssMirrroContentData;
+        const { url, newContent } = JSON.parse(message) as ICssMirrorContentData;
 
         const uri = await this.parseUrlToUri(url);
 
@@ -360,13 +359,13 @@ export class DevToolsPanel {
         // Convert the workspace path into a VS Code url
         let uri: vscode.Uri | undefined;
         try {
-            uri = vscode.Uri.file(sourcePath);
-        } catch {
-            try {
+            if (vscode.env.remoteName) {
                 uri = vscode.Uri.parse(sourcePath, true);
-            } catch {
-                uri = undefined;
+            } else {
+                uri = vscode.Uri.file(sourcePath);
             }
+        } catch {
+            uri = undefined;
         }
         return uri;
     }
@@ -449,6 +448,15 @@ export class DevToolsPanel {
             </head>
             <body>
                 <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}"></iframe>
+                <div id="error-message" class="hidden">
+                    <h1>Unable to download DevTools for the current target.</h1>
+                    <p>Try these troubleshooting steps:</p>
+                    <ol>
+                    <li>Check your network connection</li>
+                    <li>Close and re-launch the DevTools</li>
+                    </ol>
+                    <p>If this problem continues, please <a target="_blank" href="https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.md">file an issue.</a></p>
+                </div>
             </body>
             </html>
             `;
@@ -457,9 +465,11 @@ export class DevToolsPanel {
     private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
         if (msg.revision !== '') {
             this.config.isCdnHostedTools = true;
+            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', true);
             this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision}/vscode_app.html`;
         } else {
             this.config.isCdnHostedTools = false;
+            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', false);
             this.devtoolsBaseUri = '';
         }
         this.isHeadless = msg.isHeadless;
