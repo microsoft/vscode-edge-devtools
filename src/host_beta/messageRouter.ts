@@ -23,10 +23,17 @@ const vscode = acquireVsCodeApi();
  */
 export class MessageRouter {
     private toolsFrameWindow: Window | null | undefined;
+    private errorMessageDiv: HTMLElement | null | undefined;
+    private devtoolsActionReceived: boolean = false;
 
     constructor(webviewWindow: Window) {
         webviewWindow.addEventListener('DOMContentLoaded', () => {
             this.toolsFrameWindow = (document.getElementById('devtools-frame') as HTMLIFrameElement).contentWindow;
+            this.toolsFrameWindow?.addEventListener('load', () => {
+                this.devtoolsActionReceived = true;
+            });
+
+            this.errorMessageDiv = document.getElementById('error-message') as HTMLElement;
         });
 
         const extensionMessageCallback = this.onMessageFromChannel.bind(this);
@@ -38,6 +45,8 @@ export class MessageRouter {
             if (!fromExtension) {
                 // Send message from DevTools to Extension
                 this.onMessageFromFrame(messageEvent.data.method as FrameToolsEvent, messageEvent.data.args as any[]);
+                // Record that the DevTools has sent a message to prevent error page from loading
+                this.devtoolsActionReceived = true;
             } else if (this.toolsFrameWindow) {
                 // Send message from Extension to DevTools
                 parseMessageFromChannel(
@@ -51,6 +60,9 @@ export class MessageRouter {
 
         // Inform the extension we are ready to receive messages
         this.sendReady();
+
+        // Set timeout to show error message if devtools has not loaded within 10 seconds
+        setTimeout(() => this.showLoadingError(), 10000);
     }
 
     onMessageFromFrame(e: FrameToolsEvent, args: any[]): boolean {
@@ -169,5 +181,13 @@ export class MessageRouter {
         if (this.toolsFrameWindow && e === 'message') {
             this.toolsFrameWindow.postMessage({method: 'dispatchMessage', args: [message]}, '*');
         }
+    }
+
+    private showLoadingError() {
+        if (this.devtoolsActionReceived || !this.errorMessageDiv) {
+            return;
+        }
+        // Show the error message if DevTools has failed to record an action
+        this.errorMessageDiv.classList.remove('hidden');
     }
 }

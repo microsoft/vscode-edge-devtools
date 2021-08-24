@@ -3,7 +3,7 @@
 
 import WebSocket from "ws";
 import { Mocked } from "./helpers/helpers";
-import type {BrowserVersionCdpResponse} from "../src/versionSocketConnection";
+import {BrowserVersionCdpResponse, MIN_SUPPORTED_VERSION} from "../src/versionSocketConnection";
 
 describe("versionDetectionSocket", () => {
     let mockWebSocket: Mocked<WebSocket>;
@@ -54,11 +54,11 @@ describe("versionDetectionSocket", () => {
         const versionMessages: BrowserVersionCdpResponse[] = [
             { id: 0, result: { revision: "FAIL", product: "Edg/92.0.0.0"}},
             { id: 0, result: { revision: "PASS", product: "Edg/95.0.0.0"}},
-            { id: 0, result: { revision: "PASS", product: "Edg/94.0.975.0"}},
+            { id: 0, result: { revision: "PASS", product: `Edg/${MIN_SUPPORTED_VERSION}`}},
             { id: 0, result: { revision: "FAIL", product: "Edg/94.0.100.0"}},
             { id: 0, result: { revision: "FAIL", product: "HeadlessEdg/92.0.0.0"}},
             { id: 0, result: { revision: "PASS", product: "HeadlessEdg/95.0.0.0"}},
-            { id: 0, result: { revision: "PASS", product: "HeadlessEdg/94.0.975.0"}},
+            { id: 0, result: { revision: "PASS", product: `HeadlessEdg/${MIN_SUPPORTED_VERSION}`}},
             { id: 0, result: { revision: "FAIL", product: "HeadlessEdg/94.0.100.0"}},
         ]
 
