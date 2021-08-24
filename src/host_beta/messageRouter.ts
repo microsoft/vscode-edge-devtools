@@ -4,7 +4,7 @@
 import {
     encodeMessageForChannel,
     FrameToolsEvent,
-    ICssMirrroContentData,
+    ICssMirrorContentData,
     IOpenEditorData,
     parseMessageFromChannel,
     TelemetryData,
@@ -159,7 +159,7 @@ export class MessageRouter {
 
     private cssMirrorContent(url: string, newContent: string): void {
         // Forward the data to the extension
-        const request: ICssMirrroContentData = { url, newContent };
+        const request: ICssMirrorContentData = { url, newContent };
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'cssMirrorContent', request);
     }
 
