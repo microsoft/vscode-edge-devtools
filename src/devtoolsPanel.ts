@@ -9,7 +9,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
-    ICssMirrroContentData,
+    ICssMirrorContentData,
     IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
@@ -328,7 +328,7 @@ export class DevToolsPanel {
         }
 
         // Parse message and open the requested file
-        const { url, newContent } = JSON.parse(message) as ICssMirrroContentData;
+        const { url, newContent } = JSON.parse(message) as ICssMirrorContentData;
 
         const uri = await this.parseUrlToUri(url);
 
@@ -457,9 +457,11 @@ export class DevToolsPanel {
     private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
         if (msg.revision !== '') {
             this.config.isCdnHostedTools = true;
+            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', true);
             this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision}/vscode_app.html`;
         } else {
             this.config.isCdnHostedTools = false;
+            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', false);
             this.devtoolsBaseUri = '';
         }
         this.isHeadless = msg.isHeadless;
