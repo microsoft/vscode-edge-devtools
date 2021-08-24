@@ -327,8 +327,8 @@ export class DevToolsPanel {
         } else {
             await ErrorReporter.showInformationDialog({
                 errorCode: ErrorCodes.Error,
-                title: 'Error while opening file in editor.',
-                message: `${sourcePath} file is not mapped to a local file.`,
+                title: 'Unable to open file in editor.',
+                message: `${sourcePath} does not map to a local file.`,
             });
         }
     }
