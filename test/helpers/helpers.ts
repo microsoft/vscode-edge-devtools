@@ -49,6 +49,13 @@ export function createFakeVSCode() {
                 id: 'vscode-session-debug-id'
             }
         },
+        extensions: {
+            getExtension: jest.fn().mockReturnValue({ 
+                packageJSON: {
+                    version: '1.3.0' // can be any version.
+                }
+            }),
+        },
         env: {
             clipboard: { writeText: jest.fn() },
             machineId: "someValue.machineId",
