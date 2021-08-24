@@ -319,13 +319,13 @@ export class DevToolsPanel {
         // Convert the workspace path into a VS Code url
         let uri: vscode.Uri | undefined;
         try {
-            uri = vscode.Uri.file(sourcePath);
-        } catch {
-            try {
+            if (vscode.env.remoteName) {
                 uri = vscode.Uri.parse(sourcePath, true);
-            } catch {
-                uri = undefined;
+            } else {
+                uri = vscode.Uri.file(sourcePath);
             }
+        } catch {
+            uri = undefined;
         }
 
         // Finally open the document if it exists

@@ -524,6 +524,9 @@ export function applyPathMapping(
         // replacement pattern, and return the result.
         const wildcardValue = overridePatternMatches[1];
         let mappedPath = rightPattern.replace(/\*/g, wildcardValue);
+        if (vscode.env.remoteName) {
+            return mappedPath;
+        }
         mappedPath = debugCore.utils.properJoin(mappedPath); // Fix any ..'s
         mappedPath = replaceWorkSpaceFolderPlaceholder(mappedPath);
         return mappedPath;

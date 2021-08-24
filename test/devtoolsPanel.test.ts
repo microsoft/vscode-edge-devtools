@@ -492,7 +492,6 @@ describe("devtoolsPanel", () => {
                 };
 
                 const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
 
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
