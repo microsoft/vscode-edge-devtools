@@ -13,6 +13,7 @@ import {
     createFakeExtensionContext,
     createFakeTelemetryReporter,
     createFakeVSCode,
+    createFakeDebugCore,
     getFirstCallback,
     Mocked,
     Writable,
@@ -483,6 +484,74 @@ describe("devtoolsPanel", () => {
                 );
             });
 
+            it("calls openInEditor with a file mapped correctly ", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    ignoreTabChanges: false,
+                    line: 1,
+                    url: "app.js",
+                };
+                const mockDebugCore = createFakeDebugCore();
+                mockDebugCore.UrlPathTransformer.mockImplementation(() => {
+                    return {
+                        launch: jest.fn(),
+                        fixSource: jest.fn(args => {
+                            args.origin = undefined;
+                        }),
+                    }
+                });
+                
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn();
+
+                const dtp = await import("../src/devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showInformationMessage).not.toHaveBeenCalled();
+            });
+
+            it("shows an informational message with an incorrectly mapped file", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    ignoreTabChanges: false,
+                    line: 1,
+                    url: "app.js",
+                };
+                const mockDebugCore = createFakeDebugCore();
+                mockDebugCore.UrlPathTransformer.mockImplementation(() => {
+                    return {
+                        launch: jest.fn(),
+                        fixSource: jest.fn(args => {
+                            args.origin = "vscode-webview://";
+                        }),
+                    }
+                });
+                
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn();
+
+                const dtp = await import("../src/devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showInformationMessage ).toHaveBeenCalled();
+            });
+
             it("calls show document for open in editor", async () => {
                 const expectedRequest = {
                     column: 5,
@@ -490,21 +559,68 @@ describe("devtoolsPanel", () => {
                     line: 1,
                     url: "app.js",
                 };
-
-                const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
-
+                const mockDebugCore = createFakeDebugCore();
+                mockDebugCore.UrlPathTransformer.mockImplementation(() => {
+                    return {
+                        launch: jest.fn(),
+                        fixSource: jest.fn(args => {
+                            args.origin = undefined;
+                        }),
+                    }
+                });
+                
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
+                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn();
 
                 const dtp = await import("../src/devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
                 expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
+            });
+
+            it("shows an error dialog for open in editor exceptions", async () => {
+                const expectedRequest = {
+                    column: 5,
+                    ignoreTabChanges: false,
+                    line: 1,
+                    url: "app.js",
+                };
+                const mockDebugCore = createFakeDebugCore();
+                mockDebugCore.UrlPathTransformer.mockImplementation(() => {
+                    return {
+                        launch: jest.fn(),
+                        fixSource: jest.fn(args => {
+                            args.origin = undefined;
+                        }),
+                    }
+                });
+
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+
+                const mockVsCode = jest.requireMock("vscode");
+                mockVsCode.Uri.file = jest.fn();
+                mockVsCode.window.showTextDocument = jest.fn(() => {
+                    throw new Error();
+                });
+
+                const dtp = await import("../src/devtoolsPanel");
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.window.showErrorMessage).toHaveBeenCalled();
             });
 
             it("calls getVscodeSettings", async () => {
@@ -533,32 +649,6 @@ describe("devtoolsPanel", () => {
                 const { callback, thisObj } = getFirstCallback(mockWebviewEvents.encodeMessageForChannel);
                 callback.call(thisObj, expectedPostedMessage);
                 expect(mockPanel.webview.postMessage).toHaveBeenCalledWith(expectedPostedMessage);
-            });
-
-            it("shows an error for unmapped urls", async () => {
-                const expectedRequest = {
-                    column: 5,
-                    ignoreTabChanges: false,
-                    line: 1,
-                    url: "app.js",
-                };
-
-                const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn(() => { throw new Error(); });
-                mockVsCode.Uri.parse = jest.fn(() => { throw new Error(); });
-
-                const mockUtils = {
-                    applyPathMapping: jest.fn().mockImplementation((x) => x),
-                    fetchUri: jest.fn().mockRejectedValue(null),
-                };
-                jest.doMock("../src/utils", () => mockUtils);
-
-                const dtp = await import("../src/devtoolsPanel");
-                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
-
-                await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
-                expect(mockVsCode.window.showErrorMessage).toHaveBeenCalledWith(
-                    expect.stringContaining(expectedRequest.url));
             });
 
             it("creates a JsDebugProxyPanelSocket when config requires it", async () => {

@@ -33,6 +33,7 @@ import {
     reportUrlType,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
+import { ErrorCodes, ErrorReporter } from './errorReporter';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
@@ -183,15 +184,17 @@ export async function attach(
 
     // Get the attach target and keep trying until reaching timeout
     const startTime = Date.now();
+    let responseArray: IRemoteTargetJson[] | undefined;
+    let exceptionStack: unknown;
     do {
-        let responseArray: IRemoteTargetJson[] | undefined;
         try {
             // Keep trying to attach to the list endpoint until timeout
             responseArray = await debugCore.utils.retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
                 /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL) as IRemoteTargetJson[];
-        } catch {
+        } catch (e) {
+            exceptionStack = e;
             // Timeout so make sure we error out with no json result
             responseArray = undefined;
         }
@@ -204,7 +207,13 @@ export async function attach(
                 let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
                 try {
                     matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray as unknown as debugCore.chromeConnection.ITarget[], attachUrl);
-                } catch {
+                } catch (e) {
+                    void ErrorReporter.showErrorDialog({
+                        errorCode: ErrorCodes.Error,
+                        title: 'Error while getting a debug connection to the target',
+                        message: e,
+                    });
+
                     matchedTargets = undefined;
                 }
 
@@ -246,10 +255,18 @@ export async function attach(
                     DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
                 }
             }
-        } else {
-            telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
         }
     } while (useRetry && Date.now() - startTime < timeout);
+
+    // If there is no after the timeout then throw an exception
+    if (!responseArray) {
+        void ErrorReporter.showErrorDialog({
+            errorCode: ErrorCodes.Error,
+            title: 'Error while attaching to target',
+            message: exceptionStack,
+        });
+        telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
+    }
 }
 
 export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext, debugSessionId?: string): Promise<void> {

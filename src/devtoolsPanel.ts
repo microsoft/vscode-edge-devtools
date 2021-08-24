@@ -312,39 +312,43 @@ export class DevToolsPanel {
         // Convert the local url to a workspace path
         const transformer = new debugCore.UrlPathTransformer();
         void transformer.launch({ pathMapping: this.config.pathMapping });
-        const localSource = { path: sourcePath };
+
+        // origin in this case is trivial since we expect fixSource to take it out
+        const localSource = { path: sourcePath, origin: 'vscode-webview://' };
         await transformer.fixSource(localSource);
 
-        sourcePath = localSource.path || sourcePath;
-
-        // Convert the workspace path into a VS Code url
-        let uri: vscode.Uri | undefined;
-        try {
-            uri = vscode.Uri.file(sourcePath);
+        // per documentation if the file was correctly resolved origin will be cleared.
+        // https://github.com/Microsoft/vscode-chrome-debug-core/blob/main/src/transformers/urlPathTransformer.ts
+        if (!localSource.origin) {
+            // Convert the workspace path into a VS Code url
+            const uri = vscode.Uri.file(localSource.path);
             await this.openInEditor(uri, line, column);
-        } catch {
-            try {
-                uri = vscode.Uri.parse(sourcePath, true);
-                await this.openInEditor(uri, line, column);
-            } catch (error: unknown) {
-                void ErrorReporter.showErrorDialog({
-                    errorCode: ErrorCodes.Error,
-                    title: 'Error while opening file',
-                    message: error,
-                });
-            }
+        } else {
+            await ErrorReporter.showInformationDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while opening file in editor.',
+                message: `${sourcePath} file is not mapped to a local file.`,
+            });
         }
     }
 
     private async openInEditor(uri:vscode.Uri, line: number, column: number){
-        const doc = await vscode.workspace.openTextDocument(uri);
-        void vscode.window.showTextDocument(
-            doc,
-            {
-                preserveFocus: true,
-                selection: new vscode.Range(line, column, line, column),
-                viewColumn: vscode.ViewColumn.One,
+        try {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            void vscode.window.showTextDocument(
+                doc,
+                {
+                    preserveFocus: true,
+                    selection: new vscode.Range(line, column, line, column),
+                    viewColumn: vscode.ViewColumn.One,
             });
+        } catch (e) {
+            await ErrorReporter.showErrorDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while opening file in editor.',
+                message: e,
+            });
+        }
     }
 
     private update() {

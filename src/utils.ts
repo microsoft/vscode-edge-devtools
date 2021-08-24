@@ -14,6 +14,7 @@ import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
 
 import puppeteer from 'puppeteer-core';
+import { ErrorCodes, ErrorReporter } from './errorReporter';
 
 export type BrowserFlavor = 'Default' | 'Stable' | 'Beta' | 'Dev' | 'Canary';
 
@@ -208,23 +209,38 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
 
     const protocol = (useHttps ? 'https' : 'http');
 
-    let jsonResponse = '';
+    let jsonResponse = null;
     for (const endpoint of ['/json/list', '/json']) {
         try {
             jsonResponse = await checkDiscoveryEndpoint(`${protocol}://${hostname}:${port}${endpoint}`);
             if (jsonResponse) {
                 break;
             }
-        } catch {
-            // Do nothing
+        } catch (e) {
+            // localhost might not be ready as the user might not have a server running
+            // so just show an error dialog for any other condition.
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (e && e.code && e.code === 'ECONNREFUSED'){
+                continue;
+            }
+
+            void ErrorReporter.showErrorDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while getting the list of targets',
+                message: e,
+            });
         }
     }
 
-    let result: IRemoteTargetJson[];
+    let result: IRemoteTargetJson[] = [];
     try {
-        result = JSON.parse(jsonResponse) as IRemoteTargetJson[];
-    } catch {
-        result = [];
+        result = jsonResponse ? JSON.parse(jsonResponse) as IRemoteTargetJson[] : [];
+    } catch (e) {
+        void ErrorReporter.showErrorDialog({
+            errorCode: ErrorCodes.Error,
+            title: 'Error while parsing the list of targets.',
+            message: e,
+        });
     }
     return result;
 }
@@ -302,7 +318,11 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
             return e;
         }
         // Throw remaining unhandled exceptions
-        throw e;
+        void ErrorReporter.showErrorDialog({
+            errorCode: ErrorCodes.Error,
+            title: 'Error while creating the debug socket for CDP target.',
+            message: e,
+        });
     }
 }
 

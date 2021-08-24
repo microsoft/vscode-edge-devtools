@@ -10,6 +10,7 @@ import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemot
 import { IncomingMessage } from 'http';
 import https = require('https');
 import { LaunchConfigManager } from './launchConfigManager';
+import { ErrorCodes, ErrorReporter } from './errorReporter';
 
 export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
@@ -139,6 +140,11 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
                             actualTarget.faviconUrl = filePath;
                             resolve(actualTarget);
                         } catch (e) {
+                            void ErrorReporter.showErrorDialog({
+                                errorCode: ErrorCodes.Error,
+                                title: 'Error obtaining the target favicon',
+                                message: e,
+                            });
                             reject(actualTarget);
                         }
                     });
