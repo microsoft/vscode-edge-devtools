@@ -314,7 +314,8 @@ export class DevToolsPanel {
         void transformer.launch({ pathMapping: this.config.pathMapping });
 
         // origin in this case is trivial since we expect fixSource to take it out
-        const localSource = { path: sourcePath, origin: 'vscode-webview://' };
+        // marking it explicitly as invalid to clarify intention.
+        const localSource = { path: sourcePath, origin: 'invalid-origin://' };
         await transformer.fixSource(localSource);
 
         // per documentation if the file was correctly resolved origin will be cleared.

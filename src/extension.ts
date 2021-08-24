@@ -184,7 +184,7 @@ export async function attach(
 
     // Get the attach target and keep trying until reaching timeout
     const startTime = Date.now();
-    let responseArray: IRemoteTargetJson[] | undefined;
+    let responseArray: IRemoteTargetJson[] = [];
     let exceptionStack: unknown;
     do {
         try {
@@ -195,11 +195,9 @@ export async function attach(
                 /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL) as IRemoteTargetJson[];
         } catch (e) {
             exceptionStack = e;
-            // Timeout so make sure we error out with no json result
-            responseArray = undefined;
         }
 
-        if (Array.isArray(responseArray)) {
+        if (responseArray.length > 0) {
             // Try to match the given target with the list of targets we received from the endpoint
             let targetWebsocketUrl = '';
             if (attachUrl) {
@@ -258,12 +256,12 @@ export async function attach(
         }
     } while (useRetry && Date.now() - startTime < timeout);
 
-    // If there is no after the timeout then throw an exception
-    if (!responseArray) {
+    // If there is no response after the timeout then throw an exception
+    if (responseArray.length === 0) {
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
-            title: 'Error while attaching to target',
-            message: exceptionStack,
+            title: 'Error while fetching list of available targets',
+            message: exceptionStack || 'No available targets to attach.',
         });
         telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
     }
