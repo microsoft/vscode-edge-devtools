@@ -603,12 +603,12 @@
             },
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "[Toggle Mirror Editing ON](command:vscode-edge-devtools-view.toggleMirrorEditingOn)",
+                "contents": "Mirror editing is currently OFF.\n[Toggle Mirror Editing On](command:vscode-edge-devtools-view.toggleMirrorEditingOn)",
                 "when": "!mirrorEditingEnabled"
             },
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "[Toggle Mirror Editing OFF](command:vscode-edge-devtools-view.toggleMirrorEditingOff)",
+                "contents": "Mirror editing is currently ON.\n[Toggle Mirror Editing Off](command:vscode-edge-devtools-view.toggleMirrorEditingOff)",
                 "when": "mirrorEditingEnabled"
             },
             {
