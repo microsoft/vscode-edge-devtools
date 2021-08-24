@@ -18,6 +18,13 @@ export class ErrorReporter {
     error: ErrorEventInterface): Promise<void> {
 
     const template = `<!-- Please delete any private information -->
+        **Version:**
+        ${// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          vscode.extensions.getExtension('ms-edgedevtools.vscode-edge-devtools')?.packageJSON.version || 'N/A'}
+
+        **OS:**
+        <!-- Add your hosting platform e.g Microsoft Windows, WSL -->
+
         **Stack :**
         ${error.message}
 
