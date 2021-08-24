@@ -613,7 +613,7 @@
             },
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "Please help us improve this feature by [leaving feedback here](https://github.com/microsoft/vscode-edge-devtools/issues/new?title=[CSS%20Mirror%20Editing])."
+                "contents": "Please help us improve this feature by [leaving feedback here](https://github.com/microsoft/vscode-edge-devtools/issues/new?title=[CSS%20Mirror%20Editing]:&labels=feedback)."
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
