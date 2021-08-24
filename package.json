@@ -563,7 +563,7 @@
                 {
                     "id": "vscode-edge-devtools-view.mirror-editing",
                     "name": "CSS Mirror Editing",
-                    "when": "config.vscode-edge-devtools.browserFlavor == Canary"
+                    "when": "isCdnHostedTools"
                 },
                 {
                     "id": "vscode-edge-devtools-view.help-links",
@@ -604,12 +604,12 @@
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
                 "contents": "[Toggle Mirror Editing ON](command:vscode-edge-devtools-view.toggleMirrorEditingOn)",
-                "when": "!config.vscode-edge-devtools.mirrorEdits"
+                "when": "!mirrorEditingEnabled"
             },
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
                 "contents": "[Toggle Mirror Editing OFF](command:vscode-edge-devtools-view.toggleMirrorEditingOff)",
-                "when": "config.vscode-edge-devtools.mirrorEdits"
+                "when": "mirrorEditingEnabled"
             },
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
