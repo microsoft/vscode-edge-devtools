@@ -18,6 +18,13 @@ export class ErrorReporter {
     error: ErrorEventInterface): Promise<void> {
 
     const template = `<!-- Please delete any private information -->
+        **Version:**
+        ${// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          vscode.extensions.getExtension('ms-edgedevtools.vscode-edge-devtools')?.packageJSON.version || 'N/A'}
+
+        **OS:**
+        <!-- Add your hosting platform e.g Microsoft Windows, WSL -->
+
         **Stack :**
         ${error.message}
 
@@ -38,7 +45,7 @@ export class ErrorReporter {
 
       params.set('title',encodeURIComponent(`[${error.errorCode}] ${error.title}`));
       params.set('body', encodeURIComponent(template));
-      params.set('labels', 'bug');
+      params.set('labels', 'error');
 
       // As this are GET request params there is no need to take out the last
       // ampersand
