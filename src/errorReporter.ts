@@ -38,7 +38,7 @@ export class ErrorReporter {
 
       params.set('title',encodeURIComponent(`[${error.errorCode}] ${error.title}`));
       params.set('body', encodeURIComponent(template));
-      params.set('labels', 'bug');
+      params.set('labels', 'error');
 
       // As this are GET request params there is no need to take out the last
       // ampersand
