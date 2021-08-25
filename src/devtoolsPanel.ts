@@ -313,7 +313,11 @@ export class DevToolsPanel {
                 sourcePath = addEntrypointIfNeeded(sourcePath, this.config.defaultEntrypoint);
                 appendedEntryPoint = true;
             } catch (e) {
-                void vscode.window.showErrorMessage(`Could not open document. '${sourcePath}' is not a valid url.`);
+                await ErrorReporter.showInformationDialog({
+                    errorCode: ErrorCodes.Error,
+                    title: 'Unable to open file in editor.',
+                    message: `'${sourcePath}' is not a valid url.`,
+                });
                 return;
             }
         }
@@ -337,33 +341,27 @@ export class DevToolsPanel {
             const uri = vscode.Uri.file(localSource.path);
             await this.openInEditor(uri, line, column);
         } else {
+            // If failed to resolve origin, it's possible entrypoint needs to be updated.
+            // Space at beginning to allow insertion in message below
+            const entryPointErrorMessage = ` If ${sourcePath} is the entrypoint to your site, consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
             await ErrorReporter.showInformationDialog({
                 errorCode: ErrorCodes.Error,
                 title: 'Unable to open file in editor.',
-                message: `${sourcePath} does not map to a local file.`,
+                message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
             });
         }
     }
 
     private async openInEditor(uri:vscode.Uri, line: number, column: number){
         try {
-        // Finally open the document if it exists
-            if (!uri.path?.startsWith('/http:')) {
-                const doc = await vscode.workspace.openTextDocument(uri);
-                void vscode.window.showTextDocument(
-                    doc,
-                    {
-                        preserveFocus: true,
-                        selection: new vscode.Range(line, column, line, column),
-                        viewColumn: vscode.ViewColumn.One,
-                });
-            }else {
-                // workspace mapping failure and append attemtped to be set TODO fix
-                 // let errorMessage = `Could not open document. No workspace mapping was found for '${url}'.`;
-            // if (appendedEntryPoint) {
-            //     errorMessage += `If ${url} is the entrypoint to your site, consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
-            // }
-            }
+            const doc = await vscode.workspace.openTextDocument(uri);
+            void vscode.window.showTextDocument(
+                doc,
+                {
+                    preserveFocus: true,
+                    selection: new vscode.Range(line, column, line, column),
+                    viewColumn: vscode.ViewColumn.One,
+            });
         } catch (e) {
             await ErrorReporter.showErrorDialog({
                 errorCode: ErrorCodes.Error,
