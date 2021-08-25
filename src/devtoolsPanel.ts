@@ -308,7 +308,9 @@ export class DevToolsPanel {
 
         const uri = await this.parseUrlToUri(url);
         if (uri) {
-            void this.openInEditor(uri, line, column);
+            void this.openEditorFromUri(uri, line, column);
+        } else {
+            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
         }
     }
 
@@ -324,12 +326,30 @@ export class DevToolsPanel {
 
         // Finally open and edit the document if it exists
         if (uri) {
-            const enc = new TextEncoder();
-            const encodedNewContent = enc.encode(newContent);
-            void vscode.workspace.fs.writeFile(uri, encodedNewContent);
+            const textEditor = await this.openEditorFromUri(uri);
+            if (textEditor) {
+                const fullRange = this.getDocumentFullRange(textEditor);
+                void textEditor.edit(editBuilder => {
+                    editBuilder.replace(fullRange, newContent);
+                });
+            }
         } else {
             void vscode.window.showErrorMessage(`Could not mirror css changes to document. No workspace mapping was found for '${url}'.`);
         }
+    }
+
+    private async openEditorFromUri(uri: vscode.Uri, line?: number, column?: number): Promise<vscode.TextEditor> {
+        const doc = await vscode.workspace.openTextDocument(uri);
+        const viewColumn = this.panel.viewColumn === vscode.ViewColumn.One ? vscode.ViewColumn.Beside : vscode.ViewColumn.One;
+        const selection = line !== undefined && column !== undefined ? new vscode.Range(line, column, line, column) : undefined;
+        return await vscode.window.showTextDocument(doc, { preserveFocus: true, viewColumn, selection });
+    }
+
+    private getDocumentFullRange(textEditor: vscode.TextEditor): vscode.Range {
+        const firstLine = textEditor.document.lineAt(0);
+        const lastLine = textEditor.document.lineAt(textEditor.document.lineCount - 1);
+        const range =  new vscode.Range(firstLine.range.start, lastLine.range.end);
+        return range;
     }
 
     private async parseUrlToUri(url: string): Promise<vscode.Uri | undefined> {
