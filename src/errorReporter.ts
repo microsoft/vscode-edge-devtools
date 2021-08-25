@@ -23,7 +23,7 @@ export class ErrorReporter {
           vscode.extensions.getExtension('ms-edgedevtools.vscode-edge-devtools')?.packageJSON.version || 'N/A'}
 
         **OS:**
-        <!-- Add your hosting platform e.g Microsoft Windows, WSL -->
+        <!-- Add your hosting platform e.g Microsoft Windows, WSL, MacOs or Linux -->
 
         **Stack :**
         ${error.message}
@@ -35,8 +35,8 @@ export class ErrorReporter {
     // https://github.com/Microsoft/vscode/issues/48900
     const answer = await vscode.window
       .showErrorMessage(
-        `An error occurred:\n${error.title}\n${error.message}`,
-        ...['File a bug', 'Close dialog']
+        `An error occurred: ${error.title} ${error.message}`,
+        ...['File a bug']
       );
 
     if (answer === 'File a bug') {
@@ -62,7 +62,7 @@ export class ErrorReporter {
     // cannot do multiline due to:
     // https://github.com/Microsoft/vscode/issues/48900
     await vscode.window.showInformationMessage(
-      `${error.title}\n${error.message}`
+      `${error.title} ${error.message}`
     );
   }
 }
