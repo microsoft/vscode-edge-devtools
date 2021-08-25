@@ -310,8 +310,9 @@ export class DevToolsPanel {
         if (this.config.defaultEntrypoint) {
             // If sourcePath is just a baseUrl, append to default entrypoint
             try {
+                const oldSourePath = sourcePath;
                 sourcePath = addEntrypointIfNeeded(sourcePath, this.config.defaultEntrypoint);
-                appendedEntryPoint = true;
+                appendedEntryPoint = oldSourePath !== sourcePath;
             } catch (e) {
                 await ErrorReporter.showInformationDialog({
                     errorCode: ErrorCodes.Error,
@@ -343,7 +344,7 @@ export class DevToolsPanel {
         } else {
             // If failed to resolve origin, it's possible entrypoint needs to be updated.
             // Space at beginning to allow insertion in message below
-            const entryPointErrorMessage = ` If ${sourcePath} is the entrypoint to your site, consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
+            const entryPointErrorMessage = ` Consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
             await ErrorReporter.showInformationDialog({
                 errorCode: ErrorCodes.Error,
                 title: 'Unable to open file in editor.',
