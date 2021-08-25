@@ -49,6 +49,7 @@ export interface IUserConfig {
     sourceMapPathOverrides: IStringDictionary<string>;
     sourceMaps: boolean;
     timeout: number;
+    defaultEntrypoint: string;
 }
 
 export interface IRuntimeConfig {
@@ -60,6 +61,7 @@ export interface IRuntimeConfig {
     isCdnHostedTools: boolean;
     useLocalEdgeWatch: boolean;
     devtoolsBaseUri?: string;
+    defaultEntrypoint?: string;
 }
 export interface IStringDictionary<T> {
     [name: string]: T;
@@ -101,6 +103,7 @@ export const SETTINGS_DEFAULT_SOURCE_MAPS = true;
 export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT = 2015;
 export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
 export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
+export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
@@ -437,6 +440,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
     const sourceMapPathOverrides =
         config.sourceMapPathOverrides || settings.get('sourceMapPathOverrides') || SETTINGS_DEFAULT_PATH_OVERRIDES;
     const webRoot = config.webRoot || settings.get('webRoot') || SETTINGS_DEFAULT_WEB_ROOT;
+    const defaultEntrypoint = config.defaultEntrypoint || settings.get('defaultEntrypoint') || SETTINGS_DEFAULT_ENTRY_POINT;
 
     let sourceMaps = SETTINGS_DEFAULT_SOURCE_MAPS;
     if (typeof config.sourceMaps !== 'undefined') {
@@ -479,6 +483,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         isCdnHostedTools: DEBUG || false,
         useLocalEdgeWatch: DEBUG,
         devtoolsBaseUri: DEVTOOLS_BASE_URI,
+        defaultEntrypoint: defaultEntrypoint,
     };
 }
 
@@ -496,6 +501,21 @@ export function replaceWebRootInSourceMapPathOverridesEntry(webRoot: string, ent
         }
     }
     return entry;
+}
+
+/**
+ * Take in a devtools provided file url and append an html entrypoint if no path name is present.
+ * This function will Throw() if sourcePath is not a valid URL
+ *
+ * @param sourcePath Url from devtools (i.e. http://localhost:8080/)
+ * @param defaultEntrypoint The html file name to append (index.html).
+ */
+export function addEntrypointIfNeeded(sourcePath: string, defaultEntrypoint: string): string {
+    const url = new URL(sourcePath);
+    if (!url.pathname || url.pathname === '/') {
+        return sourcePath.endsWith('/') ? `${sourcePath}${defaultEntrypoint}` : `${sourcePath}/${defaultEntrypoint}`;
+    }
+    return sourcePath;
 }
 
 /**

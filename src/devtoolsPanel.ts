@@ -19,6 +19,7 @@ import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
 import { BrowserVersionDetectionSocket } from './versionSocketConnection';
 import {
+    addEntrypointIfNeeded,
     applyPathMapping,
     fetchUri,
     IRuntimeConfig,
@@ -305,6 +306,22 @@ export class DevToolsPanel {
 
         // Convert the devtools url into a local one
         let sourcePath = url;
+        let appendedEntryPoint = false;
+        if (this.config.defaultEntrypoint) {
+            // If sourcePath is just a baseUrl, append to default entrypoint
+            try {
+                const oldSourePath = sourcePath;
+                sourcePath = addEntrypointIfNeeded(sourcePath, this.config.defaultEntrypoint);
+                appendedEntryPoint = oldSourePath !== sourcePath;
+            } catch (e) {
+                await ErrorReporter.showInformationDialog({
+                    errorCode: ErrorCodes.Error,
+                    title: 'Unable to open file in editor.',
+                    message: `'${sourcePath}' is not a valid url.`,
+                });
+                return;
+            }
+        }
         if (this.config.sourceMaps) {
             sourcePath = applyPathMapping(sourcePath, this.config.sourceMapPathOverrides);
         }
@@ -325,10 +342,13 @@ export class DevToolsPanel {
             const uri = vscode.Uri.file(localSource.path);
             await this.openInEditor(uri, line, column);
         } else {
+            // If failed to resolve origin, it's possible entrypoint needs to be updated.
+            // Space at beginning to allow insertion in message below
+            const entryPointErrorMessage = ` Consider updating the 'Default Entrypoint' setting to map to your root html page. The current setting is '${this.config.defaultEntrypoint}'.`;
             await ErrorReporter.showInformationDialog({
                 errorCode: ErrorCodes.Error,
                 title: 'Unable to open file in editor.',
-                message: `${sourcePath} does not map to a local file.`,
+                message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
             });
         }
     }

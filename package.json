@@ -159,6 +159,11 @@
                     "default": "",
                     "description": "The default url to open when launching the browser without a target"
                 },
+                "vscode-edge-devtools.defaultEntrypoint": {
+                    "type": "string",
+                    "default": "index.html",
+                    "description": "The default entrypoint into your webpage. Used to resolve debugging urls without a pathname"
+                },
                 "vscode-edge-devtools.userDataDir": {
                     "type": [
                         "string",

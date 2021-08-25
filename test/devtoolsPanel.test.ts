@@ -416,7 +416,7 @@ describe("devtoolsPanel", () => {
                 const expectedContent = "some content";
                 const expectedRequest = {
                     id: 1,
-                    url: "fake.com",
+                    url: "www.fake.com",
                 };
 
                 const mockUtils = {

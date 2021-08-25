@@ -789,6 +789,25 @@ describe("utils", () => {
         });
     });
 
+    describe("addEntrypointIfNeeded", () => {
+        beforeEach(async () => {
+            jest.unmock("path");
+            jest.resetModules();
+            utils = await import("../src/utils");
+        });
+        it("appends index.html to a path", () => {
+            expect(utils.addEntrypointIfNeeded("http://localhost:8080", "index.html")).toEqual("http://localhost:8080/index.html");
+        });
+
+        it("appends index.html to a path", () => {
+            expect(utils.addEntrypointIfNeeded("http://localhost:8080/", "index.html")).toEqual("http://localhost:8080/index.html");
+        });
+
+        it("does not append index.html to a url already containing a pathname", () => {
+            expect(utils.addEntrypointIfNeeded("http://localhost:8080/main.css", "index.html")).toEqual("http://localhost:8080/main.css");
+        });
+    });
+
     describe("applyPathMapping", () => {
         function pathResolve(...segments: string[]): string {
             let aPath = path.resolve.apply(null, segments);
