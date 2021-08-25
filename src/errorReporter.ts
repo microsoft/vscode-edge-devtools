@@ -35,7 +35,7 @@ export class ErrorReporter {
     // https://github.com/Microsoft/vscode/issues/48900
     const answer = await vscode.window
       .showErrorMessage(
-        `An error occurred: ${error.title}\n${error.message}`,
+        `An error occurred: ${error.title} ${error.message}`,
         ...['File a bug']
       );
 
