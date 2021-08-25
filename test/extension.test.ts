@@ -37,7 +37,7 @@ describe("extension", () => {
                 SETTINGS_STORE_NAME,
                 SETTINGS_VIEW_NAME,
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
-                getListOfTargets: jest.fn(),
+                getListOfTargets: jest.fn().mockReturnValue([]),
                 getRemoteEndpointSettings: jest.fn(),
                 getRuntimeConfig: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
@@ -371,7 +371,7 @@ describe("extension", () => {
         });
 
         it("reports telemetry if failed to get targets", async () => {
-            mocks.utils.getListOfTargets!.mockResolvedValueOnce(null as any);
+            mocks.utils.getListOfTargets!.mockResolvedValueOnce([]);
 
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext());
@@ -391,7 +391,7 @@ describe("extension", () => {
             mockUtils = {
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => mockReporter),
                 getBrowserPath: jest.fn().mockResolvedValue("path"),
-                getListOfTargets: jest.fn().mockResolvedValue(null),
+                getListOfTargets: jest.fn().mockResolvedValue([]),
                 getRemoteEndpointSettings: jest.fn().mockReturnValue({
                     hostname: "hostname",
                     port: "port",

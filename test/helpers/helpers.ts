@@ -49,6 +49,13 @@ export function createFakeVSCode() {
                 id: 'vscode-session-debug-id'
             }
         },
+        extensions: {
+            getExtension: jest.fn().mockReturnValue({ 
+                packageJSON: {
+                    version: '1.3.0' // can be any version.
+                }
+            }),
+        },
         env: {
             clipboard: { writeText: jest.fn() },
             machineId: "someValue.machineId",
@@ -60,6 +67,7 @@ export function createFakeVSCode() {
             showErrorMessage: jest.fn(),
             showQuickPick: jest.fn().mockResolvedValue(null),
             showTextDocument: jest.fn(),
+            showInformationMessage: jest.fn(),
         },
         workspace: {
             findFiles: jest.fn(() => {
@@ -165,6 +173,16 @@ export function createFakeGet(getResponse: () => string, getStatusCode: () => nu
     };
 
     return { get: fakeGet, on: getOnMock };
+}
+
+export function createFakeDebugCore() {
+    const urlPathTransformerMock = jest.fn().mockImplementation(() => {
+        return {
+            launch: jest.fn(),
+            fixSource: jest.fn(),
+        }
+    });
+    return { UrlPathTransformer: urlPathTransformerMock }
 }
 
 /**

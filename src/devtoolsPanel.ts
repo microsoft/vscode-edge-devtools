@@ -27,6 +27,7 @@ import {
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
 } from './utils';
+import { ErrorCodes, ErrorReporter } from './errorReporter';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -311,25 +312,29 @@ export class DevToolsPanel {
         // Convert the local url to a workspace path
         const transformer = new debugCore.UrlPathTransformer();
         void transformer.launch({ pathMapping: this.config.pathMapping });
-        const localSource = { path: sourcePath };
+
+        // origin in this case is trivial since we expect fixSource to take it out
+        // marking it explicitly as invalid to clarify intention.
+        const localSource = { path: sourcePath, origin: 'invalid-origin://' };
         await transformer.fixSource(localSource);
 
-        sourcePath = localSource.path || sourcePath;
-
-        // Convert the workspace path into a VS Code url
-        let uri: vscode.Uri | undefined;
-        try {
-            if (vscode.env.remoteName) {
-                uri = vscode.Uri.parse(sourcePath, true);
-            } else {
-                uri = vscode.Uri.file(sourcePath);
-            }
-        } catch {
-            uri = undefined;
+        // per documentation if the file was correctly resolved origin will be cleared.
+        // https://github.com/Microsoft/vscode-chrome-debug-core/blob/main/src/transformers/urlPathTransformer.ts
+        if (!localSource.origin) {
+            // Convert the workspace path into a VS Code url
+            const uri = vscode.Uri.file(localSource.path);
+            await this.openInEditor(uri, line, column);
+        } else {
+            await ErrorReporter.showInformationDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Unable to open file in editor.',
+                message: `${sourcePath} does not map to a local file.`,
+            });
         }
+    }
 
-        // Finally open the document if it exists
-        if (uri) {
+    private async openInEditor(uri:vscode.Uri, line: number, column: number){
+        try {
             const doc = await vscode.workspace.openTextDocument(uri);
             void vscode.window.showTextDocument(
                 doc,
@@ -337,9 +342,13 @@ export class DevToolsPanel {
                     preserveFocus: true,
                     selection: new vscode.Range(line, column, line, column),
                     viewColumn: vscode.ViewColumn.One,
-                });
-        } else {
-            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
+            });
+        } catch (e) {
+            await ErrorReporter.showErrorDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while opening file in editor.',
+                message: e,
+            });
         }
     }
 
