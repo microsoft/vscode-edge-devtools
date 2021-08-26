@@ -338,11 +338,19 @@ export class DevToolsPanel {
         }
     }
 
-    private async openEditorFromUri(uri: vscode.Uri, line?: number, column?: number): Promise<vscode.TextEditor> {
-        const doc = await vscode.workspace.openTextDocument(uri);
-        const viewColumn = this.panel.viewColumn === vscode.ViewColumn.One ? vscode.ViewColumn.Beside : vscode.ViewColumn.One;
-        const selection = line !== undefined && column !== undefined ? new vscode.Range(line, column, line, column) : undefined;
-        return await vscode.window.showTextDocument(doc, { preserveFocus: true, viewColumn, selection });
+    private async openEditorFromUri(uri: vscode.Uri, line?: number, column?: number): Promise<vscode.TextEditor | undefined> {
+        try {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            const viewColumn = this.panel.viewColumn === vscode.ViewColumn.One ? vscode.ViewColumn.Beside : vscode.ViewColumn.One;
+            const selection = line !== undefined && column !== undefined ? new vscode.Range(line, column, line, column) : undefined;
+            return await vscode.window.showTextDocument(doc, { preserveFocus: true, viewColumn, selection });
+        } catch (e) {
+            await ErrorReporter.showErrorDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while opening file in editor.',
+                message: e,
+            });
+        }
     }
 
     private getDocumentFullRange(textEditor: vscode.TextEditor): vscode.Range {
@@ -399,25 +407,6 @@ export class DevToolsPanel {
             title: 'Unable to open file in editor.',
             message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
         });
-    }
-
-    private async openInEditor(uri:vscode.Uri, line: number, column: number){
-        try {
-            const doc = await vscode.workspace.openTextDocument(uri);
-            void vscode.window.showTextDocument(
-                doc,
-                {
-                    preserveFocus: true,
-                    selection: new vscode.Range(line, column, line, column),
-                    viewColumn: vscode.ViewColumn.One,
-            });
-        } catch (e) {
-            await ErrorReporter.showErrorDialog({
-                errorCode: ErrorCodes.Error,
-                title: 'Error while opening file in editor.',
-                message: e,
-            });
-        }
     }
 
     private update() {

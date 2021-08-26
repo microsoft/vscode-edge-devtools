@@ -577,8 +577,6 @@ describe("devtoolsPanel", () => {
                 jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
 
                 const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn();
-
                 const dtp = await import("../src/devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
