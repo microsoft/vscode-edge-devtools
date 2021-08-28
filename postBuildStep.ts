@@ -121,7 +121,7 @@ async function patchFilesForWebView(toolsOutDir: string) {
     ]);
     // Post built files swap upstream and downstream names
     await patchFileForWebViewWrapper('panels/elements/StylesSidebarPane_edge.js', toolsOutDir, [
-        applyNoMatchingStylesPatch,
+        applyNoMatchingStylesPatch
     ]);
     await patchFileForWebViewWrapper('panels/elements/ElementsPanel.js', toolsOutDir, [
         applySetupTextSelectionPatch,

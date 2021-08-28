@@ -310,7 +310,11 @@ export class DevToolsPanel {
         if (uri) {
             void this.openEditorFromUri(uri, line, column);
         } else {
-            void vscode.window.showErrorMessage(`Could not open document. No workspace mapping was found for '${url}'.`);
+            await ErrorReporter.showErrorDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while opening file in editor.',
+                message: `Could not open document. No workspace mapping was found for '${url}'.`,
+            });
         }
     }
 
@@ -334,7 +338,11 @@ export class DevToolsPanel {
                 });
             }
         } else {
-            void vscode.window.showErrorMessage(`Could not mirror css changes to document. No workspace mapping was found for '${url}'.`);
+            await ErrorReporter.showErrorDialog({
+                errorCode: ErrorCodes.Error,
+                title: 'Error while mirroring css content to document.',
+                message: `Could not mirror css changes to document. No workspace mapping was found for '${url}'.`,
+            });
         }
     }
 
