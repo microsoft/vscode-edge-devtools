@@ -552,7 +552,7 @@ describe("devtoolsPanel", () => {
                 expect(mockVsCode.window.showInformationMessage ).toHaveBeenCalled();
             });
 
-            it("calls show document for open in editor", async () => {
+            it("calls openTextDocument for open in editor", async () => {
                 const expectedRequest = {
                     column: 5,
                     ignoreTabChanges: false,
@@ -577,13 +577,11 @@ describe("devtoolsPanel", () => {
                 jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
 
                 const mockVsCode = jest.requireMock("vscode");
-                mockVsCode.Uri.file = jest.fn();
-
                 const dtp = await import("../src/devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
-                expect(mockVsCode.window.showTextDocument).toHaveBeenCalled();
+                expect(mockVsCode.workspace.openTextDocument).toHaveBeenCalled();
             });
 
             it("shows an error dialog for open in editor exceptions", async () => {
@@ -621,6 +619,28 @@ describe("devtoolsPanel", () => {
 
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
                 expect(mockVsCode.window.showErrorMessage).toHaveBeenCalled();
+            });
+
+            it("calls openTextDocument for onSocketCssMirrorContent", async () => {
+                const expectedRequest = {
+                    url: "app.js",
+                    newContent: ".body{color: blue;}"
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+
+                const dtp = await import("../src/devtoolsPanel");
+                const { TextEncoder } = require('util');
+                global.TextEncoder = TextEncoder;
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("cssMirrorContent")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.workspace.openTextDocument).toHaveBeenCalled();
             });
 
             it("calls getVscodeSettings", async () => {

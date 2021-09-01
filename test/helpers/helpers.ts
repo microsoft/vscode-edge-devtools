@@ -90,6 +90,8 @@ export function createFakeVSCode() {
                                 return true;
                             case "isHeadless":
                                 return false;
+                            case "mirrorEdits":
+                                return true;
                             default:
                                 return undefined;
                         }
@@ -107,7 +109,9 @@ export function createFakeVSCode() {
                             default:
                                 return {defaultValue: undefined};
                         }
-                    }
+                    },
+                    update: jest.fn(),
+                    has: jest.fn()
                 };
             }),
             onDidChangeConfiguration: jest.fn(),
@@ -116,7 +120,10 @@ export function createFakeVSCode() {
                 {
                     uri:  'file:///g%3A/GIT/testPage'
                 }
-            ]
+            ],
+            fs: {
+                writeFile: jest.fn()
+            }
         },
     };
 }
