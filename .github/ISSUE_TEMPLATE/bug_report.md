@@ -12,8 +12,9 @@ assignees: ''
 <!-- Please search existing issues to avoid creating duplicates. -->
 
 **Environment (please complete the following information):**
- - OS: [e.g. iOS]
- - Extension version [e.g. 22]
+ - OS (*e.g.,* Windows 10):
+ - Extension version (*e.g.,* 1.2.3):
+<!-- The extension version can be found by hovering or selecting "Microsoft Edge Tools for VS Code" in the VS Code Extensions Marketplace panel. -->
 
 **Describe the bug:**
 <!-- A clear and concise description of what the bug is -->
