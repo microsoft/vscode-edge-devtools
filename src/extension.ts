@@ -59,6 +59,10 @@ export function activate(context: vscode.ExtensionContext): void {
         void attachToCurrentDebugTarget(context, debugSessionId);
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openScreencast`, (): void => {
+        DevToolsPanel.createScreencast();
+    }));
+
     // Register the launch provider
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));

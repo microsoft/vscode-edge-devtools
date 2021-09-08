@@ -145,6 +145,12 @@
                 "category": "Microsoft Edge Tools",
                 "enablement": "mirrorEditingEnabled && titleCommandsRegistered && isCdnHostedTools",
                 "title": "Toggle mirror editing off for CSS files in workspace"
+            },
+            {
+                "command": "vscode-edge-devtools-view.openScreencast",
+                "category": "Microsoft Edge Tools",
+                "enablement": "titleCommandsRegistered && isCdnHostedTools",
+                "title": "Open the screencast for the current target"
             }
         ],
         "configuration": {
@@ -566,6 +572,11 @@
                     "name": "Targets"
                 },
                 {
+                    "id": "vscode-edge-devtools-view.screencast",
+                    "name": "Screencast",
+                    "when": "isCdnHostedTools"
+                },
+                {
                     "id": "vscode-edge-devtools-view.mirror-editing",
                     "name": "CSS Mirror Editing",
                     "when": "isCdnHostedTools"
@@ -619,6 +630,10 @@
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
                 "contents": "Please help us improve this feature by [leaving feedback here](https://github.com/microsoft/vscode-edge-devtools/issues/476)."
+            },
+            {
+                "view": "vscode-edge-devtools-view.screencast",
+                "contents": "[Open Screencast](command:vscode-edge-devtools-view.openScreencast)"
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",

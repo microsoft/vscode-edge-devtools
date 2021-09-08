@@ -30,6 +30,7 @@ import {
     SETTINGS_WEBVIEW_NAME,
 } from './utils';
 import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { ScreencastPanel } from './screencastPanel';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -544,6 +545,12 @@ export class DevToolsPanel {
             });
 
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
+        }
+    }
+
+    static createScreencast(): void {
+        if (DevToolsPanel.instance) {
+            ScreencastPanel.createOrShow(DevToolsPanel.instance.context, DevToolsPanel.instance.panelSocket);
         }
     }
 }
