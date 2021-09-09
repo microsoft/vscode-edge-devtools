@@ -120,8 +120,8 @@ export class ScreencastPanel {
                 <div id="main">
                     <div id="toolbar">
                         <select id="device">
-                            <option selected>Fill</option>
-                            <option>Phone</option>
+                            <option selected value="fill">Fill</option>
+                            <option value="phone">Phone</option>
                         </select>
                         <label>
                             <input id="mobile" type="checkbox"/> Mobile

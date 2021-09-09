@@ -19,7 +19,18 @@ export class Screencast {
         // Screencast image for demo
         this.initScreencastImage();
         
-        this.deviceSelect.addEventListener('change', () => this.updateEmulation());
+        this.deviceSelect.addEventListener('change', () => {
+            switch (this.deviceSelect.value) {
+                case 'fill':
+                    this.screencastImage.style.width = this.screencastImage.style.height = '';
+                    break;
+                case 'phone':
+                    this.screencastImage.style.width = '414px';
+                    this.screencastImage.style.height = '750px';
+                    break;
+            }
+            this.updateEmulation();
+        });
 
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onFrame(result));
 
