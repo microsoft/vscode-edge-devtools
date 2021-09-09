@@ -6,24 +6,39 @@ import { encodeMessageForChannel, parseMessageFromChannel, WebSocketEvent } from
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 export const vscode = acquireVsCodeApi();
 
+interface CdpMessage {
+    id: number;
+    method: string;
+    params?: any;
+    result?: any;
+}
+
 export type CdpEventCallback = (params: any) => void;
+export type CdpMethodCallback = (result: any) => void;
 
 export class ScreencastCDPConnection {
     private nextId: number = 0;
-    private eventMap: Map<string, CdpEventCallback[]> = new Map();
+    private eventCallbackMap: Map<string, CdpEventCallback[]> = new Map();
+    private methodCallbackMap: Map<number, CdpMethodCallback> = new Map();
 
     constructor() {
+        // Handle CDP messages/events routed from the extension through post message
         window.addEventListener('message', e => {
             parseMessageFromChannel(e.data, (eventName, args) => {
                 if (eventName === 'websocket') {
                     const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
                     console.log(event, message);
                     // Handle event responses
-                    const messageObj = JSON.parse(message);
-                    for (const callback of this.eventMap.get(messageObj.method) || []) {
+                    const messageObj = JSON.parse(message) as CdpMessage;
+                    for (const callback of this.eventCallbackMap.get(messageObj.method) || []) {
                         callback(messageObj.params)
                     }
-                    // TODO: handle CDP method responses
+                    // Handle method responses
+                    const methodCallback = this.methodCallbackMap.get(messageObj.id);
+                    if (methodCallback) {
+                        methodCallback(messageObj.result);
+                        this.methodCallbackMap.delete(messageObj.id);
+                    }
                     return true;
                 }
                 return false;
@@ -31,19 +46,23 @@ export class ScreencastCDPConnection {
         });
     }
 
-    sendMessageToBackend(method: string, params: any): void {
-        const cdpMessage = {
-            id: this.nextId++,
+    sendMessageToBackend(method: string, params: any, callback?: CdpMethodCallback): void {
+        const id = this.nextId++
+        const cdpMessage: CdpMessage = {
+            id: id,
             method,
             params
+        }
+        if (callback) {
+            this.methodCallbackMap.set(id, callback);
         }
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message: JSON.stringify(cdpMessage) });
     }
 
     registerForEvent(method: string, callback: CdpEventCallback): void {
-        if (this.eventMap.has(method)) {
-            this.eventMap.get(method)?.push(callback);
+        if (this.eventCallbackMap.has(method)) {
+            this.eventCallbackMap.get(method)?.push(callback);
         }
-        this.eventMap.set(method, [callback]);
+        this.eventCallbackMap.set(method, [callback]);
     }
 }
