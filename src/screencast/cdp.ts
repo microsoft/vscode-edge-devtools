@@ -17,16 +17,13 @@ export class ScreencastCDPConnection {
             parseMessageFromChannel(e.data, (eventName, args) => {
                 if (eventName === 'websocket') {
                     const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
-                    // TODO: handle CDP message
                     console.log(event, message);
+                    // Handle event responses
                     const messageObj = JSON.parse(message);
-                    const callbacks = this.eventMap.get(messageObj.method);
-                    if(callbacks) {
-                        for (const callback of callbacks) {
-                            callback(messageObj.params)
-                        }
+                    for (const callback of this.eventMap.get(messageObj.method) || []) {
+                        callback(messageObj.params)
                     }
-
+                    // TODO: handle CDP method responses
                     return true;
                 }
                 return false;

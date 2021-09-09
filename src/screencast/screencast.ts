@@ -4,6 +4,7 @@
 import { ScreencastCDPConnection } from './cdp';
 
 export function initialize(): void {
+    // Button to emulate
     const cdpConnection = new ScreencastCDPConnection();
     const emulateTest = document.createElement('button');
     emulateTest.addEventListener('click', () => {
@@ -18,6 +19,7 @@ export function initialize(): void {
     emulateTest.textContent = "Update Emulation";
     document.body.appendChild(emulateTest);
 
+    // Start screencast
     const startScreencastbutton = document.createElement('button');
     startScreencastbutton.addEventListener('click', () => {
         const screencastParams = {
@@ -32,6 +34,7 @@ export function initialize(): void {
     startScreencastbutton.textContent = "Start Screencast";
     document.body.appendChild(startScreencastbutton);
 
+    // Screencast image for demo
     const screencastImage = document.createElement('img');
     document.body.appendChild(screencastImage);
 
