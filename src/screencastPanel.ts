@@ -6,7 +6,7 @@ import { encodeMessageForChannel, WebSocketEvent } from './common/webviewEvents'
 import { PanelSocket } from './panelSocket';
 import {
     SETTINGS_STORE_NAME,
-    SETTINGS_WEBVIEW_NAME,
+    SETTINGS_SCREENCAST_WEBVIEW_NAME,
 } from './utils';
 
 export class ScreencastPanel {
@@ -14,24 +14,26 @@ export class ScreencastPanel {
     private readonly context: vscode.ExtensionContext;
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
+    private targetUrl: string
     private panelSocket: PanelSocket;
 
     private constructor(
         panel: vscode.WebviewPanel,
-        panelSocket: PanelSocket,
-        context: vscode.ExtensionContext) {
+        context: vscode.ExtensionContext,
+        targetUrl: string) {
         this.panel = panel;
-        this.panelSocket = panelSocket;
         this.context = context;
+        this.targetUrl = targetUrl
         this.extensionPath = this.context.extensionPath;
 
+        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
         this.panelSocket.on('websocket', () => this.onSocketMessage());
         this.panelSocket.on('close', () => this.onSocketClose());
-        this.panelSocket.setScreencastCallback((e, msg) => this.postToWebview(e, msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
+            this.panelSocket.dispose();
         }, this);
 
         // Handle view change
@@ -103,20 +105,18 @@ export class ScreencastPanel {
             `;
     }
 
-    static createOrShow(
-        context: vscode.ExtensionContext,
-        panelSocket: PanelSocket): void {
+    static createOrShow(context: vscode.ExtensionContext, targetUrl: string): void {
         const column = vscode.ViewColumn.Beside;
 
         if (ScreencastPanel.instance) {
             ScreencastPanel.instance.dispose();
         }
-        const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME, column, {
+        const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_SCREENCAST_WEBVIEW_NAME, column, {
             enableCommandUris: true,
             enableScripts: true,
             retainContextWhenHidden: true,
         });
 
-        ScreencastPanel.instance = new ScreencastPanel(panel, panelSocket, context);
+        ScreencastPanel.instance = new ScreencastPanel(panel, context, targetUrl);
     }
 }

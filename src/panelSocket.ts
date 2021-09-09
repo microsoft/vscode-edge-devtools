@@ -10,7 +10,6 @@ export type IDevToolsPostMessageCallback = (e: WebSocketEvent, message?: string)
 export class PanelSocket extends EventEmitter {
     private readonly targetUrl: string;
     private readonly postMessageToDevTools: IDevToolsPostMessageCallback;
-    private postMessageToScreencast?: IDevToolsPostMessageCallback;
     protected socket: WebSocket | undefined;
     private isConnected = false;
     private messages: string[] = [];
@@ -35,10 +34,6 @@ export class PanelSocket extends EventEmitter {
             this.socket.close();
             this.socket = undefined;
         }
-    }
-
-    setScreencastCallback(callback: IDevToolsPostMessageCallback) {
-        this.postMessageToScreencast = callback;
     }
 
     private onMessageParsed(eventName: WebviewEvent, args: string): boolean {
@@ -96,10 +91,6 @@ export class PanelSocket extends EventEmitter {
     }
 
     private onMessage(message: { data: WebSocket.Data }) {
-        if (message.data.toString().includes('123456') && this.postMessageToScreencast) {
-            this.postMessageToScreencast('message', message.data.toString());
-            return;
-        }
         if (this.isConnected) {
             // Forward the message onto the devtools
             this.postMessageToDevTools('message', message.data.toString());
