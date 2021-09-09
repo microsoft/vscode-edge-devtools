@@ -6,8 +6,11 @@ import { encodeMessageForChannel, parseMessageFromChannel, WebSocketEvent } from
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 export const vscode = acquireVsCodeApi();
 
+export type CdpEventCallback = (result: any) => void;
+
 export class ScreencastCDPConnection {
     private nextId: number = 0;
+    private eventMap: Map<string, CdpEventCallback[]> = new Map();
 
     constructor() {
         window.addEventListener('message', e => {
@@ -30,5 +33,12 @@ export class ScreencastCDPConnection {
             params
         }
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message: JSON.stringify(cdpMessage) });
+    }
+
+    registerForEvent(method: string, callback: CdpEventCallback): void {
+        if (this.eventMap.has(method)) {
+            this.eventMap.get(method)?.push(callback);
+        }
+        this.eventMap.set(method, [callback]);
     }
 }
