@@ -6,7 +6,7 @@ import { encodeMessageForChannel, parseMessageFromChannel, WebSocketEvent } from
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 export const vscode = acquireVsCodeApi();
 
-export type CdpEventCallback = (result: any) => void;
+export type CdpEventCallback = (params: any) => void;
 
 export class ScreencastCDPConnection {
     private nextId: number = 0;
@@ -19,6 +19,14 @@ export class ScreencastCDPConnection {
                     const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
                     // TODO: handle CDP message
                     console.log(event, message);
+                    const messageObj = JSON.parse(message);
+                    const callbacks = this.eventMap.get(messageObj.method);
+                    if(callbacks) {
+                        for (const callback of callbacks) {
+                            callback(messageObj.params)
+                        }
+                    }
+
                     return true;
                 }
                 return false;
