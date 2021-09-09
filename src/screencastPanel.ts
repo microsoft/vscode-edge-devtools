@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { encodeMessageForChannel, WebSocketEvent } from './common/webviewEvents';
 import { PanelSocket } from './panelSocket';
 import {
     SETTINGS_STORE_NAME,
-    SETTINGS_WEBVIEW_NAME,
+    SETTINGS_SCREENCAST_WEBVIEW_NAME,
 } from './utils';
 
 export class ScreencastPanel {
@@ -13,23 +14,26 @@ export class ScreencastPanel {
     private readonly context: vscode.ExtensionContext;
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
+    private targetUrl: string
     private panelSocket: PanelSocket;
 
     private constructor(
         panel: vscode.WebviewPanel,
-        panelSocket: PanelSocket,
-        context: vscode.ExtensionContext) {
+        context: vscode.ExtensionContext,
+        targetUrl: string) {
         this.panel = panel;
-        this.panelSocket = panelSocket;
         this.context = context;
+        this.targetUrl = targetUrl
         this.extensionPath = this.context.extensionPath;
 
+        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
         this.panelSocket.on('websocket', () => this.onSocketMessage());
         this.panelSocket.on('close', () => this.onSocketClose());
 
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
+            this.panelSocket.dispose();
         }, this);
 
         // Handle view change
@@ -65,8 +69,12 @@ export class ScreencastPanel {
         this.panel.webview.html = this.getHtmlForWebview();
     }
 
+    private postToWebview(e: WebSocketEvent, message?: string) {
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
+    }
+
     private getHtmlForWebview() {
-        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
+        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/screencast', 'screencast.bundle.js'));
         const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
 
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
@@ -78,7 +86,6 @@ export class ScreencastPanel {
             <html>
             <head>
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-                <!--
                 <meta http-equiv="Content-Security-Policy"
                     content="default-src;
                     img-src 'self' data: ${this.panel.webview.cspSource};
@@ -90,7 +97,6 @@ export class ScreencastPanel {
                 <meta name="referrer" content="no-referrer">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script type="module" src="${inspectorUri}"></script>
-                -->
             </head>
             <body>
                 Hello World!!!
@@ -99,20 +105,18 @@ export class ScreencastPanel {
             `;
     }
 
-    static createOrShow(
-        context: vscode.ExtensionContext,
-        panelSocket: PanelSocket): void {
+    static createOrShow(context: vscode.ExtensionContext, targetUrl: string): void {
         const column = vscode.ViewColumn.Beside;
 
         if (ScreencastPanel.instance) {
             ScreencastPanel.instance.dispose();
         }
-        const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_WEBVIEW_NAME, column, {
+        const panel = vscode.window.createWebviewPanel(SETTINGS_STORE_NAME, SETTINGS_SCREENCAST_WEBVIEW_NAME, column, {
             enableCommandUris: true,
             enableScripts: true,
             retainContextWhenHidden: true,
         });
 
-        ScreencastPanel.instance = new ScreencastPanel(panel, panelSocket, context);
+        ScreencastPanel.instance = new ScreencastPanel(panel, context, targetUrl);
     }
 }

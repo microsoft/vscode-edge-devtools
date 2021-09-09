@@ -550,7 +550,7 @@ export class DevToolsPanel {
 
     static createScreencast(): void {
         if (DevToolsPanel.instance) {
-            ScreencastPanel.createOrShow(DevToolsPanel.instance.context, DevToolsPanel.instance.panelSocket);
+            ScreencastPanel.createOrShow(DevToolsPanel.instance.context, DevToolsPanel.instance.targetUrl);
         }
     }
 }
