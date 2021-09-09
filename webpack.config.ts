@@ -72,8 +72,36 @@ module.exports = (env: any) => {
                 new DefinePlugin({
                     DEBUG: JSON.stringify(env && env.debug || false),
                     DEVTOOLS_BASE_URI: JSON.stringify(env && env.devtoolsBaseUri || undefined),
-                })
+                }),
             ],
+        },
+        {
+            entry: {
+                extension: './src/extension.ts',
+                server: './src/webhint/server.ts'
+            },
+            externals: { vscode: 'commonjs vscode' },
+            module: {
+                rules: [
+                    {
+                        exclude: /node_modules/,
+                        test: /\.ts$/,
+                        use: [
+                            { loader: 'ts-loader' }
+                        ]
+                    }
+                ]
+            },
+            output: {
+                filename: '[name].js',
+                libraryTarget: 'commonjs2',
+                path: path.resolve(__dirname, 'out/webhint')
+            },
+            resolve: {
+                alias: { '../../package.json$': path.resolve(__dirname, 'package.json') },
+                extensions: ['.ts', '.js']
+            },
+            target: 'node'
         },
     ]
 };

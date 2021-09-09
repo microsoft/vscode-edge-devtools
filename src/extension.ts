@@ -34,11 +34,25 @@ import {
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorCodes, ErrorReporter } from './errorReporter';
+import {
+    LanguageClient,
+    LanguageClientOptions,
+    ServerOptions,
+    TransportKind,
+} from 'vscode-languageclient/node';
+import * as notifications from './webhint/utils/notifications';
+import { activationEvents } from '../package.json';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
+// List of document types the extension will run against.
+const supportedDocuments = activationEvents.map((event: string) => {
+    return event.split(':')[1];
+});
+// Keep a reference to the client to stop it when deactivating.
+let client: LanguageClient;
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -185,7 +199,47 @@ export function activate(context: vscode.ExtensionContext): void {
     void reportFileExtensionTypes(telemetryReporter);
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
+
+    // Webhint activation
+    const module = context.asAbsolutePath('out/webhint/server.js');
+    const transport = TransportKind.ipc;
+    const serverOptions: ServerOptions = {
+        debug: {
+            module,
+            options: { execArgv: ['--nolazy', '--inspect=6009'] },
+            transport,
+        },
+        run: {
+            module,
+            transport,
+        },
+    };
+
+    const clientOptions: LanguageClientOptions = {
+        documentSelector: supportedDocuments,
+        synchronize: {
+            // Notify the server if a webhint-related configuration changes.
+            fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
+        },
+    };
+
+    // Create and start the client (also starts the server).
+    client = new LanguageClient('webhint', serverOptions, clientOptions);
+
+    void client.onReady().then(() => {
+        // Listen for requests to show the output panel for this extension.
+        client.onNotification(notifications.showOutput, () => {
+            client.outputChannel.clear();
+            client.outputChannel.show(true);
+        });
+    });
+
+    client.start();
 }
+
+export const deactivate = (): Thenable<void> => {
+    return client && client.stop();
+};
 
 export async function attach(
     context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
