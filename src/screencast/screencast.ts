@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { parseMessageFromChannel, WebSocketEvent } from '../common/webviewEvents';
+import { parseMessageFromChannel, WebSocketEvent, encodeMessageForChannel } from '../common/webviewEvents';
 
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 export const vscode = acquireVsCodeApi();
@@ -19,4 +19,28 @@ export function initialize(): void {
             return false;
         });
     });
+
+
+    const emulateTest = document.createElement('button');
+    emulateTest.addEventListener('click', () => {
+        sendMessageToBackend(
+        `{
+            "id": 123456,
+            "method": "Emulation.setDeviceMetricsOverride",
+            "params": {
+                "width": 400,
+                "height": 700,
+                "deviceScaleFactor": 0,
+                "mobile": false
+            }
+        }`)
+    })
+    emulateTest.textContent = "Update Emulation";
+    document.body.appendChild(emulateTest);
+}
+
+
+
+function sendMessageToBackend(message: string): void {
+    encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'websocket', { message });
 }

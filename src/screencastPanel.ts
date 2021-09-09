@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { encodeMessageForChannel, WebSocketEvent } from './common/webviewEvents';
 import { PanelSocket } from './panelSocket';
 import {
     SETTINGS_STORE_NAME,
@@ -26,6 +27,7 @@ export class ScreencastPanel {
 
         this.panelSocket.on('websocket', () => this.onSocketMessage());
         this.panelSocket.on('close', () => this.onSocketClose());
+        this.panelSocket.setScreencastCallback((e, msg) => this.postToWebview(e, msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -65,8 +67,12 @@ export class ScreencastPanel {
         this.panel.webview.html = this.getHtmlForWebview();
     }
 
+    private postToWebview(e: WebSocketEvent, message?: string) {
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
+    }
+
     private getHtmlForWebview() {
-        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
+        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/screencast', 'screencast.bundle.js'));
         const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
 
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
@@ -78,7 +84,6 @@ export class ScreencastPanel {
             <html>
             <head>
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-                <!--
                 <meta http-equiv="Content-Security-Policy"
                     content="default-src;
                     img-src 'self' data: ${this.panel.webview.cspSource};
@@ -90,7 +95,6 @@ export class ScreencastPanel {
                 <meta name="referrer" content="no-referrer">
                 <link href="${stylesUri}" rel="stylesheet"/>
                 <script type="module" src="${inspectorUri}"></script>
-                -->
             </head>
             <body>
                 Hello World!!!

@@ -35,6 +35,17 @@ module.exports = (env: any) => {
         {
             ...commonConfig,
             entry: {
+                screencast: './src/screencast/main.ts',
+            },
+            name: 'screencast',
+            output: {
+                filename: '[name].bundle.js',
+                path: path.resolve(__dirname, 'out/screencast'),
+            },
+        },
+        {
+            ...commonConfig,
+            entry: {
                 host: './src/host_beta/mainHost.ts',
             },
             name: 'host',
