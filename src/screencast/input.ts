@@ -7,6 +7,14 @@ export const MouseEventMap = {
   wheel: 'mouseWheel'
 };
 
+const MouseButtonMap = [
+    'left',
+    'middle',
+    'right',
+    'back',
+    'forward'
+];
+
 export class ScreencastInputHandler {
     private cdpConnection: ScreencastCDPConnection;
     private activeTouchParams: any | null;
@@ -23,10 +31,14 @@ export class ScreencastInputHandler {
         }
         this.cdpConnection.sendMessageToBackend('Input.dispatchMouseEvent', {
             type: eventType,
+            clickCount: eventType === 'mousePressed' || eventType === 'mouseReleased' ? 1 : 0,
             x: mouseEvent.offsetX,
             y: mouseEvent.offsetY,
             modifiers: this.modifiersForEvent(mouseEvent),
-            buttons: mouseEvent.which,
+            button: MouseButtonMap[mouseEvent.button],
+            buttons: mouseEvent.buttons,
+            deltaX: (mouseEvent as WheelEvent).deltaX,
+            deltaY: (mouseEvent as WheelEvent).deltaY
         });
     }
 
