@@ -77,9 +77,6 @@ export class ScreencastPanel {
         const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/screencast', 'screencast.bundle.js'));
         const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
 
-        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
-        const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
-
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
             <!doctype html>
@@ -95,11 +92,43 @@ export class ScreencastPanel {
                     connect-src 'self' data: ${this.panel.webview.cspSource};
                 ">
                 <meta name="referrer" content="no-referrer">
-                <link href="${stylesUri}" rel="stylesheet"/>
+                <style>
+                    html, body {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                        overflow: hidden;
+                        background-color: #000;
+                    }
+                    #main {
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    #canvas {
+                        flex: 1;
+                    }
+                </style>
                 <script type="module" src="${inspectorUri}"></script>
             </head>
             <body>
-                Hello World!!!
+                <div id="main">
+                    <div id="toolbar">
+                        <select id="device">
+                            <option selected>Fill</option>
+                            <option>Phone</option>
+                        </select>
+                        <label>
+                            <input id="mobile" type="checkbox"/> Mobile
+                        </label>
+                    </div>
+                    <img id="canvas" />
+                </div>
             </body>
             </html>
             `;
