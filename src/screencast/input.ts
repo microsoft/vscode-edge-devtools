@@ -43,12 +43,10 @@ export class ScreencastInputHandler {
     }
 
     emitKeyEvent(keyboardEvent: KeyboardEvent): void {
-        const text = keyboardEvent.type === 'keypress' ? String.fromCharCode(keyboardEvent.charCode) : undefined;
+        // TODO: preventDefault for "Tab"
         this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
-            type: keyboardEvent.type,
+            type: keyboardEvent.type === 'keydown' ? 'rawKeyDown' : 'keyUp',
             modifiers: this.modifiersForEvent(keyboardEvent),
-            text: text,
-            unmodifiedText: text ? text.toLowerCase() : undefined,
             keyIdentifier: (keyboardEvent as { keyIdentifier?: string }).keyIdentifier,
             code: keyboardEvent.code,
             key: keyboardEvent.key,

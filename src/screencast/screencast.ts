@@ -42,9 +42,6 @@ export class Screencast {
         this.reloadButton.addEventListener('click', () => this.onReloadClick());
         this.rotateButton.addEventListener('click', () => this.onRotateClick());
         this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
-
-        // Screencast image for demo
-        this.initScreencastImage();
         
         this.deviceSelect.addEventListener('change', () => {
             switch (this.deviceSelect.value) {
@@ -69,7 +66,7 @@ export class Screencast {
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
         this.mobileCheckbox.addEventListener('input', () => {
-            // TODO: flip between mobile/desktop emulation
+            this.updateEmulation();
         });
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
@@ -78,10 +75,30 @@ export class Screencast {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => this.updateEmulation(), 100);
         });
+
+        this.registerInputListeners();
         
         // Start screencast
         this.updateEmulation();
         this.updateHistory();
+    }
+
+    private registerInputListeners(): void {
+        for (const eventName of Object.keys(MouseEventMap)) {
+            this.screencastImage.addEventListener(eventName, (event) => {
+                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
+                if (this.mobileCheckbox.checked) {
+                    this.inputHandler.emitTouchFromMouseEvent(event as MouseEvent, scale);
+                } else {
+                    this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
+                }
+            });
+        }
+        for (const eventName of ['keydown', 'keyup']) {
+            this.screencastImage.addEventListener(eventName, (event) => {
+                this.inputHandler.emitKeyEvent(event as KeyboardEvent);
+            });
+        }
     }
 
     private updateHistory(): void {
@@ -96,7 +113,6 @@ export class Screencast {
     }
 
     private updateEmulation(): void {
-        // Button to emulate
         const params = {
             width: this.width || this.screencastWrapper.offsetWidth,
             height: this.height || this.screencastWrapper.offsetHeight,
@@ -115,19 +131,6 @@ export class Screencast {
             maxHeight: this.height || this.screencastWrapper.offsetHeight
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
-    }
-
-    private initScreencastImage(): void {
-        for (const eventName of Object.keys(MouseEventMap)) {
-            this.screencastImage.addEventListener(eventName, (event) => {
-                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
-                if (this.mobileCheckbox.checked) {
-                    this.inputHandler.emitTouchFromMouseEvent(event as MouseEvent, scale);
-                } else {
-                    this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
-                }
-            });
-        }
     }
 
     private onBackClick(): void {

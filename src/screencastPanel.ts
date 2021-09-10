@@ -143,6 +143,9 @@ export class ScreencastPanel {
                         max-width: none;
                         max-height: none;
                     }
+                    #canvas {
+                        outline: none;
+                    }
                 </style>
                 <script type="module" src="${inspectorUri}"></script>
             </head>
@@ -171,7 +174,7 @@ export class ScreencastPanel {
                         </label>
                     </div>
                     <div id="canvas-wrapper" class="fill">
-                        <img id="canvas" draggable="false" />
+                        <img id="canvas" draggable="false" tabindex="0" />
                     </div>
                 </div>
             </body>
