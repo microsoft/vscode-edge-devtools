@@ -149,6 +149,12 @@ export class ScreencastPanel {
             <body>
                 <div id="main">
                     <div id="toolbar">
+                        <button id="back">
+                            <i class="codicon codicon-arrow-left"></i>
+                        </button>
+                        <button id="forward">
+                            <i class="codicon codicon-arrow-right"></i>
+                        </button>
                         <button id="reload">
                             <i class="codicon codicon-refresh"></i>
                         </button>
