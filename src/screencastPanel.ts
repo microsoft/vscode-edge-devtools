@@ -107,11 +107,23 @@ export class ScreencastPanel {
                     #main {
                         display: flex;
                         flex-direction: column;
+                        align-items: center;
                         width: 100%;
                         height: 100%;
                     }
-                    #canvas {
+                    #canvas-wrapper {
                         flex: 1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                    }
+                    #canvas-wrapper.fill {
+                        display: block;
+                    }
+                    #canvas-wrapper.fill #canvas {
+                        max-width: none;
+                        max-height: none;
                     }
                 </style>
                 <script type="module" src="${inspectorUri}"></script>
@@ -127,7 +139,9 @@ export class ScreencastPanel {
                             <input id="mobile" type="checkbox"/> Mobile
                         </label>
                     </div>
-                    <img id="canvas" draggable="false" />
+                    <div id="canvas-wrapper" class="fill">
+                        <img id="canvas" draggable="false" />
+                    </div>
                 </div>
             </body>
             </html>

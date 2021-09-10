@@ -8,11 +8,15 @@ export class Screencast {
     private cdpConnection = new ScreencastCDPConnection();
     private inputHandler: ScreencastInputHandler;
     private screencastImage: HTMLImageElement;
+    private screencastWrapper: HTMLElement;
     private deviceSelect: HTMLSelectElement;
     private mobileCheckbox: HTMLInputElement;
+    private width = 0;
+    private height = 0;
 
     constructor() {
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
+        this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
         this.mobileCheckbox = document.getElementById('mobile') as HTMLInputElement;
 
@@ -22,11 +26,14 @@ export class Screencast {
         this.deviceSelect.addEventListener('change', () => {
             switch (this.deviceSelect.value) {
                 case 'fill':
-                    this.screencastImage.style.width = this.screencastImage.style.height = '';
+                    this.width = 0;
+                    this.height = 0;
+                    this.screencastWrapper.classList.add('fill');
                     break;
                 case 'phone':
-                    this.screencastImage.style.width = '414px';
-                    this.screencastImage.style.height = '750px';
+                    this.width = 414;
+                    this.height = 750;
+                    this.screencastWrapper.classList.remove('fill');
                     break;
             }
             this.updateEmulation();
@@ -34,14 +41,18 @@ export class Screencast {
 
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onFrame(result));
 
-        this.inputHandler = new ScreencastInputHandler(this.cdpConnection, false);
+        this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
         this.mobileCheckbox.addEventListener('input', () => {
             // TODO: flip between mobile/desktop emulation
         });
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
-        window.addEventListener('resize', () => this.updateEmulation());
+        let resizeTimeout = 0 as unknown as NodeJS.Timeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.updateEmulation(), 100);
+        });
         
         // Start screencast
         this.updateEmulation();
@@ -50,8 +61,8 @@ export class Screencast {
     private updateEmulation(): void {
         // Button to emulate
         const params = {
-            width: this.screencastImage.offsetWidth || 400,
-            height: this.screencastImage.offsetHeight || 700,
+            width: this.width || this.screencastWrapper.offsetWidth,
+            height: this.height || this.screencastWrapper.offsetHeight,
             deviceScaleFactor: 0,
             mobile: false
         }
@@ -63,8 +74,8 @@ export class Screencast {
         const screencastParams = {
             format: 'png',
             quality: 100,
-            maxWidth: this.screencastImage.offsetWidth || 400,
-            maxHeight: this.screencastImage.offsetHeight || 700
+            maxWidth: this.width || this.screencastWrapper.offsetWidth,
+            maxHeight: this.height || this.screencastWrapper.offsetHeight
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
     }
@@ -72,13 +83,15 @@ export class Screencast {
     private initScreencastImage(): void {
         for (const eventName of Object.keys(MouseEventMap)) {
             this.screencastImage.addEventListener(eventName, (event) => {
-                this.inputHandler.emitMouseEvent(event as MouseEvent);
+                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
+                this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
             });
         }
     }
 
     private onFrame({data, sessionId}: any): void {
         this.screencastImage.src = 'data:image/png;base64,' + data;
+        this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
     }
 }

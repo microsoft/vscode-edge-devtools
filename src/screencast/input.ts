@@ -19,12 +19,12 @@ export class ScreencastInputHandler {
     private cdpConnection: ScreencastCDPConnection;
     private activeTouchParams: any | null;
 
-    constructor(cdpConnection: ScreencastCDPConnection, isMobile?: boolean) {
+    constructor(cdpConnection: ScreencastCDPConnection) {
         this.cdpConnection = cdpConnection;
         this.activeTouchParams = null;
     }
 
-    emitMouseEvent(mouseEvent: MouseEvent): void {
+    emitMouseEvent(mouseEvent: MouseEvent, scale: number): void {
         const eventType = MouseEventMap[mouseEvent.type as keyof typeof MouseEventMap];
         if (!eventType) {
             return;
@@ -32,8 +32,8 @@ export class ScreencastInputHandler {
         this.cdpConnection.sendMessageToBackend('Input.dispatchMouseEvent', {
             type: eventType,
             clickCount: eventType === 'mousePressed' || eventType === 'mouseReleased' ? 1 : 0,
-            x: mouseEvent.offsetX,
-            y: mouseEvent.offsetY,
+            x: Math.round(mouseEvent.offsetX / scale),
+            y: Math.round(mouseEvent.offsetY / scale),
             modifiers: this.modifiersForEvent(mouseEvent),
             button: MouseButtonMap[mouseEvent.button],
             buttons: mouseEvent.buttons,
