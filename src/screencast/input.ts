@@ -60,7 +60,7 @@ export class ScreencastInputHandler {
         });
     }
 
-    emitTouchFromMouseEvent(mouseEvent: MouseEvent): void {
+    emitTouchFromMouseEvent(mouseEvent: MouseEvent, scale: number): void {
         const buttons = ['none', 'left', 'middle', 'right'];
         const eventType = MouseEventMap[mouseEvent.type as keyof typeof MouseEventMap];
         if (!eventType) {
@@ -76,10 +76,10 @@ export class ScreencastInputHandler {
 
         const params: any = {
             type: eventType,
-            x: mouseEvent.offsetX,
-            y: mouseEvent.offsetY,
+            x: Math.round(mouseEvent.offsetX / scale),
+            y: Math.round(mouseEvent.offsetY / scale),
             modifiers: 0,
-            button: buttons[mouseEvent.which],
+            button: MouseButtonMap[mouseEvent.button],
             clickCount: 0,
         };
         if (mouseEvent.type === 'wheel') {

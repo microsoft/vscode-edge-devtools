@@ -7,6 +7,9 @@ import { MouseEventMap, ScreencastInputHandler } from './input';
 export class Screencast {
     private cdpConnection = new ScreencastCDPConnection();
     private inputHandler: ScreencastInputHandler;
+    private reloadButton: HTMLButtonElement;
+    private rotateButton: HTMLButtonElement;
+    private urlInput: HTMLInputElement;
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
     private deviceSelect: HTMLSelectElement;
@@ -15,10 +18,17 @@ export class Screencast {
     private height = 0;
 
     constructor() {
+        this.reloadButton = document.getElementById('reload') as HTMLButtonElement;
+        this.rotateButton = document.getElementById('rotate') as HTMLButtonElement;
+        this.urlInput = document.getElementById('url') as HTMLInputElement;
+        this.mobileCheckbox = document.getElementById('mobile') as HTMLInputElement;
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
-        this.mobileCheckbox = document.getElementById('mobile') as HTMLInputElement;
+
+        this.reloadButton.addEventListener('click', () => this.onReloadClick());
+        this.rotateButton.addEventListener('click', () => this.onRotateClick());
+        this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
 
         // Screencast image for demo
         this.initScreencastImage();
@@ -64,7 +74,7 @@ export class Screencast {
             width: this.width || this.screencastWrapper.offsetWidth,
             height: this.height || this.screencastWrapper.offsetHeight,
             deviceScaleFactor: 0,
-            mobile: false
+            mobile: this.mobileCheckbox.checked
         }
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', params);
         this.updateScreencast();
@@ -84,8 +94,31 @@ export class Screencast {
         for (const eventName of Object.keys(MouseEventMap)) {
             this.screencastImage.addEventListener(eventName, (event) => {
                 const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
-                this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
+                if (this.mobileCheckbox.checked) {
+                    this.inputHandler.emitTouchFromMouseEvent(event as MouseEvent, scale);
+                } else {
+                    this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
+                }
             });
+        }
+    }
+
+    private onReloadClick(): void {
+        this.cdpConnection.sendMessageToBackend('Page.reload', {});
+    }
+
+    private onRotateClick(): void {
+        const width = this.height;
+        const height = this.width;
+        this.width = width;
+        this.height = height;
+        this.updateEmulation();
+    }
+
+    private onUrlKeyDown(event: KeyboardEvent): void {
+        const url = this.urlInput.value;
+        if (event.key === 'Enter' && url) {
+            this.cdpConnection.sendMessageToBackend('Page.navigate', {url});
         }
     }
 

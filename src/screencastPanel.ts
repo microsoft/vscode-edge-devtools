@@ -76,6 +76,7 @@ export class ScreencastPanel {
     private getHtmlForWebview() {
         const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/screencast', 'screencast.bundle.js'));
         const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
+		const codiconsUri = this.panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
@@ -85,6 +86,7 @@ export class ScreencastPanel {
                 <meta http-equiv="content-type" content="text/html; charset=utf-8">
                 <meta http-equiv="Content-Security-Policy"
                     content="default-src;
+                    font-src ${this.panel.webview.cspSource};
                     img-src 'self' data: ${this.panel.webview.cspSource};
                     style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
                     script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
@@ -92,6 +94,7 @@ export class ScreencastPanel {
                     connect-src 'self' data: ${this.panel.webview.cspSource};
                 ">
                 <meta name="referrer" content="no-referrer">
+				<link href="${codiconsUri}" rel="stylesheet" />
                 <style>
                     html, body {
                         position: absolute;
@@ -109,6 +112,22 @@ export class ScreencastPanel {
                         align-items: center;
                         width: 100%;
                         height: 100%;
+                    }
+                    #toolbar {
+                        display: flex;
+                        width: 100%;
+                    }
+                    #toolbar > button, #toolbar > select {
+                        background-color: var(--vscode-editor-background);
+                        border: none;
+                        color: var(--vscode-editor-foreground);
+                    }
+                    #url {
+                        flex: 1;
+                        background-color: var(--vscode-input-background);
+                        border-style: solid;
+                        border-width: 1px;
+                        color: var(--vscode-input-foreground);
                     }
                     #canvas-wrapper {
                         flex: 1;
@@ -130,10 +149,17 @@ export class ScreencastPanel {
             <body>
                 <div id="main">
                     <div id="toolbar">
+                        <button id="reload">
+                            <i class="codicon codicon-refresh"></i>
+                        </button>
+                        <input id="url" />
                         <select id="device">
                             <option selected value="fill">Fill</option>
                             <option value="phone">Phone</option>
                         </select>
+                        <button id="rotate">
+                            <i class="codicon codicon-editor-layout"></i>
+                        </button>
                         <label>
                             <input id="mobile" type="checkbox"/> Mobile
                         </label>
