@@ -127,7 +127,7 @@ export class ScreencastPanel {
                             <input id="mobile" type="checkbox"/> Mobile
                         </label>
                     </div>
-                    <img id="canvas" />
+                    <img id="canvas" draggable="false" />
                 </div>
             </body>
             </html>
