@@ -102,7 +102,6 @@ export class ScreencastPanel {
                         margin: 0;
                         padding: 0;
                         overflow: hidden;
-                        background-color: #000;
                     }
                     #main {
                         display: flex;
