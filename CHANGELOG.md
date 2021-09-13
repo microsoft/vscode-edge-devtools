@@ -1,3 +1,12 @@
+## 1.3.1
+* **[Feature]**: Error handling implementation. - [PR #475](https://github.com/microsoft/vscode-edge-devtools/pull/475)
+* **[Feature]**: Implement CSS mirror editing - [PR #462](https://github.com/microsoft/vscode-edge-devtools/pull/462)
+* **[Bug Fix]**: Properly resolve index.html and other entrypoint links - [PR #469](https://github.com/microsoft/vscode-edge-devtools/pull/469)
+* **[Feature]**: Introducing error reporter. - [PR #474](https://github.com/microsoft/vscode-edge-devtools/pull/474)
+* **[Bug Fix]**: Supporting following CSS links on WSL remotes - [PR #467](https://github.com/microsoft/vscode-edge-devtools/pull/467)
+* **[Feature]**: Update min supported version for CDN tools - [PR #466](https://github.com/microsoft/vscode-edge-devtools/pull/466)
+* **[Feature]**: Create default landing page for webview in case remote devtools fail to load - [PR #463](https://github.com/microsoft/vscode-edge-devtools/pull/463)
+
 ## 1.3.0
 * **[Feature]**: The Extension now retrieves DevTools that directly match supported browser targets - Microsoft Edge 94.0.988.0 and newer. - [PR #449](https://github.com/microsoft/vscode-edge-devtools/pull/449)
 * **[Feature]**: Targeting Microsoft Edge Version 94.0.988.0 and newer now supports automatically changing themes to match built in Visual Studio Code themes. - [PR #445](https://github.com/microsoft/vscode-edge-devtools/pull/445)
