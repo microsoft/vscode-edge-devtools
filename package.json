@@ -290,6 +290,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Enable edits in the styles pane to be automatically applied to the corresponding stylesheet in the workspace. (Only works when targeting Edge Browser versions 94.0.988.0+)"
+                },
+                "vscode-edge-devtools.webhint": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
                 }
             }
         },

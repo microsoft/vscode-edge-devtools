@@ -200,7 +200,21 @@ export function activate(context: vscode.ExtensionContext): void {
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
 
-    // Webhint activation
+    if (settingsConfig.get('webhint')) {
+        startWebhint(context);
+    }
+    vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.webhint`)) {
+            if (vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhint')) {
+                startWebhint(context);
+            } else {
+                stopWebhint();
+            }
+        }
+    });
+}
+
+function startWebhint(context: vscode.ExtensionContext): void {
     const args = [context.globalStoragePath];
     const module = context.asAbsolutePath('out/webhint/server.js');
     const transport = TransportKind.ipc;
@@ -240,8 +254,14 @@ export function activate(context: vscode.ExtensionContext): void {
     client.start();
 }
 
+async function stopWebhint(): Promise<void> {
+    if (client) {
+        await client.stop();
+    }
+}
+
 export const deactivate = (): Thenable<void> => {
-    return client && client.stop();
+    return stopWebhint();
 };
 
 export async function attach(
