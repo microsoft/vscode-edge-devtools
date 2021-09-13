@@ -201,15 +201,18 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
 
     // Webhint activation
+    const args = [context.globalStoragePath];
     const module = context.asAbsolutePath('out/webhint/server.js');
     const transport = TransportKind.ipc;
     const serverOptions: ServerOptions = {
         debug: {
+            args,
             module,
             options: { execArgv: ['--nolazy', '--inspect=6009'] },
             transport,
         },
         run: {
+            args,
             module,
             transport,
         },

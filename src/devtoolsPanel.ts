@@ -3,6 +3,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
+import * as fse from 'fs-extra';
 import { performance } from 'perf_hooks';
 import TelemetryReporter from 'vscode-extension-telemetry';
 
@@ -475,6 +476,15 @@ export class DevToolsPanel {
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
 
+        let hintConfig = '';
+        if (vscode.workspace.workspaceFolders) {
+            const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
+            const filePath = `${workspaceUri.fsPath}/.hintrc`;
+            if (fse.pathExistsSync(filePath)) {
+                hintConfig = encodeURIComponent(fse.readFileSync(filePath).toString());
+            }
+        }
+
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
             <!doctype html>
@@ -494,7 +504,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}&hint=${hintConfig}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>
