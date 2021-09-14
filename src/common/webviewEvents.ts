@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'ready' | 'setState' | 'telemetry' | 'websocket'
+export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'cssMirrorContent' | 'ready' | 'setState' | 'telemetry' | 'websocket'
 | 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'consoleOutput';
 export const webviewEventNames: WebviewEvent[] = [
     'getState',
     'getUrl',
     'openInEditor',
+    'cssMirrorContent',
     'ready',
     'setState',
     'telemetry',
@@ -20,11 +21,12 @@ export const webviewEventNames: WebviewEvent[] = [
 ];
 
 export type FrameToolsEvent = 'sendMessageToBackend' | 'openInNewTab' | 'recordEnumeratedHistogram' |
-'recordPerformanceHistogram' | 'reportError' | 'openInEditor';
+'recordPerformanceHistogram' | 'reportError' | 'openInEditor' | 'cssMirrorContent';
 export const FrameToolsEventNames: FrameToolsEvent[] = [
     'sendMessageToBackend',
     'openInNewTab',
     'openInEditor',
+    'cssMirrorContent',
     'recordEnumeratedHistogram',
     'recordPerformanceHistogram',
     'reportError',
@@ -62,6 +64,11 @@ export interface IOpenEditorData {
     line: number;
     column: number;
     ignoreTabChanges: boolean;
+}
+
+export interface ICssMirrorContentData {
+    url: string;
+    newContent: string;
 }
 
 /**
