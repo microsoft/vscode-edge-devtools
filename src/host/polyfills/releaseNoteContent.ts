@@ -26,18 +26,6 @@ export const extensionHighlights = `[
             i18nLazyString("Fixes an issue that prevented CSS files from opening in WSL."),
         link: 'https://github.com/microsoft/vscode-edge-devtools/pull/467',
     },
-    {
-        title: i18nLazyString("Update minimum supported version for CDN tools"),
-        subtitle:
-            i18nLazyString("Update minimum supported version that the extension will attempt to use the CDN to 94.0.988.0,"),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/466',
-    },
-    {
-        title: i18nLazyString("Create default landing page for webview in case remote devtools fail to load"),
-        subtitle:
-            i18nLazyString("Adds a default message to the DevTools webview that is only seen if the iframe fails to load"),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/463',
-    },
 ],`;
 
 export const devtoolsHighlights = `[
