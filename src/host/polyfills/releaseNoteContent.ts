@@ -3,28 +3,28 @@
 
 export const extensionHighlights = `[
     {
-        title: i18nLazyString("DevTools Built for Specific Target"),
+        title: i18nLazyString("Error handling implementation"),
         subtitle:
-            i18nLazyString("The Extension now retrieves DevTools that directly match supported browser targets - Microsoft Edge 94.0.988.0 and newer."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/449',
+            i18nLazyString("Introduces the behavior for handling a common set of errors by using the Error reporter."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/475',
     },
     {
-        title: i18nLazyString("Automatic Theme changes"),
+        title: i18nLazyString("Implement CSS mirror editing"),
         subtitle:
-            i18nLazyString("Targeting Microsoft Edge Version 94.0.988.0 and newer now supports automatically changing themes to match built in Visual Studio Code themes."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/445',
+            i18nLazyString("Adds the cssMirrorContent function for VSCode hosted DevTools that allows mirror editing for the extension when the modified stylesheet is in the VSCode workspace."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/462',
     },
     {
-        title: i18nLazyString("DevTools Console Output Deprecation"),
+        title: i18nLazyString("Properly resolve index.html and other entrypoint links"),
         subtitle:
-            i18nLazyString("The Extension's DevTools Console output has been deprecated in favor of Visual Studio Code's Debug Console."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/460',
+            i18nLazyString("Fixes an issue where index.html and other entrypoint links in the extension would not properly resolve to workspace folders."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/469',
     },
     {
-        title: i18nLazyString("Documentation and Issue Links"),
+        title: i18nLazyString("Supporting following CSS links on WSL remotes"),
         subtitle:
-            i18nLazyString("The Extension sidebar now provides direct links to our documentation and issue pages."),
-        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/459',
+            i18nLazyString("Fixes an issue that prevented CSS files from opening in WSL."),
+        link: 'https://github.com/microsoft/vscode-edge-devtools/pull/467',
     },
 ],`;
 
