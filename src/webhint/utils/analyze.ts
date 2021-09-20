@@ -46,6 +46,8 @@ export class Analyzer {
 
         /* istanbul ignore if */
         if (!hintModule) {
+            this.connection.sendNotification(notifications.installFailed);
+
             return null;
         }
 

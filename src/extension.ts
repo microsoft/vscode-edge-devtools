@@ -241,9 +241,18 @@ function startWebhint(context: vscode.ExtensionContext): void {
     };
 
     // Create and start the client (also starts the server).
-    client = new LanguageClient('webhint', serverOptions, clientOptions);
+    client = new LanguageClient('Microsoft Edge Tools', serverOptions, clientOptions);
 
     void client.onReady().then(() => {
+        // Listen for notification that the webhint install failed.
+        client.onNotification(notifications.installFailed, () => {
+            const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
+            vscode.window.showInformationMessage(message, 'OK', 'Disable').then(button => {
+                if (button === 'Disable') {
+                    vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
+                }
+            });
+        });
         // Listen for requests to show the output panel for this extension.
         client.onNotification(notifications.showOutput, () => {
             client.outputChannel.clear();
