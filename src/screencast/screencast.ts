@@ -22,7 +22,6 @@ export class Screencast {
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
     private deviceSelect: HTMLSelectElement;
-    private mobileCheckbox: HTMLInputElement;
     private width = 0;
     private height = 0;
 
@@ -32,7 +31,6 @@ export class Screencast {
         this.reloadButton = document.getElementById('reload') as HTMLButtonElement;
         this.rotateButton = document.getElementById('rotate') as HTMLButtonElement;
         this.urlInput = document.getElementById('url') as HTMLInputElement;
-        this.mobileCheckbox = document.getElementById('mobile') as HTMLInputElement;
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
@@ -42,19 +40,22 @@ export class Screencast {
         this.reloadButton.addEventListener('click', () => this.onReloadClick());
         this.rotateButton.addEventListener('click', () => this.onRotateClick());
         this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
-        
+
         this.deviceSelect.addEventListener('change', () => {
-            switch (this.deviceSelect.value) {
-                case 'fill':
-                    this.width = 0;
-                    this.height = 0;
-                    this.screencastWrapper.classList.add('fill');
-                    break;
-                case 'phone':
-                    this.width = 414;
-                    this.height = 736;
-                    this.screencastWrapper.classList.remove('fill');
-                    break;
+            if (this.deviceSelect.value.toLowerCase() === 'desktop') {
+                this.width = 0;
+                this.height = 0;
+                this.screencastWrapper.classList.add('desktop');
+            } else {
+                const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
+                const deviceWidth = selectedOption.getAttribute('devicewidth');
+                const deviceHeight = selectedOption.getAttribute('deviceheight');
+                if (deviceWidth && deviceHeight) {
+                    this.width = parseInt(deviceWidth);
+                    this.height = parseInt(deviceHeight);
+                }
+
+                this.screencastWrapper.classList.remove('desktop');
             }
             this.updateEmulation();
         });
@@ -64,10 +65,6 @@ export class Screencast {
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
 
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
-
-        this.mobileCheckbox.addEventListener('input', () => {
-            this.updateEmulation();
-        });
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
         let resizeTimeout = 0 as unknown as NodeJS.Timeout;
@@ -87,14 +84,15 @@ export class Screencast {
         for (const eventName of Object.keys(MouseEventMap)) {
             this.screencastImage.addEventListener(eventName, (event) => {
                 const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
-                if (this.mobileCheckbox.checked) {
+                if (this.isDeviceTouch()) {
                     this.inputHandler.emitTouchFromMouseEvent(event as MouseEvent, scale);
                 } else {
                     this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
                 }
             });
         }
-        for (const eventName of ['keydown', 'keyup']) {
+
+        for (const eventName of ['keydown', 'keypress']) {
             this.screencastImage.addEventListener(eventName, (event) => {
                 this.inputHandler.emitKeyEvent(event as KeyboardEvent);
             });
@@ -117,10 +115,16 @@ export class Screencast {
             width: this.width || this.screencastWrapper.offsetWidth,
             height: this.height || this.screencastWrapper.offsetHeight,
             deviceScaleFactor: 0,
-            mobile: this.mobileCheckbox.checked
+            mobile: this.isDeviceTouch()
         }
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', params);
         this.updateScreencast();
+    }
+
+    private isDeviceTouch(){
+        const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
+        return selectedOption.getAttribute('touch') === "true" 
+            || selectedOption.getAttribute('mobile') === "true";
     }
 
     private updateScreencast(): void {
@@ -171,8 +175,12 @@ export class Screencast {
     }
 
     private onUrlKeyDown(event: KeyboardEvent): void {
-        const url = this.urlInput.value;
+        let url = this.urlInput.value;
         if (event.key === 'Enter' && url) {
+            if(!url.startsWith('http')) {
+                url = 'http://' + url;
+            }
+
             this.cdpConnection.sendMessageToBackend('Page.navigate', {url});
         }
     }

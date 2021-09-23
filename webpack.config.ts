@@ -77,6 +77,7 @@ module.exports = (env: any) => {
                     patterns: [
                     { from: 'startpage', to: 'startpage'},
                     { from: 'icon.png', to: 'icon.png'},
+                    { from: 'src/screencast/view.css', to: 'screencast/view.css'},
                     ],
                 }),
                 // These must also be defined in the jest section of package.json for tests to pass

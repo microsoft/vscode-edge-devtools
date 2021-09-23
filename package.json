@@ -103,6 +103,16 @@
                 }
             },
             {
+                "command": "vscode-edge-devtools-view.toggleScreencast",
+                "category": "Microsoft Edge Tools",
+                "title": "Toggle screencast",
+                "enablement": "viewItem != cdpTargetClosing",
+                "icon": {
+                    "light": "resources/light/screencast.svg",
+                    "dark": "resources/dark/screencast.svg"
+                }
+            },
+            {
                 "command": "vscode-edge-devtools-view.copyItem",
                 "category": "Microsoft Edge Tools",
                 "title": "Copy Value"
@@ -145,12 +155,6 @@
                 "category": "Microsoft Edge Tools",
                 "enablement": "mirrorEditingEnabled && titleCommandsRegistered && isCdnHostedTools",
                 "title": "Toggle mirror editing off for CSS files in workspace"
-            },
-            {
-                "command": "vscode-edge-devtools-view.openScreencast",
-                "category": "Microsoft Edge Tools",
-                "enablement": "titleCommandsRegistered && isCdnHostedTools",
-                "title": "Open the screencast for the current target"
             }
         ],
         "configuration": {
@@ -201,6 +205,11 @@
                         "/": "${workspaceFolder}"
                     },
                     "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
+                },
+                "vscode-edge-devtools.standaloneScreencast": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "When selected, screencast will be rendered in an individual screen and enable device emulation."
                 },
                 "vscode-edge-devtools.sourceMapPathOverrides": {
                     "type": "object",
@@ -536,14 +545,19 @@
             ],
             "view/item/context": [
                 {
+                    "command": "vscode-edge-devtools-view.toggleScreencast",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget && standaloneScreencast",
+                    "group": "inline@0"
+                },
+                {
                     "command": "vscode-edge-devtools-view.attach",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
-                    "group": "inline"
+                    "group": "inline@1"
                 },
                 {
                     "command": "vscode-edge-devtools-view.close-instance",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
-                    "group": "inline"
+                    "group": "inline@2"
                 },
                 {
                     "command": "vscode-edge-devtools-view.attach",
@@ -570,11 +584,6 @@
                 {
                     "id": "vscode-edge-devtools-view.targets",
                     "name": "Targets"
-                },
-                {
-                    "id": "vscode-edge-devtools-view.screencast",
-                    "name": "Screencast",
-                    "when": "isCdnHostedTools"
                 },
                 {
                     "id": "vscode-edge-devtools-view.mirror-editing",
@@ -630,10 +639,6 @@
             {
                 "view": "vscode-edge-devtools-view.mirror-editing",
                 "contents": "Please help us improve this feature by [leaving feedback here](https://github.com/microsoft/vscode-edge-devtools/issues/476)."
-            },
-            {
-                "view": "vscode-edge-devtools-view.screencast",
-                "contents": "[Open Screencast](command:vscode-edge-devtools-view.openScreencast)"
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",

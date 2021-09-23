@@ -43,19 +43,29 @@ export class ScreencastInputHandler {
     }
 
     emitKeyEvent(keyboardEvent: KeyboardEvent): void {
-        // TODO: preventDefault for "Tab"
-        this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
-            type: keyboardEvent.type === 'keydown' ? 'rawKeyDown' : 'keyUp',
-            modifiers: this.modifiersForEvent(keyboardEvent),
-            keyIdentifier: (keyboardEvent as { keyIdentifier?: string }).keyIdentifier,
-            code: keyboardEvent.code,
-            key: keyboardEvent.key,
-            windowsVirtualKeyCode: keyboardEvent.keyCode,
-            nativeVirtualKeyCode: keyboardEvent.keyCode,
-            autoRepeat: false,
-            isKeypad: false,
-            isSystemKey: false,
-        });
+        // For what seems a bug to me on CDP:
+        // - non printable key events only respond to object with type keydown and virtual key codes.
+        // - printable characters respond only to object with type char and text property set to key.
+        // This could be related:
+        // https://github.com/ChromeDevTools/devtools-protocol/issues/45
+        if(keyboardEvent.type === 'keydown' && keyboardEvent.key.length > 1 && keyboardEvent.key !== 'Enter') {
+            this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
+                type: 'keyDown',
+                windowsVirtualKeyCode: keyboardEvent.keyCode,
+                nativeVirtualKeyCode: keyboardEvent.keyCode,
+            });
+        } else if(keyboardEvent.type === 'keypress') {
+            const cdpObject = { 
+                type: 'char',
+                text: keyboardEvent.key
+            }
+
+            if (keyboardEvent.key === 'Enter') {
+                cdpObject.text = '\r';
+            }
+
+            this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', cdpObject);
+        }
     }
 
     emitTouchFromMouseEvent(mouseEvent: MouseEvent, scale: number): void {

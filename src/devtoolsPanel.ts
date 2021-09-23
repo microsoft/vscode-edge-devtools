@@ -28,9 +28,9 @@ import {
     SETTINGS_PREF_NAME,
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
+    SETTINGS_VIEW_NAME,
 } from './utils';
 import { ErrorCodes, ErrorReporter } from './errorReporter';
-import { ScreencastPanel } from './screencastPanel';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -124,6 +124,10 @@ export class DevToolsPanel {
 
         // Handle messages from the webview
         this.panel.webview.onDidReceiveMessage(message => {
+            if ((message as string).includes('toggleScreencast')) {
+                this.toggleScreencast();
+            }
+
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
 
@@ -206,6 +210,11 @@ export class DevToolsPanel {
         } else {
             void vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
+    }
+
+    private toggleScreencast() {
+        const websocketUrl = this.targetUrl;
+        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleScreencast`, { websocketUrl });
     }
 
     private onSocketConsoleOutput(message: string) {
@@ -475,6 +484,7 @@ export class DevToolsPanel {
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
+        const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
@@ -495,7 +505,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}&standaloneScreencast=${standaloneScreencast}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>
@@ -548,9 +558,4 @@ export class DevToolsPanel {
         }
     }
 
-    static createScreencast(): void {
-        if (DevToolsPanel.instance) {
-            ScreencastPanel.createOrShow(DevToolsPanel.instance.context, DevToolsPanel.instance.targetUrl);
-        }
-    }
 }

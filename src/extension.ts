@@ -8,6 +8,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
 import { DevToolsPanel } from './devtoolsPanel';
+import { ScreencastPanel } from './screencastPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
 import {
     buttonCode,
@@ -34,6 +35,7 @@ import {
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { SettingsProvider } from './common/settingsProvider';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
@@ -44,6 +46,10 @@ export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
+
+    // enable/disable standalone screencast target panel icon.
+    const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
+    void vscode.commands.executeCommand('setContext', 'standaloneScreencast', standaloneScreencast);
 
     // Check if launch.json exists and has supported config to populate side pane welcome message
     LaunchConfigManager.instance.updateLaunchConfig();
@@ -57,10 +63,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId): void => {
         void attachToCurrentDebugTarget(context, debugSessionId);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openScreencast`, (): void => {
-        DevToolsPanel.createScreencast();
     }));
 
     // Register the launch provider
@@ -107,6 +109,19 @@ export function activate(context: vscode.ExtensionContext): void {
             const runtimeConfig = getRuntimeConfig();
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
         }));
+
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_VIEW_NAME}.toggleScreencast`,
+        (target?: CDPTarget) => {
+            if (!target){
+                telemetryReporter.sendTelemetryEvent('command/screencast/noTarget');
+                return;
+            }
+            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.toggleScreencast });
+            telemetryReporter.sendTelemetryEvent('view/screencast');
+            ScreencastPanel.createOrShow(context, target.websocketUrl);
+        }));
+
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openSettings`, () => {
         telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.openSettings });
         void vscode.commands.executeCommand('workbench.action.openSettings', `${SETTINGS_STORE_NAME}`);
