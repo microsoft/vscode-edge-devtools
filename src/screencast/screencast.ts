@@ -50,7 +50,7 @@ export class Screencast {
                 this.screencastWrapper.classList.add('desktop');
             } else {
                 const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-                const deviceWidth = null; //selectedOption.getAttribute('devicewidth');
+                const deviceWidth = selectedOption.getAttribute('devicewidth');
                 const deviceHeight = selectedOption.getAttribute('deviceheight');
                 if (deviceWidth && deviceHeight) {
                     this.width = parseInt(deviceWidth);
@@ -185,7 +185,7 @@ export class Screencast {
     private onUrlKeyDown(event: KeyboardEvent): void {
         let url = this.urlInput.value;
         if (event.key === 'Enter' && url) {
-            if(!url.startsWith('http')) {
+            if (!url.startsWith('http') || !url.startsWith('file')) {
                 url = 'http://' + url;
             }
 
