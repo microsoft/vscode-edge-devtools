@@ -6,7 +6,7 @@
 
 import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { TelemetryData, webviewEventNames } from "../src/common/webviewEvents";
+import { TelemetryData, WebviewEvent, webviewEventNames } from "../src/common/webviewEvents";
 import { PanelSocket } from "../src/panelSocket";
 import { JsDebugProxyPanelSocket } from "../src/JsDebugProxyPanelSocket";
 import {
@@ -193,8 +193,11 @@ describe("devtoolsPanel", () => {
     });
 
     describe("panelSocket", () => {
-        it("listens for all the emit events", async () => {
+        it("listens for all the Devtools Panel emit events", async () => {
             const hookedEvents: string[] = [];
+            const nonUsedEvents: WebviewEvent[] = [
+                "reportError",
+            ]
             mockPanelSocket.on.mockImplementation(((name: string | symbol, ...args: any) => {
                 hookedEvents.push(name.toString());
                 return mockPanelSocket;
@@ -204,8 +207,16 @@ describe("devtoolsPanel", () => {
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
             // The +1 in here is due to the 'close' event. This is an extension event not raised from the Webview.
-            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1);
+            let total = Object.keys(webviewEventNames).length + 1;
+
+            // Some events are used on other webviews, so take that out from the expected total.
+            total -= nonUsedEvents.length;
+            expect(mockPanelSocket.on).toHaveBeenCalledTimes(total);
             for (const e of webviewEventNames) {
+                if(nonUsedEvents.includes(e)) {
+                    continue;
+                }
+
                 expect(hookedEvents).toContain(e);
             }
 
@@ -635,7 +646,7 @@ describe("devtoolsPanel", () => {
                 jest.doMock("../src/utils", () => mockUtils);
 
                 const dtp = await import("../src/devtoolsPanel");
-                const { TextEncoder } = require('util');
+                const { TextEncoder } = await require('util');
                 global.TextEncoder = TextEncoder;
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 

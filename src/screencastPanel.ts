@@ -12,6 +12,7 @@ import {
     SETTINGS_SCREENCAST_WEBVIEW_NAME,
     createTelemetryReporter,
 } from './utils';
+import { ErrorCodes } from './common/errorCodes';
 
 export class ScreencastPanel {
     private static instance: ScreencastPanel | undefined;
@@ -75,9 +76,9 @@ export class ScreencastPanel {
     }
 
     private reportError(msg: string) {
-        const errorObj = JSON.parse(msg);
+        const errorObj = JSON.parse(msg) as { errorCode: ErrorCodes.Error, title: string, message: string };
         if (errorObj.errorCode !== undefined && errorObj.title && errorObj.message) {
-            ErrorReporter.showErrorDialog(errorObj);
+            void ErrorReporter.showErrorDialog(errorObj);
         } else {
             this.telemetryReporter.sendTelemetryErrorEvent('view/screencast/error', { message: msg });
         }
