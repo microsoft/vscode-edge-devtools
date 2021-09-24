@@ -1,11 +1,6 @@
 
 import * as vscode from 'vscode';
-
-export const enum ErrorCodes {
-  Error,
-  Warning,
-  Informational
-}
+import { ErrorCodes } from './common/errorCodes';
 
 export interface ErrorEventInterface {
   title: string,

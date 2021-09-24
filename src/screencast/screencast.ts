@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { ScreencastCDPConnection } from './cdp';
+import { ErrorCodes } from '../common/errorCodes';
+import { encodeMessageForChannel } from '../common/webviewEvents';
+import { ScreencastCDPConnection, vscode } from './cdp';
 import { MouseEventMap, ScreencastInputHandler } from './input';
 
 type NavigationEntry = {
@@ -48,11 +50,17 @@ export class Screencast {
                 this.screencastWrapper.classList.add('desktop');
             } else {
                 const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-                const deviceWidth = selectedOption.getAttribute('devicewidth');
+                const deviceWidth = null; //selectedOption.getAttribute('devicewidth');
                 const deviceHeight = selectedOption.getAttribute('deviceheight');
                 if (deviceWidth && deviceHeight) {
                     this.width = parseInt(deviceWidth);
                     this.height = parseInt(deviceHeight);
+                } else {
+                    encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'reportError', {
+                        errorCode: ErrorCodes.Error,
+                        title: 'Error while getting screencast width and height.',
+                        message: `Actual width: ${deviceWidth}, height: ${deviceHeight}`,
+                    });
                 }
 
                 this.screencastWrapper.classList.remove('desktop');

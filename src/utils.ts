@@ -14,7 +14,8 @@ import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
 
 import puppeteer from 'puppeteer-core';
-import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { ErrorReporter } from './errorReporter';
+import { ErrorCodes } from './common/errorCodes';
 
 export type BrowserFlavor = 'Default' | 'Stable' | 'Beta' | 'Dev' | 'Canary';
 

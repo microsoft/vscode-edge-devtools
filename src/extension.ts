@@ -34,8 +34,9 @@ import {
     reportUrlType,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
-import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { ErrorReporter } from './errorReporter';
 import { SettingsProvider } from './common/settingsProvider';
+import { ErrorCodes } from './common/errorCodes';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
@@ -114,7 +115,8 @@ export function activate(context: vscode.ExtensionContext): void {
         `${SETTINGS_VIEW_NAME}.toggleScreencast`,
         (target?: CDPTarget) => {
             if (!target){
-                telemetryReporter.sendTelemetryEvent('command/screencast/noTarget');
+                const errorMessage = 'No target selected';
+                telemetryReporter.sendTelemetryErrorEvent('command/screencast/target', {message: errorMessage});
                 return;
             }
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.toggleScreencast });

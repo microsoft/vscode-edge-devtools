@@ -30,7 +30,8 @@ import {
     SETTINGS_WEBVIEW_NAME,
     SETTINGS_VIEW_NAME,
 } from './utils';
-import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { ErrorReporter } from './errorReporter';
+import { ErrorCodes } from './common/errorCodes';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -88,6 +89,7 @@ export class DevToolsPanel {
         this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg) as unknown as void);
         this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg) as unknown as void);
         this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg) as unknown as void);
+        this.panelSocket.on('toggleScreencast', () => this.toggleScreencast() as unknown as void);
         this.panelSocket.on('cssMirrorContent', msg => this.onSocketCssMirrorContent(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
@@ -124,10 +126,6 @@ export class DevToolsPanel {
 
         // Handle messages from the webview
         this.panel.webview.onDidReceiveMessage(message => {
-            if ((message as string).includes('toggleScreencast')) {
-                this.toggleScreencast();
-            }
-
             this.panelSocket.onMessageFromWebview(message);
         }, this, this.disposables);
 
@@ -557,5 +555,4 @@ export class DevToolsPanel {
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
         }
     }
-
 }

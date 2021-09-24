@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+// Taken from
+// devtools-frontend/src/front_end/models/emulation/EmulatedDevices.ts
+
 export const emulatedDevices = [
   {
     'order': 52,
