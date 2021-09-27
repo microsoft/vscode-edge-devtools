@@ -62,6 +62,13 @@ export class SettingsProvider {
     return isHeadless;
   }
 
+  getScreencastSettings(): boolean {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const screencastSetting = settings.get('standaloneScreencast');
+    const standaloneScreencast: boolean = screencastSetting !== undefined ? !!screencastSetting : false;
+    return standaloneScreencast;
+  }
+
   static get instance(): SettingsProvider {
     if (!SettingsProvider.singletonInstance) {
       SettingsProvider.singletonInstance = new SettingsProvider();

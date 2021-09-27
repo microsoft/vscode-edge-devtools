@@ -14,7 +14,8 @@ import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
 
 import puppeteer from 'puppeteer-core';
-import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { ErrorReporter } from './errorReporter';
+import { ErrorCodes } from './common/errorCodes';
 
 export type BrowserFlavor = 'Default' | 'Stable' | 'Beta' | 'Dev' | 'Canary';
 
@@ -81,6 +82,7 @@ export const SETTINGS_DEFAULT_HOSTNAME = 'localhost';
 export const SETTINGS_DEFAULT_PORT = 9222;
 export const SETTINGS_DEFAULT_URL = path.resolve(path.join(__dirname, 'startpage', 'index.html'));
 export const SETTINGS_WEBVIEW_NAME = 'Edge DevTools';
+export const SETTINGS_SCREENCAST_WEBVIEW_NAME = 'Edge DevTools: Screencast';
 export const SETTINGS_PREF_NAME = 'devtools-preferences';
 export const SETTINGS_PREF_DEFAULTS = {
     screencastEnabled: false,
@@ -137,6 +139,7 @@ export const buttonCode: Record<string, string> = {
     viewChangelog: '8',
     closeTarget: '9',
     emptyTargetListLaunchBrowserInstance: '10',
+    toggleScreencast: '10',
 };
 
 /**

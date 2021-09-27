@@ -1,0 +1,56 @@
+html,
+body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#toolbar {
+  display: flex;
+  width: 100%;
+}
+
+#toolbar>button,
+#toolbar>select {
+  background-color: var(--vscode-editor-background);
+  border: none;
+  color: var(--vscode-editor-foreground);
+}
+
+#url {
+  flex: 1;
+  background-color: var(--vscode-input-background);
+  border-style: solid;
+  border-width: 1px;
+  color: var(--vscode-input-foreground);
+}
+
+#canvas-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+#canvas-wrapper.fill #canvas {
+  max-width: none;
+  max-height: none;
+}
+
+#canvas {
+  outline: none;
+}

@@ -35,6 +35,17 @@ module.exports = (env: any) => {
         {
             ...commonConfig,
             entry: {
+                screencast: './src/screencast/main.ts',
+            },
+            name: 'screencast',
+            output: {
+                filename: '[name].bundle.js',
+                path: path.resolve(__dirname, 'out/screencast'),
+            },
+        },
+        {
+            ...commonConfig,
+            entry: {
                 host: './src/host_beta/mainHost.ts',
             },
             name: 'host',
@@ -66,6 +77,7 @@ module.exports = (env: any) => {
                     patterns: [
                     { from: 'startpage', to: 'startpage'},
                     { from: 'icon.png', to: 'icon.png'},
+                    { from: 'src/screencast/view.css', to: 'screencast/view.css'},
                     ],
                 }),
                 // These must also be defined in the jest section of package.json for tests to pass

@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -103,6 +103,16 @@
                 }
             },
             {
+                "command": "vscode-edge-devtools-view.toggleScreencast",
+                "category": "Microsoft Edge Tools",
+                "title": "Toggle screencast",
+                "enablement": "viewItem != cdpTargetClosing",
+                "icon": {
+                    "light": "resources/light/screencast.svg",
+                    "dark": "resources/dark/screencast.svg"
+                }
+            },
+            {
                 "command": "vscode-edge-devtools-view.copyItem",
                 "category": "Microsoft Edge Tools",
                 "title": "Copy Value"
@@ -195,6 +205,11 @@
                         "/": "${workspaceFolder}"
                     },
                     "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
+                },
+                "vscode-edge-devtools.standaloneScreencast": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "When selected, screencast will be rendered in an individual screen and enable device emulation."
                 },
                 "vscode-edge-devtools.sourceMapPathOverrides": {
                     "type": "object",
@@ -530,14 +545,19 @@
             ],
             "view/item/context": [
                 {
+                    "command": "vscode-edge-devtools-view.toggleScreencast",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget && standaloneScreencast",
+                    "group": "inline@0"
+                },
+                {
                     "command": "vscode-edge-devtools-view.attach",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
-                    "group": "inline"
+                    "group": "inline@1"
                 },
                 {
                     "command": "vscode-edge-devtools-view.close-instance",
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget || viewItem == cdpTargetClosing",
-                    "group": "inline"
+                    "group": "inline@2"
                 },
                 {
                     "command": "vscode-edge-devtools-view.attach",
@@ -690,6 +710,7 @@
         "@types/ws": "7.4.2",
         "@typescript-eslint/eslint-plugin": "4.22.1",
         "@typescript-eslint/parser": "4.22.1",
+        "@vscode/codicons": "0.0.22",
         "copy-webpack-plugin": "8.1.1",
         "eslint": "7.25.0",
         "eslint-plugin-import": "2.22.1",

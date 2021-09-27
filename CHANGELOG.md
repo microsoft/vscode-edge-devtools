@@ -1,6 +1,13 @@
+## 1.3.1
+* **[Feature]**: Error handling implementation. - [PR #475](https://github.com/microsoft/vscode-edge-devtools/pull/475)
+* **[Feature]**: Implement CSS mirror editing - [PR #462](https://github.com/microsoft/vscode-edge-devtools/pull/462)
+* **[Bug Fix]**: Properly resolve index.html and other entrypoint links - [PR #469](https://github.com/microsoft/vscode-edge-devtools/pull/469)
+* **[Feature]**: Introducing error reporter. - [PR #474](https://github.com/microsoft/vscode-edge-devtools/pull/474)
+* **[Bug Fix]**: Supporting following CSS links on WSL remotes - [PR #467](https://github.com/microsoft/vscode-edge-devtools/pull/467)
+
 ## 1.3.0
 * **[Feature]**: The Extension now retrieves DevTools that directly match supported browser targets - Microsoft Edge 94.0.988.0 and newer. - [PR #449](https://github.com/microsoft/vscode-edge-devtools/pull/449)
-* **[Feature]**: Targeting Microsoft Edge Version 94.0.988.0 and newer now supports automatically changing themes to match built in Visual Studio Code themes. - [PR #445](https://github.com/microsoft/vscode-edge-devtools/pull/445)
+* **[Feature]**: Targeting Microsoft Edge Version 94.0.988.0 and newer now supports automatically changing themes to match built in Visual Studio Code themes. - [PR #455](https://github.com/microsoft/vscode-edge-devtools/pull/455)
 * **[Deprecation]**: The Extension's DevTools Console output has been deprecated in favor of Visual Studio Code's Debug Console. - [PR #460](https://github.com/microsoft/vscode-edge-devtools/pull/460)
 * **[Documentation]**: The Extension sidebar now provides direct links to our documentation and issue pages. - [PR #459](https://github.com/microsoft/vscode-edge-devtools/pull/459)
 
