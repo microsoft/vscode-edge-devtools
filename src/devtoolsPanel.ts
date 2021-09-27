@@ -29,6 +29,7 @@ import {
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
     SETTINGS_VIEW_NAME,
+    CDN_FALLBACK_REVISION,
 } from './utils';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
@@ -87,8 +88,7 @@ export class DevToolsPanel {
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
 
         // This Websocket is only used on initial connection to determine the browser version.
-        // The browser version is used to select between CDN and bundled tools
-        // Future versions of the extension will remove this socket and only use CDN
+        // The browser version is used to select the correct hashed version of the devtools
         this.versionDetectionSocket = new BrowserVersionDetectionSocket(this.targetUrl);
         this.versionDetectionSocket.on('setCdnParameters', msg => this.setCdnParameters(msg));
 
@@ -117,8 +117,7 @@ export class DevToolsPanel {
 
         // Update DevTools theme if user changes global theme
         vscode.workspace.onDidChangeConfiguration(e => {
-            if (this.config.isCdnHostedTools &&
-            e.affectsConfiguration('workbench.colorTheme') &&
+            if (e.affectsConfiguration('workbench.colorTheme') &&
             this.panel.visible) {
                 this.update();
             }
@@ -406,56 +405,13 @@ export class DevToolsPanel {
     }
 
     private update() {
-        // Check to see which version of devtools we need to launch
-        this.panel.webview.html = (this.config.isCdnHostedTools || this.config.useLocalEdgeWatch) ? this.getCdnHtmlForWebview() : this.getHtmlForWebview();
-    }
-
-    private getHtmlForWebview() {
-        // inspectorUri is the file that used to be loaded in inspector.html
-        // They are being loaded directly into the webview.
-        // local resource loading inside iframes was deprecated in these commits:
-        // https://github.com/microsoft/vscode/commit/de9887d9e0eaf402250d2735b3db5dc340184b74
-        // https://github.com/microsoft/vscode/commit/d05ded6d3b64fed4a3cc74106f9b6c72243b18de
-
-        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
-        const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
-
-        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
-        const hostUri = this.panel.webview.asWebviewUri(hostPath);
-
-        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
-        const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
-
-        // the added fields for "Content-Security-Policy" allow resource loading for other file types
-        return `
-            <!doctype html>
-            <html>
-            <head>
-                <base href="${inspectorUri}">
-                <meta http-equiv="content-type" content="text/html; charset=utf-8">
-                <meta http-equiv="Content-Security-Policy"
-                    content="default-src;
-                    img-src 'self' data: ${this.panel.webview.cspSource};
-                    style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
-                    script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src 'self' ${this.panel.webview.cspSource};
-                    connect-src 'self' data: ${this.panel.webview.cspSource};
-                ">
-                <meta name="referrer" content="no-referrer">
-                <link href="${stylesUri}" rel="stylesheet"/>
-                <script src="${hostUri}"></script>
-                <script type="module" src="${inspectorUri}"></script>
-            </head>
-            <body>
-            </body>
-            </html>
-            `;
+        this.panel.webview.html = this.getCdnHtmlForWebview();
     }
 
     private getCdnHtmlForWebview() {
         // Default to config provided base uri
         const cdnBaseUri = this.config.devtoolsBaseUri || this.devtoolsBaseUri;
-        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
+        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
         const hostUri = this.panel.webview.asWebviewUri(hostPath);
 
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
@@ -499,15 +455,7 @@ export class DevToolsPanel {
     }
 
     private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
-        if (msg.revision !== '') {
-            this.config.isCdnHostedTools = true;
-            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', true);
-            this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision}/vscode_app.html`;
-        } else {
-            this.config.isCdnHostedTools = false;
-            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', false);
-            this.devtoolsBaseUri = '';
-        }
+        this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision || CDN_FALLBACK_REVISION}/vscode_app.html`;
         this.isHeadless = msg.isHeadless;
         this.update();
     }

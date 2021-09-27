@@ -46,17 +46,6 @@ module.exports = (env: any) => {
         {
             ...commonConfig,
             entry: {
-                host: './src/host_beta/mainHost.ts',
-            },
-            name: 'host',
-            output: {
-                filename: '[name].bundle.js',
-                path: path.resolve(__dirname, 'out/host_beta'),
-            },
-        },
-        {
-            ...commonConfig,
-            entry: {
                 extension: './src/extension.ts',
             },
             externals: {
@@ -76,6 +65,7 @@ module.exports = (env: any) => {
                 new copyPlugin({
                     patterns: [
                     { from: 'startpage', to: 'startpage'},
+                    { from: './src/common/styles.css', to: 'common/styles.css'},
                     { from: 'icon.png', to: 'icon.png'},
                     { from: 'src/screencast/view.css', to: 'screencast/view.css'},
                     ],
