@@ -226,6 +226,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             // localhost might not be ready as the user might not have a server running
             // so just show an error dialog for any other condition.
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // @ts-ignore specific case for ECONNREFUSED.
             if (e && e.code && e.code === 'ECONNREFUSED'){
                 continue;
             }
