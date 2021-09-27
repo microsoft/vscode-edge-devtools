@@ -28,8 +28,10 @@ import {
     SETTINGS_PREF_NAME,
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
+    SETTINGS_VIEW_NAME,
 } from './utils';
-import { ErrorCodes, ErrorReporter } from './errorReporter';
+import { ErrorReporter } from './errorReporter';
+import { ErrorCodes } from './common/errorCodes';
 
 export class DevToolsPanel {
     private static instance: DevToolsPanel | undefined;
@@ -77,6 +79,7 @@ export class DevToolsPanel {
         this.panelSocket.on('getUrl', msg => this.onSocketGetUrl(msg) as unknown as void);
         this.panelSocket.on('openUrl', msg => this.onSocketOpenUrl(msg) as unknown as void);
         this.panelSocket.on('openInEditor', msg => this.onSocketOpenInEditor(msg) as unknown as void);
+        this.panelSocket.on('toggleScreencast', () => this.toggleScreencast() as unknown as void);
         this.panelSocket.on('cssMirrorContent', msg => this.onSocketCssMirrorContent(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
@@ -190,6 +193,11 @@ export class DevToolsPanel {
         } else {
             void vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
+    }
+
+    private toggleScreencast() {
+        const websocketUrl = this.targetUrl;
+        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleScreencast`, { websocketUrl });
     }
 
     private onSocketTelemetry(message: string) {
@@ -454,6 +462,7 @@ export class DevToolsPanel {
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
+        const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
@@ -474,7 +483,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}&standaloneScreencast=${standaloneScreencast}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>

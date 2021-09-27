@@ -94,6 +94,9 @@ export class MessageRouter {
                 const [cdpMessage] = args;
                 this.sendMessageToBackend(cdpMessage);
                 return true;
+            case 'toggleScreencast':
+                this.toggleScreencast()
+                return true;
             default:
                 // TODO: handle other types of messages from devtools
                 return false;
@@ -155,6 +158,11 @@ export class MessageRouter {
         // Forward the data to the extension
         const request: IOpenEditorData = { column, line, url, ignoreTabChanges };
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'openInEditor', request);
+    }
+
+    private toggleScreencast(): void {
+        // Forward the data to the extension
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'toggleScreencast');
     }
 
     private cssMirrorContent(url: string, newContent: string): void {
