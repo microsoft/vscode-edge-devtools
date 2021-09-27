@@ -3,16 +3,12 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { encodeMessageForChannel, WebSocketEvent } from './common/webviewEvents';
-import TelemetryReporter from 'vscode-extension-telemetry';
-import { ErrorReporter } from './errorReporter';
 import { PanelSocket } from './panelSocket';
 import { ScreencastView } from './screencast/view';
 import {
     SETTINGS_STORE_NAME,
     SETTINGS_SCREENCAST_WEBVIEW_NAME,
-    createTelemetryReporter,
 } from './utils';
-import { ErrorCodes } from './common/errorCodes';
 
 export class ScreencastPanel {
     private static instance: ScreencastPanel | undefined;
@@ -21,7 +17,6 @@ export class ScreencastPanel {
     private readonly panel: vscode.WebviewPanel;
     private targetUrl: string
     private panelSocket: PanelSocket;
-    private telemetryReporter: Readonly<TelemetryReporter>;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -31,11 +26,9 @@ export class ScreencastPanel {
         this.context = context;
         this.targetUrl = targetUrl;
         this.extensionPath = this.context.extensionPath;
-        this.telemetryReporter = createTelemetryReporter(context);
 
         this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
         this.panelSocket.on('close', () => this.onSocketClose());
-        this.panelSocket.on('reportError', msg => this.reportError(msg));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -73,15 +66,6 @@ export class ScreencastPanel {
 
     private postToWebview(e: WebSocketEvent, message?: string) {
         encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
-    }
-
-    private reportError(msg: string) {
-        const errorObj = JSON.parse(msg) as { errorCode: ErrorCodes.Error, title: string, message: string };
-        if (errorObj.errorCode !== undefined && errorObj.title && errorObj.message) {
-            void ErrorReporter.showErrorDialog(errorObj);
-        } else {
-            this.telemetryReporter.sendTelemetryErrorEvent('view/screencast/error', { message: msg });
-        }
     }
 
     private getHtmlForWebview() {

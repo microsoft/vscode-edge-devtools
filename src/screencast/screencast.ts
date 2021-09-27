@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { ErrorCodes } from '../common/errorCodes';
-import { encodeMessageForChannel } from '../common/webviewEvents';
+import { encodeMessageForChannel, TelemetryData } from '../common/webviewEvents';
 import { ScreencastCDPConnection, vscode } from './cdp';
 import { MouseEventMap, ScreencastInputHandler } from './input';
 
@@ -56,11 +56,7 @@ export class Screencast {
                     this.width = parseInt(deviceWidth);
                     this.height = parseInt(deviceHeight);
                 } else {
-                    encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'reportError', {
-                        errorCode: ErrorCodes.Error,
-                        title: 'Error while getting screencast width and height.',
-                        message: `Actual width: ${deviceWidth}, height: ${deviceHeight}`,
-                    });
+                    this.reportError(ErrorCodes.Error, 'Error while getting screencast width and height.', `Actual width: ${deviceWidth}, height: ${deviceHeight}`);
                 }
 
                 this.screencastWrapper.classList.remove('desktop');
@@ -75,6 +71,8 @@ export class Screencast {
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
+
+        // Optimizing the resize event to limit how often can it be called.
         let resizeTimeout = 0 as unknown as NodeJS.Timeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
@@ -127,6 +125,24 @@ export class Screencast {
         }
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', params);
         this.updateScreencast();
+    }
+
+    private reportError(type: ErrorCodes.Error, message: string, stack: string) {
+
+        // Package up the error info to send to the extension
+        const data = { type, message, stack };
+
+        // Inform the extension of the DevTools telemetry event
+        this.sendTelemetry({
+            data,
+            event: 'error',
+            name: 'screencast error',
+        });
+    }
+
+    private sendTelemetry(telemetry: TelemetryData) {
+        // Forward the data to the extension
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', telemetry);
     }
 
     private isDeviceTouch(){
