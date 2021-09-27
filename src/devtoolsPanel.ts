@@ -193,16 +193,13 @@ export class DevToolsPanel {
         } else {
             void vscode.commands.executeCommand('workbench.action.focusPreviousGroup');
         }
+    }
+
     private toggleScreencast() {
         const websocketUrl = this.targetUrl;
         void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleScreencast`, { websocketUrl });
     }
 
-    private onSocketConsoleOutput(message: string) {
-        const { consoleMessage } = JSON.parse(message) as { consoleMessage : string };
-        this.consoleOutput.appendLine(consoleMessage);
-    }
-    
     private onSocketTelemetry(message: string) {
         const telemetry: TelemetryData = JSON.parse(message) as TelemetryData;
 

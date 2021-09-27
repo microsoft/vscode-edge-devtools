@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'cssMirrorContent' | 'ready' | 'setState' | 'telemetry' | 'websocket'
-| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'consoleOutput';
+| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'toggleScreencast';
 export const webviewEventNames: WebviewEvent[] = [
     'getState',
     'getUrl',
@@ -17,7 +17,6 @@ export const webviewEventNames: WebviewEvent[] = [
     'focusEditor',
     'focusEditorGroup',
     'openUrl',
-    'consoleOutput',
     'toggleScreencast',
 ];
 
