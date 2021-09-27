@@ -686,7 +686,7 @@
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
         "lint": "eslint -c .eslintrc.js */*.ts",
-        "test": "npm run lint && jest --config package.json --runInBand",
+        "test": "npm run lint && jest --config package.json --runInBand --env=jsdom",
         "download-edge": "node scripts/downloadAndExtractEdge.js",
         "minify-devtools": "node scripts/minifyDevtools.js"
     },
