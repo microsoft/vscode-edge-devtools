@@ -28,6 +28,7 @@ body {
   background-color: var(--vscode-editor-background);
   border: none;
   color: var(--vscode-editor-foreground);
+  padding-bottom: 4px;
 }
 
 #url {
