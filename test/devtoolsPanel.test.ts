@@ -47,7 +47,6 @@ describe("devtoolsPanel", () => {
             sourceMaps: true,
             webRoot: "",
             isJsDebugProxiedCDPConnection: false,
-            isCdnHostedTools: false,
             useLocalEdgeWatch: false,
         };
 
@@ -500,7 +499,7 @@ describe("devtoolsPanel", () => {
                         }),
                     }
                 });
-                
+
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
@@ -534,7 +533,7 @@ describe("devtoolsPanel", () => {
                         }),
                     }
                 });
-                
+
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
@@ -568,7 +567,7 @@ describe("devtoolsPanel", () => {
                         }),
                     }
                 });
-                
+
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
