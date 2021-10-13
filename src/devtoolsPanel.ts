@@ -420,6 +420,11 @@ export class DevToolsPanel {
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
         const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
 
+        // The headless query param is used to show/hide the DevTools screencast on launch
+        // If the standalone screencast is enabled, we want to hide the DevTools screencast
+        // regardless of the headless setting.
+        const enableScreencast = standaloneScreencast ? false : this.isHeadless;
+
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
             <!doctype html>
@@ -439,7 +444,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}&standaloneScreencast=${standaloneScreencast}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${enableScreencast}&standaloneScreencast=${standaloneScreencast}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>
