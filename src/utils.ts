@@ -59,7 +59,6 @@ export interface IRuntimeConfig {
     sourceMaps: boolean;
     webRoot: string;
     isJsDebugProxiedCDPConnection: boolean;
-    isCdnHostedTools: boolean;
     useLocalEdgeWatch: boolean;
     devtoolsBaseUri?: string;
     defaultEntrypoint?: string;
@@ -109,6 +108,9 @@ export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
+
+// Current Revision: 94.0.992.31
+export const CDN_FALLBACK_REVISION = '@fd65e6bbedc86a22f2393b7cd8d1585c54cada42';
 
 /** Build-specified flags. */
 declare const DEBUG: boolean;
@@ -226,6 +228,8 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             // localhost might not be ready as the user might not have a server running
             // so just show an error dialog for any other condition.
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore specific case for ECONNREFUSED.
             if (e && e.code && e.code === 'ECONNREFUSED'){
                 continue;
             }
@@ -483,7 +487,6 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         sourceMaps,
         webRoot: resolvedWebRoot,
         isJsDebugProxiedCDPConnection: false,
-        isCdnHostedTools: DEBUG || false,
         useLocalEdgeWatch: DEBUG,
         devtoolsBaseUri: DEVTOOLS_BASE_URI,
         defaultEntrypoint: defaultEntrypoint,
