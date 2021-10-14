@@ -56,3 +56,7 @@ body {
 #canvas {
   outline: none;
 }
+
+#canvas.touch {
+  cursor: -webkit-image-set(url('../../resources/Images/touchCursor.png') 1x, url('../../resources/Images/touchCursor_2x.png') 2x), default;
+}

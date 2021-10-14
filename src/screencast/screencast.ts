@@ -117,20 +117,22 @@ export class Screencast {
     }
 
     private updateEmulation(): void {
+        const isTouch = this.isDeviceTouch();
         const deviceMetricsParams = {
             width: this.width || this.screencastWrapper.offsetWidth,
             height: this.height || this.screencastWrapper.offsetHeight,
             deviceScaleFactor: 0,
-            mobile: this.isDeviceTouch(),
+            mobile: isTouch,
         };
         const touchEmulationParams = {
-            enabled: this.isDeviceTouch(),
+            enabled: isTouch,
             maxTouchPoints: 1,
         };
         const touchEventsParams = {
-            enabled: this.isDeviceTouch(),
-            configuration: this.isDeviceTouch() ? 'mobile' : 'desktop',
+            enabled: isTouch,
+            configuration: isTouch ? 'mobile' : 'desktop',
         };
+        this.screencastImage.classList.toggle('touch', isTouch);
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
