@@ -80,7 +80,7 @@ export class Screencast {
         });
 
         this.registerInputListeners();
-        
+
         // Start screencast
         this.updateEmulation();
         this.updateHistory();
@@ -103,14 +103,14 @@ export class Screencast {
         }
 
         for (const eventName of ['keydown', 'keypress']) {
-            this.screencastImage.addEventListener(eventName, (event) => {
+            this.screencastImage.addEventListener(eventName, event => {
                 this.inputHandler.emitKeyEvent(event as KeyboardEvent);
             });
         }
     }
 
     private updateHistory(): void {
-        this.cdpConnection.sendMessageToBackend('Page.getNavigationHistory', {}, (result) => {
+        this.cdpConnection.sendMessageToBackend('Page.getNavigationHistory', {}, result => {
             const {currentIndex, entries} = result;
             this.history = entries;
             this.historyIndex = currentIndex;
@@ -121,13 +121,25 @@ export class Screencast {
     }
 
     private updateEmulation(): void {
-        const params = {
+        const isTouch = this.isDeviceTouch();
+        const deviceMetricsParams = {
             width: this.width || this.screencastWrapper.offsetWidth,
             height: this.height || this.screencastWrapper.offsetHeight,
             deviceScaleFactor: 0,
-            mobile: this.isDeviceTouch()
-        }
-        this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', params);
+            mobile: isTouch,
+        };
+        const touchEmulationParams = {
+            enabled: isTouch,
+            maxTouchPoints: 1,
+        };
+        const touchEventsParams = {
+            enabled: isTouch,
+            configuration: isTouch ? 'mobile' : 'desktop',
+        };
+        this.screencastImage.classList.toggle('touch', isTouch);
+        this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
+        this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
+        this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
         this.updateScreencast();
     }
 
@@ -151,8 +163,7 @@ export class Screencast {
 
     private isDeviceTouch(){
         const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-        return selectedOption.getAttribute('touch') === "true" 
-            || selectedOption.getAttribute('mobile') === "true";
+        return selectedOption.getAttribute('touch') === 'true' || selectedOption.getAttribute('mobile') === 'true';
     }
 
     private updateScreencast(): void {
@@ -214,7 +225,7 @@ export class Screencast {
     }
 
     private onScreencastFrame({data, sessionId}: any): void {
-        this.screencastImage.src = 'data:image/png;base64,' + data;
+        this.screencastImage.src = `data:image/png;base64,${data}`;
         this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
     }

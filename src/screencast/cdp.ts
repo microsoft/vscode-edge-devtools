@@ -26,12 +26,11 @@ export class ScreencastCDPConnection {
         window.addEventListener('message', e => {
             parseMessageFromChannel(e.data, (eventName, args) => {
                 if (eventName === 'websocket') {
-                    const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
-                    console.log(event, message);
+                    const { message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
                     // Handle event responses
                     const messageObj = JSON.parse(message) as CdpMessage;
                     for (const callback of this.eventCallbackMap.get(messageObj.method) || []) {
-                        callback(messageObj.params)
+                        callback(messageObj.params);
                     }
                     // Handle method responses
                     const methodCallback = this.methodCallbackMap.get(messageObj.id);
@@ -47,12 +46,12 @@ export class ScreencastCDPConnection {
     }
 
     sendMessageToBackend(method: string, params: any, callback?: CdpMethodCallback): void {
-        const id = this.nextId++
+        const id = this.nextId++;
         const cdpMessage: CdpMessage = {
             id: id,
             method,
-            params
-        }
+            params,
+        };
         if (callback) {
             this.methodCallbackMap.set(id, callback);
         }
