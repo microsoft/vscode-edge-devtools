@@ -97,7 +97,7 @@ export class ScreencastInputHandler {
             const wheelEvent = mouseEvent as WheelEvent;
             params.deltaX = wheelEvent.deltaX;
             params.deltaY = -wheelEvent.deltaY;
-            params.button = "none";
+            params.button = 'none';
         } else {
             this.activeTouchParams = params;
         }
