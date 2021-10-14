@@ -87,13 +87,17 @@ export class Screencast {
     }
 
     private registerInputListeners(): void {
+        // Disable context menu on screencast image
+        this.screencastImage.addEventListener('contextmenu', event => event.preventDefault());
+
         for (const eventName of Object.keys(MouseEventMap)) {
-            this.screencastImage.addEventListener(eventName, (event) => {
+            this.screencastImage.addEventListener(eventName, event => {
                 const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
+                const mouseEvent = event as MouseEvent;
                 if (this.isDeviceTouch()) {
-                    this.inputHandler.emitTouchFromMouseEvent(event as MouseEvent, scale);
-                } else {
-                    this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
+                    this.inputHandler.emitTouchFromMouseEvent(mouseEvent, scale);
+                } else if (mouseEvent.button !== 2 /* right click */) {
+                    this.inputHandler.emitMouseEvent(mouseEvent, scale);
                 }
             });
         }
