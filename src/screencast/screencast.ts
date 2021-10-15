@@ -227,6 +227,9 @@ export class Screencast {
     private onScreencastFrame({data, sessionId}: any): void {
         this.screencastImage.src = `data:image/png;base64,${data}`;
         this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
+        if (this.screencastImage.naturalWidth !== this.width || this.screencastImage.naturalHeight !== this.height) {
+            this.updateEmulation();
+        }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
     }
 }
