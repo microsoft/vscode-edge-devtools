@@ -224,7 +224,8 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             if (jsonResponse) {
                 break;
             }
-        } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
             // localhost might not be ready as the user might not have a server running
             // so just show an error dialog for any other condition.
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
