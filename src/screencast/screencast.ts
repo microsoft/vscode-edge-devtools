@@ -65,7 +65,6 @@ export class Screencast {
         });
 
         this.cdpConnection.registerForEvent('Page.domContentEventFired', () => this.onDomContentEventFired());
-        this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
 
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
@@ -191,13 +190,6 @@ export class Screencast {
         if (this.historyIndex < this.history.length - 1) {
             const entryId = this.history[this.historyIndex + 1].id;
             this.cdpConnection.sendMessageToBackend('Page.navigateToHistoryEntry', {entryId})
-        }
-    }
-
-    private onFrameNavigated({frame}: any): void {
-        if (!frame.parentId) {
-            this.updateHistory();
-            this.updateEmulation();
         }
     }
 
