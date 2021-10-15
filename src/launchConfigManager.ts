@@ -52,7 +52,7 @@ export class LaunchConfigManager {
             // Check if there is a supported debug config
             const configs = vscode.workspace.getConfiguration('launch', workspaceUri).get('configurations') as vscode.DebugConfiguration[];
             for (const config of configs) {
-                if (config.type === 'vscode-edge-devtools.debug' || config.type === 'msedge' || config.type === 'edge') {
+                if (config.type === 'vscode-edge-devtools.debug' || config.type === 'pwa-msedge') {
                     void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Supported');
                     this.launchConfig = config;
                     this.isValidConfig = true;
