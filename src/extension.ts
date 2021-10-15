@@ -293,7 +293,7 @@ export async function attach(
 
     // If there is no response after the timeout then throw an exception
     if (responseArray.length === 0) {
-        void ErrorReporter.showInformationDialog({
+        void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while fetching list of available targets',
             message: exceptionStack || 'No available targets to attach.',
