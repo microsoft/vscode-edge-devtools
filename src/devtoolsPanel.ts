@@ -166,11 +166,11 @@ export class DevToolsPanel {
     private onSocketMessage(message: string) {
         // If inspect mode is toggled on the DevTools, we need to let the standalone screencast
         // know in order to enable hover events to be sent through.
-        if (message.indexOf('\\"method\\":\\"Overlay.setInspectMode\\"') !== -1) {
+        if (message && message.indexOf('\\"method\\":\\"Overlay.setInspectMode\\"') !== -1) {
             if (message.indexOf('\\"mode\\":\\"none\\"') !== -1) {
-                void vscode.commands.executeCommand(`${SETTINGS_STORE_NAME}.toggleInspect`, { enabled: false });
+                void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleInspect`, { enabled: false });
             } else if (message.indexOf('\\"mode\\":\\"searchForNode\\"') !== -1) {
-                void vscode.commands.executeCommand(`${SETTINGS_STORE_NAME}.toggleInspect`, { enabled: true });
+                void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleInspect`, { enabled: true });
             }
         }
         // TODO: Handle message

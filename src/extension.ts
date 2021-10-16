@@ -125,7 +125,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }));
 
     context.subscriptions.push(vscode.commands.registerCommand(
-        `${SETTINGS_STORE_NAME}.toggleInspect`,
+        `${SETTINGS_VIEW_NAME}.toggleInspect`,
         (enabled: boolean) => {
             if (ScreencastPanel.instance) {
                 ScreencastPanel.instance.toggleInspect(enabled);

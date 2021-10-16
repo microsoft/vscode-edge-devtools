@@ -81,8 +81,8 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(17);
-            expect(commandMock).toHaveBeenCalledTimes(16);
+            expect(context.subscriptions.length).toBe(18);
+            expect(commandMock).toHaveBeenCalledTimes(17);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
@@ -98,19 +98,21 @@ describe("extension", () => {
             expect(commandMock)
                 .toHaveBeenNthCalledWith(7, `${SETTINGS_VIEW_NAME}.toggleScreencast`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(8, `${SETTINGS_VIEW_NAME}.openSettings`, expect.any(Function));
+                .toHaveBeenNthCalledWith(8, `${SETTINGS_VIEW_NAME}.toggleInspect`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(9, `${SETTINGS_VIEW_NAME}.viewChangelog`, expect.any(Function));
+                .toHaveBeenNthCalledWith(9, `${SETTINGS_VIEW_NAME}.openSettings`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(10, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
+                .toHaveBeenNthCalledWith(10, `${SETTINGS_VIEW_NAME}.viewChangelog`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(11, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
+                .toHaveBeenNthCalledWith(11, `${SETTINGS_VIEW_NAME}.close-instance`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(12, `${SETTINGS_VIEW_NAME}.configureLaunchJson`, expect.any(Function));
+                .toHaveBeenNthCalledWith(12, `${SETTINGS_VIEW_NAME}.copyItem`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(13, `${SETTINGS_VIEW_NAME}.launchProject`, expect.any(Function));
+                .toHaveBeenNthCalledWith(13, `${SETTINGS_VIEW_NAME}.configureLaunchJson`, expect.any(Function));
             expect(commandMock)
-                .toHaveBeenNthCalledWith(14, `${SETTINGS_VIEW_NAME}.viewDocumentation`, expect.any(Function));
+                .toHaveBeenNthCalledWith(14, `${SETTINGS_VIEW_NAME}.launchProject`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(15, `${SETTINGS_VIEW_NAME}.viewDocumentation`, expect.any(Function));
             expect(mockRegisterTree)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
@@ -167,7 +169,7 @@ describe("extension", () => {
             attach.callback.call(attach.thisObj, { websocketUrl: "" });
             expect(mockPanelShow).toHaveBeenCalled();
 
-            const copy = getCommandCallback(10);
+            const copy = getCommandCallback(11);
             copy.callback.call(copy.thisObj, { tooltip: "something" });
             expect(mockClipboard).toHaveBeenCalledWith("something");
         });
