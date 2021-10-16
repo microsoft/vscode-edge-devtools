@@ -72,7 +72,7 @@ export class DevToolsPanel {
             this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
         }
         this.panelSocket.on('ready', () => this.onSocketReady());
-        this.panelSocket.on('websocket', () => this.onSocketMessage());
+        this.panelSocket.on('websocket', msg => this.onSocketMessage(msg));
         this.panelSocket.on('telemetry', msg => this.onSocketTelemetry(msg));
         this.panelSocket.on('getState', msg => this.onSocketGetState(msg));
         this.panelSocket.on('getVscodeSettings', msg => this.onSocketGetVscodeSettings(msg));
@@ -163,7 +163,16 @@ export class DevToolsPanel {
         this.timeStart = performance.now();
     }
 
-    private onSocketMessage() {
+    private onSocketMessage(message: string) {
+        // If inspect mode is toggled on the DevTools, we need to let the standalone screencast
+        // know in order to enable hover events to be sent through.
+        if (message.indexOf('\\"method\\":\\"Overlay.setInspectMode\\"') !== -1) {
+            if (message.indexOf('\\"mode\\":\\"none\\"') !== -1) {
+                void vscode.commands.executeCommand(`${SETTINGS_STORE_NAME}.toggleInspect`, { enabled: false });
+            } else if (message.indexOf('\\"mode\\":\\"searchForNode\\"') !== -1) {
+                void vscode.commands.executeCommand(`${SETTINGS_STORE_NAME}.toggleInspect`, { enabled: true });
+            }
+        }
         // TODO: Handle message
     }
 

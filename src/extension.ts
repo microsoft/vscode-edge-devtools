@@ -124,6 +124,14 @@ export function activate(context: vscode.ExtensionContext): void {
             ScreencastPanel.createOrShow(context, target.websocketUrl);
         }));
 
+    context.subscriptions.push(vscode.commands.registerCommand(
+        `${SETTINGS_STORE_NAME}.toggleInspect`,
+        (enabled: boolean) => {
+            if (ScreencastPanel.instance) {
+                ScreencastPanel.instance.toggleInspect(enabled);
+            }
+        }));
+
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openSettings`, () => {
         telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.openSettings });
         void vscode.commands.executeCommand('workbench.action.openSettings', `${SETTINGS_STORE_NAME}`);

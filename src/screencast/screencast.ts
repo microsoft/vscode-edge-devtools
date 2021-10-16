@@ -26,6 +26,7 @@ export class Screencast {
     private deviceSelect: HTMLSelectElement;
     private width = 0;
     private height = 0;
+    private inspectMode = false;
 
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
@@ -68,9 +69,13 @@ export class Screencast {
         this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
 
+        // This message comes from the DevToolsPanel instance.
+        this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
+
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
+        this.cdpConnection.sendMessageToBackend('Overlay.enable', {});
 
         // Optimizing the resize event to limit how often can it be called.
         let resizeTimeout = 0 as unknown as NodeJS.Timeout;
@@ -94,7 +99,7 @@ export class Screencast {
             this.screencastImage.addEventListener(eventName, event => {
                 const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
                 const mouseEvent = event as MouseEvent;
-                if (this.isDeviceTouch()) {
+                if (this.isDeviceTouch() && !this.inspectMode) {
                     this.inputHandler.emitTouchFromMouseEvent(mouseEvent, scale);
                 } else if (mouseEvent.button !== 2 /* right click */) {
                     this.inputHandler.emitMouseEvent(mouseEvent, scale);
@@ -228,5 +233,29 @@ export class Screencast {
         this.screencastImage.src = `data:image/png;base64,${data}`;
         this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
+    }
+
+    private onToggleInspect({ enabled }: any): void {
+        this.toggleTouchMode(enabled);
+    }
+
+    private toggleTouchMode(enabled: boolean): void {
+        this.inspectMode = enabled;
+        let touchEventsParams;
+        if (enabled) {
+            touchEventsParams = {
+                enabled: false,
+                configuration: 'desktop',
+            };
+            this.screencastImage.classList.toggle('touch', false);
+        } else {
+            const isTouch = this.isDeviceTouch();
+            touchEventsParams = {
+                enabled: isTouch,
+                configuration: isTouch ? 'mobile' : 'desktop',
+            };
+            this.screencastImage.classList.toggle('touch', isTouch);
+        }
+        this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
     }
 }
