@@ -64,7 +64,6 @@ export class Screencast {
             this.updateEmulation();
         });
 
-        this.cdpConnection.registerForEvent('Page.domContentEventFired', () => this.onDomContentEventFired());
         this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
 
@@ -183,10 +182,6 @@ export class Screencast {
         }
     }
 
-    private onDomContentEventFired(): void {
-        setTimeout(() => this.updateEmulation(), 100);
-    }
-
     private onForwardClick(): void {
         if (this.historyIndex < this.history.length - 1) {
             const entryId = this.history[this.historyIndex + 1].id;
@@ -197,7 +192,6 @@ export class Screencast {
     private onFrameNavigated({frame}: any): void {
         if (!frame.parentId) {
             this.updateHistory();
-            this.updateEmulation();
         }
     }
 
@@ -227,6 +221,9 @@ export class Screencast {
     private onScreencastFrame({data, sessionId}: any): void {
         this.screencastImage.src = `data:image/png;base64,${data}`;
         this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
+        if (this.screencastImage.naturalWidth !== this.width || this.screencastImage.naturalHeight !== this.height) {
+            this.updateEmulation();
+        }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
     }
 }
