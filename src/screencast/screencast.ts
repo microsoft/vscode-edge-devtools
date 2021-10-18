@@ -74,7 +74,6 @@ export class Screencast {
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
-        this.cdpConnection.sendMessageToBackend('Overlay.enable', {});
 
         // Optimizing the resize event to limit how often can it be called.
         let resizeTimeout = 0 as unknown as NodeJS.Timeout;
@@ -136,11 +135,15 @@ export class Screencast {
             enabled: isTouch,
             maxTouchPoints: 1,
         };
+
+        // In the case where inspect mode is toggled, we want to modify touchEventsparams
+        // to allow hover events to pass through.
+        const useTouchEvents = isTouch && !this.inspectMode;
         const touchEventsParams = {
-            enabled: isTouch,
-            configuration: isTouch ? 'mobile' : 'desktop',
+            enabled: useTouchEvents,
+            configuration: useTouchEvents ? 'mobile' : 'desktop',
         };
-        this.screencastImage.classList.toggle('touch', isTouch);
+        this.screencastImage.classList.toggle('touch', useTouchEvents);
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
