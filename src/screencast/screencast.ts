@@ -136,17 +136,9 @@ export class Screencast {
             maxTouchPoints: 1,
         };
 
-        // In the case where inspect mode is toggled, we want to modify touchEventsparams
-        // to allow hover events to pass through.
-        const useTouchEvents = isTouch && !this.inspectMode;
-        const touchEventsParams = {
-            enabled: useTouchEvents,
-            configuration: useTouchEvents ? 'mobile' : 'desktop',
-        };
-        this.screencastImage.classList.toggle('touch', useTouchEvents);
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
-        this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
+        this.toggleTouchMode();
         this.updateScreencast();
     }
 
@@ -236,26 +228,17 @@ export class Screencast {
     }
 
     private onToggleInspect({ enabled }: any): void {
-        this.toggleTouchMode(enabled);
+        this.inspectMode = enabled as boolean;
+        this.toggleTouchMode();
     }
 
-    private toggleTouchMode(enabled: boolean): void {
-        this.inspectMode = enabled;
-        let touchEventsParams;
-        if (enabled) {
-            touchEventsParams = {
-                enabled: false,
-                configuration: 'desktop',
-            };
-            this.screencastImage.classList.toggle('touch', false);
-        } else {
-            const isTouch = this.isDeviceTouch();
-            touchEventsParams = {
-                enabled: isTouch,
-                configuration: isTouch ? 'mobile' : 'desktop',
-            };
-            this.screencastImage.classList.toggle('touch', isTouch);
-        }
+    private toggleTouchMode(): void {
+        const touchEnabled = this.isDeviceTouch() && !this.inspectMode;
+        const touchEventsParams = {
+            enabled: touchEnabled,
+            configuration: touchEnabled ? 'mobile' : 'desktop',
+        };
+        this.screencastImage.classList.toggle('touch', touchEnabled);
         this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
     }
 }
