@@ -26,6 +26,7 @@ export class Screencast {
     private deviceSelect: HTMLSelectElement;
     private width = 0;
     private height = 0;
+    private inspectMode = false;
 
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
@@ -67,6 +68,9 @@ export class Screencast {
         this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
 
+        // This message comes from the DevToolsPanel instance.
+        this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
+
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
         this.cdpConnection.sendMessageToBackend('Page.enable', {});
@@ -93,7 +97,7 @@ export class Screencast {
             this.screencastImage.addEventListener(eventName, event => {
                 const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
                 const mouseEvent = event as MouseEvent;
-                if (this.isDeviceTouch()) {
+                if (this.isDeviceTouch() && !this.inspectMode) {
                     this.inputHandler.emitTouchFromMouseEvent(mouseEvent, scale);
                 } else if (mouseEvent.button !== 2 /* right click */) {
                     this.inputHandler.emitMouseEvent(mouseEvent, scale);
@@ -131,14 +135,10 @@ export class Screencast {
             enabled: isTouch,
             maxTouchPoints: 1,
         };
-        const touchEventsParams = {
-            enabled: isTouch,
-            configuration: isTouch ? 'mobile' : 'desktop',
-        };
-        this.screencastImage.classList.toggle('touch', isTouch);
+
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
-        this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
+        this.toggleTouchMode();
         this.updateScreencast();
     }
 
@@ -225,5 +225,20 @@ export class Screencast {
             this.updateEmulation();
         }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
+    }
+
+    private onToggleInspect({ enabled }: any): void {
+        this.inspectMode = enabled as boolean;
+        this.toggleTouchMode();
+    }
+
+    private toggleTouchMode(): void {
+        const touchEnabled = this.isDeviceTouch() && !this.inspectMode;
+        const touchEventsParams = {
+            enabled: touchEnabled,
+            configuration: touchEnabled ? 'mobile' : 'desktop',
+        };
+        this.screencastImage.classList.toggle('touch', touchEnabled);
+        this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
     }
 }
