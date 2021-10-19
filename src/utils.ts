@@ -605,7 +605,7 @@ export function isLocalResource(path: string): boolean {
 /**
  * Verifies if the headless checkbox in extension settings is enabled.
  */
-function isHeadlessEnabled() {
+export function isHeadlessEnabled(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const headless: boolean = settings.get('headless') || false;
     return headless;

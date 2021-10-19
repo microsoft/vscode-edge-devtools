@@ -23,6 +23,7 @@ import {
     addEntrypointIfNeeded,
     applyPathMapping,
     fetchUri,
+    isHeadlessEnabled,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
     SETTINGS_PREF_NAME,
@@ -33,9 +34,9 @@ import {
 } from './utils';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
+import { ScreencastPanel } from './screencastPanel';
 
 export class DevToolsPanel {
-    private static instance: DevToolsPanel | undefined;
     private readonly config: IRuntimeConfig;
     private readonly context: vscode.ExtensionContext;
     private readonly disposables: vscode.Disposable[] = [];
@@ -48,6 +49,7 @@ export class DevToolsPanel {
     private timeStart: number | null;
     private devtoolsBaseUri: string | null;
     private isHeadless: boolean;
+    static instance: DevToolsPanel | undefined;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -502,6 +504,11 @@ export class DevToolsPanel {
             });
 
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
+            if (isHeadlessEnabled()) {
+                if (!ScreencastPanel.instance) {
+                    ScreencastPanel.createOrShow(context, targetUrl);
+                }
+            }
         }
     }
 }
