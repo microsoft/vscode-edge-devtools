@@ -208,7 +208,7 @@
                 },
                 "vscode-edge-devtools.standaloneScreencast": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "When selected, screencast will be rendered in an individual screen and enable device emulation."
                 },
                 "vscode-edge-devtools.sourceMapPathOverrides": {

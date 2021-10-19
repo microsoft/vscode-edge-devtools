@@ -428,6 +428,7 @@ describe("devtoolsPanel", () => {
 
                 const mockUtils = {
                     fetchUri: jest.fn().mockResolvedValue(expectedContent),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
 
@@ -458,6 +459,7 @@ describe("devtoolsPanel", () => {
 
                 const mockUtils = {
                     fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
 
@@ -480,7 +482,10 @@ describe("devtoolsPanel", () => {
                     line: 4,
                     url: "http://fake.com/app.js",
                 };
-
+                const mockUtils = {
+                    isHeadlessEnabled: jest.fn(),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
                 const dtp = await import("../src/devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
@@ -511,6 +516,7 @@ describe("devtoolsPanel", () => {
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
                 jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
@@ -545,6 +551,7 @@ describe("devtoolsPanel", () => {
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
                 jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
@@ -579,6 +586,7 @@ describe("devtoolsPanel", () => {
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
                 jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
@@ -611,6 +619,7 @@ describe("devtoolsPanel", () => {
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
                 jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
@@ -638,6 +647,7 @@ describe("devtoolsPanel", () => {
                 const mockUtils = {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
 
@@ -654,7 +664,10 @@ describe("devtoolsPanel", () => {
                 const expectedId = { id: 0 };
                 const expectedState = { enableNetwork: true, themeString: "System preference", welcome: true, isHeadless: false};
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
-
+                const mockUtils = {
+                    isHeadlessEnabled: jest.fn(),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
                 const dtp = await import("../src/devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
