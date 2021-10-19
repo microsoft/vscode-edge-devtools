@@ -28,6 +28,7 @@
         "dom"
     ],
     "engines": {
+        "node": ">=8.0.0",
         "vscode": "^1.48.0"
     },
     "categories": [
@@ -41,7 +42,18 @@
         "onCommand:vscode-edge-devtools.attachToCurrentDebugTarget",
         "onWebviewPanel:vscode-edge-devtools",
         "onView:vscode-edge-devtools-view.targets",
-        "onDebug"
+        "onDebug",
+        "onLanguage:css",
+        "onLanguage:html",
+        "onLanguage:javascript",
+        "onLanguage:javascriptreact",
+        "onLanguage:json",
+        "onLanguage:jsonc",
+        "onLanguage:less",
+        "onLanguage:sass",
+        "onLanguage:scss",
+        "onLanguage:typescript",
+        "onLanguage:typescriptreact"
     ],
     "capabilities": {
         "untrustedWorkspaces": {
@@ -293,6 +305,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Enable edits in the styles pane to be automatically applied to the corresponding stylesheet in the workspace. (Only works when targeting Edge Browser versions 94.0.988.0+)"
+                },
+                "vscode-edge-devtools.webhint": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
                 }
             }
         },
@@ -690,6 +707,7 @@
         "utf-8-validate": "5.0.6",
         "vscode-chrome-debug-core": "6.8.11",
         "vscode-extension-telemetry": "0.4.1",
+        "vscode-webhint": "1.5.12",
         "ws": "8.2.2",
         "xmlhttprequest": "1.8.0"
     },
@@ -719,6 +737,7 @@
         "uglify-js": "3.14.2",
         "unzipper": "0.10.11",
         "vsce": "1.100.0",
+        "vscode-languageclient": "7.0.0",
         "vscode-test": "1.6.1",
         "webpack": "5.54.0",
         "webpack-cli": "4.8.0"

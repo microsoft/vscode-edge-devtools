@@ -29,6 +29,15 @@ export type Writable<T> = {
  */
 export function createFakeVSCode() {
     return {
+        CompletionItem: jest.fn(),
+        CodeLens: jest.fn(),
+        DocumentLink: jest.fn(),
+        CodeAction: jest.fn(),
+        Diagnostic: jest.fn(),
+        CallHierarchyItem: jest.fn(),
+        CodeActionKind: jest.fn(),
+        Disposable: jest.fn(),
+        version: '1.60.0',
         EventEmitter: jest.fn(),
         Range: function Range() { /* constructor */ },
         TreeDataProvider: jest.fn(),
@@ -60,6 +69,9 @@ export function createFakeVSCode() {
             clipboard: { writeText: jest.fn() },
             machineId: "someValue.machineId",
         },
+        languages: {
+            createDiagnosticCollection: jest.fn(),
+        },
         window: {
             createOutputChannel: jest.fn().mockReturnValue({ appendLine: jest.fn(), dispose: jest.fn() }),
             createWebviewPanel: jest.fn(),
@@ -70,6 +82,7 @@ export function createFakeVSCode() {
             showInformationMessage: jest.fn(),
         },
         workspace: {
+            createFileSystemWatcher: jest.fn(),
             findFiles: jest.fn(() => {
                 return [
                     {path: '/c:/test/main.js'},
@@ -139,6 +152,7 @@ export function createFakeExtensionContext() {
             get: jest.fn(),
             update: jest.fn(),
         },
+        asAbsolutePath: jest.fn(),
     } as object as ExtensionContext;
 }
 
