@@ -193,17 +193,25 @@ describe("devtoolsPanel", () => {
 
     describe("panelSocket", () => {
         it("listens for all the emit events", async () => {
+            // We need to account for webview events that are not used in the DevTools panel.
+            const screencastOnlyWebviewEvents = [
+                'toggleInspect',
+            ]
             const hookedEvents: string[] = [];
             mockPanelSocket.on.mockImplementation(((name: string | symbol, ...args: any) => {
                 hookedEvents.push(name.toString());
                 return mockPanelSocket;
             }));
+            for (const event of screencastOnlyWebviewEvents) {
+                hookedEvents.push(event);
+            }
 
             const dtp = await import("../src/devtoolsPanel");
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
             // The +1 in here is due to the 'close' event. This is an extension event not raised from the Webview.
-            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1);
+            // We subtract the # of screencast only webview events as the mockPanelSocket.on will not be called by the DevTools panel.
+            expect(mockPanelSocket.on).toHaveBeenCalledTimes(Object.keys(webviewEventNames).length + 1 - screencastOnlyWebviewEvents.length);
             for (const e of webviewEventNames) {
                 expect(hookedEvents).toContain(e);
             }
