@@ -24,8 +24,9 @@ export class Screencast {
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
     private deviceSelect: HTMLSelectElement;
-    private width = 0;
-    private height = 0;
+    private fixedWidth = 0;
+    private fixedHeight = 0;
+    private inspectMode = false;
 
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
@@ -45,16 +46,16 @@ export class Screencast {
 
         this.deviceSelect.addEventListener('change', () => {
             if (this.deviceSelect.value.toLowerCase() === 'desktop') {
-                this.width = 0;
-                this.height = 0;
+                this.fixedWidth = 0;
+                this.fixedHeight = 0;
                 this.screencastWrapper.classList.add('desktop');
             } else {
                 const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
                 const deviceWidth = selectedOption.getAttribute('devicewidth');
                 const deviceHeight = selectedOption.getAttribute('deviceheight');
                 if (deviceWidth && deviceHeight) {
-                    this.width = parseInt(deviceWidth);
-                    this.height = parseInt(deviceHeight);
+                    this.fixedWidth = parseInt(deviceWidth);
+                    this.fixedHeight = parseInt(deviceHeight);
                 } else {
                     this.reportError(ErrorCodes.Error, 'Error while getting screencast width and height.', `Actual width: ${deviceWidth}, height: ${deviceHeight}`);
                 }
@@ -64,9 +65,11 @@ export class Screencast {
             this.updateEmulation();
         });
 
-        this.cdpConnection.registerForEvent('Page.domContentEventFired', () => this.onDomContentEventFired());
         this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
+
+        // This message comes from the DevToolsPanel instance.
+        this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
 
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
@@ -80,33 +83,45 @@ export class Screencast {
         });
 
         this.registerInputListeners();
-        
+
         // Start screencast
         this.updateEmulation();
         this.updateHistory();
     }
 
+    get width(): number {
+        return this.fixedWidth || this.screencastWrapper.offsetWidth;
+    }
+
+    get height(): number {
+        return this.fixedHeight || this.screencastWrapper.offsetHeight;
+    }
+
     private registerInputListeners(): void {
+        // Disable context menu on screencast image
+        this.screencastImage.addEventListener('contextmenu', event => event.preventDefault());
+
         for (const eventName of Object.keys(MouseEventMap)) {
-            this.screencastImage.addEventListener(eventName, (event) => {
+            this.screencastImage.addEventListener(eventName, event => {
                 const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
-                if (this.isDeviceTouch()) {
-                    this.inputHandler.emitTouchFromMouseEvent(event as MouseEvent, scale);
-                } else {
-                    this.inputHandler.emitMouseEvent(event as MouseEvent, scale);
+                const mouseEvent = event as MouseEvent;
+                if (this.isDeviceTouch() && !this.inspectMode) {
+                    this.inputHandler.emitTouchFromMouseEvent(mouseEvent, scale);
+                } else if (mouseEvent.button !== 2 /* right click */) {
+                    this.inputHandler.emitMouseEvent(mouseEvent, scale);
                 }
             });
         }
 
         for (const eventName of ['keydown', 'keypress']) {
-            this.screencastImage.addEventListener(eventName, (event) => {
+            this.screencastImage.addEventListener(eventName, event => {
                 this.inputHandler.emitKeyEvent(event as KeyboardEvent);
             });
         }
     }
 
     private updateHistory(): void {
-        this.cdpConnection.sendMessageToBackend('Page.getNavigationHistory', {}, (result) => {
+        this.cdpConnection.sendMessageToBackend('Page.getNavigationHistory', {}, result => {
             const {currentIndex, entries} = result;
             this.history = entries;
             this.historyIndex = currentIndex;
@@ -117,13 +132,21 @@ export class Screencast {
     }
 
     private updateEmulation(): void {
-        const params = {
-            width: this.width || this.screencastWrapper.offsetWidth,
-            height: this.height || this.screencastWrapper.offsetHeight,
+        const isTouch = this.isDeviceTouch();
+        const deviceMetricsParams = {
+            width: this.width,
+            height: this.height,
             deviceScaleFactor: 0,
-            mobile: this.isDeviceTouch()
-        }
-        this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', params);
+            mobile: isTouch,
+        };
+        const touchEmulationParams = {
+            enabled: isTouch,
+            maxTouchPoints: 1,
+        };
+
+        this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
+        this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
+        this.toggleTouchMode();
         this.updateScreencast();
     }
 
@@ -147,16 +170,15 @@ export class Screencast {
 
     private isDeviceTouch(){
         const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-        return selectedOption.getAttribute('touch') === "true" 
-            || selectedOption.getAttribute('mobile') === "true";
+        return selectedOption.getAttribute('touch') === 'true' || selectedOption.getAttribute('mobile') === 'true';
     }
 
     private updateScreencast(): void {
         const screencastParams = {
             format: 'png',
             quality: 100,
-            maxWidth: this.width || this.screencastWrapper.offsetWidth,
-            maxHeight: this.height || this.screencastWrapper.offsetHeight
+            maxWidth: this.width,
+            maxHeight: this.height
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
     }
@@ -166,10 +188,6 @@ export class Screencast {
             const entryId = this.history[this.historyIndex - 1].id;
             this.cdpConnection.sendMessageToBackend('Page.navigateToHistoryEntry', {entryId})
         }
-    }
-
-    private onDomContentEventFired(): void {
-        setTimeout(() => this.updateEmulation(), 100);
     }
 
     private onForwardClick(): void {
@@ -182,7 +200,6 @@ export class Screencast {
     private onFrameNavigated({frame}: any): void {
         if (!frame.parentId) {
             this.updateHistory();
-            this.updateEmulation();
         }
     }
 
@@ -191,10 +208,10 @@ export class Screencast {
     }
 
     private onRotateClick(): void {
-        const width = this.height;
-        const height = this.width;
-        this.width = width;
-        this.height = height;
+        const width = this.fixedHeight;
+        const height = this.fixedWidth;
+        this.fixedWidth = width;
+        this.fixedHeight = height;
         this.updateEmulation();
     }
 
@@ -210,8 +227,26 @@ export class Screencast {
     }
 
     private onScreencastFrame({data, sessionId}: any): void {
-        this.screencastImage.src = 'data:image/png;base64,' + data;
+        this.screencastImage.src = `data:image/png;base64,${data}`;
         this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
+        if (this.screencastImage.naturalWidth !== this.width || this.screencastImage.naturalHeight !== this.height) {
+            this.updateEmulation();
+        }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
+    }
+
+    private onToggleInspect({ enabled }: any): void {
+        this.inspectMode = enabled as boolean;
+        this.toggleTouchMode();
+    }
+
+    private toggleTouchMode(): void {
+        const touchEnabled = this.isDeviceTouch() && !this.inspectMode;
+        const touchEventsParams = {
+            enabled: touchEnabled,
+            configuration: touchEnabled ? 'mobile' : 'desktop',
+        };
+        this.screencastImage.classList.toggle('touch', touchEnabled);
+        this.cdpConnection.sendMessageToBackend('Emulation.setEmitTouchEventsForMouse', touchEventsParams);
     }
 }

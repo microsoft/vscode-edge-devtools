@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { Uri } from 'vscode';
-import { emulatedDevices } from "./emulatedDevices";
+import { emulatedDevices } from './emulatedDevices';
 
 export class ScreencastView {
     private webviewCSP: string;
@@ -74,10 +74,10 @@ export class ScreencastView {
         return templatedString;
     }
 
-    public static getDeviceCapabilities(deviceCapabilities: string[]){
+    static getDeviceCapabilities(deviceCapabilities: string[]): string{
         let result = '';
-        for(const device of deviceCapabilities){
-            if(device === 'touch' || device === 'mobile') {
+        for (const device of deviceCapabilities){
+            if (device === 'touch' || device === 'mobile') {
                 result += `${device}=true `
             }
         }
@@ -85,11 +85,11 @@ export class ScreencastView {
         return result;
     }
 
-    public static getDeviceValueFromTitle(title: string) {
+    static getDeviceValueFromTitle(title: string): string {
         return title.replace(/['/' || ' ' || '-']/g, '');
     }
 
-    public render(): string {
+    render(): string {
         const deviceList = this.getDeviceList(emulatedDevices);
         return this.htmlTemplate(this.webviewCSP, this.cssPath, this.codiconsUri, this.inspectorUri, deviceList);
     }

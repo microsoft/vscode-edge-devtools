@@ -81,7 +81,7 @@ export class ScreencastInputHandler {
         if (!(mouseEvent.which in buttons)) {
             return;
         }
-        if (eventType !== 'wheel' && buttons[mouseEvent.which] === 'none') {
+        if (eventType !== 'mouseWheel' && buttons[mouseEvent.which] === 'none') {
             return;
         }
 
@@ -97,6 +97,7 @@ export class ScreencastInputHandler {
             const wheelEvent = mouseEvent as WheelEvent;
             params.deltaX = wheelEvent.deltaX;
             params.deltaY = -wheelEvent.deltaY;
+            params.button = 'none';
         } else {
             this.activeTouchParams = params;
         }

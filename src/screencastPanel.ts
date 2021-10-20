@@ -11,12 +11,12 @@ import {
 } from './utils';
 
 export class ScreencastPanel {
-    private static instance: ScreencastPanel | undefined;
     private readonly context: vscode.ExtensionContext;
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
     private targetUrl: string
     private panelSocket: PanelSocket;
+    static instance: ScreencastPanel | undefined;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -54,6 +54,10 @@ export class ScreencastPanel {
 
         this.panel.dispose();
         this.panelSocket.dispose();
+    }
+
+    toggleInspect(enabled: boolean): void {
+        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'toggleInspect', { enabled });
     }
 
     private onSocketClose() {

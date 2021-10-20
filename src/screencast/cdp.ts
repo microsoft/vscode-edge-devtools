@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, parseMessageFromChannel, WebSocketEvent } from "../common/webviewEvents";
+import { encodeMessageForChannel, parseMessageFromChannel } from "../common/webviewEvents";
 
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 export const vscode = acquireVsCodeApi();
@@ -26,12 +26,11 @@ export class ScreencastCDPConnection {
         window.addEventListener('message', e => {
             parseMessageFromChannel(e.data, (eventName, args) => {
                 if (eventName === 'websocket') {
-                    const { event, message } = JSON.parse(args) as {event: WebSocketEvent, message: string};
-                    console.log(event, message);
+                    const { message } = JSON.parse(args) as { message: string };
                     // Handle event responses
                     const messageObj = JSON.parse(message) as CdpMessage;
                     for (const callback of this.eventCallbackMap.get(messageObj.method) || []) {
-                        callback(messageObj.params)
+                        callback(messageObj.params);
                     }
                     // Handle method responses
                     const methodCallback = this.methodCallbackMap.get(messageObj.id);
@@ -41,18 +40,24 @@ export class ScreencastCDPConnection {
                     }
                     return true;
                 }
+                if (eventName === 'toggleInspect') {
+                    const { enabled } = JSON.parse(args) as { enabled: string };
+                    for (const callback of this.eventCallbackMap.get('DevTools.toggleInspect') || []) {
+                        callback(enabled);
+                    }
+                }
                 return false;
             });
         });
     }
 
     sendMessageToBackend(method: string, params: any, callback?: CdpMethodCallback): void {
-        const id = this.nextId++
+        const id = this.nextId++;
         const cdpMessage: CdpMessage = {
             id: id,
             method,
-            params
-        }
+            params,
+        };
         if (callback) {
             this.methodCallbackMap.set(id, callback);
         }

@@ -23,18 +23,20 @@ import {
     addEntrypointIfNeeded,
     applyPathMapping,
     fetchUri,
+    isHeadlessEnabled,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
     SETTINGS_PREF_NAME,
     SETTINGS_STORE_NAME,
     SETTINGS_WEBVIEW_NAME,
     SETTINGS_VIEW_NAME,
+    CDN_FALLBACK_REVISION,
 } from './utils';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
+import { ScreencastPanel } from './screencastPanel';
 
 export class DevToolsPanel {
-    private static instance: DevToolsPanel | undefined;
     private readonly config: IRuntimeConfig;
     private readonly context: vscode.ExtensionContext;
     private readonly disposables: vscode.Disposable[] = [];
@@ -47,6 +49,7 @@ export class DevToolsPanel {
     private timeStart: number | null;
     private devtoolsBaseUri: string | null;
     private isHeadless: boolean;
+    static instance: DevToolsPanel | undefined;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -71,7 +74,7 @@ export class DevToolsPanel {
             this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToDevTools(e, msg));
         }
         this.panelSocket.on('ready', () => this.onSocketReady());
-        this.panelSocket.on('websocket', () => this.onSocketMessage());
+        this.panelSocket.on('websocket', msg => this.onSocketMessage(msg));
         this.panelSocket.on('telemetry', msg => this.onSocketTelemetry(msg));
         this.panelSocket.on('getState', msg => this.onSocketGetState(msg));
         this.panelSocket.on('getVscodeSettings', msg => this.onSocketGetVscodeSettings(msg));
@@ -87,8 +90,7 @@ export class DevToolsPanel {
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
 
         // This Websocket is only used on initial connection to determine the browser version.
-        // The browser version is used to select between CDN and bundled tools
-        // Future versions of the extension will remove this socket and only use CDN
+        // The browser version is used to select the correct hashed version of the devtools
         this.versionDetectionSocket = new BrowserVersionDetectionSocket(this.targetUrl);
         this.versionDetectionSocket.on('setCdnParameters', msg => this.setCdnParameters(msg));
 
@@ -117,8 +119,7 @@ export class DevToolsPanel {
 
         // Update DevTools theme if user changes global theme
         vscode.workspace.onDidChangeConfiguration(e => {
-            if (this.config.isCdnHostedTools &&
-            e.affectsConfiguration('workbench.colorTheme') &&
+            if (e.affectsConfiguration('workbench.colorTheme') &&
             this.panel.visible) {
                 this.update();
             }
@@ -164,7 +165,23 @@ export class DevToolsPanel {
         this.timeStart = performance.now();
     }
 
-    private onSocketMessage() {
+    private onSocketMessage(message: string) {
+        // If inspect mode is toggled on the DevTools, we need to let the standalone screencast
+        // know in order to enable hover events to be sent through.
+        if (message && message.includes('\\"method\\":\\"Overlay.setInspectMode\\"')) {
+            try {
+                const cdpMsg = JSON.parse((JSON.parse(message) as {message: string}).message) as {method: string, params: {mode: string} };
+                if (cdpMsg.method === 'Overlay.setInspectMode') {
+                    if (cdpMsg.params.mode === 'none') {
+                        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleInspect`, { enabled: false });
+                    } else if (cdpMsg.params.mode === 'searchForNode') {
+                        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleInspect`, { enabled: true });
+                    }
+                }
+            } catch (e) {
+                // Ignore
+            }
+        }
         // TODO: Handle message
     }
 
@@ -406,56 +423,13 @@ export class DevToolsPanel {
     }
 
     private update() {
-        // Check to see which version of devtools we need to launch
-        this.panel.webview.html = (this.config.isCdnHostedTools || this.config.useLocalEdgeWatch) ? this.getCdnHtmlForWebview() : this.getHtmlForWebview();
-    }
-
-    private getHtmlForWebview() {
-        // inspectorUri is the file that used to be loaded in inspector.html
-        // They are being loaded directly into the webview.
-        // local resource loading inside iframes was deprecated in these commits:
-        // https://github.com/microsoft/vscode/commit/de9887d9e0eaf402250d2735b3db5dc340184b74
-        // https://github.com/microsoft/vscode/commit/d05ded6d3b64fed4a3cc74106f9b6c72243b18de
-
-        const inspectorPath = vscode.Uri.file(path.join(this.extensionPath, 'out/tools/front_end', 'inspector.js'));
-        const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
-
-        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
-        const hostUri = this.panel.webview.asWebviewUri(hostPath);
-
-        const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
-        const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
-
-        // the added fields for "Content-Security-Policy" allow resource loading for other file types
-        return `
-            <!doctype html>
-            <html>
-            <head>
-                <base href="${inspectorUri}">
-                <meta http-equiv="content-type" content="text/html; charset=utf-8">
-                <meta http-equiv="Content-Security-Policy"
-                    content="default-src;
-                    img-src 'self' data: ${this.panel.webview.cspSource};
-                    style-src 'self' 'unsafe-inline' ${this.panel.webview.cspSource};
-                    script-src 'self' 'unsafe-eval' ${this.panel.webview.cspSource};
-                    frame-src 'self' ${this.panel.webview.cspSource};
-                    connect-src 'self' data: ${this.panel.webview.cspSource};
-                ">
-                <meta name="referrer" content="no-referrer">
-                <link href="${stylesUri}" rel="stylesheet"/>
-                <script src="${hostUri}"></script>
-                <script type="module" src="${inspectorUri}"></script>
-            </head>
-            <body>
-            </body>
-            </html>
-            `;
+        this.panel.webview.html = this.getCdnHtmlForWebview();
     }
 
     private getCdnHtmlForWebview() {
         // Default to config provided base uri
         const cdnBaseUri = this.config.devtoolsBaseUri || this.devtoolsBaseUri;
-        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host_beta', 'host.bundle.js'));
+        const hostPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'host', 'host.bundle.js'));
         const hostUri = this.panel.webview.asWebviewUri(hostPath);
 
         const stylesPath = vscode.Uri.file(path.join(this.extensionPath, 'out', 'common', 'styles.css'));
@@ -463,6 +437,11 @@ export class DevToolsPanel {
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
         const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
+
+        // The headless query param is used to show/hide the DevTools screencast on launch
+        // If the standalone screencast is enabled, we want to hide the DevTools screencast
+        // regardless of the headless setting.
+        const enableScreencast = standaloneScreencast ? false : this.isHeadless;
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
@@ -483,7 +462,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${this.isHeadless}&standaloneScreencast=${standaloneScreencast}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${enableScreencast}&standaloneScreencast=${standaloneScreencast}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>
@@ -499,15 +478,7 @@ export class DevToolsPanel {
     }
 
     private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
-        if (msg.revision !== '') {
-            this.config.isCdnHostedTools = true;
-            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', true);
-            this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision}/vscode_app.html`;
-        } else {
-            this.config.isCdnHostedTools = false;
-            void vscode.commands.executeCommand('setContext', 'isCdnHostedTools', false);
-            this.devtoolsBaseUri = '';
-        }
+        this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision || CDN_FALLBACK_REVISION}/vscode_app.html`;
         this.isHeadless = msg.isHeadless;
         this.update();
     }
@@ -533,6 +504,11 @@ export class DevToolsPanel {
             });
 
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
+            if (isHeadlessEnabled()) {
+                if (!ScreencastPanel.instance) {
+                    ScreencastPanel.createOrShow(context, targetUrl);
+                }
+            }
         }
     }
 }
