@@ -1,3 +1,9 @@
+## 1.4.0
+* **[Feature]**: Introducing the new standalone screencast with device emulation as the default screencast experience!  - [PR #513](https://github.com/microsoft/vscode-edge-devtools/pull/513), [PR #564](https://github.com/microsoft/vscode-edge-devtools/pull/564)
+* **[Feature]**: Implemented static analysis using webhint language server which offers inline feedback on your source code. - [PR #513](https://github.com/microsoft/vscode-edge-devtools/pull/513), [PR #566](https://github.com/microsoft/vscode-edge-devtools/pull/566)
+* **[Bug Fix]**: Screencast quality of life improvements  - [PR #522](https://github.com/microsoft/vscode-edge-devtools/pull/475), [PR #555](https://github.com/microsoft/vscode-edge-devtools/pull/555), [PR #559](https://github.com/microsoft/vscode-edge-devtools/pull/559)
+* **[Bug Fix]**: Screencast bug fixes  - [PR #556](https://github.com/microsoft/vscode-edge-devtools/pull/475), [PR #558](https://github.com/microsoft/vscode-edge-devtools/pull/555), [PR #561](https://github.com/microsoft/vscode-edge-devtools/pull/559)
+
 ## 1.3.1
 * **[Feature]**: Error handling implementation. - [PR #475](https://github.com/microsoft/vscode-edge-devtools/pull/475)
 * **[Feature]**: Implement CSS mirror editing - [PR #462](https://github.com/microsoft/vscode-edge-devtools/pull/462)
