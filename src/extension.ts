@@ -43,7 +43,7 @@ import {
     ServerOptions,
     TransportKind,
 } from 'vscode-languageclient/node';
-import { installFailed, showOutput } from 'vscode-webhint/src/utils/notifications';
+import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
 import { activationEvents } from '../package.json';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
@@ -274,7 +274,8 @@ function startWebhint(context: vscode.ExtensionContext): void {
 
     void client.onReady().then(() => {
         // Listen for notification that the webhint install failed.
-        client.onNotification(installFailed, () => {
+        const installFailedNotification: typeof installFailed = 'vscode-webhint/install-failed';
+        client.onNotification(installFailedNotification, () => {
             const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
             void vscode.window.showInformationMessage(message, 'OK', 'Disable').then(button => {
                 if (button === 'Disable') {
@@ -283,7 +284,8 @@ function startWebhint(context: vscode.ExtensionContext): void {
             });
         });
         // Listen for requests to show the output panel for this extension.
-        client.onNotification(showOutput, () => {
+        const showOutputNotification: typeof showOutput = 'vscode-webhint/show-output';
+        client.onNotification(showOutputNotification, () => {
             client.outputChannel.clear();
             client.outputChannel.show(true);
         });
