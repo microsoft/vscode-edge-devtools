@@ -8,6 +8,8 @@ package-lock.json
 img/
 node_modules/
 !node_modules/vscode-webhint/dist/src/server.js
+!node_modules/@vscode/codicons/dist/codicon.css
+!node_modules/@vscode/codicons/dist/codicon.ttf
 out/edge/
 src/
 scripts/

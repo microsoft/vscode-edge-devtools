@@ -702,6 +702,7 @@
         "test": "npm run lint && jest --config package.json --runInBand --env=jsdom"
     },
     "dependencies": {
+        "@vscode/codicons": "0.0.22",
         "bufferutil": "4.0.4",
         "puppeteer-core": "10.4.0",
         "utf-8-validate": "5.0.6",
@@ -722,7 +723,6 @@
         "@types/ws": "8.2.0",
         "@typescript-eslint/eslint-plugin": "4.32.0",
         "@typescript-eslint/parser": "4.32.0",
-        "@vscode/codicons": "0.0.22",
         "copy-webpack-plugin": "9.0.1",
         "eslint": "7.32.0",
         "eslint-plugin-import": "2.24.2",
