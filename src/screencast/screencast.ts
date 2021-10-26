@@ -103,7 +103,7 @@ export class Screencast {
 
         for (const eventName of Object.keys(MouseEventMap)) {
             this.screencastImage.addEventListener(eventName, event => {
-                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
+                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth * window.devicePixelRatio;
                 const mouseEvent = event as MouseEvent;
                 if (this.isDeviceTouch() && !this.inspectMode) {
                     this.inputHandler.emitTouchFromMouseEvent(mouseEvent, scale);
@@ -177,8 +177,8 @@ export class Screencast {
         const screencastParams = {
             format: 'png',
             quality: 100,
-            maxWidth: this.width,
-            maxHeight: this.height
+            maxWidth: Math.floor(this.width * window.devicePixelRatio),
+            maxHeight: Math.floor(this.height * window.devicePixelRatio)
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
     }
@@ -227,9 +227,11 @@ export class Screencast {
     }
 
     private onScreencastFrame({data, sessionId}: any): void {
+        const expectedWidth = Math.floor(this.width * window.devicePixelRatio);
+        const expectedHeight = Math.floor(this.height * window.devicePixelRatio);
         this.screencastImage.src = `data:image/png;base64,${data}`;
-        this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
-        if (this.screencastImage.naturalWidth !== this.width || this.screencastImage.naturalHeight !== this.height) {
+        this.screencastImage.style.width = `${this.width}px`;
+        if (this.screencastImage.naturalWidth !== expectedWidth || this.screencastImage.naturalHeight !== expectedHeight) {
             this.updateEmulation();
         }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
