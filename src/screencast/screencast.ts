@@ -177,8 +177,8 @@ export class Screencast {
         const screencastParams = {
             format: 'png',
             quality: 100,
-            maxWidth: this.width * window.devicePixelRatio,
-            maxHeight: this.height * window.devicePixelRatio
+            maxWidth: Math.floor(this.width * window.devicePixelRatio),
+            maxHeight: Math.floor(this.height * window.devicePixelRatio)
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
     }
@@ -227,9 +227,11 @@ export class Screencast {
     }
 
     private onScreencastFrame({data, sessionId}: any): void {
+        const expectedWidth = Math.floor(this.width * window.devicePixelRatio);
+        const expectedHeight = Math.floor(this.height * window.devicePixelRatio);
         this.screencastImage.src = `data:image/png;base64,${data}`;
-        this.screencastImage.style.width = `${this.screencastImage.naturalWidth / window.devicePixelRatio}px`;
-        if (this.screencastImage.naturalWidth / window.devicePixelRatio !== this.width || this.screencastImage.naturalHeight / window.devicePixelRatio !== this.height) {
+        this.screencastImage.style.width = `${this.width}px`;
+        if (this.screencastImage.naturalWidth !== expectedWidth || this.screencastImage.naturalHeight !== expectedHeight) {
             this.updateEmulation();
         }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
