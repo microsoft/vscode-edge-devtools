@@ -52,6 +52,9 @@ export class ScreencastView {
               <img id="canvas" draggable="false" tabindex="0" />
           </div>
       </div>
+      <div id="inactive-overlay" hidden>
+        The tab is inactive
+      </div>
   </body>
   </html>
   `;

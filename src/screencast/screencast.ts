@@ -24,6 +24,7 @@ export class Screencast {
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
     private deviceSelect: HTMLSelectElement;
+    private inactiveOverlay: HTMLElement;
     private fixedWidth = 0;
     private fixedHeight = 0;
     private inspectMode = false;
@@ -37,6 +38,7 @@ export class Screencast {
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
+        this.inactiveOverlay = document.getElementById('inactive-overlay') as HTMLElement;
 
         this.backButton.addEventListener('click', () => this.onBackClick());
         this.forwardButton.addEventListener('click', () => this.onForwardClick());
@@ -67,6 +69,7 @@ export class Screencast {
 
         this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
+        this.cdpConnection.registerForEvent('Page.screencastVisibilityChanged', result => this.onScreencastVisibilityChanged(result));
 
         // This message comes from the DevToolsPanel instance.
         this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
@@ -235,6 +238,10 @@ export class Screencast {
             this.updateEmulation();
         }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
+    }
+
+    private onScreencastVisibilityChanged({visible}: {visible: boolean}): void {
+        this.inactiveOverlay.hidden = visible;
     }
 
     private onToggleInspect({ enabled }: any): void {
