@@ -147,12 +147,9 @@ export class Screencast {
             maxTouchPoints: 1,
         };
 
-        if (this.deviceUserAgent().length > 0) {
-            this.cdpConnection.sendMessageToBackend('Emulation.setUserAgentOverride', {
-                userAgent: this.deviceUserAgent(),
-            });
-        }
-
+        this.cdpConnection.sendMessageToBackend('Emulation.setUserAgentOverride', {
+            userAgent: this.deviceUserAgent(),
+        });
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
         this.toggleTouchMode();
@@ -184,7 +181,7 @@ export class Screencast {
 
     private deviceUserAgent() {
         if (this.deviceSelect.value.toLowerCase() === 'desktop') {
-            return navigator.userAgent;
+            return '';
         }
         const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
         return unescape(selectedOption.getAttribute('userAgent') || '');
