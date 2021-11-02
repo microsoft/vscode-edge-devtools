@@ -71,7 +71,7 @@ export class ScreencastView {
 
         for (const device of devicesArray) {
             // @ts-ignore ignoring as this is a static template.
-            templatedString += `<option deviceWidth=${device.screen.vertical.width} deviceHeight=${device.screen.vertical.height} ${ScreencastView.getDeviceCapabilities(device.capabilities)} value="${ScreencastView.getDeviceValueFromTitle(device.title)}">${device.title}</option>`;
+            templatedString += `<option deviceWidth=${device.screen.vertical.width} deviceHeight=${device.screen.vertical.height} ${ScreencastView.getDeviceCapabilities(device.capabilities)} userAgent=${escape(device['user-agent'])} value="${ScreencastView.getDeviceValueFromTitle(device.title)}">${device.title}</option>`;
         }
 
         return templatedString;
