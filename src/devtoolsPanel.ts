@@ -506,7 +506,7 @@ export class DevToolsPanel {
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
             if (isHeadlessEnabled()) {
                 if (!ScreencastPanel.instance) {
-                    ScreencastPanel.createOrShow(context, targetUrl);
+                    ScreencastPanel.createOrShow(context, telemetryReporter, targetUrl);
                 }
             }
         }
