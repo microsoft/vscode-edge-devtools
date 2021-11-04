@@ -1,3 +1,8 @@
+## 1.4.1
+* **[Feature]**: Updating webhint version to fix bug where static analysis squigglies underline only the first letter. - [PR #608](https://github.com/microsoft/vscode-edge-devtools/pull/608)
+* **[Feature]**: Update list of devices for device emulation in standalone screencast - [PR #595](https://github.com/microsoft/vscode-edge-devtools/pull/595)
+* **[Bug Fix]**: Set correct user agent string in device emulation - [PR #604](https://github.com/microsoft/vscode-edge-devtools/pull/604)
+
 ## 1.4.0
 * **[Feature]**: Introducing the new standalone screencast with device emulation as the default screencast experience!  - [PR #513](https://github.com/microsoft/vscode-edge-devtools/pull/513), [PR #564](https://github.com/microsoft/vscode-edge-devtools/pull/564)
 * **[Feature]**: Implemented static analysis using webhint language server which offers inline feedback on your source code. - [PR #566](https://github.com/microsoft/vscode-edge-devtools/pull/566)
