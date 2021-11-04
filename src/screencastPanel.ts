@@ -71,8 +71,6 @@ export class ScreencastPanel {
         this.telemetryReporter.sendTelemetryEvent(
             `devtools/${actionName}`,
             properties);
-        // eslint-disable-next-line no-console
-        console.log({name: `devtools/${actionName}`, properties});
     }
 
     private recordPerformanceHistogram(actionName: string, duration: number) {
@@ -82,8 +80,6 @@ export class ScreencastPanel {
             `devtools/${actionName}`,
             undefined,
             measures);
-        // eslint-disable-next-line no-console
-        console.log({name: `devtools/${actionName}`, measures});
     }
 
     dispose(): void {
