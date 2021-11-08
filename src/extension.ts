@@ -135,7 +135,7 @@ export function activate(context: vscode.ExtensionContext): void {
             }
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.toggleScreencast });
             telemetryReporter.sendTelemetryEvent('view/screencast');
-            ScreencastPanel.createOrShow(context, target.websocketUrl);
+            ScreencastPanel.createOrShow(context,  telemetryReporter, target.websocketUrl);
         }));
 
     context.subscriptions.push(vscode.commands.registerCommand(
