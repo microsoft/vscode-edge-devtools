@@ -400,9 +400,14 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
     ];
 
     const headless: boolean = isHeadlessEnabled();
+    const corsEnabled: boolean = isCorsEnabled();
 
     if (userDataDir) {
         args.unshift(`--user-data-dir=${userDataDir}`);
+    }
+
+    if (corsEnabled) {
+        args.unshift('--disable-web-security');
     }
 
     const browserInstance = await puppeteer.launch({executablePath: browserPath, args, headless});
@@ -609,6 +614,15 @@ export function isHeadlessEnabled(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const headless: boolean = settings.get('headless') || false;
     return headless;
+}
+
+/**
+ * Verifies if the headless checkbox in extension settings is enabled.
+ */
+export function isCorsEnabled(): boolean {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const enableCors: boolean = settings.get('enableCors') || false;
+    return enableCors;
 }
 
 /**

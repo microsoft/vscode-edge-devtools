@@ -265,6 +265,11 @@
                     "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",
                     "default": false
                 },
+                "vscode-edge-devtools.enableCors": {
+                    "type": "boolean",
+                    "description": "Launch Microsoft Edge with cors enabled. (requires relaunching Visual Studio Code)",
+                    "default": false
+                },
                 "vscode-edge-devtools.timeout": {
                     "type": "number",
                     "description": "The number of milliseconds that the Microsoft Edge Tools will keep trying to attach the browser before timing out",
