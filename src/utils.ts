@@ -617,7 +617,7 @@ export function isHeadlessEnabled(): boolean {
 }
 
 /**
- * Verifies if the headless checkbox in extension settings is enabled.
+ * Verifies if the cors checkbox in extension settings is enabled.
  */
 export function isCorsEnabled(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
