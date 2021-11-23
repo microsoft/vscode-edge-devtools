@@ -62,10 +62,10 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
         } else if (config && (config.type === 'edge' || config.type === 'msedge')) {
             void vscode.window.showWarningMessage(
                 `Launch type "${config.type}" is deprecated. Update your launch.json to use "pwa-msedge" instead.`, 'Learn More', 'OK'
-            ).then((value) => {
+            ).then(value => {
                 if (value === 'Learn More') {
                     const uri = vscode.Uri.parse('https://code.visualstudio.com/docs/nodejs/browser-debugging');
-                    vscode.env.openExternal(uri);
+                    void vscode.env.openExternal(uri);
                 }
             });
             const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
