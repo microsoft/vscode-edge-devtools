@@ -127,7 +127,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.toggleScreencast`,
-        (target?: CDPTarget) => {
+        (target?: CDPTarget, isJsDebugProxiedCDPConnection = false) => {
             if (!target){
                 const errorMessage = 'No target selected';
                 telemetryReporter.sendTelemetryErrorEvent('command/screencast/target', {message: errorMessage});
@@ -135,7 +135,7 @@ export function activate(context: vscode.ExtensionContext): void {
             }
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.toggleScreencast });
             telemetryReporter.sendTelemetryEvent('view/screencast');
-            ScreencastPanel.createOrShow(context,  telemetryReporter, target.websocketUrl);
+            ScreencastPanel.createOrShow(context,  telemetryReporter, target.websocketUrl, isJsDebugProxiedCDPConnection);
         }));
 
     context.subscriptions.push(vscode.commands.registerCommand(
