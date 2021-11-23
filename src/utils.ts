@@ -401,8 +401,16 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
 
     const headless: boolean = isHeadlessEnabled();
 
+    let browserArgs: string[] = getBrowserArgs();
+    browserArgs = browserArgs.filter(arg => !arg.startsWith('--remote-debugging-port') && arg !== targetUrl);
+
     if (userDataDir) {
         args.unshift(`--user-data-dir=${userDataDir}`);
+        browserArgs = browserArgs.filter(arg => !arg.startsWith('--user-data-dir'));
+    }
+
+    if (browserArgs.length) {
+        args.unshift(...browserArgs);
     }
 
     const browserInstance = await puppeteer.launch({executablePath: browserPath, args, headless});
@@ -609,6 +617,15 @@ export function isHeadlessEnabled(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const headless: boolean = settings.get('headless') || false;
     return headless;
+}
+
+/**
+ * get the command line args which are passed to the browser.
+ */
+export function getBrowserArgs(): string[] {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const browserArgs: string[] = settings.get('browserArgs') || [];
+    return browserArgs.map(arg => arg.trim());
 }
 
 /**

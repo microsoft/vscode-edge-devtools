@@ -265,6 +265,14 @@
                     "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",
                     "default": false
                 },
+                "vscode-edge-devtools.browserArgs": {
+                    "type": "array",
+                    "description": "Launch Microsoft Edge with specified args. (requires relaunching Visual Studio Code)",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                },
                 "vscode-edge-devtools.timeout": {
                     "type": "number",
                     "description": "The number of milliseconds that the Microsoft Edge Tools will keep trying to attach the browser before timing out",
