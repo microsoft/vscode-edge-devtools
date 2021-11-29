@@ -1,3 +1,9 @@
+## 1.4.2
+* **[Feature]**: Launch Microsoft Edge with specified args - [PR #623](https://github.com/microsoft/vscode-edge-devtools/pull/623)
+* **[Feature]**: Warn when using deprecated 'edge' or 'msedge' launch types - [PR #690](https://github.com/microsoft/vscode-edge-devtools/pull/690)
+* **[Bug Fix]**: Fix using screencast with js-debug session - [PR #688](https://github.com/microsoft/vscode-edge-devtools/pull/688)
+* **[Bug Fix]**: Fix screencast incorrectly prefixing URLs with http:// - [PR #689](https://github.com/microsoft/vscode-edge-devtools/pull/689)
+
 ## 1.4.1
 * **[Feature]**: Updating webhint version to fix bug where static analysis squigglies underline only the first letter. - [PR #608](https://github.com/microsoft/vscode-edge-devtools/pull/608)
 * **[Feature]**: Update list of devices for device emulation in standalone screencast - [PR #595](https://github.com/microsoft/vscode-edge-devtools/pull/595)
