@@ -226,19 +226,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             }
         } catch (e) {
             // localhost might not be ready as the user might not have a server running
-            // so just show an error dialog for any other condition.
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore specific case for ECONNREFUSED.
-            if (e && e.code && e.code === 'ECONNREFUSED'){
-                continue;
-            }
-
-            void ErrorReporter.showErrorDialog({
-                errorCode: ErrorCodes.Error,
-                title: 'Error while getting the list of targets',
-                message: e,
-            });
+            // user may also have changed settings making the endpoint invalid
         }
     }
 
