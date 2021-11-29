@@ -50,6 +50,7 @@ export interface IUserConfig {
     sourceMapPathOverrides: IStringDictionary<string>;
     sourceMaps: boolean;
     timeout: number;
+    type: string;
     defaultEntrypoint: string;
 }
 

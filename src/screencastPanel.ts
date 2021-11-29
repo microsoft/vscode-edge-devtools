@@ -8,6 +8,7 @@ import {
     ITelemetryProps,
     ITelemetryMeasures,
 } from './common/webviewEvents';
+import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
 import { ScreencastView } from './screencast/view';
 import {
@@ -30,7 +31,8 @@ export class ScreencastPanel {
         panel: vscode.WebviewPanel,
         context: vscode.ExtensionContext,
         telemetryReporter: TelemetryReporter,
-        targetUrl: string) {
+        targetUrl: string,
+        isJsDebugProxiedCDPConnection: boolean) {
         this.panel = panel;
         this.context = context;
         this.targetUrl = targetUrl;
@@ -38,7 +40,11 @@ export class ScreencastPanel {
         this.telemetryReporter = telemetryReporter;
         this.screencastStartTime = Date.now();
 
-        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
+        if (isJsDebugProxiedCDPConnection) {
+            this.panelSocket = new JsDebugProxyPanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
+        } else {
+            this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
+        }
         this.panelSocket.on('close', () => this.onSocketClose());
 
         // Handle closing
@@ -115,7 +121,7 @@ export class ScreencastPanel {
     }
 
     static createOrShow(context: vscode.ExtensionContext,
-        telemetryReporter: TelemetryReporter, targetUrl: string): void {
+        telemetryReporter: TelemetryReporter, targetUrl: string, isJsDebugProxiedCDPConnection = false): void {
         const column = vscode.ViewColumn.Beside;
         if (ScreencastPanel.instance) {
             ScreencastPanel.instance.dispose();
@@ -125,7 +131,7 @@ export class ScreencastPanel {
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
-            ScreencastPanel.instance = new ScreencastPanel(panel, context, telemetryReporter, targetUrl);
+            ScreencastPanel.instance = new ScreencastPanel(panel, context, telemetryReporter, targetUrl, isJsDebugProxiedCDPConnection);
         }
     }
 }
