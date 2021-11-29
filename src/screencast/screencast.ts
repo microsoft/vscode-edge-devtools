@@ -232,7 +232,7 @@ export class Screencast {
     private onUrlKeyDown(event: KeyboardEvent): void {
         let url = this.urlInput.value;
         if (event.key === 'Enter' && url) {
-            if (!url.startsWith('http') || !url.startsWith('file')) {
+            if (!url.startsWith('http') && !url.startsWith('file')) {
                 url = 'http://' + url;
             }
 
