@@ -50,6 +50,7 @@ export interface IUserConfig {
     sourceMapPathOverrides: IStringDictionary<string>;
     sourceMaps: boolean;
     timeout: number;
+    type: string;
     defaultEntrypoint: string;
 }
 
@@ -226,19 +227,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             }
         } catch (e) {
             // localhost might not be ready as the user might not have a server running
-            // so just show an error dialog for any other condition.
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore specific case for ECONNREFUSED.
-            if (e && e.code && e.code === 'ECONNREFUSED'){
-                continue;
-            }
-
-            void ErrorReporter.showErrorDialog({
-                errorCode: ErrorCodes.Error,
-                title: 'Error while getting the list of targets',
-                message: e,
-            });
+            // user may also have changed settings making the endpoint invalid
         }
     }
 
@@ -401,8 +390,16 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
 
     const headless: boolean = isHeadlessEnabled();
 
+    let browserArgs: string[] = getBrowserArgs();
+    browserArgs = browserArgs.filter(arg => !arg.startsWith('--remote-debugging-port') && arg !== targetUrl);
+
     if (userDataDir) {
         args.unshift(`--user-data-dir=${userDataDir}`);
+        browserArgs = browserArgs.filter(arg => !arg.startsWith('--user-data-dir'));
+    }
+
+    if (browserArgs.length) {
+        args.unshift(...browserArgs);
     }
 
     const browserInstance = await puppeteer.launch({executablePath: browserPath, args, headless});
@@ -609,6 +606,15 @@ export function isHeadlessEnabled(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const headless: boolean = settings.get('headless') || false;
     return headless;
+}
+
+/**
+ * get the command line args which are passed to the browser.
+ */
+export function getBrowserArgs(): string[] {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const browserArgs: string[] = settings.get('browserArgs') || [];
+    return browserArgs.map(arg => arg.trim());
 }
 
 /**

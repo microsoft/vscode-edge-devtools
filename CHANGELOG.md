@@ -1,3 +1,20 @@
+## 1.4.2
+* **[Feature]**: Launch Microsoft Edge with specified args - [PR #623](https://github.com/microsoft/vscode-edge-devtools/pull/623)
+* **[Feature]**: Warn when using deprecated 'edge' or 'msedge' launch types - [PR #690](https://github.com/microsoft/vscode-edge-devtools/pull/690)
+* **[Bug Fix]**: Fix using screencast with js-debug session - [PR #688](https://github.com/microsoft/vscode-edge-devtools/pull/688)
+* **[Bug Fix]**: Fix screencast incorrectly prefixing URLs with http:// - [PR #689](https://github.com/microsoft/vscode-edge-devtools/pull/689)
+
+## 1.4.1
+* **[Feature]**: Updating webhint version to fix bug where static analysis squigglies underline only the first letter. - [PR #608](https://github.com/microsoft/vscode-edge-devtools/pull/608)
+* **[Feature]**: Update list of devices for device emulation in standalone screencast - [PR #595](https://github.com/microsoft/vscode-edge-devtools/pull/595)
+* **[Bug Fix]**: Set correct user agent string in device emulation - [PR #604](https://github.com/microsoft/vscode-edge-devtools/pull/604)
+
+## 1.4.0
+* **[Feature]**: Introducing the new standalone screencast with device emulation as the default screencast experience!  - [PR #513](https://github.com/microsoft/vscode-edge-devtools/pull/513), [PR #564](https://github.com/microsoft/vscode-edge-devtools/pull/564)
+* **[Feature]**: Implemented static analysis using webhint language server which offers inline feedback on your source code. - [PR #566](https://github.com/microsoft/vscode-edge-devtools/pull/566)
+* **[Bug Fix]**: Screencast quality of life improvements  - [PR #522](https://github.com/microsoft/vscode-edge-devtools/pull/475), [PR #555](https://github.com/microsoft/vscode-edge-devtools/pull/555), [PR #559](https://github.com/microsoft/vscode-edge-devtools/pull/559)
+* **[Bug Fix]**: Screencast bug fixes  - [PR #556](https://github.com/microsoft/vscode-edge-devtools/pull/475), [PR #558](https://github.com/microsoft/vscode-edge-devtools/pull/555), [PR #561](https://github.com/microsoft/vscode-edge-devtools/pull/559)
+
 ## 1.3.1
 * **[Feature]**: Error handling implementation. - [PR #475](https://github.com/microsoft/vscode-edge-devtools/pull/475)
 * **[Feature]**: Implement CSS mirror editing - [PR #462](https://github.com/microsoft/vscode-edge-devtools/pull/462)

@@ -2,38 +2,58 @@
 // Licensed under the MIT License.
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { encodeMessageForChannel, WebSocketEvent } from './common/webviewEvents';
+import {
+    encodeMessageForChannel,
+    WebSocketEvent,
+    ITelemetryProps,
+    ITelemetryMeasures,
+} from './common/webviewEvents';
+import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
 import { ScreencastView } from './screencast/view';
 import {
     SETTINGS_STORE_NAME,
     SETTINGS_SCREENCAST_WEBVIEW_NAME,
 } from './utils';
+import TelemetryReporter from 'vscode-extension-telemetry';
 
 export class ScreencastPanel {
     private readonly context: vscode.ExtensionContext;
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
+    private readonly telemetryReporter: TelemetryReporter;
     private targetUrl: string
     private panelSocket: PanelSocket;
+    private screencastStartTime;
     static instance: ScreencastPanel | undefined;
 
     private constructor(
         panel: vscode.WebviewPanel,
         context: vscode.ExtensionContext,
-        targetUrl: string) {
+        telemetryReporter: TelemetryReporter,
+        targetUrl: string,
+        isJsDebugProxiedCDPConnection: boolean) {
         this.panel = panel;
         this.context = context;
         this.targetUrl = targetUrl;
         this.extensionPath = this.context.extensionPath;
+        this.telemetryReporter = telemetryReporter;
+        this.screencastStartTime = Date.now();
 
-        this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
+        if (isJsDebugProxiedCDPConnection) {
+            this.panelSocket = new JsDebugProxyPanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
+        } else {
+            this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
+        }
         this.panelSocket.on('close', () => this.onSocketClose());
 
         // Handle closing
         this.panel.onDidDispose(() => {
             this.dispose();
             this.panelSocket.dispose();
+            this.recordEnumeratedHistogram('DevTools.ScreencastToggle', 0);
+            const sessionDuration = Date.now() - this.screencastStartTime;
+            this.recordPerformanceHistogram('DevTools.ScreencastDuration', sessionDuration);
         }, this);
 
         // Handle view change
@@ -47,6 +67,25 @@ export class ScreencastPanel {
         this.panel.webview.onDidReceiveMessage(message => {
             this.panelSocket.onMessageFromWebview(message);
         }, this);
+
+        this.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1);
+    }
+
+    private recordEnumeratedHistogram(actionName: string, actionCode: number) {
+        const properties: ITelemetryProps = {};
+        properties[`${actionName}.actionCode`] = actionCode.toString();
+        this.telemetryReporter.sendTelemetryEvent(
+            `devtools/${actionName}`,
+            properties);
+    }
+
+    private recordPerformanceHistogram(actionName: string, duration: number) {
+        const measures: ITelemetryMeasures = {};
+        measures[`${actionName}.duration`] = duration;
+        this.telemetryReporter.sendTelemetryEvent(
+            `devtools/${actionName}`,
+            undefined,
+            measures);
     }
 
     dispose(): void {
@@ -82,7 +121,7 @@ export class ScreencastPanel {
     }
 
     static createOrShow(context: vscode.ExtensionContext,
-        targetUrl: string): void {
+        telemetryReporter: TelemetryReporter, targetUrl: string, isJsDebugProxiedCDPConnection = false): void {
         const column = vscode.ViewColumn.Beside;
         if (ScreencastPanel.instance) {
             ScreencastPanel.instance.dispose();
@@ -92,7 +131,7 @@ export class ScreencastPanel {
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
-            ScreencastPanel.instance = new ScreencastPanel(panel, context, targetUrl);
+            ScreencastPanel.instance = new ScreencastPanel(panel, context, telemetryReporter, targetUrl, isJsDebugProxiedCDPConnection);
         }
     }
 }

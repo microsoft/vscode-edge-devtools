@@ -37,11 +37,25 @@ import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { SettingsProvider } from './common/settingsProvider';
 import { ErrorCodes } from './common/errorCodes';
+import {
+    LanguageClient,
+    LanguageClientOptions,
+    ServerOptions,
+    TransportKind,
+} from 'vscode-languageclient/node';
+import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
+import { activationEvents } from '../package.json';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
+// List of document types the extension will run against.
+const supportedDocuments = activationEvents.map((event: string) => {
+    return event.split(':')[1];
+});
+// Keep a reference to the client to stop it when deactivating.
+let client: LanguageClient;
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
@@ -113,7 +127,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.toggleScreencast`,
-        (target?: CDPTarget) => {
+        (target?: CDPTarget, isJsDebugProxiedCDPConnection = false) => {
             if (!target){
                 const errorMessage = 'No target selected';
                 telemetryReporter.sendTelemetryErrorEvent('command/screencast/target', {message: errorMessage});
@@ -121,7 +135,7 @@ export function activate(context: vscode.ExtensionContext): void {
             }
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.toggleScreencast });
             telemetryReporter.sendTelemetryEvent('view/screencast');
-            ScreencastPanel.createOrShow(context, target.websocketUrl);
+            ScreencastPanel.createOrShow(context,  telemetryReporter, target.websocketUrl, isJsDebugProxiedCDPConnection);
         }));
 
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -214,7 +228,81 @@ export function activate(context: vscode.ExtensionContext): void {
     void reportFileExtensionTypes(telemetryReporter);
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
+
+    if (settingsConfig.get('webhint')) {
+        startWebhint(context);
+    }
+    vscode.workspace.onDidChangeConfiguration(event => {
+        if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.webhint`)) {
+            if (vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhint')) {
+                startWebhint(context);
+            } else {
+                void stopWebhint();
+            }
+        }
+    });
 }
+
+function startWebhint(context: vscode.ExtensionContext): void {
+    const args = [context.globalStoragePath, 'Microsoft Edge Tools'];
+    const module = context.asAbsolutePath('node_modules/vscode-webhint/dist/src/server.js');
+    const transport = TransportKind.ipc;
+    const serverOptions: ServerOptions = {
+        debug: {
+            args,
+            module,
+            options: { execArgv: ['--nolazy', '--inspect=6009'] },
+            transport,
+        },
+        run: {
+            args,
+            module,
+            transport,
+        },
+    };
+
+    const clientOptions: LanguageClientOptions = {
+        documentSelector: supportedDocuments,
+        synchronize: {
+            // Notify the server if a webhint-related configuration changes.
+            fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
+        },
+    };
+
+    // Create and start the client (also starts the server).
+    client = new LanguageClient('Microsoft Edge Tools', serverOptions, clientOptions);
+
+    void client.onReady().then(() => {
+        // Listen for notification that the webhint install failed.
+        const installFailedNotification: typeof installFailed = 'vscode-webhint/install-failed';
+        client.onNotification(installFailedNotification, () => {
+            const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
+            void vscode.window.showInformationMessage(message, 'OK', 'Disable').then(button => {
+                if (button === 'Disable') {
+                    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
+                }
+            });
+        });
+        // Listen for requests to show the output panel for this extension.
+        const showOutputNotification: typeof showOutput = 'vscode-webhint/show-output';
+        client.onNotification(showOutputNotification, () => {
+            client.outputChannel.clear();
+            client.outputChannel.show(true);
+        });
+    });
+
+    client.start();
+}
+
+async function stopWebhint(): Promise<void> {
+    if (client) {
+        await client.stop();
+    }
+}
+
+export const deactivate = (): Thenable<void> => {
+    return stopWebhint();
+};
 
 export async function attach(
     context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
@@ -299,8 +387,8 @@ export async function attach(
         }
     } while (useRetry && Date.now() - startTime < timeout);
 
-    // If there is no response after the timeout then throw an exception
-    if (responseArray.length === 0) {
+    // If there is no response after the timeout then throw an exception (unless for legacy Edge targets which we warned about separately)
+    if (responseArray.length === 0 && config?.type !== 'edge' && config?.type !== 'msedge') {
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while fetching list of available targets',

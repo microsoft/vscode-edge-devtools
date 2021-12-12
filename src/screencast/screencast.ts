@@ -24,6 +24,7 @@ export class Screencast {
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
     private deviceSelect: HTMLSelectElement;
+    private inactiveOverlay: HTMLElement;
     private fixedWidth = 0;
     private fixedHeight = 0;
     private inspectMode = false;
@@ -37,6 +38,7 @@ export class Screencast {
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
+        this.inactiveOverlay = document.getElementById('inactive-overlay') as HTMLElement;
 
         this.backButton.addEventListener('click', () => this.onBackClick());
         this.forwardButton.addEventListener('click', () => this.onForwardClick());
@@ -67,6 +69,7 @@ export class Screencast {
 
         this.cdpConnection.registerForEvent('Page.frameNavigated', result => this.onFrameNavigated(result));
         this.cdpConnection.registerForEvent('Page.screencastFrame', result => this.onScreencastFrame(result));
+        this.cdpConnection.registerForEvent('Page.screencastVisibilityChanged', result => this.onScreencastVisibilityChanged(result));
 
         // This message comes from the DevToolsPanel instance.
         this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
@@ -103,7 +106,7 @@ export class Screencast {
 
         for (const eventName of Object.keys(MouseEventMap)) {
             this.screencastImage.addEventListener(eventName, event => {
-                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth;
+                const scale = this.screencastImage.offsetWidth / this.screencastImage.naturalWidth * window.devicePixelRatio;
                 const mouseEvent = event as MouseEvent;
                 if (this.isDeviceTouch() && !this.inspectMode) {
                     this.inputHandler.emitTouchFromMouseEvent(mouseEvent, scale);
@@ -144,6 +147,9 @@ export class Screencast {
             maxTouchPoints: 1,
         };
 
+        this.cdpConnection.sendMessageToBackend('Emulation.setUserAgentOverride', {
+            userAgent: this.deviceUserAgent(),
+        });
         this.cdpConnection.sendMessageToBackend('Emulation.setDeviceMetricsOverride', deviceMetricsParams);
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
         this.toggleTouchMode();
@@ -173,12 +179,20 @@ export class Screencast {
         return selectedOption.getAttribute('touch') === 'true' || selectedOption.getAttribute('mobile') === 'true';
     }
 
+    private deviceUserAgent() {
+        if (this.deviceSelect.value.toLowerCase() === 'desktop') {
+            return '';
+        }
+        const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
+        return unescape(selectedOption.getAttribute('userAgent') || '');
+    }
+
     private updateScreencast(): void {
         const screencastParams = {
             format: 'png',
             quality: 100,
-            maxWidth: this.width,
-            maxHeight: this.height
+            maxWidth: Math.floor(this.width * window.devicePixelRatio),
+            maxHeight: Math.floor(this.height * window.devicePixelRatio)
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
     }
@@ -218,7 +232,7 @@ export class Screencast {
     private onUrlKeyDown(event: KeyboardEvent): void {
         let url = this.urlInput.value;
         if (event.key === 'Enter' && url) {
-            if (!url.startsWith('http') || !url.startsWith('file')) {
+            if (!url.startsWith('http') && !url.startsWith('file')) {
                 url = 'http://' + url;
             }
 
@@ -227,12 +241,18 @@ export class Screencast {
     }
 
     private onScreencastFrame({data, sessionId}: any): void {
+        const expectedWidth = Math.floor(this.width * window.devicePixelRatio);
+        const expectedHeight = Math.floor(this.height * window.devicePixelRatio);
         this.screencastImage.src = `data:image/png;base64,${data}`;
-        this.screencastImage.style.width = `${this.screencastImage.naturalWidth}px`;
-        if (this.screencastImage.naturalWidth !== this.width || this.screencastImage.naturalHeight !== this.height) {
+        this.screencastImage.style.width = `${this.width}px`;
+        if (this.screencastImage.naturalWidth !== expectedWidth || this.screencastImage.naturalHeight !== expectedHeight) {
             this.updateEmulation();
         }
         this.cdpConnection.sendMessageToBackend('Page.screencastFrameAck', {sessionId});
+    }
+
+    private onScreencastVisibilityChanged({visible}: {visible: boolean}): void {
+        this.inactiveOverlay.hidden = visible;
     }
 
     private onToggleInspect({ enabled }: any): void {

@@ -214,7 +214,8 @@ export class DevToolsPanel {
 
     private toggleScreencast() {
         const websocketUrl = this.targetUrl;
-        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleScreencast`, { websocketUrl });
+        const isJsDebugProxiedCDPConnection = this.config.isJsDebugProxiedCDPConnection;
+        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleScreencast`, { websocketUrl }, isJsDebugProxiedCDPConnection);
     }
 
     private onSocketTelemetry(message: string) {
@@ -506,7 +507,7 @@ export class DevToolsPanel {
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
             if (isHeadlessEnabled()) {
                 if (!ScreencastPanel.instance) {
-                    ScreencastPanel.createOrShow(context, targetUrl);
+                    ScreencastPanel.createOrShow(context, telemetryReporter, targetUrl);
                 }
             }
         }
