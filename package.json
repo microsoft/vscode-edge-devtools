@@ -263,7 +263,7 @@
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
                     "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",
-                    "default": false
+                    "default": true
                 },
                 "vscode-edge-devtools.browserArgs": {
                     "type": "array",
