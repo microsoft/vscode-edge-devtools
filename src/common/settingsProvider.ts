@@ -51,7 +51,9 @@ export class SettingsProvider {
       if (SUPPORTED_THEMES.has(themeSetting as string)) {
         return SUPPORTED_THEMES.get(themeSetting as string) || 'systemPreferred';
       }
-      return SUPPORTED_THEMES.get(legacySetting as string) || 'systemPreferred';
+      const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme') as string;
+      const legacySetting = (vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('themes') || '') as string;
+      return SUPPORTED_THEMES.get(themeSetting) || SUPPORTED_THEMES.get(legacySetting) || 'systemPreferred';
   }
 
   getWelcomeSettings(): boolean {
