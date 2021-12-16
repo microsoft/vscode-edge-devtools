@@ -23,7 +23,6 @@ import {
     addEntrypointIfNeeded,
     applyPathMapping,
     fetchUri,
-    isHeadlessEnabled,
     IRuntimeConfig,
     SETTINGS_PREF_DEFAULTS,
     SETTINGS_PREF_NAME,
@@ -482,6 +481,12 @@ export class DevToolsPanel {
         this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision || CDN_FALLBACK_REVISION}/vscode_app.html`;
         this.isHeadless = msg.isHeadless;
         this.update();
+
+        if (this.isHeadless) {
+            if (!ScreencastPanel.instance) {
+                ScreencastPanel.createOrShow(this.context, this.telemetryReporter, this.targetUrl);
+            }
+        }
     }
 
 
@@ -505,11 +510,6 @@ export class DevToolsPanel {
             });
 
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
-            if (isHeadlessEnabled()) {
-                if (!ScreencastPanel.instance) {
-                    ScreencastPanel.createOrShow(context, telemetryReporter, targetUrl);
-                }
-            }
         }
     }
 }
