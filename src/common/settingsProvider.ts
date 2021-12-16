@@ -46,11 +46,6 @@ export class SettingsProvider {
   // 2. Fall back to the extension Theme setting selector (light, dark, system preference)
   // 3. Fall back to system preference
   getThemeFromUserSetting(): string {
-      const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme');
-      const legacySetting = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('themes');
-      if (SUPPORTED_THEMES.has(themeSetting as string)) {
-        return SUPPORTED_THEMES.get(themeSetting as string) || 'systemPreferred';
-      }
       const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme') as string;
       const legacySetting = (vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('themes') || '') as string;
       return SUPPORTED_THEMES.get(themeSetting) || SUPPORTED_THEMES.get(legacySetting) || 'systemPreferred';
