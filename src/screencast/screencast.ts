@@ -4,6 +4,7 @@
 import { ErrorCodes } from '../common/errorCodes';
 import { encodeMessageForChannel, TelemetryData } from '../common/webviewEvents';
 import { ScreencastCDPConnection, vscode } from './cdp';
+import { emulatedDevices } from './emulatedDevices';
 import { MouseEventMap, ScreencastInputHandler } from './input';
 
 type NavigationEntry = {
@@ -28,6 +29,7 @@ export class Screencast {
     private fixedWidth = 0;
     private fixedHeight = 0;
     private inspectMode = false;
+    private emulatedDevices = new Map();
 
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
@@ -39,6 +41,11 @@ export class Screencast {
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
         this.inactiveOverlay = document.getElementById('inactive-overlay') as HTMLElement;
+
+        for (const device of emulatedDevices) {
+            const id = device.title.replace(/['/' || ' ' || '-']/g, '');
+            this.emulatedDevices.set(id, device);
+        }
 
         this.backButton.addEventListener('click', () => this.onBackClick());
         this.forwardButton.addEventListener('click', () => this.onForwardClick());
@@ -52,10 +59,10 @@ export class Screencast {
                 this.fixedHeight = 0;
                 this.screencastWrapper.classList.add('desktop');
             } else {
-                const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-                const deviceWidth = selectedOption.getAttribute('devicewidth');
-                const deviceHeight = selectedOption.getAttribute('deviceheight');
-                if (deviceWidth && deviceHeight) {
+                const device = this.emulatedDevices.get(this.deviceSelect.value);
+                const deviceWidth = device.screen.vertical.width;
+                const deviceHeight = device.screen.vertical.height;
+                if (device && deviceHeight) {
                     this.fixedWidth = parseInt(deviceWidth);
                     this.fixedHeight = parseInt(deviceHeight);
                 } else {
@@ -174,17 +181,22 @@ export class Screencast {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', telemetry);
     }
 
-    private isDeviceTouch(){
-        const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-        return selectedOption.getAttribute('touch') === 'true' || selectedOption.getAttribute('mobile') === 'true';
+    private isDeviceTouch() {
+        const device = this.emulatedDevices.get(this.deviceSelect.value);
+
+        if (!device) {
+            return false;
+        }
+
+        return device.capabilities.includes('touch') || device.capabilities.includes('mobile');
     }
 
     private deviceUserAgent() {
         if (this.deviceSelect.value.toLowerCase() === 'desktop') {
             return '';
         }
-        const selectedOption = this.deviceSelect[this.deviceSelect.selectedIndex];
-        return unescape(selectedOption.getAttribute('userAgent') || '');
+        const device = this.emulatedDevices.get(this.deviceSelect.value);
+        return unescape(device['user-agent'] || '');
     }
 
     private updateScreencast(): void {

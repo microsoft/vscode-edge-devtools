@@ -66,12 +66,14 @@ export class ScreencastView {
         this.inspectorUri = inspectorUri;
     }
 
-    private getDeviceList(devicesArray: Object[]) {
+    private getDeviceListPartial(devicesArray: Object[]) {
         let templatedString = '';
 
         for (const device of devicesArray) {
-            // @ts-ignore ignoring as this is a static template.
-            templatedString += `<option deviceWidth=${device.screen.vertical.width} deviceHeight=${device.screen.vertical.height} ${ScreencastView.getDeviceCapabilities(device.capabilities)} userAgent=${escape(device['user-agent'])} value="${ScreencastView.getDeviceValueFromTitle(device.title)}">${device.title}</option>`;
+            // @ts-ignore-start ignoring as this is a static template.
+            const { title } = device;
+            const id = title.replace(/['/' || ' ' || '-']/g, '');
+            templatedString += `<option value="${id}">${title}</option>`;
         }
 
         return templatedString;
@@ -93,7 +95,7 @@ export class ScreencastView {
     }
 
     render(): string {
-        const deviceList = this.getDeviceList(emulatedDevices);
+        const deviceList = this.getDeviceListPartial(emulatedDevices);
         return this.htmlTemplate(this.webviewCSP, this.cssPath, this.codiconsUri, this.inspectorUri, deviceList);
     }
 }
