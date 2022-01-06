@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ADOSync workflow
     steps:
-    - uses: jasonstephen15/github-actions-issue-to-work-item@master
+    - uses: captainbrosset/github-actions-issue-to-work-item@master
       env:
         github_token: "${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}"
         ado_token: '${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}'
