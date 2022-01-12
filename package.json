@@ -628,7 +628,7 @@
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "To customize your launch experience, [open a folder](command:vscode.openFolder) and create a launch.json file.",
+                "contents": "To customize your launch experience, open a folder and create a launch.json file. \n[Open Folder](command:vscode.openFolder)",
                 "when": "workbenchState == empty"
             },
             {
