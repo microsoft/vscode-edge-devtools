@@ -14,7 +14,7 @@ jobs:
   - checkout: self
   - task: NodeTool@0
     inputs:
-      versionSpec: '10.x'
+      versionSpec: '16.x'
     displayName: Install Node.js
   - script: |
       npm install
@@ -42,7 +42,7 @@ jobs:
   - checkout: self
   - task: NodeTool@0
     inputs:
-      versionSpec: '10.x'
+      versionSpec: '16.x'
     displayName: Install Node.js
   - script: |
       npm install
@@ -73,7 +73,7 @@ jobs:
   - checkout: self
   - task: NodeTool@0
     inputs:
-      versionSpec: '10.x'
+      versionSpec: '16.x'
     displayName: Install Node.js
   - script: |
       npm install
