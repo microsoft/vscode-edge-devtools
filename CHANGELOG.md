@@ -1,3 +1,8 @@
+## 1.4.3
+* **[Feature]**: Switch to headless by default - [PR #751](https://github.com/microsoft/vscode-edge-devtools/pull/751)
+* **[Feature]**: Refine prompt informing users of errors - [PR #807](https://github.com/microsoft/vscode-edge-devtools/pull/807)
+* **[Bug Fix]**: Fix open folder link to be a button - [PR #803](https://github.com/microsoft/vscode-edge-devtools/pull/803)
+
 ## 1.4.2
 * **[Feature]**: Launch Microsoft Edge with specified args - [PR #623](https://github.com/microsoft/vscode-edge-devtools/pull/623)
 * **[Feature]**: Warn when using deprecated 'edge' or 'msedge' launch types - [PR #690](https://github.com/microsoft/vscode-edge-devtools/pull/690)
