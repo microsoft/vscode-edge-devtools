@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { ScreencastCDPConnection } from "./cdp";
+import { ScreencastCDPConnection } from './cdp';
 
 export const MouseEventMap = {
   mousedown: 'mousePressed',
   mouseup: 'mouseReleased',
   mousemove: 'mouseMoved',
-  wheel: 'mouseWheel'
+  wheel: 'mouseWheel',
 };
 
 const MouseButtonMap = [
@@ -15,7 +15,7 @@ const MouseButtonMap = [
     'middle',
     'right',
     'back',
-    'forward'
+    'forward',
 ];
 
 export class ScreencastInputHandler {
@@ -41,7 +41,7 @@ export class ScreencastInputHandler {
             button: MouseButtonMap[mouseEvent.button],
             buttons: mouseEvent.buttons,
             deltaX: (mouseEvent as WheelEvent).deltaX,
-            deltaY: (mouseEvent as WheelEvent).deltaY
+            deltaY: (mouseEvent as WheelEvent).deltaY,
         });
     }
 
@@ -51,17 +51,17 @@ export class ScreencastInputHandler {
         // - printable characters respond only to object with type char and text property set to key.
         // This could be related:
         // https://github.com/ChromeDevTools/devtools-protocol/issues/45
-        if(keyboardEvent.type === 'keydown' && keyboardEvent.key.length > 1 && keyboardEvent.key !== 'Enter') {
+        if (keyboardEvent.type === 'keydown' && keyboardEvent.key.length > 1 && keyboardEvent.key !== 'Enter') {
             this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
                 type: 'keyDown',
                 windowsVirtualKeyCode: keyboardEvent.keyCode,
                 nativeVirtualKeyCode: keyboardEvent.keyCode,
             });
-        } else if(keyboardEvent.type === 'keypress') {
-            const cdpObject = { 
+        } else if (keyboardEvent.type === 'keypress') {
+            const cdpObject = {
                 type: 'char',
-                text: keyboardEvent.key
-            }
+                text: keyboardEvent.key,
+            };
 
             if (keyboardEvent.key === 'Enter') {
                 cdpObject.text = '\r';
