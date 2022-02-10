@@ -275,6 +275,9 @@ export function getRemoteEndpointSettings(config: Partial<IUserConfig> = {}): ID
     if (userDataDir === true || (typeof userDataDir === 'undefined' && browserPathSet === 'Default')) {
         // Generate a temp directory
         userDataDir = path.join(os.tmpdir(), `vscode-edge-devtools-userdatadir_${port}`);
+        if (!fse.pathExistsSync(userDataDir)) {
+            fse.mkdirSync(userDataDir);
+        }
     } else if (!userDataDir) {
         // Explicit opt-out
         userDataDir = '';
