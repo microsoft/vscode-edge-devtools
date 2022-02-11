@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { encodeMessageForChannel, parseMessageFromChannel } from '../common/webviewEvents';
+import { encodeMessageForChannel, parseMessageFromChannel } from "../common/webviewEvents";
 
 declare const acquireVsCodeApi: () => {postMessage(message: unknown, args?: any|undefined): void};
 export const vscode = acquireVsCodeApi();
@@ -17,7 +17,7 @@ export type CdpEventCallback = (params: any) => void;
 export type CdpMethodCallback = (result: any) => void;
 
 export class ScreencastCDPConnection {
-    private nextId = 0;
+    private nextId: number = 0;
     private eventCallbackMap: Map<string, CdpEventCallback[]> = new Map();
     private methodCallbackMap: Map<number, CdpMethodCallback> = new Map();
 

@@ -192,7 +192,7 @@ export class Screencast {
             format: 'png',
             quality: 100,
             maxWidth: Math.floor(this.width * window.devicePixelRatio),
-            maxHeight: Math.floor(this.height * window.devicePixelRatio),
+            maxHeight: Math.floor(this.height * window.devicePixelRatio)
         };
         this.cdpConnection.sendMessageToBackend('Page.startScreencast', screencastParams);
     }
@@ -200,14 +200,14 @@ export class Screencast {
     private onBackClick(): void {
         if (this.historyIndex > 0) {
             const entryId = this.history[this.historyIndex - 1].id;
-            this.cdpConnection.sendMessageToBackend('Page.navigateToHistoryEntry', {entryId});
+            this.cdpConnection.sendMessageToBackend('Page.navigateToHistoryEntry', {entryId})
         }
     }
 
     private onForwardClick(): void {
         if (this.historyIndex < this.history.length - 1) {
             const entryId = this.history[this.historyIndex + 1].id;
-            this.cdpConnection.sendMessageToBackend('Page.navigateToHistoryEntry', {entryId});
+            this.cdpConnection.sendMessageToBackend('Page.navigateToHistoryEntry', {entryId})
         }
     }
 
