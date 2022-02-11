@@ -484,7 +484,7 @@ export class DevToolsPanel {
 
         if (this.isHeadless) {
             if (!ScreencastPanel.instance) {
-                ScreencastPanel.createOrShow(this.context, this.telemetryReporter, this.targetUrl);
+                ScreencastPanel.createOrShow(this.context, this.telemetryReporter, this.targetUrl, this.config.isJsDebugProxiedCDPConnection);
             }
         }
     }
