@@ -1,3 +1,7 @@
+## 1.4.4
+* **[Bug Fix]**: Fixing bug where missing UserDataDir causes failure preventing extension from launching - [PR #871](https://github.com/microsoft/vscode-edge-devtools/pull/871)
+* **[Bug Fix]**: Fixing a bug where the screencast is not initialized correctly on first launch with JSDebug - [PR #869](https://github.com/microsoft/vscode-edge-devtools/pull/869)
+
 ## 1.4.3
 * **[Feature]**: Switch to headless by default - [PR #751](https://github.com/microsoft/vscode-edge-devtools/pull/751)
 * **[Feature]**: Refine prompt informing users of errors - [PR #807](https://github.com/microsoft/vscode-edge-devtools/pull/807)
