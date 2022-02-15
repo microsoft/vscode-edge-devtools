@@ -471,6 +471,11 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
         }
     }
 
+    // The webRoot config is equivalent to a pathMapping entry of { '/': '${webRoot}' }.
+    if (!pathMapping.hasOwnProperty('/')) {
+        pathMapping['/'] = webRoot;
+    }
+
     // replace workspaceFolder with local paths
     const resolvedMappingOverrides: IStringDictionary<string> = {};
     for (const customPathMapped in pathMapping) {
