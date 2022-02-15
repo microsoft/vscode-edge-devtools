@@ -698,6 +698,7 @@
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
+        
         "vscode:prepublish": "npm run build && npm run lint",
         "build": "webpack",
         "build-debug": "npm run build debug",

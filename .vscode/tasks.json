@@ -15,6 +15,15 @@
             "problemMatcher": [
                 "$tsc"
             ]
+        },
+        {
+            "type": "deno",
+            "command": "bundle",
+            "problemMatcher": [
+                "$deno"
+            ],
+            "group": "build",
+            "label": "deno: bundle"
         }
     ]
 }

@@ -1,6 +1,41 @@
 {
     "version": "0.1.0",
     "configurations": [
+        
+
+        {
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node"
+        },
+        {
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}"
+            ],
+            "name": "Launch Extension",
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ],
+            "preLaunchTask": "npm",
+            "request": "launch",
+            "type": "pwa-extensionHost"
+        },
+        
+        {
+            "name": "Launch Apex Debugger",
+            "type": "apex",
+            "request": "launch",
+            "userIdFilter": [],
+            "requestTypeFilter": [],
+            "entryPointFilter": "",
+            "sfdxProject": "${workspaceRoot}"
+        },
+
+
         {
             "name": "Launch Extension",
             "type": "extensionHost",
