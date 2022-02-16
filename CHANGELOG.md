@@ -1,3 +1,6 @@
+## 1.4.5
+* **[Bug Fix]**: Fixes browser comparison bug that caused extension to fetch wrong DevTools UI bundle from CDN - [PR #886](https://github.com/microsoft/vscode-edge-devtools/pull/886)
+
 ## 1.4.4
 * **[Bug Fix]**: Fixing bug where missing UserDataDir causes failure preventing extension from launching - [PR #871](https://github.com/microsoft/vscode-edge-devtools/pull/871)
 * **[Bug Fix]**: Fixing a bug where the screencast is not initialized correctly on first launch with JSDebug - [PR #869](https://github.com/microsoft/vscode-edge-devtools/pull/869)
