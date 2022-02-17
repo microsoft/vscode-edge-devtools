@@ -472,7 +472,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
     }
 
     // The webRoot config is equivalent to a pathMapping entry of { '/': '${webRoot}' }.
-    if (!pathMapping.hasOwnProperty('/')) {
+    if (webRoot) {
         pathMapping['/'] = webRoot;
     }
 
