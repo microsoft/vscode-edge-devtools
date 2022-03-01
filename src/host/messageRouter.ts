@@ -95,7 +95,10 @@ export class MessageRouter {
                 this.sendMessageToBackend(cdpMessage);
                 return true;
             case 'toggleScreencast':
-                this.toggleScreencast()
+                this.toggleScreencast();
+                return true;
+            case 'replayConsoleMessages':
+                this.replayConsoleMessages();
                 return true;
             default:
                 // TODO: handle other types of messages from devtools
@@ -163,6 +166,11 @@ export class MessageRouter {
     private toggleScreencast(): void {
         // Forward the data to the extension
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'toggleScreencast');
+    }
+
+    private replayConsoleMessages(): void {
+        // Forward the data to the extension
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'replayConsoleMessages');
     }
 
     private cssMirrorContent(url: string, newContent: string): void {

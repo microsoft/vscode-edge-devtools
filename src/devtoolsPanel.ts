@@ -49,6 +49,8 @@ export class DevToolsPanel {
     private devtoolsBaseUri: string | null;
     private isHeadless: boolean;
     static instance: DevToolsPanel | undefined;
+    private consoleMessages: string[] = [];
+    private collectConsoleMessages = true;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -87,6 +89,7 @@ export class DevToolsPanel {
         this.panelSocket.on('copyText', msg => this.onSocketCopyText(msg));
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
+        this.panelSocket.on('replayConsoleMessages', () => this.onSocketReplayConsoleMessages());
 
         // This Websocket is only used on initial connection to determine the browser version.
         // The browser version is used to select the correct hashed version of the devtools
@@ -154,7 +157,19 @@ export class DevToolsPanel {
                 this.telemetryReporter.sendTelemetryEvent(`websocket/${e}`);
                 break;
         }
-        encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
+        if (this.collectConsoleMessages && message && message.indexOf('Runtime.consoleAPICalled') !== -1) {
+            this.consoleMessages.push(message);
+        } else {
+            encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
+        }
+    }
+
+    private onSocketReplayConsoleMessages() {
+        for (const message of this.consoleMessages) {
+            encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: 'message', message });
+        }
+        this.consoleMessages = [];
+        this.collectConsoleMessages = false;
     }
 
     private onSocketReady() {
@@ -186,6 +201,7 @@ export class DevToolsPanel {
 
     private onSocketClose() {
         this.dispose();
+        this.collectConsoleMessages = true;
     }
 
     private onSocketCopyText(message: string) {
