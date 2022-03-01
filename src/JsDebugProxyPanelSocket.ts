@@ -26,7 +26,6 @@ export class JsDebugProxyPanelSocket extends PanelSocket {
                 events: [
                 'Runtime.*',
                 'DOM.*',
-                'Console.*',
                 'CSS.*',
                 'DOMDebugger.*',
                 'Network.*',
