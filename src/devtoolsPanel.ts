@@ -157,7 +157,7 @@ export class DevToolsPanel {
                 this.telemetryReporter.sendTelemetryEvent(`websocket/${e}`);
                 break;
         }
-        if (this.collectConsoleMessages && message && message.indexOf('Runtime.consoleAPICalled') !== -1) {
+        if (this.collectConsoleMessages && message && message.includes('Runtime.consoleAPICalled')) {
             this.consoleMessages.push(message);
         } else {
             encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'websocket', { event: e, message });
