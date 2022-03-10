@@ -5,7 +5,6 @@ import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import { performance } from 'perf_hooks';
 import TelemetryReporter from 'vscode-extension-telemetry';
-
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
@@ -51,6 +50,7 @@ export class DevToolsPanel {
     static instance: DevToolsPanel | undefined;
     private consoleMessages: string[] = [];
     private collectConsoleMessages = true;
+    private currentRevision: string | undefined;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -90,6 +90,7 @@ export class DevToolsPanel {
         this.panelSocket.on('focusEditor', msg => this.onSocketFocusEditor(msg));
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
         this.panelSocket.on('replayConsoleMessages', () => this.onSocketReplayConsoleMessages());
+        this.panelSocket.on('devtoolsConnection', success => this.onSocketDevToolsConnection(success));
 
         // This Websocket is only used on initial connection to determine the browser version.
         // The browser version is used to select the correct hashed version of the devtools
@@ -367,6 +368,20 @@ export class DevToolsPanel {
         }
     }
 
+    private onSocketDevToolsConnection(success: string) {
+        if (success === 'true') {
+            void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('fallbackRevision', this.currentRevision, true);
+        } else {
+            // Retry connection with fallback.
+            const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+            const fallbackRevision = settingsConfig.get('fallbackRevision') as string;
+            if (this.currentRevision) {
+                this.telemetryReporter.sendTelemetryEvent('websocket/failedConnection', {revision: this.currentRevision});
+            }
+            this.setCdnParameters({revision: fallbackRevision, isHeadless: this.isHeadless});
+        }
+    }
+
     private async openEditorFromUri(uri: vscode.Uri, line?: number, column?: number): Promise<vscode.TextEditor | undefined> {
         try {
             const doc = await vscode.workspace.openTextDocument(uri);
@@ -494,7 +509,8 @@ export class DevToolsPanel {
     }
 
     private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
-        this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${msg.revision || CDN_FALLBACK_REVISION}/vscode_app.html`;
+        this.currentRevision = msg.revision || CDN_FALLBACK_REVISION;
+        this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${this.currentRevision}/vscode_app.html`;
         this.isHeadless = msg.isHeadless;
         this.update();
 
