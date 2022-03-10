@@ -375,6 +375,9 @@ export class DevToolsPanel {
             // Retry connection with fallback.
             const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
             const fallbackRevision = settingsConfig.get('fallbackRevision') as string;
+            if (this.currentRevision) {
+                this.telemetryReporter.sendTelemetryEvent('websocket/failedConnection', {revision: this.currentRevision});
+            }
             this.setCdnParameters({revision: fallbackRevision, isHeadless: this.isHeadless});
         }
     }
