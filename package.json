@@ -721,7 +721,7 @@
         "utf-8-validate": "5.0.6",
         "vscode-chrome-debug-core": "6.8.11",
         "vscode-extension-telemetry": "0.4.1",
-        "vscode-webhint": "1.6.3",
+        "vscode-webhint": "1.6.5",
         "ws": "8.2.2",
         "xmlhttprequest": "1.8.0"
     },
