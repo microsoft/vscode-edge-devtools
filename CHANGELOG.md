@@ -1,3 +1,15 @@
+## 1.4.5
+* **[Bug Fix]**: Fixes browser comparison bug that caused extension to fetch wrong DevTools UI bundle from CDN - [PR #886](https://github.com/microsoft/vscode-edge-devtools/pull/886)
+
+## 1.4.4
+* **[Bug Fix]**: Fixing bug where missing UserDataDir causes failure preventing extension from launching - [PR #871](https://github.com/microsoft/vscode-edge-devtools/pull/871)
+* **[Bug Fix]**: Fixing a bug where the screencast is not initialized correctly on first launch with JSDebug - [PR #869](https://github.com/microsoft/vscode-edge-devtools/pull/869)
+
+## 1.4.3
+* **[Feature]**: Switch to headless by default - [PR #751](https://github.com/microsoft/vscode-edge-devtools/pull/751)
+* **[Feature]**: Refine prompt informing users of errors - [PR #807](https://github.com/microsoft/vscode-edge-devtools/pull/807)
+* **[Bug Fix]**: Fix open folder link to be a button - [PR #803](https://github.com/microsoft/vscode-edge-devtools/pull/803)
+
 ## 1.4.2
 * **[Feature]**: Launch Microsoft Edge with specified args - [PR #623](https://github.com/microsoft/vscode-edge-devtools/pull/623)
 * **[Feature]**: Warn when using deprecated 'edge' or 'msedge' launch types - [PR #690](https://github.com/microsoft/vscode-edge-devtools/pull/690)

@@ -24,7 +24,8 @@ const vscode = acquireVsCodeApi();
 export class MessageRouter {
     private toolsFrameWindow: Window | null | undefined;
     private errorMessageDiv: HTMLElement | null | undefined;
-    private devtoolsActionReceived: boolean = false;
+    private devtoolsActionReceived = false;
+    private fallbackAttempt = false;
 
     constructor(webviewWindow: Window) {
         webviewWindow.addEventListener('DOMContentLoaded', () => {
@@ -95,7 +96,10 @@ export class MessageRouter {
                 this.sendMessageToBackend(cdpMessage);
                 return true;
             case 'toggleScreencast':
-                this.toggleScreencast()
+                this.toggleScreencast();
+                return true;
+            case 'replayConsoleMessages':
+                this.replayConsoleMessages();
                 return true;
             default:
                 // TODO: handle other types of messages from devtools
@@ -165,6 +169,11 @@ export class MessageRouter {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'toggleScreencast');
     }
 
+    private replayConsoleMessages(): void {
+        // Forward the data to the extension
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'replayConsoleMessages');
+    }
+
     private cssMirrorContent(url: string, newContent: string): void {
         // Forward the data to the extension
         const request: ICssMirrorContentData = { url, newContent };
@@ -184,6 +193,10 @@ export class MessageRouter {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', telemetry);
     }
 
+    private sendDevToolsConnectionStatus(success: boolean) {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'devtoolsConnection', success);
+    }
+
     private fireWebSocketCallback(e: WebSocketEvent, message: string) {
         // Send response message to DevTools
         if (this.toolsFrameWindow && e === 'message') {
@@ -193,9 +206,16 @@ export class MessageRouter {
 
     private showLoadingError() {
         if (this.devtoolsActionReceived || !this.errorMessageDiv) {
+            this.sendDevToolsConnectionStatus(true);
+            this.fallbackAttempt = false;
             return;
         }
         // Show the error message if DevTools has failed to record an action
-        this.errorMessageDiv.classList.remove('hidden');
+        if (!this.fallbackAttempt) {
+            this.sendDevToolsConnectionStatus(false);
+            this.fallbackAttempt = true;
+        } else {
+            this.errorMessageDiv.classList.remove('hidden');
+        }
     }
 }

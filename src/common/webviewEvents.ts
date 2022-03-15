@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'cssMirrorContent' | 'ready' | 'setState' | 'telemetry' | 'websocket'
-| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'toggleScreencast' | 'toggleInspect';
+| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'toggleScreencast' | 'toggleInspect' | 'replayConsoleMessages' | 'devtoolsConnection';
 export const webviewEventNames: WebviewEvent[] = [
     'getState',
     'getUrl',
@@ -19,10 +19,12 @@ export const webviewEventNames: WebviewEvent[] = [
     'openUrl',
     'toggleScreencast',
     'toggleInspect',
+    'replayConsoleMessages',
+    'devtoolsConnection',
 ];
 
 export type FrameToolsEvent = 'sendMessageToBackend' | 'openInNewTab' | 'recordEnumeratedHistogram' |
-'recordPerformanceHistogram' | 'reportError' | 'openInEditor' | 'cssMirrorContent' | 'toggleScreencast';
+'recordPerformanceHistogram' | 'reportError' | 'openInEditor' | 'cssMirrorContent' | 'toggleScreencast' | 'replayConsoleMessages';
 export const FrameToolsEventNames: FrameToolsEvent[] = [
     'sendMessageToBackend',
     'openInNewTab',
@@ -32,6 +34,7 @@ export const FrameToolsEventNames: FrameToolsEvent[] = [
     'recordPerformanceHistogram',
     'reportError',
     'toggleScreencast',
+    'replayConsoleMessages',
 ];
 
 export type WebSocketEvent = 'open' | 'close' | 'error' | 'message';

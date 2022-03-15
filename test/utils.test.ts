@@ -721,24 +721,25 @@ describe("utils", () => {
         it("uses user config with workspace", async () => {
             const config = {
                 pathMapping: {
-                    "/app": "${workspaceFolder}/out",
+                    "/app": "${workspaceFolder}/out/app",
                 },
                 sourceMapPathOverrides: {
                     "webpack:///./*": "${webRoot}/*",
                 },
                 sourceMaps: false,
-                webRoot: "/out",
+                webRoot: "${workspaceFolder}/out",
             };
 
             const expectedConfig = {
                 pathMapping: {
-                    "/app": `g:\\GIT\\testPage\\out`,
+                    "/app": `g:\\GIT\\testPage\\out\\app`,
+                    "/": `g:\\GIT\\testPage\\out`
                 },
                 sourceMapPathOverrides: {
-                    "webpack:///./*": "/out/*",
+                    "webpack:///./*": "g:\\GIT\\testPage\\out\\*",
                 },
                 sourceMaps: false,
-                webRoot: "/out",
+                webRoot: "g:\\GIT\\testPage\\out",
             };
 
             const { pathMapping, sourceMapPathOverrides, sourceMaps, webRoot } = utils.getRuntimeConfig(config);
@@ -763,6 +764,7 @@ describe("utils", () => {
             const expectedConfig = {
                 pathMapping: {
                     "/app": `c:\\user\\test\\out`,
+                    "/": `/out`
                 },
                 sourceMapPathOverrides: {
                     "webpack:///./*": "/out/*",

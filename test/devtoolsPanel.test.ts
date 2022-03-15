@@ -634,7 +634,7 @@ describe("devtoolsPanel", () => {
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
-                expect(mockVsCode.window.showErrorMessage).toHaveBeenCalled();
+                expect(mockVsCode.window.showWarningMessage).toHaveBeenCalled();
             });
 
             it("calls openTextDocument for onSocketCssMirrorContent", async () => {

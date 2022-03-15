@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.4.2",
+    "version": "1.4.5",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -341,6 +341,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
+                },
+                "vscode-edge-devtools.fallbackRevision": {
+                    "type": "string",
+                    "default": "@c438621746b2932668109129d137a7e3a22ef4fd",
+                    "description": "Last known good revision used for when we fail to connect to the CDN with the current target revision."
                 }
             }
         },
@@ -651,7 +656,7 @@
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "To customize your launch experience, [open a folder](command:vscode.openFolder) and create a launch.json file.",
+                "contents": "To customize your launch experience, open a folder and create a launch.json file. \n[Open Folder](command:vscode.openFolder)",
                 "when": "workbenchState == empty"
             },
             {
@@ -735,11 +740,11 @@
     "dependencies": {
         "@vscode/codicons": "0.0.22",
         "bufferutil": "4.0.4",
-        "puppeteer-core": "10.4.0",
+        "puppeteer-core": "13.1.2",
         "utf-8-validate": "5.0.6",
         "vscode-chrome-debug-core": "6.8.11",
         "vscode-extension-telemetry": "0.4.1",
-        "vscode-webhint": "1.6.3",
+        "vscode-webhint": "1.6.5",
         "ws": "8.2.2",
         "xmlhttprequest": "1.8.0"
     },
@@ -767,7 +772,7 @@
         "typescript": "4.4.3",
         "uglify-js": "3.14.2",
         "unzipper": "0.10.11",
-        "vsce": "1.100.0",
+        "vsce": "2.6.4",
         "vscode-languageclient": "7.0.0",
         "vscode-test": "1.6.1",
         "webpack": "5.54.0",

@@ -76,8 +76,8 @@ export function activate(context: vscode.ExtensionContext): void {
         void launch(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId): void => {
-        void attachToCurrentDebugTarget(context, debugSessionId);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId, config): void => {
+        void attachToCurrentDebugTarget(context, debugSessionId, config);
     }));
 
     // Register the launch provider
@@ -398,7 +398,7 @@ export async function attach(
     }
 }
 
-export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext, debugSessionId?: string): Promise<void> {
+export async function attachToCurrentDebugTarget(context: vscode.ExtensionContext, debugSessionId?: string, config?: Partial<IUserConfig>): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
@@ -421,7 +421,7 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
     } else if (targetWebsocketUrl) {
         // Auto connect to found target
         telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
-        const runtimeConfig = getRuntimeConfig();
+        const runtimeConfig = getRuntimeConfig(config);
         runtimeConfig.isJsDebugProxiedCDPConnection = true;
         DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
     } else {

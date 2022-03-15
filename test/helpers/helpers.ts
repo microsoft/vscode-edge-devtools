@@ -80,7 +80,7 @@ export function createFakeVSCode() {
             showQuickPick: jest.fn().mockResolvedValue(null),
             showTextDocument: jest.fn(),
             showInformationMessage: jest.fn(),
-            showWarningMessage: jest.fn().mockResolvedValue(new Promise(()=>{})),
+            showWarningMessage: jest.fn().mockResolvedValue({}),
         },
         workspace: {
             createFileSystemWatcher: jest.fn(),
