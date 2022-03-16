@@ -86,7 +86,7 @@ describe("launchConfigManager", () => {
 
         it('inserts a comment after the url property', async () => {
             const fse = jest.requireMock("fs-extra");
-            const expectedText = "startpage\\\\index.html\", // Provide your project's url to finish configuring";
+            const expectedText = '// Provide your project\'s url to finish configuring';
             fse.readFileSync.mockImplementation(() => JSON.stringify(providedDebugConfig));
             const launchConfigManager = LaunchConfigManager.instance;
             await launchConfigManager.configureLaunchJson();
