@@ -36,7 +36,7 @@ describe("launchDebugProvider", () => {
             const result = await host.provideDebugConfigurations(undefined, undefined);
             expect(result).toBeDefined();
             expect(result![0].request).toEqual("launch");
-            expect(result![0].type).toEqual(`${SETTINGS_STORE_NAME}.debug`);
+            expect(result![0].type).toEqual('pwa-msedge');
         });
     });
 

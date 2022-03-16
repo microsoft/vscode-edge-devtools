@@ -3,14 +3,65 @@
 
 import * as vscode from 'vscode';
 import * as fse from 'fs-extra';
-import { SETTINGS_STORE_NAME } from './utils';
+import {
+    SETTINGS_STORE_NAME,
+    SETTINGS_DEFAULT_URL,
+} from './utils';
 export type LaunchConfig = 'None' | 'Unsupported' | vscode.DebugConfiguration;
+export type CompoundConfig = {
+    name: string,
+    configurations: string[],
+}
+
+const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+const defaultUrl: string = settings.get('defaultUrl') || SETTINGS_DEFAULT_URL;
 
 export const providedDebugConfig: vscode.DebugConfiguration = {
-    name: 'Launch Microsoft Edge and open the Edge DevTools',
+    type: 'pwa-msedge',
+    name: 'Launch Microsoft Edge',
     request: 'launch',
-    type: `${SETTINGS_STORE_NAME}.debug`,
-    url: '',
+    runtimeArgs: ['--remote-debugging-port=9222'],
+    url: defaultUrl,
+    presentation: {
+        hidden: true,
+    },
+};
+
+const providedHeadlessDebugConfig: vscode.DebugConfiguration = {
+    type: 'pwa-msedge',
+    name: 'Launch Microsoft Edge in headless mode',
+    request: 'launch',
+    runtimeArgs: ['--headless', '--remote-debugging-port=9222'],
+    url: defaultUrl,
+    presentation: {
+        hidden: true,
+    },
+};
+
+const providedLaunchDevToolsConfig: vscode.DebugConfiguration = {
+    type: 'vscode-edge-devtools.debug',
+    name: 'Open Edge DevTools',
+    request: 'attach',
+    url: defaultUrl,
+    presentation: {
+        hidden: true,
+    },
+};
+
+const providedCompoundDebugConfig: CompoundConfig = {
+    name: 'Launch Edge and attach DevTools',
+    configurations: [
+        'Launch Microsoft Edge',
+        'Open Edge DevTools',
+    ],
+};
+
+const providedCompoundDebugConfigHeadless: CompoundConfig = {
+    name: 'Launch Edge Headless and attach DevTools',
+    configurations: [
+        'Launch Microsoft Edge in headless mode',
+        'Open Edge DevTools',
+    ],
 };
 
 export class LaunchConfigManager {
@@ -88,15 +139,23 @@ export class LaunchConfigManager {
         const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
         const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
         configs.push(providedDebugConfig);
+        configs.push(providedHeadlessDebugConfig);
+        configs.push(providedLaunchDevToolsConfig);
         await launchJson.update('configurations', configs) as unknown as Promise<void>;
 
         // Insert instruction comment
         let launchText = fse.readFileSync(workspaceUri.fsPath + relativePath).toString();
-        const re = new RegExp(`{(.|\\n|\\s)*(${providedDebugConfig.type})(.|\\n|\\s)*(${providedDebugConfig.url}")`, 'm');
+        const re = /("url":.*startpage[\/\\]+index\.html",)/gm;
         const match = re.exec(launchText);
         const instructions = ' // Provide your project\'s url to finish configuring';
         launchText = launchText.replace(re, `${match ? match[0] : ''}${instructions}`);
         fse.writeFileSync(workspaceUri.fsPath + relativePath, launchText);
+
+        // Add compound configs
+        const compounds = launchJson.get('compounds') as CompoundConfig[];
+        compounds.push(providedCompoundDebugConfig);
+        compounds.push(providedCompoundDebugConfigHeadless);
+        await launchJson.update('compounds', compounds) as unknown as Promise<void>;
 
         // Open launch.json in editor
         void vscode.commands.executeCommand('vscode.open', vscode.Uri.joinPath(workspaceUri, relativePath));
