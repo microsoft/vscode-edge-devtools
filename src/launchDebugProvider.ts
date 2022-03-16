@@ -54,7 +54,7 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
             const targetUri: string = this.getUrlFromConfig(folder, config);
             if (config.request && config.request === 'attach') {
                 this.telemetryReporter.sendTelemetryEvent('debug/attach');
-                void this.attach(this.context, targetUri, userConfig);
+                void this.attach(this.context, targetUri, userConfig, true);
             } else if (config.request && config.request === 'launch') {
                 this.telemetryReporter.sendTelemetryEvent('debug/launch');
                 void this.launch(this.context, targetUri, userConfig);
