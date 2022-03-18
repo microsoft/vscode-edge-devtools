@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 
 export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'cssMirrorContent' | 'ready' | 'setState' | 'telemetry' | 'websocket'
-| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'toggleScreencast' | 'toggleInspect' | 'replayConsoleMessages' | 'devtoolsConnection';
+| 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'toggleScreencast' | 'toggleInspect' | 'replayConsoleMessages'
+| 'devtoolsConnection' | 'toggleCSSMirrorContent';
 export const webviewEventNames: WebviewEvent[] = [
     'getState',
     'getUrl',
@@ -21,10 +22,11 @@ export const webviewEventNames: WebviewEvent[] = [
     'toggleInspect',
     'replayConsoleMessages',
     'devtoolsConnection',
+    'toggleCSSMirrorContent',
 ];
 
 export type FrameToolsEvent = 'sendMessageToBackend' | 'openInNewTab' | 'recordEnumeratedHistogram' |
-'recordPerformanceHistogram' | 'reportError' | 'openInEditor' | 'cssMirrorContent' | 'toggleScreencast' | 'replayConsoleMessages';
+'recordPerformanceHistogram' | 'reportError' | 'openInEditor' | 'cssMirrorContent' | 'toggleScreencast' | 'replayConsoleMessages' | 'toggleCSSMirrorContent';
 export const FrameToolsEventNames: FrameToolsEvent[] = [
     'sendMessageToBackend',
     'openInNewTab',
@@ -35,6 +37,7 @@ export const FrameToolsEventNames: FrameToolsEvent[] = [
     'reportError',
     'toggleScreencast',
     'replayConsoleMessages',
+    'toggleCSSMirrorContent',
 ];
 
 export type WebSocketEvent = 'open' | 'close' | 'error' | 'message';
@@ -74,6 +77,10 @@ export interface IOpenEditorData {
 export interface ICssMirrorContentData {
     url: string;
     newContent: string;
+}
+
+export interface IToggleCSSMirrorContentData {
+    isEnabled: boolean;
 }
 
 /**

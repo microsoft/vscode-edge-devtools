@@ -211,24 +211,23 @@ export function activate(context: vscode.ExtensionContext): void {
             void vscode.env.openExternal(vscode.Uri.parse('https://docs.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension'));
         }));
 
-    const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const mirrorEditsEnabled = settingsConfig.get('mirrorEdits');
-    void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', mirrorEditsEnabled);
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.toggleMirrorEditingOn`, () => {
-            void settingsConfig.update('mirrorEdits', true, true);
-            void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', true);
-        }));
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.toggleMirrorEditingOff`, () => {
-        void settingsConfig.update('mirrorEdits', false, true);
-        void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', false);
-        }));
-    void settingsConfig.update('mirrorEdits', true, true);
-    void vscode.commands.executeCommand('setContext', 'mirrorEditingEnabled', true);
+    const cssMirrorContent = SettingsProvider.instance.getCSSMirrorContentSettings();
+    void vscode.commands.executeCommand('setContext', 'cssMirrorContent', cssMirrorContent);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContentOn`, () => {
+        SettingsProvider.instance.setCSSMirrorContentSettings(true);
+        void vscode.commands.executeCommand('setContext', 'cssMirrorContent', true);
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContentOff`, () => {
+        SettingsProvider.instance.setCSSMirrorContentSettings(false);
+        void vscode.commands.executeCommand('setContext', 'cssMirrorContent', false);
+    }));
+
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     void reportFileExtensionTypes(telemetryReporter);
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
 
+    const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     if (settingsConfig.get('webhint')) {
         startWebhint(context);
     }
