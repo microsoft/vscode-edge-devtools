@@ -1,3 +1,10 @@
+## 1.4.6
+* **[Feature]**: Enable console tool in DevTools (Only available on Edge version 101.0.1193.0+) - [PR #905](https://github.com/microsoft/vscode-edge-devtools/pull/905)
+* **[Feature]**: Updated auto-generated launch.json configs to use JSDebug workflows - [PR #927](https://github.com/microsoft/vscode-edge-devtools/pull/927)
+* **[Feature]**: Extension now caches and copies the last successful connection to the DevTools. This enables offline usage and overall availability. - [PR #916](https://github.com/microsoft/vscode-edge-devtools/pull/916)
+* **[Feature]**: Updated webhint to 1.6.5. - [PR #920](https://github.com/microsoft/vscode-edge-devtools/pull/920)
+* **[Bug Fix]**: Use webRoot config for source path resolution. Improves stability of openInEditor/CSS sync functionalities - [PR #885](https://github.com/microsoft/vscode-edge-devtools/pull/885)
+
 ## 1.4.5
 * **[Bug Fix]**: Fixes browser comparison bug that caused extension to fetch wrong DevTools UI bundle from CDN - [PR #886](https://github.com/microsoft/vscode-edge-devtools/pull/886)
 
