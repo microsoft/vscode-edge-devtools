@@ -153,8 +153,8 @@ export class LaunchConfigManager {
 
         // Add compound configs
         const compounds = launchJson.get('compounds') as CompoundConfig[];
-        compounds.push(providedCompoundDebugConfig);
         compounds.push(providedCompoundDebugConfigHeadless);
+        compounds.push(providedCompoundDebugConfig);
         await launchJson.update('compounds', compounds) as unknown as Promise<void>;
 
         // Open launch.json in editor
