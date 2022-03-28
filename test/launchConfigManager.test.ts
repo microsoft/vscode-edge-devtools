@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import {createFakeVSCode} from "./helpers/helpers";
-import { LaunchConfigManager, providedDebugConfig} from "../src/launchConfigManager";
+import { extensionCompoundConfigs, extensionConfigs, LaunchConfigManager, providedDebugConfig } from "../src/launchConfigManager";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 jest.mock("fs-extra");
@@ -44,11 +44,17 @@ describe("launchConfigManager", () => {
             fse.pathExistsSync.mockImplementation(() => true);
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return {
-                    get: (name: string) => [{type: 'vscode-edge-devtools.debug'}]
+                    get: (name: string) => {
+                        if (name === 'configurations') {
+                            return extensionConfigs;
+                        } else {
+                            return extensionCompoundConfigs;
+                        }
+                    }
                 }
             });
             const launchConfigManager = LaunchConfigManager.instance;
-            expect(launchConfigManager.getLaunchConfig()).toEqual({type: 'vscode-edge-devtools.debug'});
+            expect(launchConfigManager.getLaunchConfig()).toEqual('Launch Edge Headless and attach DevTools');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
         });
 
