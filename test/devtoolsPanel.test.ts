@@ -649,7 +649,15 @@ describe("devtoolsPanel", () => {
                     fetchUri: jest.fn().mockRejectedValue(null),
                     isHeadlessEnabled: jest.fn(),
                 };
+                const mockSettingsProvider = {
+                    SettingsProvider: {
+                        instance: {
+                            getCSSMirrorContentSettings: jest.fn().mockImplementation(() => true),
+                        }
+                    }
+                };
                 jest.doMock("../src/utils", () => mockUtils);
+                jest.doMock("../src/common/settingsProvider.ts", () => mockSettingsProvider); 
 
                 const dtp = await import("../src/devtoolsPanel");
                 const { TextEncoder } = require('util');
@@ -661,6 +669,7 @@ describe("devtoolsPanel", () => {
             });
 
             it("calls getVscodeSettings", async () => {
+                jest.dontMock("../src/common/settingsProvider.ts");
                 const expectedId = { id: 0 };
                 const expectedState = { enableNetwork: true, themeString: "System preference", welcome: true, isHeadless: false};
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
