@@ -81,8 +81,8 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(18);
-            expect(commandMock).toHaveBeenCalledTimes(17);
+            expect(context.subscriptions.length).toBe(17);
+            expect(commandMock).toHaveBeenCalledTimes(16);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
