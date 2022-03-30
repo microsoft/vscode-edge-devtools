@@ -157,16 +157,10 @@
                 "title": "Launch project"
             },
             {
-                "command": "vscode-edge-devtools-view.cssMirrorContentOn",
+                "command": "vscode-edge-devtools-view.cssMirrorContent",
                 "category": "Microsoft Edge Tools",
                 "enablement": "!cssMirrorContent && titleCommandsRegistered",
                 "title": "Toggle mirror editing on for CSS files in workspace"
-            },
-            {
-                "command": "vscode-edge-devtools-view.cssMirrorContentOff",
-                "category": "Microsoft Edge Tools",
-                "enablement": "cssMirrorContent && titleCommandsRegistered",
-                "title": "Toggle mirror editing off for CSS files in workspace"
             }
         ],
         "configuration": {

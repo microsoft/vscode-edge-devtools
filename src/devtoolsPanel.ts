@@ -184,12 +184,7 @@ export class DevToolsPanel {
 
     private onToggleCSSMirrorContent(message: string) {
         const { isEnabled } = JSON.parse(message) as IToggleCSSMirrorContentData;
-
-        if (isEnabled) {
-            void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContentOn`);
-        } else {
-            void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContentOff`);
-        }
+        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, {isEnabled});
     }
 
     private onSocketMessage(message: string) {
