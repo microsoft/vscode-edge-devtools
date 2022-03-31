@@ -147,7 +147,9 @@ export class LaunchConfigManager {
 
         // Append a supported debug config to their list of configurations and update workspace configuration
         const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
-        const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
+        let configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
+        configs = this.replaceDuplicateNameConfigs(configs, extensionConfigs) as vscode.DebugConfiguration[];
+
         const missingConfigs = this.getMissingConfigs(configs, extensionConfigs);
         for (const missingConfig of missingConfigs) {
             configs.push((missingConfig as vscode.DebugConfiguration));
@@ -155,7 +157,8 @@ export class LaunchConfigManager {
         await launchJson.update('configurations', configs) as unknown as Promise<void>;
 
         // Add compound configs
-        const compounds = launchJson.get('compounds') as CompoundConfig[];
+        let compounds = launchJson.get('compounds') as CompoundConfig[];
+        compounds = this.replaceDuplicateNameConfigs(compounds, extensionCompoundConfigs) as CompoundConfig[];
         const missingCompoundConfigs = this.getMissingConfigs(compounds, extensionCompoundConfigs);
         for (const missingCompoundConfig of missingCompoundConfigs) {
             compounds.push((missingCompoundConfig as CompoundConfig));
@@ -177,6 +180,20 @@ export class LaunchConfigManager {
 
     isValidLaunchConfig(): boolean {
         return this.isValidConfig;
+    }
+
+    replaceDuplicateNameConfigs(userConfigs: Record<string, unknown>[], extensionConfigs: Record<string, unknown>[]): Record<string, unknown>[] {
+        const configs = [];
+        const extensionConfigMap: Map<string, Record<string, unknown>> = new Map();
+        for (const extensionConfig of extensionConfigs) {
+            extensionConfigMap.set((extensionConfig.name as string), extensionConfig);
+        }
+        for (const userConfig of userConfigs) {
+            const duplicateNameConfig = extensionConfigMap.get((userConfig.name as string));
+            const addConfig = duplicateNameConfig ? duplicateNameConfig : userConfig;
+            configs.push(addConfig);
+        }
+        return configs;
     }
 
     getMissingConfigs(userConfigs: Record<string, unknown>[], extensionConfigs: Record<string, unknown>[]): Record<string, unknown>[] {
