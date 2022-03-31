@@ -159,7 +159,7 @@
             {
                 "command": "vscode-edge-devtools-view.cssMirrorContent",
                 "category": "Microsoft Edge Tools",
-                "enablement": "!cssMirrorContent && titleCommandsRegistered",
+                "enablement": "titleCommandsRegistered",
                 "title": "Toggle mirror editing on for CSS files in workspace"
             }
         ],
