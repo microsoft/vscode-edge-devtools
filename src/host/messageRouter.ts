@@ -101,6 +101,10 @@ export class MessageRouter {
             case 'replayConsoleMessages':
                 this.replayConsoleMessages();
                 return true;
+            case 'toggleCSSMirrorContent':
+                const [isEnabled] = args;
+                this.toggleCSSMirrorContent(isEnabled);
+                return true;
             default:
                 // TODO: handle other types of messages from devtools
                 return false;
@@ -167,6 +171,10 @@ export class MessageRouter {
     private toggleScreencast(): void {
         // Forward the data to the extension
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'toggleScreencast');
+    }
+
+    private toggleCSSMirrorContent(isEnabled: boolean): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'toggleCSSMirrorContent', {isEnabled});
     }
 
     private replayConsoleMessages(): void {
