@@ -70,6 +70,14 @@ export class SettingsProvider {
     return standaloneScreencast;
   }
 
+  getCSSMirrorContentSettings(): boolean {
+    return vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('cssMirrorContent') || false;
+  }
+
+  setCSSMirrorContentSettings(isEnabled: boolean): void {
+    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('cssMirrorContent', isEnabled, true);
+  }
+
   static get instance(): SettingsProvider {
     if (!SettingsProvider.singletonInstance) {
       SettingsProvider.singletonInstance = new SettingsProvider();

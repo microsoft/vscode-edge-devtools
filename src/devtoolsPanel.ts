@@ -12,6 +12,7 @@ import {
     IOpenEditorData,
     ITelemetryMeasures,
     ITelemetryProps,
+    IToggleCSSMirrorContentData,
     TelemetryData,
     WebSocketEvent,
 } from './common/webviewEvents';
@@ -91,6 +92,7 @@ export class DevToolsPanel {
         this.panelSocket.on('focusEditorGroup', msg => this.onSocketFocusEditorGroup(msg));
         this.panelSocket.on('replayConsoleMessages', () => this.onSocketReplayConsoleMessages());
         this.panelSocket.on('devtoolsConnection', success => this.onSocketDevToolsConnection(success));
+        this.panelSocket.on('toggleCSSMirrorContent', msg => this.onToggleCSSMirrorContent(msg) as unknown as void);
 
         // This Websocket is only used on initial connection to determine the browser version.
         // The browser version is used to select the correct hashed version of the devtools
@@ -178,6 +180,11 @@ export class DevToolsPanel {
         this.telemetryReporter.sendTelemetryEvent(
             this.panelSocket.isConnectedToTarget ? 'websocket/reconnect' : 'websocket/connect');
         this.timeStart = performance.now();
+    }
+
+    private onToggleCSSMirrorContent(message: string) {
+        const { isEnabled } = JSON.parse(message) as IToggleCSSMirrorContentData;
+        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, {isEnabled});
     }
 
     private onSocketMessage(message: string) {
@@ -341,7 +348,7 @@ export class DevToolsPanel {
     }
 
     private async onSocketCssMirrorContent(message: string) {
-        if (!vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('mirrorEdits')) {
+        if (!SettingsProvider.instance.getCSSMirrorContentSettings()) {
             return;
         }
 
@@ -467,6 +474,7 @@ export class DevToolsPanel {
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
+        const cssMirrorContent = SettingsProvider.instance.getCSSMirrorContentSettings();
         const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
 
         // The headless query param is used to show/hide the DevTools screencast on launch
@@ -493,7 +501,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${enableScreencast}&standaloneScreencast=${standaloneScreencast}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${enableScreencast}&standaloneScreencast=${standaloneScreencast}&cssMirrorContent=${cssMirrorContent}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>
