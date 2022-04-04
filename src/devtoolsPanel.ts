@@ -363,7 +363,7 @@ export class DevToolsPanel {
             const textEditor = await this.openEditorFromUri(uri);
             if (textEditor) {
                 const fullRange = this.getDocumentFullRange(textEditor);
-                const isSnapshotSameAsLastMirroredCSS = this.mirroredCSS.get(url) == textEditor.document.getText();
+                const isSnapshotSameAsLastMirroredCSS = this.mirroredCSS.get(url) === textEditor.document.getText();
                 if (!textEditor.document.isDirty || isSnapshotSameAsLastMirroredCSS)
                 {
                     this.mirroredCSS.set(url, newContent);
