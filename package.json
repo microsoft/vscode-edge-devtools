@@ -157,16 +157,10 @@
                 "title": "Launch project"
             },
             {
-                "command": "vscode-edge-devtools-view.toggleMirrorEditingOn",
+                "command": "vscode-edge-devtools-view.cssMirrorContent",
                 "category": "Microsoft Edge Tools",
-                "enablement": "!mirrorEditingEnabled && titleCommandsRegistered",
+                "enablement": "titleCommandsRegistered",
                 "title": "Toggle mirror editing on for CSS files in workspace"
-            },
-            {
-                "command": "vscode-edge-devtools-view.toggleMirrorEditingOff",
-                "category": "Microsoft Edge Tools",
-                "enablement": "mirrorEditingEnabled && titleCommandsRegistered",
-                "title": "Toggle mirror editing off for CSS files in workspace"
             }
         ],
         "configuration": {
@@ -332,7 +326,7 @@
 
                     ]
                 },
-                "vscode-edge-devtools.mirrorEdits": {
+                "vscode-edge-devtools.cssMirrorContent": {
                     "type": "boolean",
                     "default": false,
                     "description": "Enable edits in the styles pane to be automatically applied to the corresponding stylesheet in the workspace. (Only works when targeting Edge Browser versions 94.0.988.0+)"
@@ -639,10 +633,6 @@
                     "name": "Targets"
                 },
                 {
-                    "id": "vscode-edge-devtools-view.mirror-editing",
-                    "name": "CSS Mirror Editing"
-                },
-                {
                     "id": "vscode-edge-devtools-view.help-links",
                     "name": "Helpful links"
                 }
@@ -673,24 +663,6 @@
                 "view": "vscode-edge-devtools-view.targets",
                 "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launchProject)",
                 "when": "launchJsonStatus == Supported && isWorkspaceTrusted"
-            },
-            {
-                "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "CSS mirror editing is an experimental feature that automatically applies changes made in the DevTools panel to CSS files in your workspace."
-            },
-            {
-                "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "Mirror editing is currently OFF.\n[Toggle Mirror Editing On](command:vscode-edge-devtools-view.toggleMirrorEditingOn)",
-                "when": "!mirrorEditingEnabled"
-            },
-            {
-                "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "Mirror editing is currently ON.\n[Toggle Mirror Editing Off](command:vscode-edge-devtools-view.toggleMirrorEditingOff)",
-                "when": "mirrorEditingEnabled"
-            },
-            {
-                "view": "vscode-edge-devtools-view.mirror-editing",
-                "contents": "Please help us improve this feature by [leaving feedback here](https://github.com/microsoft/vscode-edge-devtools/issues/476)."
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
@@ -744,7 +716,7 @@
         "utf-8-validate": "5.0.6",
         "vscode-chrome-debug-core": "6.8.11",
         "vscode-extension-telemetry": "0.4.1",
-        "vscode-webhint": "1.6.5",
+        "vscode-webhint": "1.6.6",
         "ws": "8.2.2",
         "xmlhttprequest": "1.8.0"
     },
