@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import {createFakeVSCode} from "./helpers/helpers";
-import { LaunchConfigManager, providedDebugConfig} from "../src/launchConfigManager";
+import { extensionCompoundConfigs, extensionConfigs, LaunchConfigManager, providedDebugConfig } from "../src/launchConfigManager";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 jest.mock("fs-extra");
@@ -44,11 +44,17 @@ describe("launchConfigManager", () => {
             fse.pathExistsSync.mockImplementation(() => true);
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return {
-                    get: (name: string) => [{type: 'vscode-edge-devtools.debug'}]
+                    get: (name: string) => {
+                        if (name === 'configurations') {
+                            return extensionConfigs;
+                        } else {
+                            return extensionCompoundConfigs;
+                        }
+                    }
                 }
             });
             const launchConfigManager = LaunchConfigManager.instance;
-            expect(launchConfigManager.getLaunchConfig()).toEqual({type: 'vscode-edge-devtools.debug'});
+            expect(launchConfigManager.getLaunchConfig()).toEqual('Launch Edge Headless and attach DevTools');
             expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
         });
 
@@ -62,7 +68,7 @@ describe("launchConfigManager", () => {
     });
 
     describe('configureLaunchJson', () => {
-        it('adds a debug config to launch.json', async () => {
+        it('adds extension configs/compounds to launch.json', async () => {
             const vscodeMock = jest.requireMock("vscode");
             const fse = jest.requireMock("fs-extra");
             fse.readFileSync.mockImplementation((() => ''));
@@ -80,8 +86,9 @@ describe("launchConfigManager", () => {
             });
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
-            launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([expect.any(Object)]));
+            await launchConfigManager.configureLaunchJson();
+            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([...extensionConfigs]));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('compounds', expect.arrayContaining([...extensionCompoundConfigs]));
         });
 
         it('inserts a comment after the url property', async () => {
@@ -91,6 +98,50 @@ describe("launchConfigManager", () => {
             const launchConfigManager = LaunchConfigManager.instance;
             await launchConfigManager.configureLaunchJson();
             expect(fse.writeFileSync).toHaveBeenCalledWith(expect.any(String), expect.stringContaining(expectedText));
+        });
+
+        it('replaces config with duplicate name with extension config', async () => {
+            const vscodeMock = jest.requireMock("vscode");
+            const fse = jest.requireMock("fs-extra");
+            fse.readFileSync.mockImplementation((() => ''));
+            vscodeMock.workspace.workspaceFolders = [{
+                uri:  'file:///g%3A/GIT/testPage'
+            }];
+            vscodeMock.WorkspaceConfiguration = {
+                update: jest.fn((name: string, value: any) => {}),
+            };
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return {
+                        get: jest.fn((name: string) => [{name: 'Launch Microsoft Edge in headless mode'}]),
+                        update: vscodeMock.WorkspaceConfiguration.update,
+                }
+            });
+            vscodeMock.Uri.joinPath = jest.fn();
+            const launchConfigManager = LaunchConfigManager.instance;
+            launchConfigManager.configureLaunchJson();
+            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', Array(3).fill(expect.anything()));
+        });
+
+        it('retains user config', async () => {
+            const vscodeMock = jest.requireMock("vscode");
+            const fse = jest.requireMock("fs-extra");
+            fse.readFileSync.mockImplementation((() => ''));
+            vscodeMock.workspace.workspaceFolders = [{
+                uri:  'file:///g%3A/GIT/testPage'
+            }];
+            vscodeMock.WorkspaceConfiguration = {
+                update: jest.fn((name: string, value: any) => {}),
+            };
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return {
+                        get: jest.fn((name: string) => [{name: 'Personal config'}]),
+                        update: vscodeMock.WorkspaceConfiguration.update,
+                }
+            });
+            vscodeMock.Uri.joinPath = jest.fn();
+            const launchConfigManager = LaunchConfigManager.instance;
+            launchConfigManager.configureLaunchJson();
+            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', Array(4).fill(expect.anything()));
         });
     });
 
