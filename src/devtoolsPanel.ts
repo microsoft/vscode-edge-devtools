@@ -40,6 +40,7 @@ export class DevToolsPanel {
     private readonly context: vscode.ExtensionContext;
     private readonly disposables: vscode.Disposable[] = [];
     private readonly extensionPath: string;
+    private readonly mirroredCSS = new Map<string, string>();
     private readonly panel: vscode.WebviewPanel;
     private readonly telemetryReporter: Readonly<TelemetryReporter>;
     private readonly targetUrl: string;
@@ -362,9 +363,18 @@ export class DevToolsPanel {
             const textEditor = await this.openEditorFromUri(uri);
             if (textEditor) {
                 const fullRange = this.getDocumentFullRange(textEditor);
-                void textEditor.edit(editBuilder => {
-                    editBuilder.replace(fullRange, newContent);
-                });
+                const isSnapshotSameAsLastMirroredCSS = this.mirroredCSS.get(url) == textEditor.document.getText();
+                if (!textEditor.document.isDirty || isSnapshotSameAsLastMirroredCSS)
+                {
+                    this.mirroredCSS.set(url, newContent);
+                    void textEditor.edit(editBuilder => {
+                        editBuilder.replace(fullRange, newContent);
+                    });
+                }
+                else
+                {
+                    void vscode.window.showWarningMessage('DevTools will not mirror CSS changes while there are unsaved direct edits. Save your changes then refresh the target page to re-enable.');
+                }
             }
         } else {
             await ErrorReporter.showErrorDialog({
