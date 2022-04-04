@@ -7,7 +7,7 @@ import {
     SETTINGS_STORE_NAME,
     SETTINGS_DEFAULT_URL,
 } from './utils';
-export type LaunchConfig = 'None' | 'Unsupported' | vscode.DebugConfiguration;
+export type LaunchConfig = 'None' | 'Unsupported' | string;
 export type CompoundConfig = {
     name: string,
     configurations: string[],
@@ -64,6 +64,17 @@ const providedCompoundDebugConfigHeadless: CompoundConfig = {
     ],
 };
 
+export const extensionCompoundConfigs: CompoundConfig[] = [
+    providedCompoundDebugConfigHeadless,
+    providedCompoundDebugConfig,
+];
+
+export const extensionConfigs: vscode.DebugConfiguration[] = [
+    providedDebugConfig,
+    providedHeadlessDebugConfig,
+    providedLaunchDevToolsConfig,
+];
+
 export class LaunchConfigManager {
     private launchConfig: LaunchConfig;
     private isValidConfig: boolean;
@@ -102,13 +113,12 @@ export class LaunchConfigManager {
         if (fse.pathExistsSync(filePath)) {
             // Check if there is a supported debug config
             const configs = vscode.workspace.getConfiguration('launch', workspaceUri).get('configurations') as vscode.DebugConfiguration[];
-            for (const config of configs) {
-                if (config.type === 'vscode-edge-devtools.debug' || config.type === 'msedge' || config.type === 'edge') {
-                    void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Supported');
-                    this.launchConfig = config;
-                    this.isValidConfig = true;
-                    return;
-                }
+            const compoundConfigs = vscode.workspace.getConfiguration('launch', workspaceUri).get('compounds') as CompoundConfig[];
+            if (this.getMissingConfigs(configs, extensionConfigs).length === 0 && this.getMissingConfigs(compoundConfigs, extensionCompoundConfigs).length === 0) {
+                void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Supported');
+                this.launchConfig = extensionCompoundConfigs[0].name; // extensionCompoundConfigs[0].name => 'Launch Edge Headless and attach DevTools'
+                this.isValidConfig = true;
+                return;
             }
             void vscode.commands.executeCommand('setContext', 'launchJsonStatus', 'Unsupported');
             this.launchConfig = 'Unsupported';
@@ -137,11 +147,23 @@ export class LaunchConfigManager {
 
         // Append a supported debug config to their list of configurations and update workspace configuration
         const launchJson = vscode.workspace.getConfiguration('launch', workspaceUri);
-        const configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
-        configs.push(providedDebugConfig);
-        configs.push(providedHeadlessDebugConfig);
-        configs.push(providedLaunchDevToolsConfig);
+        let configs = launchJson.get('configurations') as vscode.DebugConfiguration[];
+        configs = this.replaceDuplicateNameConfigs(configs, extensionConfigs) as vscode.DebugConfiguration[];
+
+        const missingConfigs = this.getMissingConfigs(configs, extensionConfigs);
+        for (const missingConfig of missingConfigs) {
+            configs.push((missingConfig as vscode.DebugConfiguration));
+        }
         await launchJson.update('configurations', configs) as unknown as Promise<void>;
+
+        // Add compound configs
+        let compounds = launchJson.get('compounds') as CompoundConfig[];
+        compounds = this.replaceDuplicateNameConfigs(compounds, extensionCompoundConfigs) as CompoundConfig[];
+        const missingCompoundConfigs = this.getMissingConfigs(compounds, extensionCompoundConfigs);
+        for (const missingCompoundConfig of missingCompoundConfigs) {
+            compounds.push((missingCompoundConfig as CompoundConfig));
+        }
+        await launchJson.update('compounds', compounds) as unknown as Promise<void>;
 
         // Insert instruction comment
         let launchText = fse.readFileSync(workspaceUri.fsPath + relativePath).toString();
@@ -151,12 +173,6 @@ export class LaunchConfigManager {
         launchText = launchText.replace(re, `${match ? match[0] : ''}${instructions}`);
         fse.writeFileSync(workspaceUri.fsPath + relativePath, launchText);
 
-        // Add compound configs
-        const compounds = launchJson.get('compounds') as CompoundConfig[];
-        compounds.push(providedCompoundDebugConfigHeadless);
-        compounds.push(providedCompoundDebugConfig);
-        await launchJson.update('compounds', compounds) as unknown as Promise<void>;
-
         // Open launch.json in editor
         void vscode.commands.executeCommand('vscode.open', vscode.Uri.joinPath(workspaceUri, relativePath));
         this.updateLaunchConfig();
@@ -164,5 +180,56 @@ export class LaunchConfigManager {
 
     isValidLaunchConfig(): boolean {
         return this.isValidConfig;
+    }
+
+    replaceDuplicateNameConfigs(userConfigs: Record<string, unknown>[], extensionConfigs: Record<string, unknown>[]): Record<string, unknown>[] {
+        const configs = [];
+        const extensionConfigMap: Map<string, Record<string, unknown>> = new Map();
+        for (const extensionConfig of extensionConfigs) {
+            extensionConfigMap.set((extensionConfig.name as string), extensionConfig);
+        }
+        for (const userConfig of userConfigs) {
+            const duplicateNameConfig = extensionConfigMap.get((userConfig.name as string));
+            const addConfig = duplicateNameConfig ? duplicateNameConfig : userConfig;
+            configs.push(addConfig);
+        }
+        return configs;
+    }
+
+    getMissingConfigs(userConfigs: Record<string, unknown>[], extensionConfigs: Record<string, unknown>[]): Record<string, unknown>[] {
+        const missingConfigs: Record<string, unknown>[] = [];
+        for (const extensionConfig of extensionConfigs) {
+            let configExists = false;
+            for (const userConfig of userConfigs) {
+                if (this.compareConfigs(userConfig, extensionConfig)) {
+                    configExists = true;
+                    break;
+                }
+            }
+            if (!configExists) {
+                missingConfigs.push(extensionConfig);
+            }
+        }
+
+        return missingConfigs;
+    }
+
+    compareConfigs(userConfig: Record<string, unknown>, extensionConfig: Record<string, unknown>): boolean {
+        for (const property of Object.keys(extensionConfig)) {
+            if (property === 'url' || property === 'presentation') {
+                continue;
+            }
+            if (Array.isArray(extensionConfig[property]) && Array.isArray(userConfig[property])) {
+                const userPropertySet = new Set((userConfig[property] as Array<string>));
+                for (const extensionConfigProperty of (extensionConfig[property] as Array<string>)) {
+                    if (!userPropertySet.has(extensionConfigProperty)) {
+                        return false;
+                    }
+                }
+            } else if (userConfig[property] !== extensionConfig[property]) {
+                return false;
+            }
+        }
+        return true;
     }
 }
