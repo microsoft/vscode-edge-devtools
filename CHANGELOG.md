@@ -1,3 +1,7 @@
+## 1.4.7
+* **[Bug Fix]**: Update vscode-webhint to version 1.6.6. Fixes "Unable to start webhint" errors - [PR #951](https://github.com/microsoft/vscode-edge-devtools/pull/951)
+* **[Bug Fix]**: Improve logic for configuring existing launch.json - [PR #945](https://github.com/microsoft/vscode-edge-devtools/pull/
+
 ## 1.4.6
 * **[Feature]**: Enable console tool in DevTools (Only available on Edge version 101.0.1193.0+) - [PR #905](https://github.com/microsoft/vscode-edge-devtools/pull/905)
 * **[Feature]**: Updated auto-generated launch.json configs to use JSDebug workflows - [PR #927](https://github.com/microsoft/vscode-edge-devtools/pull/927)
