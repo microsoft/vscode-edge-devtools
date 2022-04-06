@@ -34,6 +34,7 @@ import {
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 import { ScreencastPanel } from './screencastPanel';
+import { providedHeadlessDebugConfig } from './launchConfigManager';
 
 export class DevToolsPanel {
     private readonly config: IRuntimeConfig;
@@ -150,7 +151,7 @@ export class DevToolsPanel {
                 d.dispose();
             }
         }
-        if (this.isHeadless && !ScreencastPanel.instance) {
+        if (!ScreencastPanel.instance && vscode.debug.activeDebugSession?.name.includes(providedHeadlessDebugConfig.name)) {
             void vscode.commands.executeCommand('workbench.action.debug.stop');
         }
     }
@@ -523,19 +524,13 @@ export class DevToolsPanel {
         this.currentRevision = msg.revision || CDN_FALLBACK_REVISION;
         this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${this.currentRevision}/vscode_app.html`;
         this.isHeadless = msg.isHeadless;
-        if (ScreencastPanel.instance) {
-            ScreencastPanel.instance.setHeadless(this.isHeadless);
-        }
         this.update();
+
         if (this.isHeadless) {
             if (!ScreencastPanel.instance) {
                 ScreencastPanel.createOrShow(this.context, this.telemetryReporter, this.targetUrl, this.config.isJsDebugProxiedCDPConnection);
             }
         }
-    }
-
-    getHeadless(): boolean {
-        return this.isHeadless;
     }
 
     static createOrShow(

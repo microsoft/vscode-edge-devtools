@@ -17,6 +17,7 @@ import {
 } from './utils';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import { DevToolsPanel } from './devtoolsPanel';
+import { providedHeadlessDebugConfig } from './launchConfigManager';
 
 export class ScreencastPanel {
     private readonly context: vscode.ExtensionContext;
@@ -27,7 +28,6 @@ export class ScreencastPanel {
     private panelSocket: PanelSocket;
     private screencastStartTime;
     static instance: ScreencastPanel | undefined;
-    private isHeadless = false;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -71,10 +71,6 @@ export class ScreencastPanel {
         }, this);
 
         this.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1);
-
-        if (DevToolsPanel.instance) {
-            this.isHeadless = DevToolsPanel.instance.getHeadless();
-        }
     }
 
     private recordEnumeratedHistogram(actionName: string, actionCode: number) {
@@ -99,13 +95,9 @@ export class ScreencastPanel {
 
         this.panel.dispose();
         this.panelSocket.dispose();
-        if (!DevToolsPanel.instance && this.isHeadless) {
+        if (!DevToolsPanel.instance && vscode.debug.activeDebugSession?.name.includes(providedHeadlessDebugConfig.name)) {
             void vscode.commands.executeCommand('workbench.action.debug.stop');
         }
-    }
-
-    setHeadless(headless: boolean): void {
-        this.isHeadless = headless;
     }
 
     toggleInspect(enabled: boolean): void {
