@@ -55,7 +55,8 @@ export function createFakeVSCode() {
         debug: {
             registerDebugConfigurationProvider: jest.fn(),
             activeDebugSession: {
-                id: 'vscode-session-debug-id'
+                id: 'vscode-session-debug-id',
+                name: 'someName',
             }
         },
         extensions: {
