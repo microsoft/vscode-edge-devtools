@@ -24,6 +24,7 @@ export class Screencast {
     private urlInput: HTMLInputElement;
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
+    private toolbar: HTMLElement;
     private deviceSelect: HTMLSelectElement;
     private inactiveOverlay: HTMLElement;
     private fixedWidth = 0;
@@ -33,12 +34,13 @@ export class Screencast {
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
         this.forwardButton = document.getElementById('forward') as HTMLButtonElement;
-        this.mainWrapper =document.getElementById('main') as HTMLElement;
+        this.mainWrapper = document.getElementById('main') as HTMLElement;
         this.reloadButton = document.getElementById('reload') as HTMLButtonElement;
         this.rotateButton = document.getElementById('rotate') as HTMLButtonElement;
         this.urlInput = document.getElementById('url') as HTMLInputElement;
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
+        this.toolbar = document.getElementById('toolbar') as HTMLElement;
         this.deviceSelect = document.getElementById('device') as HTMLSelectElement;
         this.inactiveOverlay = document.getElementById('inactive-overlay') as HTMLElement;
 
@@ -99,7 +101,7 @@ export class Screencast {
     }
 
     get height(): number {
-        return this.fixedHeight || (this.mainWrapper.offsetHeight - 24);
+        return this.fixedHeight || (this.mainWrapper.offsetHeight - this.toolbar.offsetHeight);
     }
 
     private registerInputListeners(): void {
