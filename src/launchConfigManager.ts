@@ -27,7 +27,7 @@ export const providedDebugConfig: vscode.DebugConfiguration = {
     },
 };
 
-const providedHeadlessDebugConfig: vscode.DebugConfiguration = {
+export const providedHeadlessDebugConfig: vscode.DebugConfiguration = {
     type: 'pwa-msedge',
     name: 'Launch Microsoft Edge in headless mode',
     request: 'launch',
