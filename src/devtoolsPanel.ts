@@ -34,6 +34,7 @@ import {
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 import { ScreencastPanel } from './screencastPanel';
+import { providedHeadlessDebugConfig } from './launchConfigManager';
 
 export class DevToolsPanel {
     private readonly config: IRuntimeConfig;
@@ -150,6 +151,9 @@ export class DevToolsPanel {
             if (d) {
                 d.dispose();
             }
+        }
+        if (!ScreencastPanel.instance && vscode.debug.activeDebugSession?.name.includes(providedHeadlessDebugConfig.name)) {
+            void vscode.commands.executeCommand('workbench.action.debug.stop');
         }
     }
 
@@ -538,7 +542,6 @@ export class DevToolsPanel {
             }
         }
     }
-
 
     static createOrShow(
         context: vscode.ExtensionContext,
