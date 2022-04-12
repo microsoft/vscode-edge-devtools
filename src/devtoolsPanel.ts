@@ -291,7 +291,6 @@ export class DevToolsPanel {
         const { id } = JSON.parse(message) as { id: number };
         encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
             enableNetwork: SettingsProvider.instance.isNetworkEnabled(),
-            themeString: SettingsProvider.instance.getThemeSettings(),
             welcome: SettingsProvider.instance.getWelcomeSettings(),
             isHeadless: SettingsProvider.instance.getHeadlessSettings(),
             id });
