@@ -289,43 +289,6 @@
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                     ]
                 },
-                "vscode-edge-devtools.themes": {
-                    "type": "string",
-                    "description": "Set the theme of the Microsoft Edge Tools extension (reload required after changing).",
-                    "enum": [
-                        "System Preference",
-                        "Light",
-                        "Dark",
-                        "Chromium Light",
-                        "Chromium Dark",
-                        "Monokai",
-                        "Monokai Dimmed",
-                        "Solarized Light",
-                        "Solarized Dark",
-                        "Red",
-                        "Quiet Light",
-                        "Abyss",
-                        "Kimbie Dark",
-                        "Tomorrow Night Blue"
-                    ],
-                    "enumDescriptions": [
-                        "Microsoft Edge Tools for VS Code will use the system preferred setting for themes",
-                        "Microsoft Edge Tools for VS Code will use the Edge DevTools Light theme",
-                        "Microsoft Edge Tools for VS Code will use the Edge DevTools Dark theme",
-                        "Microsoft Edge Tools for VS Code will use the Chromium Light theme",
-                        "Microsoft Edge Tools for VS Code will use the Chromium Dark theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Monkai theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Monkai Dimmed theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Solarized Light theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Solarized Dark theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Red theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Quiet Light theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Abyss theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Kimbie Dark theme",
-                        "Microsoft Edge Tools for VS Code will use the VSCode Tomorrow Night Blue theme"
-
-                    ]
-                },
                 "vscode-edge-devtools.cssMirrorContent": {
                     "type": "boolean",
                     "default": false,

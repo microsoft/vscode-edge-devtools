@@ -1016,7 +1016,6 @@ describe("utils", () => {
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return {
                     ...originalWorkspaceMockConfig,
-                    themes: 'System preference',
                     welcome: 'true',
                     enableNetwork: 'false',
                 }
@@ -1029,7 +1028,7 @@ describe("utils", () => {
         it('correctly records all changed extension settings', async () => {
             const reporter = createFakeTelemetryReporter();
             utils.reportExtensionSettings(reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { themes: 'System preference', welcome: 'true', enableNetwork: 'false' });
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { welcome: 'true', enableNetwork: 'false' });
         });
 
         it('correctly sends telemetry event for changed event', async () => {
