@@ -41,7 +41,16 @@ export class SettingsProvider {
       const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme') as string;
       let theme = SUPPORTED_THEMES.get(themeSetting);
       if (!theme) {
-        theme = vscode.window.activeColorTheme.kind === 1 ? 'default' : 'dark';
+        switch (vscode.window.activeColorTheme.kind as number) {
+          case 1: // Light theme
+          case 4: // Light high contrast theme
+            theme = 'default';
+          case 2: // Dark theme
+          case 3: // Dark high contrast theme
+            theme = 'dark';
+          default:
+            theme = 'systemPreferred';
+        }
       }
       return theme;
   }
