@@ -30,14 +30,5 @@ describe("settingsProvider", () => {
       const result = instance.isNetworkEnabled();
       expect(result).toEqual(true);
     });
-
-    it("test that the right value is retrieved for themeString configuration", async () => {
-      jest.requireMock("vscode");
-      const settingsProvider = await import("../../src/common/settingsProvider");
-      const instance = settingsProvider.SettingsProvider.instance;
-      expect(instance).not.toEqual(null);
-      const result = instance.getThemeSettings();
-      expect(result).toEqual("System preference");
-    });
   });
 });
