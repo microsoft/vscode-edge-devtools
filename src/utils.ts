@@ -797,6 +797,16 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
     telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
 }
 
+export function getSupportedStaticAnalysisFileTypes(): string[] {
+    const supportedFileTypes = [];
+    for (const event of packageJson.activationEvents) {
+        if (event.includes('onLanguage:')) {
+            supportedFileTypes.push(event.substring(11));
+        }
+    }
+    return supportedFileTypes;
+}
+
 (function initialize() {
     // insertion order matters.
     msEdgeBrowserMapping.set('Stable', {

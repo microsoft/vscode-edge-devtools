@@ -18,6 +18,7 @@ import {
     getListOfTargets,
     getRemoteEndpointSettings,
     getRuntimeConfig,
+    getSupportedStaticAnalysisFileTypes,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
@@ -56,11 +57,38 @@ const supportedDocuments = activationEvents.map((event: string) => {
 });
 // Keep a reference to the client to stop it when deactivating.
 let client: LanguageClient;
+const languageServerName = 'Microsoft Edge Tools';
+
+type DiagnosticCodeType = { value: string; target: vscode.Uri; };
 
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
+
+    const withinRange = function(position: vscode.Position, range: vscode.Range) {
+        if (position.line >= range.start.line && position.line <= range.end.line) {
+            if (position.line === range.start.line && position.character + 1 < range.start.character) {
+                return false;
+            }
+            if (position.line === range.end.line && position.character > range.end.character) {
+                return false;
+            }
+            return true;
+        }
+    };
+
+    vscode.languages.registerHoverProvider(getSupportedStaticAnalysisFileTypes(), {
+        provideHover(document, position) {
+            const documentDiagnostics = vscode.languages.getDiagnostics(document.uri);
+            for (const diagnostic of documentDiagnostics) {
+                if (diagnostic.source === languageServerName && withinRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
+                    telemetryReporter.sendTelemetryEvent('user/webhint/hover', { 'hint': (diagnostic.code as DiagnosticCodeType).value });
+                }
+            }
+            return null;
+        },
+    });
 
     // enable/disable standalone screencast target panel icon.
     const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
@@ -239,7 +267,7 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 function startWebhint(context: vscode.ExtensionContext): void {
-    const args = [context.globalStoragePath, 'Microsoft Edge Tools'];
+    const args = [context.globalStoragePath, languageServerName];
     const module = context.asAbsolutePath('node_modules/vscode-webhint/dist/src/server.js');
     const transport = TransportKind.ipc;
     const serverOptions: ServerOptions = {
