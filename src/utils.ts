@@ -797,6 +797,19 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
     telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
 }
 
+export function checkWithinRange(position: vscode.Position, range: vscode.Range): boolean {
+    if (position.line >= range.start.line && position.line <= range.end.line) {
+        if (position.line === range.start.line && position.character + 1 < range.start.character) {
+            return false;
+        }
+        if (position.line === range.end.line && position.character > range.end.character) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 export function getSupportedStaticAnalysisFileTypes(): string[] {
     const supportedFileTypes = [];
     for (const event of packageJson.activationEvents) {

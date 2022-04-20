@@ -12,6 +12,7 @@ import { ScreencastPanel } from './screencastPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
 import {
     buttonCode,
+    checkWithinRange,
     createTelemetryReporter,
     fixRemoteWebSocket,
     getBrowserPath,
@@ -66,23 +67,11 @@ export function activate(context: vscode.ExtensionContext): void {
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    const withinRange = function(position: vscode.Position, range: vscode.Range) {
-        if (position.line >= range.start.line && position.line <= range.end.line) {
-            if (position.line === range.start.line && position.character + 1 < range.start.character) {
-                return false;
-            }
-            if (position.line === range.end.line && position.character > range.end.character) {
-                return false;
-            }
-            return true;
-        }
-    };
-
     vscode.languages.registerHoverProvider(getSupportedStaticAnalysisFileTypes(), {
         provideHover(document, position) {
             const documentDiagnostics = vscode.languages.getDiagnostics(document.uri);
             for (const diagnostic of documentDiagnostics) {
-                if (diagnostic.source === languageServerName && withinRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
+                if (diagnostic.source === languageServerName && checkWithinRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
                     telemetryReporter.sendTelemetryEvent('user/webhint/hover', { 'hint': (diagnostic.code as DiagnosticCodeType).value });
                 }
             }
