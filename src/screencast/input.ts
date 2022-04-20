@@ -34,7 +34,7 @@ export class ScreencastInputHandler {
         }
         this.cdpConnection.sendMessageToBackend('Input.dispatchMouseEvent', {
             type: eventType,
-            clickCount: eventType === 'mousePressed' || eventType === 'mouseReleased' ? 1 : 0,
+            clickCount: mouseEvent.detail, // per https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail
             x: Math.round(mouseEvent.offsetX / scale),
             y: Math.round(mouseEvent.offsetY / scale),
             modifiers: this.modifiersForEvent(mouseEvent),
@@ -46,20 +46,27 @@ export class ScreencastInputHandler {
     }
 
     emitKeyEvent(keyboardEvent: KeyboardEvent): void {
+        const hasModifier = !!(keyboardEvent.ctrlKey || keyboardEvent.altKey || keyboardEvent.metaKey);
+        if (hasModifier) {
+            // Prevent keyboard shortcuts from acting on the screencast image.
+            keyboardEvent.preventDefault();
+        }
         // For what seems a bug to me on CDP:
         // - non printable key events only respond to object with type keydown and virtual key codes.
         // - printable characters respond only to object with type char and text property set to key.
         // This could be related:
         // https://github.com/ChromeDevTools/devtools-protocol/issues/45
-        if(keyboardEvent.type === 'keydown' && keyboardEvent.key.length > 1 && keyboardEvent.key !== 'Enter') {
+        if(keyboardEvent.type === 'keydown' && (hasModifier || keyboardEvent.key.length > 1) && keyboardEvent.key !== 'Enter') {
             this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
                 type: 'keyDown',
+                modifiers: this.modifiersForEvent(keyboardEvent),
                 windowsVirtualKeyCode: keyboardEvent.keyCode,
                 nativeVirtualKeyCode: keyboardEvent.keyCode,
             });
         } else if(keyboardEvent.type === 'keypress') {
             const cdpObject = { 
                 type: 'char',
+                modifiers: this.modifiersForEvent(keyboardEvent),
                 text: keyboardEvent.key
             }
 
