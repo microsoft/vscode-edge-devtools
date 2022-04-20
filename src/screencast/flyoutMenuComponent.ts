@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import {html, render} from 'lit-html';
+import {createRef, ref} from 'lit-html/directives/ref.js';
 import {styleMap, StyleInfo} from 'lit-html/directives/style-map.js';
 
 export enum OffsetDirection {
@@ -28,7 +29,7 @@ interface FlyoutMenuProps {
 }
 
 export default class FlyoutMenuComponent {
-    #componentId = window.crypto.getRandomValues(new Uint32Array(1));
+    #buttonRef = createRef();
     #title: string | undefined;
     #iconName: string;
     #container: HTMLElement | undefined;
@@ -56,7 +57,7 @@ export default class FlyoutMenuComponent {
     }
 
     #onClick = () => {
-        const thisComponent = document.getElementById(this.#componentId.toString());
+        const thisComponent = this.#buttonRef.value;
         const boundingRect = thisComponent!.getBoundingClientRect();
 
         let styles = {
@@ -129,7 +130,7 @@ export default class FlyoutMenuComponent {
 
     template() {
         return html`
-            <button .id=${this.#componentId.toString()} @click=${this.#onClick}>
+            <button ${ref(this.#buttonRef)} @click=${this.#onClick}>
                 ${this.#title
                     ? html`${this.#title}`
                     : ''
