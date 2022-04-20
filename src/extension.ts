@@ -12,7 +12,7 @@ import { ScreencastPanel } from './screencastPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
 import {
     buttonCode,
-    checkWithinRange,
+    checkWithinHoverRange,
     createTelemetryReporter,
     fixRemoteWebSocket,
     getBrowserPath,
@@ -71,7 +71,7 @@ export function activate(context: vscode.ExtensionContext): void {
         provideHover(document, position) {
             const documentDiagnostics = vscode.languages.getDiagnostics(document.uri);
             for (const diagnostic of documentDiagnostics) {
-                if (diagnostic.source === languageServerName && checkWithinRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
+                if (diagnostic.source === languageServerName && checkWithinHoverRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
                     telemetryReporter.sendTelemetryEvent('user/webhint/hover', { 'hint': (diagnostic.code as DiagnosticCodeType).value });
                 }
             }

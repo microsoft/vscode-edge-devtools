@@ -797,8 +797,10 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
     telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
 }
 
-export function checkWithinRange(position: vscode.Position, range: vscode.Range): boolean {
+export function checkWithinHoverRange(position: vscode.Position, range: vscode.Range): boolean {
     if (position.line >= range.start.line && position.line <= range.end.line) {
+        // We need to add a 1 char buffer on each side since hover events are triggered if the cursor is
+        // 1 char away from a diagnostic line.
         if (position.line === range.start.line && position.character + 1 < range.start.character) {
             return false;
         }
