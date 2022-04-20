@@ -44,13 +44,15 @@ export class ScreencastView {
                   <option selected value="desktop">Desktop</option>
                   ${deviceList}
               </select>
-              <button id="rotate">
-                  <i class="codicon codicon-editor-layout"></i>
-              </button>
           </div>
           <div id="canvas-wrapper" class="fill">
               <img id="canvas" draggable="false" tabindex="0" />
           </div>
+        <div id="emulation-bar">
+            <div id="emulation-bar-right"></div>
+            <div id="emulation-bar-center"></div>
+            <div id="emulation-bar-left"></div>
+        </div>
       </div>
       <div id="inactive-overlay" hidden>
         The tab is inactive

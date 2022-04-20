@@ -323,7 +323,6 @@
                         "Microsoft Edge Tools for VS Code will use the VSCode Abyss theme",
                         "Microsoft Edge Tools for VS Code will use the VSCode Kimbie Dark theme",
                         "Microsoft Edge Tools for VS Code will use the VSCode Tomorrow Night Blue theme"
-
                     ]
                 },
                 "vscode-edge-devtools.cssMirrorContent": {
@@ -712,6 +711,7 @@
     "dependencies": {
         "@vscode/codicons": "0.0.22",
         "bufferutil": "4.0.4",
+        "lit-html": "^2.2.2",
         "puppeteer-core": "13.1.2",
         "utf-8-validate": "5.0.6",
         "vscode-chrome-debug-core": "6.8.11",

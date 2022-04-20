@@ -1,10 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+import {html, render} from 'lit-html';
+
 import { ErrorCodes } from '../common/errorCodes';
 import { encodeMessageForChannel, TelemetryData } from '../common/webviewEvents';
 import { ScreencastCDPConnection, vscode } from './cdp';
 import { MouseEventMap, ScreencastInputHandler } from './input';
+import DimensionComponent from './dimensionComponent';
+import FlyoutMenuComponent, {OffsetDirection} from './flyoutMenuComponent';
 
 type NavigationEntry = {
     id: number;
@@ -20,7 +24,6 @@ export class Screencast {
     private forwardButton: HTMLButtonElement;
     private mainWrapper: HTMLElement;
     private reloadButton: HTMLButtonElement;
-    private rotateButton: HTMLButtonElement;
     private urlInput: HTMLInputElement;
     private screencastImage: HTMLImageElement;
     private screencastWrapper: HTMLElement;
@@ -30,13 +33,14 @@ export class Screencast {
     private fixedWidth = 0;
     private fixedHeight = 0;
     private inspectMode = false;
+    private mediaFeatureConfig = new Map();
+    private emulatedMedia = '';
 
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
         this.forwardButton = document.getElementById('forward') as HTMLButtonElement;
         this.mainWrapper = document.getElementById('main') as HTMLElement;
         this.reloadButton = document.getElementById('reload') as HTMLButtonElement;
-        this.rotateButton = document.getElementById('rotate') as HTMLButtonElement;
         this.urlInput = document.getElementById('url') as HTMLInputElement;
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.screencastWrapper = document.getElementById('canvas-wrapper') as HTMLElement;
@@ -47,8 +51,94 @@ export class Screencast {
         this.backButton.addEventListener('click', () => this.onBackClick());
         this.forwardButton.addEventListener('click', () => this.onForwardClick());
         this.reloadButton.addEventListener('click', () => this.onReloadClick());
-        this.rotateButton.addEventListener('click', () => this.onRotateClick());
         this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
+
+        FlyoutMenuComponent.render({
+            iconName: 'codicon-chevron-down',
+            title: 'Responsive',
+            menuItemSections: [{
+                onItemSelected: () => {},
+                menuItems: []
+            }]
+        }, 'emulation-bar-right');
+        DimensionComponent.render({
+            width: this.mainWrapper.offsetWidth,
+            height: this.mainWrapper.offsetHeight,
+            heightOffset: this.toolbar.offsetHeight,
+            onRotate: this.onRotateClick.bind(this)
+        }, 'emulation-bar-center');
+
+        render(html`
+            ${new FlyoutMenuComponent({
+                iconName: 'codicon-zoom-in',
+                offsetDirection: OffsetDirection.Right,
+                menuItemSections: [
+                    {
+                        onItemSelected: () => {},
+                        menuItems: [
+                            {name: '50%', value: '50'},
+                            {name: '75%', value: '75'},
+                            {name: '100%', value: '100'},
+                            {name: '125%', value: '125'},
+                            {name: '150%', value: '150'}
+                        ]
+                    },
+                    {
+                        onItemSelected: () => {},
+                        menuItems: [
+                            {name: 'Auto-adjust zoom', value: ''}
+                        ]
+                    }
+                ]
+            }).template()}
+            ${new FlyoutMenuComponent({
+                iconName: 'codicon-wand',
+                offsetDirection: OffsetDirection.Right,
+                menuItemSections: [
+                    {
+                        onItemSelected: this.onEmulatedMediaChanged, 
+                        menuItems: [
+                            {name: 'No media type emulation', value: ''},
+                            {name: 'screen', value: 'screen'},
+                            {name: 'print', value: 'print'}
+                        ],
+                    },
+                    {
+                        onItemSelected: this.onPrefersColorSchemeChanged, 
+                        menuItems: [
+                            {name: 'No prefers-color-scheme emulation', value: ''},
+                            {name: 'prefers-color-scheme: light', value: 'light'},
+                            {name: 'prefers-color-scheme: dark', value: 'dark'},
+                        ]
+                    },
+                    {
+                        onItemSelected: this.onForcedColorsChanged, 
+                        menuItems: [
+                            {name: 'No forced-colors emulation', value: ''},
+                            {name: 'forced-colors: none', value: 'none'},
+                            {name: 'forced-colors: active', value: 'active'}
+                        ]
+                    }
+                ]
+            }).template()}
+            ${new FlyoutMenuComponent({
+                iconName: 'codicon-eye',
+                offsetDirection: OffsetDirection.Right,
+                menuItemSections: [
+                    {
+                        onItemSelected: this.onVisionDeficiencyChanged,
+                        menuItems: [
+                            {name: 'No vision deficiency emulation', value: 'none'},
+                            {name: 'Blurred vision', value: 'blurredVision'},
+                            {name: 'Protanopia', value: 'protanopia'},
+                            {name: 'Deuteranopia', value: 'deuteranopia'},
+                            {name: 'Tritanopia', value: 'tritanopia'},
+                            {name: 'Achromatopsia', value: 'achromatopsia'},
+                        ]
+                    }
+                ]
+            }).template()}
+        `, document.getElementById('emulation-bar-left')!);
 
         this.deviceSelect.addEventListener('change', () => {
             if (this.deviceSelect.value.toLowerCase() === 'desktop') {
@@ -158,6 +248,38 @@ export class Screencast {
         this.cdpConnection.sendMessageToBackend('Emulation.setTouchEmulationEnabled', touchEmulationParams);
         this.toggleTouchMode();
         this.updateScreencast();
+    }
+
+    private onVisionDeficiencyChanged = (value: string) => {
+        this.cdpConnection.sendMessageToBackend('Emulation.setEmulatedVisionDeficiency', {type: value});
+    }
+
+    private onEmulatedMediaChanged = (value: string) => {
+        this.emulatedMedia = value;
+        this.updateMediaFeatures();
+    }
+
+    private onForcedColorsChanged = (value: string) => {
+        this.mediaFeatureConfig.set('forced-colors', value);
+        this.updateMediaFeatures();
+    }
+
+    private onPrefersColorSchemeChanged = (value: string) => {
+        this.mediaFeatureConfig.set('prefers-color-scheme', value);
+        this.updateMediaFeatures();
+    }
+
+    private updateMediaFeatures = () => {
+        let features = [] as {name: string, value: string}[];
+        this.mediaFeatureConfig.forEach((value, name) => {
+            features.push({name, value});
+        }); 
+        const payload = {
+            features,
+            media: this.emulatedMedia
+            
+        };
+        this.cdpConnection.sendMessageToBackend('Emulation.setEmulatedMedia', payload);
     }
 
     private reportError(type: ErrorCodes.Error, message: string, stack: string) {
