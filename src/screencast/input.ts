@@ -50,6 +50,7 @@ export class ScreencastInputHandler {
         if (hasModifier) {
             // Prevent keyboard shortcuts from acting on the screencast image.
             keyboardEvent.preventDefault();
+            keyboardEvent.stopPropagation();
         }
         // For what seems a bug to me on CDP:
         // - non printable key events only respond to object with type keydown and virtual key codes.
