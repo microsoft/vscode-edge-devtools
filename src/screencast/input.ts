@@ -52,10 +52,11 @@ export class ScreencastInputHandler {
             keyboardEvent.preventDefault();
             keyboardEvent.stopPropagation();
         }
-        if (keyboardEvent.type === 'keydown') {
+        if (keyboardEvent.type === 'keydown' || keyboardEvent.type === 'keyup') {
             const text = hasNonShiftModifier ? '' : this.textFromEvent(keyboardEvent);
             this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
-                type: text ? 'keyDown' : 'rawKeyDown',
+                type: keyboardEvent.type === 'keyup' ? 'keyUp' : (text ? 'keyDown' : 'rawKeyDown'),
+                autoRepeat: keyboardEvent.repeat,
                 code: keyboardEvent.code,
                 key: keyboardEvent.key,
                 location: keyboardEvent.location,
@@ -110,6 +111,9 @@ export class ScreencastInputHandler {
     }
 
     private textFromEvent(event: KeyboardEvent): string {
+        if (event.type === 'keyup') {
+            return '';
+        }
         if (event.key === 'Enter') {
             return '\r';
         }
