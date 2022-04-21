@@ -46,36 +46,24 @@ export class ScreencastInputHandler {
     }
 
     emitKeyEvent(keyboardEvent: KeyboardEvent): void {
-        const hasModifier = !!(keyboardEvent.ctrlKey || keyboardEvent.altKey || keyboardEvent.metaKey);
-        if (hasModifier) {
+        const hasNonShiftModifier = !!(keyboardEvent.ctrlKey || keyboardEvent.altKey || keyboardEvent.metaKey);
+        if (hasNonShiftModifier || keyboardEvent.key === 'Tab') {
             // Prevent keyboard shortcuts from acting on the screencast image.
             keyboardEvent.preventDefault();
             keyboardEvent.stopPropagation();
         }
-        // For what seems a bug to me on CDP:
-        // - non printable key events only respond to object with type keydown and virtual key codes.
-        // - printable characters respond only to object with type char and text property set to key.
-        // This could be related:
-        // https://github.com/ChromeDevTools/devtools-protocol/issues/45
-        if(keyboardEvent.type === 'keydown' && (hasModifier || keyboardEvent.key.length > 1) && keyboardEvent.key !== 'Enter') {
+        if (keyboardEvent.type === 'keydown') {
+            const text = hasNonShiftModifier ? '' : this.textFromEvent(keyboardEvent);
             this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
-                type: 'keyDown',
+                type: text ? 'keyDown' : 'rawKeyDown',
+                code: keyboardEvent.code,
+                key: keyboardEvent.key,
+                location: keyboardEvent.location,
                 modifiers: this.modifiersForEvent(keyboardEvent),
                 windowsVirtualKeyCode: keyboardEvent.keyCode,
                 nativeVirtualKeyCode: keyboardEvent.keyCode,
+                text
             });
-        } else if(keyboardEvent.type === 'keypress') {
-            const cdpObject = { 
-                type: 'char',
-                modifiers: this.modifiersForEvent(keyboardEvent),
-                text: keyboardEvent.key
-            }
-
-            if (keyboardEvent.key === 'Enter') {
-                cdpObject.text = '\r';
-            }
-
-            this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', cdpObject);
         }
     }
 
@@ -119,6 +107,16 @@ export class ScreencastInputHandler {
             params.type = 'mouseReleased';
             this.cdpConnection.sendMessageToBackend('Input.emulateTouchFromMouseEvent', params);
         }
+    }
+
+    private textFromEvent(event: KeyboardEvent): string {
+        if (event.key === 'Enter') {
+            return '\r';
+        }
+        if (event.key.length > 1) {
+            return '';
+        }
+        return event.key;
     }
 
     private modifiersForEvent(event: MouseEvent | KeyboardEvent): number {
