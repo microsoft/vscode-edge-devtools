@@ -15,7 +15,7 @@ export default class DimensionComponent {
     width: number;
     height: number;
     heightOffset: number;
-    updateOnResize = false;
+    updateOnResize = true;
     onUpdateDimensions: (width: number, height: number) => void;
     container: HTMLElement | undefined;
 
@@ -32,6 +32,7 @@ export default class DimensionComponent {
         window.addEventListener('resize', this.#onResize.bind(this));
 
         this.update();
+        this.onUpdateDimensions(this.width, this.height);
     }
 
     template() {
@@ -61,6 +62,7 @@ export default class DimensionComponent {
         this.height = this.screenCastView.offsetHeight - this.heightOffset;
 
         this.update();
+        this.onUpdateDimensions(this.width, this.height);
     }
 
     #onRotate = () => {

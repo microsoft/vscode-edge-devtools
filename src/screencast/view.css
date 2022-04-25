@@ -1,5 +1,7 @@
 html,
 body {
+  --toolbar-height: 32px;
+  --emulation-bar-height: 32px;
   position: absolute;
   top: 0;
   left: 0;
@@ -21,9 +23,9 @@ body {
 #toolbar {
   display: flex;
   width: 100%;
-  padding-bottom: 4px;
-  height: 28px;
+  height: var(--toolbar-height);
   border-bottom: 1px solid var(--vscode-editorGroup-border);
+  box-sizing: border-box;
 }
 
 #toolbar>button,
@@ -36,9 +38,13 @@ body {
 #url {
   flex: 1;
   background-color: var(--vscode-input-background);
+  border-color: var(--vscode-input-background);
   border-style: solid;
   border-width: 1px;
   color: var(--vscode-input-foreground);
+  margin-bottom: 4px;
+  margin-right: 4px;
+  margin-top: 4px;
 }
 
 #canvas-wrapper {
@@ -46,12 +52,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: auto;
-}
-
-#canvas-wrapper.fill #canvas {
-  max-width: none;
-  max-height: none;
+  width: 100%;
+  height: calc(100% - var(--toolbar-height) - var(--emulation-bar-height));
 }
 
 #canvas {
@@ -83,9 +85,10 @@ body {
 
 #emulation-bar {
   background-color: var(--vscode-editor-background);
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
-  height: 32px;
+  height: var(--emulation-bar-height);
   width: 100%;
 }
 
