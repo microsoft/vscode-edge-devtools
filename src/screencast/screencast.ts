@@ -250,9 +250,19 @@ export class Screencast {
             if (!device) {
                 return;
             }
+            if (device.modes) {
+                const defaultDeviceMode = device.modes.find((mode) => mode.title === 'default');
+                
+                if (!defaultDeviceMode) {
+                    throw new Error(`No default device mode in \`modes\` property for ${device.title}`);
+                }
 
-            this.emulatedWidth = device.screen.horizontal.width;
-            this.emulatedHeight = device.screen.horizontal.height;
+                this.emulatedWidth = device.screen[defaultDeviceMode.orientation as 'horizontal' | 'vertical'].width;
+                this.emulatedHeight = device.screen[defaultDeviceMode.orientation as 'horizontal' | 'vertical'].height;
+            } else {
+                this.emulatedWidth = device.screen.vertical.width;
+                this.emulatedHeight = device.screen.vertical.height;
+            }
             this.deviceUserAgent = device['user-agent'];
             isTouchMode = (device.capabilities.includes('touch') || device.capabilities.includes('mobile'));
         }
