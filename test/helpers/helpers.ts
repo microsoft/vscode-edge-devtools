@@ -72,6 +72,7 @@ export function createFakeVSCode() {
         },
         languages: {
             createDiagnosticCollection: jest.fn(),
+            registerHoverProvider: jest.fn(),
         },
         window: {
             createOutputChannel: jest.fn().mockReturnValue({ appendLine: jest.fn(), dispose: jest.fn() }),
