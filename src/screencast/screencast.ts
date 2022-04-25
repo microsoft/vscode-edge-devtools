@@ -26,6 +26,7 @@ export class Screencast {
     private urlInput: HTMLInputElement;
     private screencastImage: HTMLImageElement;
     private toolbar: HTMLElement;
+    private emulationBar: HTMLElement;
     private inactiveOverlay: HTMLElement;
     private emulatedWidth = 0;
     private emulatedHeight = 0;
@@ -43,6 +44,7 @@ export class Screencast {
         this.urlInput = document.getElementById('url') as HTMLInputElement;
         this.screencastImage = document.getElementById('canvas') as HTMLImageElement;
         this.toolbar = document.getElementById('toolbar') as HTMLElement;
+        this.emulationBar = document.getElementById('emulation-bar') as HTMLElement;
         this.inactiveOverlay = document.getElementById('inactive-overlay') as HTMLElement;
 
         this.backButton.addEventListener('click', () => this.onBackClick());
@@ -80,7 +82,7 @@ export class Screencast {
         DimensionComponent.render({
             width: this.mainWrapper.offsetWidth,
             height: this.mainWrapper.offsetHeight,
-            heightOffset: this.toolbar.offsetHeight,
+            heightOffset: this.toolbar.offsetHeight + this.emulationBar.offsetHeight,
             onUpdateDimensions: this.onUpdateDimensions
         }, 'emulation-bar-center');
 
@@ -241,7 +243,7 @@ export class Screencast {
         let isTouchMode = false;
         if (isResponsive) {
             this.emulatedWidth = this.mainWrapper.offsetWidth;
-            this.emulatedHeight = (this.mainWrapper.offsetHeight - this.toolbar.offsetHeight);
+            this.emulatedHeight = (this.mainWrapper.offsetHeight - this.toolbar.offsetHeight - this.emulationBar.offsetHeight);
             this.deviceUserAgent = '';
         } else {
             const device = getEmulatedDeviceDetails(value);
