@@ -46,11 +46,7 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-}
-
-#canvas-wrapper.fill #canvas {
-  max-width: none;
-  max-height: none;
+  height: 100%;
 }
 
 #canvas {
