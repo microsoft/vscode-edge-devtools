@@ -815,7 +815,7 @@ export function checkWithinHoverRange(position: vscode.Position, range: vscode.R
 export function getSupportedStaticAnalysisFileTypes(): string[] {
     const supportedFileTypes = [];
     for (const event of packageJson.activationEvents) {
-        if (event.includes('onLanguage:')) {
+        if (event.startsWith('onLanguage:')) {
             supportedFileTypes.push(event.substring(11));
         }
     }
