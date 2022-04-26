@@ -131,7 +131,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
-        (target?: CDPTarget) => {
+        (target?: CDPTarget, isJsDebugProxiedCDPConnection = false) => {
             if (!target){
                 telemetryReporter.sendTelemetryEvent('command/attach/noTarget');
                 return;
@@ -139,6 +139,9 @@ export function activate(context: vscode.ExtensionContext): void {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.attachToTarget });
             telemetryReporter.sendTelemetryEvent('view/devtools');
             const runtimeConfig = getRuntimeConfig();
+            if (isJsDebugProxiedCDPConnection) {
+                runtimeConfig.isJsDebugProxiedCDPConnection = true;
+            }
             DevToolsPanel.createOrShow(context, telemetryReporter, target.websocketUrl, runtimeConfig);
         }));
 

@@ -3,7 +3,7 @@
 
 import {html, render} from 'lit-html';
 
-import { ScreencastCDPConnection } from './cdp';
+import { ScreencastCDPConnection, vscode } from './cdp';
 import { MouseEventMap, ScreencastInputHandler } from './input';
 import DimensionComponent from './dimensionComponent';
 import { getEmulatedDeviceDetails, groupEmulatedDevicesByType } from './emulatedDeviceHelpers';
@@ -18,6 +18,7 @@ export class Screencast {
     private cdpConnection = new ScreencastCDPConnection();
     private history: NavigationEntry[] = [];
     private historyIndex = 0;
+    private inspectButton: HTMLButtonElement;
     private inputHandler: ScreencastInputHandler;
     private backButton: HTMLButtonElement;
     private forwardButton: HTMLButtonElement;
@@ -39,6 +40,7 @@ export class Screencast {
     constructor() {
         this.backButton = document.getElementById('back') as HTMLButtonElement;
         this.forwardButton = document.getElementById('forward') as HTMLButtonElement;
+        this.inspectButton = document.getElementById('inspect') as HTMLButtonElement;
         this.mainWrapper = document.getElementById('main') as HTMLElement;
         this.reloadButton = document.getElementById('reload') as HTMLButtonElement;
         this.urlInput = document.getElementById('url') as HTMLInputElement;
@@ -49,6 +51,7 @@ export class Screencast {
 
         this.backButton.addEventListener('click', () => this.onBackClick());
         this.forwardButton.addEventListener('click', () => this.onForwardClick());
+        this.inspectButton.addEventListener('click', () => this.onInspectClick());
         this.reloadButton.addEventListener('click', () => this.onReloadClick());
         this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
 
@@ -318,6 +321,10 @@ export class Screencast {
         if (!frame.parentId) {
             this.updateHistory();
         }
+    }
+
+    private onInspectClick(): void {
+        vscode.postMessage({ type: 'open-devtools' });
     }
 
     private onReloadClick(): void {
