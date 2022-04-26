@@ -72,7 +72,7 @@ export class ScreencastPanel {
         this.panel.webview.onDidReceiveMessage(message => {
             if (typeof message === 'string') {
                 this.panelSocket.onMessageFromWebview(message);
-            } else if ('type' in message && message.type === 'open-devtools') {
+            } else if ('type' in message && (message as {type:string}).type === 'open-devtools') {
                 this.openDevTools();
             }
         }, this);
