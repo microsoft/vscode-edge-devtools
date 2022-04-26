@@ -270,7 +270,7 @@ export class Screencast {
 
         this.setTouchMode(isTouchMode);
         DimensionComponent.setDimensionState(
-            this.emulatedWidth, this.emulatedHeight, isResponsive);
+            this.emulatedWidth, this.emulatedHeight, isResponsive, !isResponsive);
         this.updateEmulation();
     };
 

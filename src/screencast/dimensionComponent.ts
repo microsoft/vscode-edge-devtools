@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import {html, render} from 'lit-html';
+import {createRef, ref} from 'lit-html/directives/ref.js'
 
 interface DimensionComponentProps {
     width: number;
@@ -12,10 +13,13 @@ interface DimensionComponentProps {
 
 let component: DimensionComponent;
 export default class DimensionComponent {
+    textInputWidth = createRef();
+    textInputHeight = createRef();
     width: number;
     height: number;
     heightOffset: number;
     updateOnResize = true;
+    disableUserDimensionInputs = false;
     onUpdateDimensions: (width: number, height: number) => void;
     container: HTMLElement | undefined;
 
@@ -29,7 +33,7 @@ export default class DimensionComponent {
         this.onUpdateDimensions = props.onUpdateDimensions;
         this.container = container;
 
-        window.addEventListener('resize', this.#onResize.bind(this));
+        window.addEventListener('resize', this.#onResize);
 
         this.update();
         this.onUpdateDimensions(this.width, this.height);
@@ -37,9 +41,21 @@ export default class DimensionComponent {
 
     template() {
         return html`
-            <input type="number" .value=${this.width.toString()} /> 
+            <input
+                ${ref(this.textInputWidth)}
+                type="number"
+                @blur=${this.#onBlur}
+                @keydown=${this.#onKeyDown}
+                .disabled=${this.disableUserDimensionInputs}
+                .value=${this.width.toString()} /> 
             <i class="codicon codicon-close"></i>
-            <input type="number" .value=${this.height.toString()} /> 
+            <input
+                ${ref(this.textInputHeight)}
+                type="number"
+                @blur=${this.#onBlur}
+                @keydown=${this.#onKeyDown}
+                .disabled=${this.disableUserDimensionInputs}
+                .value=${this.height.toString()} /> 
             <button @click=${this.#onRotate}>
                 <i class="codicon codicon-arrow-swap"></i>
             </button>
@@ -53,7 +69,36 @@ export default class DimensionComponent {
         render(this.template(), this.container); 
     }
 
-    #onResize() {
+    #onKeyDown = (e: KeyboardEvent) => {
+        if (e.code !== 'Enter') {
+            return;
+        }
+        this.#onBlur(e);
+    }
+
+    #onBlur = (e: Event) => {
+        if (!e.target) {
+            return;
+        }
+
+        const oldWidth = this.width;
+        const oldHeight = this.height;
+
+        if (e.target === this.textInputWidth.value) {
+            this.width = parseInt((this.textInputWidth.value as HTMLInputElement).value);
+        } else if (e.target === this.textInputHeight.value) {
+            this.height = parseInt((this.textInputHeight.value as HTMLInputElement).value);
+        }
+
+        if (this.width === oldWidth && this.height === oldHeight) {
+            return;
+        }
+
+        this.update();
+        this.onUpdateDimensions(this.width, this.height);
+    }
+
+    #onResize = () => {
         if (!this.screenCastView || !this.updateOnResize) {
             return;
         }
@@ -74,10 +119,11 @@ export default class DimensionComponent {
         this.onUpdateDimensions(this.width, this.height);
     }
 
-    #setDimensionState(width: number, height: number, updateOnResize: boolean) {
+    #setDimensionState(width: number, height: number, updateOnResize: boolean, disableInputs: boolean) {
         this.width = width;
         this.height = height;
         this.updateOnResize = updateOnResize;
+        this.disableUserDimensionInputs = disableInputs;
 
         this.update();
     }
@@ -89,7 +135,7 @@ export default class DimensionComponent {
         }
     } 
 
-    static setDimensionState(width: number, height: number, updateOnResize: boolean) {
-        component.#setDimensionState(width, height, updateOnResize);
+    static setDimensionState(width: number, height: number, updateOnResize: boolean, disableInputs: boolean) {
+        component.#setDimensionState(width, height, updateOnResize, disableInputs);
     }
 }
