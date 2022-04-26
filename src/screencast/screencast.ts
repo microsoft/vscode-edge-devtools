@@ -372,7 +372,7 @@ export class Screencast {
     }
 
     private onToggleInspect({ enabled }: any): void {
-        this.setTouchMode(enabled as boolean);
+        this.setTouchMode(!enabled as boolean);
     }
 
     private setTouchMode(enabled: boolean): void {
