@@ -48,7 +48,7 @@ export class ScreencastView {
                   <i class="codicon codicon-editor-layout"></i>
               </button>
           </div>
-          <div id="canvas-wrapper" class="fill">
+          <div id="canvas-wrapper">
               <img id="canvas" draggable="false" tabindex="0" />
           </div>
       </div>

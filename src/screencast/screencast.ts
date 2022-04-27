@@ -248,7 +248,6 @@ export class Screencast {
         const expectedRatio = this.width / this.height;
         const actualRatio = this.screencastImage.naturalWidth / this.screencastImage.naturalHeight;
         this.screencastImage.src = `data:image/png;base64,${data}`;
-        this.screencastImage.style.width = `${this.width}px`;
         if (expectedRatio !== actualRatio) {
             this.updateEmulation();
         }
