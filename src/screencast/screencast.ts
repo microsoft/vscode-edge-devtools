@@ -120,7 +120,7 @@ export class Screencast {
             });
         }
 
-        for (const eventName of ['keydown', 'keypress']) {
+        for (const eventName of ['keydown', 'keyup']) {
             this.screencastImage.addEventListener(eventName, event => {
                 this.inputHandler.emitKeyEvent(event as KeyboardEvent);
             });
