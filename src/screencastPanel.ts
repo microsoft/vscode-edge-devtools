@@ -136,6 +136,7 @@ export class ScreencastPanel {
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
+            panel.iconPath = vscode.Uri.joinPath(context.extensionUri, 'icon.png');
             ScreencastPanel.instance = new ScreencastPanel(panel, context, telemetryReporter, targetUrl, isJsDebugProxiedCDPConnection);
         }
     }
