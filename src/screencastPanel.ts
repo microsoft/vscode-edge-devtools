@@ -14,6 +14,7 @@ import { ScreencastView } from './screencast/view';
 import {
     SETTINGS_STORE_NAME,
     SETTINGS_SCREENCAST_WEBVIEW_NAME,
+    SETTINGS_VIEW_NAME,
 } from './utils';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import { DevToolsPanel } from './devtoolsPanel';
@@ -24,6 +25,7 @@ export class ScreencastPanel {
     private readonly extensionPath: string;
     private readonly panel: vscode.WebviewPanel;
     private readonly telemetryReporter: TelemetryReporter;
+    private isJsDebugProxiedCDPConnection = false;
     private targetUrl: string
     private panelSocket: PanelSocket;
     private screencastStartTime;
@@ -41,6 +43,7 @@ export class ScreencastPanel {
         this.extensionPath = this.context.extensionPath;
         this.telemetryReporter = telemetryReporter;
         this.screencastStartTime = Date.now();
+        this.isJsDebugProxiedCDPConnection = isJsDebugProxiedCDPConnection;
 
         if (isJsDebugProxiedCDPConnection) {
             this.panelSocket = new JsDebugProxyPanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
@@ -67,7 +70,11 @@ export class ScreencastPanel {
 
         // Handle messages from the webview
         this.panel.webview.onDidReceiveMessage(message => {
-            this.panelSocket.onMessageFromWebview(message);
+            if (typeof message === 'string') {
+                this.panelSocket.onMessageFromWebview(message);
+            } else if ('type' in message && (message as {type:string}).type === 'open-devtools') {
+                this.openDevTools();
+            }
         }, this);
 
         this.recordEnumeratedHistogram('DevTools.ScreencastToggle', 1);
@@ -98,6 +105,11 @@ export class ScreencastPanel {
         if (!DevToolsPanel.instance && vscode.debug.activeDebugSession?.name.includes(providedHeadlessDebugConfig.name)) {
             void vscode.commands.executeCommand('workbench.action.debug.stop');
         }
+    }
+
+    private openDevTools() {
+        const websocketUrl = this.targetUrl;
+        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.attach`, { websocketUrl }, this.isJsDebugProxiedCDPConnection);
     }
 
     toggleInspect(enabled: boolean): void {

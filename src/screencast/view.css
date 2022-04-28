@@ -22,17 +22,25 @@ body {
 
 #toolbar {
   display: flex;
+  gap: 4px;
+  padding: 4px;
   width: 100%;
   height: var(--toolbar-height);
   border-bottom: 1px solid var(--vscode-editorGroup-border);
   box-sizing: border-box;
 }
 
-#toolbar>button,
-#toolbar>select {
+#toolbar>button {
+  padding: 4px;
   background-color: var(--vscode-editor-background);
   border: none;
+  border-radius: 4px;
   color: var(--vscode-editor-foreground);
+  cursor: pointer;
+}
+
+#toolbar>button:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
 }
 
 #url {
@@ -42,9 +50,6 @@ body {
   border-style: solid;
   border-width: 1px;
   color: var(--vscode-input-foreground);
-  margin-bottom: 4px;
-  margin-right: 4px;
-  margin-top: 4px;
 }
 
 #canvas-wrapper {
@@ -118,6 +123,7 @@ body {
   border: none;
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
+  cursor: pointer;
   border-radius: 4px;
 }
 
