@@ -46,6 +46,7 @@ export function createFakeVSCode() {
         Uri: {
             file: jest.fn().mockReturnValue({ with: jest.fn() }),
             parse: jest.fn().mockReturnValue({ with: jest.fn() }),
+            joinPath: jest.fn().mockReturnValue({ with: jest.fn() })
         },
         ViewColumn: { One: 1, Two: 2 },
         commands: {

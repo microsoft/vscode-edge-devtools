@@ -560,7 +560,7 @@ export class DevToolsPanel {
                 enableScripts: true,
                 retainContextWhenHidden: true,
             });
-
+            panel.iconPath = vscode.Uri.joinPath(context.extensionUri, 'icon.png');
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
         }
     }
