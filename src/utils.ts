@@ -82,7 +82,7 @@ export const SETTINGS_DEFAULT_HOSTNAME = 'localhost';
 export const SETTINGS_DEFAULT_PORT = 9222;
 export const SETTINGS_DEFAULT_URL = path.resolve(path.join(__dirname, 'startpage', 'index.html'));
 export const SETTINGS_WEBVIEW_NAME = 'Edge DevTools';
-export const SETTINGS_SCREENCAST_WEBVIEW_NAME = 'Edge DevTools: Screencast';
+export const SETTINGS_SCREENCAST_WEBVIEW_NAME = 'Edge DevTools: Browser';
 export const SETTINGS_PREF_NAME = 'devtools-preferences';
 export const SETTINGS_PREF_DEFAULTS = {
     screencastEnabled: false,
