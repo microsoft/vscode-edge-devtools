@@ -29,16 +29,19 @@ export class ScreencastView {
   <body>
       <div id="main">
           <div id="toolbar">
-              <button id="back">
+              <button id="back" title="Back">
                   <i class="codicon codicon-arrow-left"></i>
               </button>
-              <button id="forward">
+              <button id="forward" title="Forward">
                   <i class="codicon codicon-arrow-right"></i>
               </button>
-              <button id="reload">
+              <button id="reload" title="Reload">
                   <i class="codicon codicon-refresh"></i>
               </button>
               <input id="url" />
+              <button id="inspect" title="Open DevTools">
+                  <i class="codicon codicon-inspect"></i>
+              </button>
           </div>
           <div id="canvas-wrapper">
               <img id="canvas" draggable="false" tabindex="0" />
