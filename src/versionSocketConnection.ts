@@ -15,8 +15,9 @@ export interface BrowserVersionCdpResponse {
    }
 }
 
-// Minimum supported version of Edge for new CDN system
-export const MIN_SUPPORTED_VERSION = '94.0.988.0';
+// Minimum supported version of Edge for source-mapped CSS mirroring
+export const MIN_SUPPORTED_VERSION = '102.0.1235.1';
+export const MIN_SUPPORTED_REVISION = '@a41122be052fe9616f0def5fe6842fa942930d46';
 
 export class BrowserVersionDetectionSocket extends EventEmitter {
     private readonly targetUrl: string;
@@ -79,7 +80,7 @@ export class BrowserVersionDetectionSocket extends EventEmitter {
                 return {revision: currentRevision, isHeadless};
             }
             if (currentVersion[i] < minSupportedVersion[i]) {
-                return {revision: '', isHeadless};
+                return {revision: MIN_SUPPORTED_REVISION, isHeadless};
             }
             // Continue to the next number
         }
