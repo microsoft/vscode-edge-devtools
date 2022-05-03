@@ -291,7 +291,7 @@
                 },
                 "vscode-edge-devtools.cssMirrorContent": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "Enable edits in the styles pane to be automatically applied to the corresponding stylesheet in the workspace. (Only works when targeting Edge Browser versions 94.0.988.0+)"
                 },
                 "vscode-edge-devtools.webhint": {
