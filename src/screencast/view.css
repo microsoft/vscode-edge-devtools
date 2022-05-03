@@ -127,6 +127,10 @@ body {
   border-radius: 4px;
 }
 
+#emulation-bar .codicon-close {
+  padding: 0px 4px;
+}
+
 #emulation-bar button:last-child {
   margin-right: 4px;
 }
