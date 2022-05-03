@@ -23,6 +23,7 @@ export interface MenuItemSection {
 
 interface FlyoutMenuProps {
     iconName: string;
+    title: string;
     displayCurrentSelection?: boolean;
     globalSelectedItem?: string;
     offsetDirection?: OffsetDirection.Left | OffsetDirection.Right;
@@ -33,6 +34,7 @@ export default class FlyoutMenuComponent {
     #buttonRef = createRef();
     #globalSelectedItem: string | undefined;
     #iconName: string;
+    #title: string;
     #container: HTMLElement | undefined;
     #offsetDirection: OffsetDirection = OffsetDirection.Left;
     #displayCurrentSelection = false;
@@ -41,6 +43,7 @@ export default class FlyoutMenuComponent {
     constructor(props: FlyoutMenuProps, container?: HTMLElement) {
         this.#globalSelectedItem = props.globalSelectedItem;
         this.#iconName = props.iconName;
+        this.#title = props.title;
         this.#menuItemSections = props.menuItemSections;
         this.#container = container;
 
@@ -146,7 +149,7 @@ export default class FlyoutMenuComponent {
 
     template() {
         return html`
-            <button ${ref(this.#buttonRef)} @click=${this.#onClick}>
+            <button ${ref(this.#buttonRef)} @click=${this.#onClick} .title=${this.#title}>
                 ${this.#displayCurrentSelection
                     ? html`${this.#getTitleFromMenuItemSections(this.#globalSelectedItem)}`
                     : ''
