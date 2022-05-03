@@ -44,6 +44,7 @@ export default class DimensionComponent {
             <input
                 ${ref(this.textInputWidth)}
                 type="number"
+                title="Width"
                 @blur=${this.#onBlur}
                 @keydown=${this.#onKeyDown}
                 .disabled=${this.disableUserDimensionInputs}
@@ -52,11 +53,12 @@ export default class DimensionComponent {
             <input
                 ${ref(this.textInputHeight)}
                 type="number"
+                title="Height"
                 @blur=${this.#onBlur}
                 @keydown=${this.#onKeyDown}
                 .disabled=${this.disableUserDimensionInputs}
                 .value=${this.height.toString()} /> 
-            <button @click=${this.#onRotate}>
+            <button title="Rotate" @click=${this.#onRotate}>
                 <i class="codicon codicon-arrow-swap"></i>
             </button>
         `;

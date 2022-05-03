@@ -59,6 +59,7 @@ export class Screencast {
 
         FlyoutMenuComponent.render({
             iconName: 'codicon-chevron-down',
+            title: 'Emulate devices',
             globalSelectedItem: 'responsive',
             displayCurrentSelection: true,
             menuItemSections: [
@@ -92,6 +93,7 @@ export class Screencast {
         render(html`
             ${new FlyoutMenuComponent({
                 iconName: 'codicon-wand',
+                title: 'Emulate CSS media features',
                 offsetDirection: OffsetDirection.Right,
                 menuItemSections: [
                     {
@@ -122,6 +124,7 @@ export class Screencast {
             }).template()}
             ${new FlyoutMenuComponent({
                 iconName: 'codicon-eye',
+                title: 'Emulate vision deficiencies',
                 offsetDirection: OffsetDirection.Right,
                 menuItemSections: [
                     {
