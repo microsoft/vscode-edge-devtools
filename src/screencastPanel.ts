@@ -147,8 +147,8 @@ export class ScreencastPanel {
 
         this.telemetryReporter.sendTelemetryEvent(
             `devtools/${telemetry.name}`, {
-                "event": telemetry.data.event as string,
-                "value": telemetry.data.value as string
+                'event': telemetry.data.event as string,
+                'value': telemetry.data.value as string,
             });
     }
 
