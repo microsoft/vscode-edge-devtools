@@ -39,7 +39,12 @@ body {
   cursor: pointer;
 }
 
-#toolbar>button:hover {
+#toolbar>button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+#toolbar>button:hover:not(:disabled) {
   background-color: var(--vscode-toolbar-hoverBackground);
 }
 
@@ -108,6 +113,11 @@ body {
   color: var(--vscode-input-foreground);
   border: none;
   appearance: none;
+}
+
+#emulation-bar input:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 #emulation-bar-right,
