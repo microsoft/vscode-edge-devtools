@@ -145,11 +145,11 @@ export class ScreencastPanel {
             return;
         }
 
-        const properties: ITelemetryProps = {};
-        properties[telemetry.name] = JSON.stringify(telemetry.data);
         this.telemetryReporter.sendTelemetryEvent(
-            `devtools/${telemetry.name}`,
-            properties);
+            `devtools/${telemetry.name}`, {
+                "event": telemetry.data.event as string,
+                "value": telemetry.data.value as string
+            });
     }
 
     static createOrShow(context: vscode.ExtensionContext,
