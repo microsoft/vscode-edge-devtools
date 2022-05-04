@@ -52,7 +52,7 @@ export class ScreencastPanel {
             this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
         }
         this.panelSocket.on('close', () => this.onSocketClose());
-        this.panelSocket.on('telemetry', (message) => this.onSocketTelemetry(message));
+        this.panelSocket.on('telemetry', message => this.onSocketTelemetry(message));
 
         // Handle closing
         this.panel.onDidDispose(() => {
