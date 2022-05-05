@@ -61,13 +61,6 @@ export class SettingsProvider {
     return isHeadless;
   }
 
-  getScreencastSettings(): boolean {
-    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const screencastSetting = settings.get('standaloneScreencast');
-    const standaloneScreencast: boolean = screencastSetting !== undefined ? !!screencastSetting : false;
-    return standaloneScreencast;
-  }
-
   getCSSMirrorContentSettings(): boolean {
     return vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('cssMirrorContent') || false;
   }

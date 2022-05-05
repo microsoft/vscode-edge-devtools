@@ -79,10 +79,6 @@ export function activate(context: vscode.ExtensionContext): void {
         },
     });
 
-    // enable/disable standalone screencast target panel icon.
-    const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
-    void vscode.commands.executeCommand('setContext', 'standaloneScreencast', standaloneScreencast);
-
     // Check if launch.json exists and has supported config to populate side pane welcome message
     LaunchConfigManager.instance.updateLaunchConfig();
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, (): void => {
