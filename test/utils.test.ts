@@ -1016,8 +1016,7 @@ describe("utils", () => {
             vscodeMock.workspace.getConfiguration.mockImplementation(() => {
                 return {
                     ...originalWorkspaceMockConfig,
-                    welcome: 'true',
-                    enableNetwork: 'false',
+                    isHeadless: 'false',
                 }
             });
 
@@ -1028,20 +1027,20 @@ describe("utils", () => {
         it('correctly records all changed extension settings', async () => {
             const reporter = createFakeTelemetryReporter();
             utils.reportExtensionSettings(reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { welcome: 'true', enableNetwork: 'false' });
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChangedAtLaunch', { isHeadless: 'false' });
         });
 
         it('correctly sends telemetry event for changed event', async () => {
             const reporter = createFakeTelemetryReporter();
             const configurationChangedEvent: ConfigurationChangeEvent = {affectsConfiguration: (name): boolean=> {
-                if (name === 'vscode-edge-devtools.enableNetwork') {
+                if (name === 'vscode-edge-devtools.isHeadless') {
                     return true;
                 } else {
                     return false;
                 }
             }};
             utils.reportChangedExtensionSetting(configurationChangedEvent, reporter);
-            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChanged', { enableNetwork: 'false' });
+            expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChanged', { isHeadless: 'false' });
         });
     });
 });
