@@ -7,6 +7,7 @@ import {
     WebSocketEvent,
     ITelemetryProps,
     ITelemetryMeasures,
+    TelemetryData,
 } from './common/webviewEvents';
 import { JsDebugProxyPanelSocket } from './JsDebugProxyPanelSocket';
 import { PanelSocket } from './panelSocket';
@@ -51,6 +52,7 @@ export class ScreencastPanel {
             this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
         }
         this.panelSocket.on('close', () => this.onSocketClose());
+        this.panelSocket.on('telemetry', message => this.onSocketTelemetry(message));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -135,6 +137,18 @@ export class ScreencastPanel {
         const cssPath = this.panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'out/screencast', 'view.css'));
         const view = new ScreencastView(this.panel.webview.cspSource, cssPath, codiconsUri, inspectorUri);
         return view.render();
+    }
+
+    private onSocketTelemetry(message: string) {
+        const telemetry: TelemetryData = JSON.parse(message) as TelemetryData;
+        if (telemetry.event !== 'screencast') {
+            return;
+        }
+
+        this.telemetryReporter.sendTelemetryEvent(
+            `devtools/${telemetry.name}/${telemetry.data.event}`, {
+                'value': telemetry.data.value as string,
+            });
     }
 
     static createOrShow(context: vscode.ExtensionContext,

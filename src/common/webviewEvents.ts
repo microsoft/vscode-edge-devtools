@@ -59,7 +59,7 @@ export interface ITelemetryDataNumber {
     data: number;
 }
 export interface ITelemetryDataObject {
-    event: 'error';
+    event: 'error' | 'screencast';
     name: string;
     data: Record<string, unknown>;
 }
