@@ -9,6 +9,8 @@ import DimensionComponent from './dimensionComponent';
 import { getEmulatedDeviceDetails, groupEmulatedDevicesByType } from './emulatedDeviceHelpers';
 import FlyoutMenuComponent, {OffsetDirection} from './flyoutMenuComponent';
 
+import { encodeMessageForChannel } from '../common/webviewEvents';
+
 type NavigationEntry = {
     id: number;
     url: string;
@@ -256,25 +258,30 @@ export class Screencast {
         DimensionComponent.setDimensionState(
             this.emulatedWidth, this.emulatedHeight, isResponsive, !isResponsive);
         this.updateEmulation();
+        this.sendEmulationTelemetry('device', value);
     };
 
     private onVisionDeficiencySelected = (value: string) => {
         this.cdpConnection.sendMessageToBackend('Emulation.setEmulatedVisionDeficiency', {type: value});
+        this.sendEmulationTelemetry('visionDeficiency', value);
     };
 
     private onEmulatedMediaSelected = (value: string) => {
         this.emulatedMedia = value;
         this.updateMediaFeatures();
+        this.sendEmulationTelemetry('emulatedMedia', value);
     };
 
     private onForcedColorsSelected = (value: string) => {
         this.mediaFeatureConfig.set('forced-colors', value);
         this.updateMediaFeatures();
+        this.sendEmulationTelemetry('forcedColors', value);
     };
 
     private onPrefersColorSchemeSelected = (value: string) => {
         this.mediaFeatureConfig.set('prefers-color-scheme', value);
         this.updateMediaFeatures();
+        this.sendEmulationTelemetry('prefersColorScheme', value);
     };
 
     private onUpdateDimensions = (width: number, height: number) => {
@@ -361,6 +368,17 @@ export class Screencast {
 
     private onToggleInspect({ enabled }: any): void {
         this.setTouchMode(!enabled as boolean);
+    }
+
+    private sendEmulationTelemetry(event: string, value: string) {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', {
+            event: 'screencast',
+            name: 'Screencast.Emulation',
+            data: {
+                event,
+                value
+            }
+        });
     }
 
     private setTouchMode(enabled: boolean): void {
