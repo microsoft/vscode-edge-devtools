@@ -16,8 +16,7 @@ export interface BrowserVersionCdpResponse {
 }
 
 // Minimum supported version of Edge for source-mapped CSS mirroring
-// TODO: Remove temporary fix to force all current versions to a "known good" revision.
-export const MIN_SUPPORTED_VERSION = '104.0.0.0';
+export const MIN_SUPPORTED_VERSION = '103.0.1252.0';
 export const MIN_SUPPORTED_REVISION = '@a41122be052fe9616f0def5fe6842fa942930d46';
 
 export class BrowserVersionDetectionSocket extends EventEmitter {
