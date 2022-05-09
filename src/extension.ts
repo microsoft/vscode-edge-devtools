@@ -235,7 +235,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, () => {
         const cssMirrorContent = getCSSMirrorContentEnabled(context);
-        setCSSMirrorContentEnabled(context, !cssMirrorContent);
+        void setCSSMirrorContentEnabled(context, !cssMirrorContent);
     }));
 
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);

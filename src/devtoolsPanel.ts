@@ -191,7 +191,7 @@ export class DevToolsPanel {
 
     private onToggleCSSMirrorContent(message: string) {
         const { isEnabled } = JSON.parse(message) as IToggleCSSMirrorContentData;
-        setCSSMirrorContentEnabled(this.context, isEnabled);
+        void setCSSMirrorContentEnabled(this.context, isEnabled);
     }
 
     private onSocketMessage(message: string) {
