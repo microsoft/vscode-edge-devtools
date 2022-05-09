@@ -301,7 +301,7 @@
                 },
                 "vscode-edge-devtools.fallbackRevision": {
                     "type": "string",
-                    "default": "@c438621746b2932668109129d137a7e3a22ef4fd",
+                    "default": "@a41122be052fe9616f0def5fe6842fa942930d46",
                     "description": "Last known good revision used for when we fail to connect to the CDN with the current target revision."
                 }
             }
