@@ -49,12 +49,6 @@ export class SettingsProvider {
       return theme;
   }
 
-  getWelcomeSettings(): boolean {
-    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const welcomeEnabled: boolean = settings.get('welcome') || false;
-    return welcomeEnabled;
-  }
-
   getHeadlessSettings(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const isHeadless: boolean = settings.get('headless') || false;

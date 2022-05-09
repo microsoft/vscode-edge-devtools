@@ -290,9 +290,9 @@ export class DevToolsPanel {
     private onSocketGetVscodeSettings(message: string) {
         const { id } = JSON.parse(message) as { id: number };
         encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
-            welcome: SettingsProvider.instance.getWelcomeSettings(),
             isHeadless: SettingsProvider.instance.getHeadlessSettings(),
-            id });
+            id,
+        });
     }
 
     private onSocketSetState(message: string) {
