@@ -390,7 +390,7 @@ export class DevToolsPanel {
 
     private onSocketDevToolsConnection(success: string) {
         if (success === 'true') {
-            this.context.globalState.update('fallbackRevision', this.currentRevision);
+            void this.context.globalState.update('fallbackRevision', this.currentRevision);
         } else {
             // Retry connection with fallback.
             const fallbackRevision = this.context.globalState.get<string>('fallbackRevision') ?? '';
