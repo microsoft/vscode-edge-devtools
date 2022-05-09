@@ -648,16 +648,9 @@ describe("devtoolsPanel", () => {
                     applyPathMapping: jest.fn().mockImplementation((x) => x),
                     fetchUri: jest.fn().mockRejectedValue(null),
                     isHeadlessEnabled: jest.fn(),
-                };
-                const mockSettingsProvider = {
-                    SettingsProvider: {
-                        instance: {
-                            getCSSMirrorContentSettings: jest.fn().mockImplementation(() => true),
-                        }
-                    }
+                    getCSSMirrorContentEnabled: jest.fn().mockImplementation(() => true),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
-                jest.doMock("../src/common/settingsProvider.ts", () => mockSettingsProvider); 
 
                 const dtp = await import("../src/devtoolsPanel");
                 const { TextEncoder } = require('util');
