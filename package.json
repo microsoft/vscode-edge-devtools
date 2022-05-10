@@ -212,11 +212,6 @@
                     },
                     "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
                 },
-                "vscode-edge-devtools.standaloneScreencast": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "When selected, screencast will be rendered in an individual screen and enable device emulation."
-                },
                 "vscode-edge-devtools.sourceMapPathOverrides": {
                     "type": "object",
                     "description": "A set of mappings to override the locations of source map files.",
@@ -556,7 +551,7 @@
             "view/item/context": [
                 {
                     "command": "vscode-edge-devtools-view.toggleScreencast",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget && standaloneScreencast",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
                     "group": "inline@0"
                 },
                 {
