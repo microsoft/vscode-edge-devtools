@@ -34,10 +34,11 @@ import {
     reportChangedExtensionSetting,
     reportExtensionSettings,
     reportUrlType,
+    getCSSMirrorContentEnabled,
+    setCSSMirrorContentEnabled,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
-import { SettingsProvider } from './common/settingsProvider';
 import { ErrorCodes } from './common/errorCodes';
 import {
     LanguageClient,
@@ -221,11 +222,9 @@ export function activate(context: vscode.ExtensionContext): void {
             void vscode.env.openExternal(vscode.Uri.parse('https://docs.microsoft.com/en-us/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension'));
         }));
 
-    const cssMirrorContent = SettingsProvider.instance.getCSSMirrorContentSettings();
-    void vscode.commands.executeCommand('setContext', 'cssMirrorContent', cssMirrorContent);
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, (args: {isEnabled: boolean}) => {
-        SettingsProvider.instance.setCSSMirrorContentSettings(args.isEnabled);
-        void vscode.commands.executeCommand('setContext', 'cssMirrorContent', args.isEnabled);
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, () => {
+        const cssMirrorContent = getCSSMirrorContentEnabled(context);
+        void setCSSMirrorContentEnabled(context, !cssMirrorContent);
     }));
 
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);

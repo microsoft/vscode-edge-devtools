@@ -160,7 +160,7 @@
                 "command": "vscode-edge-devtools-view.cssMirrorContent",
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
-                "title": "Toggle mirror editing on for CSS files in workspace"
+                "title": "Toggle CSS mirror editing on/off"
             }
         ],
         "configuration": {
@@ -273,11 +273,6 @@
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                     ]
-                },
-                "vscode-edge-devtools.cssMirrorContent": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable edits in the styles pane to be automatically applied to the corresponding stylesheet in the workspace. (Only works when targeting Edge Browser versions 94.0.988.0+)"
                 },
                 "vscode-edge-devtools.webhint": {
                     "type": "boolean",
