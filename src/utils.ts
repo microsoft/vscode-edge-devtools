@@ -342,6 +342,14 @@ export function createTelemetryReporter(_context: vscode.ExtensionContext): Read
 
 }
 
+export function getCSSMirrorContentEnabled(context: vscode.ExtensionContext): boolean {
+    return context.globalState.get<boolean>('cssMirrorContent') ?? true;
+}
+
+export function setCSSMirrorContentEnabled(context: vscode.ExtensionContext, isEnabled: boolean): Thenable<void> {
+    return context.globalState.update('cssMirrorContent', isEnabled);
+}
+
 /**
  * Get the current machine platform
  */

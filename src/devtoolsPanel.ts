@@ -30,6 +30,8 @@ import {
     SETTINGS_WEBVIEW_NAME,
     SETTINGS_VIEW_NAME,
     CDN_FALLBACK_REVISION,
+    getCSSMirrorContentEnabled,
+    setCSSMirrorContentEnabled,
 } from './utils';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
@@ -189,7 +191,7 @@ export class DevToolsPanel {
 
     private onToggleCSSMirrorContent(message: string) {
         const { isEnabled } = JSON.parse(message) as IToggleCSSMirrorContentData;
-        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, {isEnabled});
+        void setCSSMirrorContentEnabled(this.context, isEnabled);
     }
 
     private onSocketMessage(message: string) {
@@ -351,7 +353,7 @@ export class DevToolsPanel {
     }
 
     private async onSocketCssMirrorContent(message: string) {
-        if (!SettingsProvider.instance.getCSSMirrorContentSettings()) {
+        if (!getCSSMirrorContentEnabled(this.context)) {
             return;
         }
 
@@ -485,7 +487,7 @@ export class DevToolsPanel {
         const stylesUri = this.panel.webview.asWebviewUri(stylesPath);
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
-        const cssMirrorContent = SettingsProvider.instance.getCSSMirrorContentSettings();
+        const cssMirrorContent = getCSSMirrorContentEnabled(this.context);
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
