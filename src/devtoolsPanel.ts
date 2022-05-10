@@ -389,11 +389,10 @@ export class DevToolsPanel {
 
     private onSocketDevToolsConnection(success: string) {
         if (success === 'true') {
-            void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('fallbackRevision', this.currentRevision, true);
+            void this.context.globalState.update('fallbackRevision', this.currentRevision);
         } else {
             // Retry connection with fallback.
-            const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-            const fallbackRevision = settingsConfig.get('fallbackRevision') as string;
+            const fallbackRevision = this.context.globalState.get<string>('fallbackRevision') ?? '';
             if (this.currentRevision) {
                 this.telemetryReporter.sendTelemetryEvent('websocket/failedConnection', {revision: this.currentRevision});
             }

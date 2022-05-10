@@ -283,11 +283,6 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
-                },
-                "vscode-edge-devtools.fallbackRevision": {
-                    "type": "string",
-                    "default": "@a41122be052fe9616f0def5fe6842fa942930d46",
-                    "description": "Last known good revision used for when we fail to connect to the CDN with the current target revision."
                 }
             }
         },

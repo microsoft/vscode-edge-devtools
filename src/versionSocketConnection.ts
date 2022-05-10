@@ -4,6 +4,7 @@
 import { EventEmitter } from 'events';
 import WebSocket from 'ws';
 import { WebSocketEvent } from './common/webviewEvents';
+import { CDN_FALLBACK_REVISION } from './utils';
 
 export type IDevToolsPostMessageCallback = (e: WebSocketEvent, message?: string) => void;
 
@@ -17,7 +18,7 @@ export interface BrowserVersionCdpResponse {
 
 // Minimum supported version of Edge for source-mapped CSS mirroring
 export const MIN_SUPPORTED_VERSION = '103.0.1252.0';
-export const MIN_SUPPORTED_REVISION = '@a41122be052fe9616f0def5fe6842fa942930d46';
+export const MIN_SUPPORTED_REVISION = CDN_FALLBACK_REVISION;
 
 export class BrowserVersionDetectionSocket extends EventEmitter {
     private readonly targetUrl: string;
