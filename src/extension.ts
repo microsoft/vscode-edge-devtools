@@ -39,7 +39,6 @@ import {
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
-import { SettingsProvider } from './common/settingsProvider';
 import { ErrorCodes } from './common/errorCodes';
 import {
     LanguageClient,
