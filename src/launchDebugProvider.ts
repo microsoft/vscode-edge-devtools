@@ -5,8 +5,6 @@ import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import {
     IUserConfig,
-    SETTINGS_DEFAULT_ATTACH_INTERVAL,
-    SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT,
     SETTINGS_STORE_NAME,
 } from './utils';
 import { providedDebugConfig } from './launchConfigManager';
@@ -59,30 +57,6 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
                 this.telemetryReporter.sendTelemetryEvent('debug/launch');
                 void this.launch(this.context, targetUri, userConfig);
             }
-        } else if (config && (config.type === 'edge' || config.type === 'msedge')) {
-            void vscode.window.showWarningMessage(
-                `Launch type "${config.type}" is deprecated. Update your launch.json to use "pwa-msedge" instead.`, 'Learn More', 'OK'
-            ).then(value => {
-                if (value === 'Learn More') {
-                    const uri = vscode.Uri.parse('https://code.visualstudio.com/docs/nodejs/browser-debugging');
-                    void vscode.env.openExternal(uri);
-                }
-            });
-            const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-            if (settings.get('autoAttachViaDebuggerForEdge')) {
-                if (!userConfig.port) {
-                    userConfig.port = SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT;
-                }
-                if (userConfig.urlFilter) {
-                    userConfig.url = userConfig.urlFilter;
-                }
-
-                // Allow the debugger to actually launch the browser before attaching
-                setTimeout(() => {
-                    void this.attach(this.context, userConfig.url, userConfig, /* useRetry=*/ true);
-                }, SETTINGS_DEFAULT_ATTACH_INTERVAL);
-            }
-            return Promise.resolve(config);
         } else {
             this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
             vscode.window.showErrorMessage('No supported launch config was found.') as Promise<void>;

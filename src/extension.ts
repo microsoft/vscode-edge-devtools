@@ -97,12 +97,6 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
-    // Register the Microsoft Edge debugger types
-    vscode.debug.registerDebugConfigurationProvider('edge',
-        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
-    vscode.debug.registerDebugConfigurationProvider('msedge',
-        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
-
     // Register the side-panel view and its commands
     cdpTargetsProvider = new CDPTargetsProvider(context, telemetryReporter);
     context.subscriptions.push(vscode.window.registerTreeDataProvider(
@@ -399,7 +393,7 @@ export async function attach(
     } while (useRetry && Date.now() - startTime < timeout);
 
     // If there is no response after the timeout then throw an exception (unless for legacy Edge targets which we warned about separately)
-    if (responseArray.length === 0 && config?.type !== 'edge' && config?.type !== 'msedge') {
+    if (responseArray.length === 0) {
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while fetching list of available targets',
