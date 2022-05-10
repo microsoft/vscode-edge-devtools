@@ -21,14 +21,5 @@ describe("settingsProvider", () => {
       expect(instance).not.toEqual(null);
       expect(instance).toEqual(instanceB);
     });
-
-    it("test that the right value is retrieved for networkEnabled configuration", async () => {
-      jest.requireMock("vscode");
-      const settingsProvider = await import("../../src/common/settingsProvider");
-      const instance = settingsProvider.SettingsProvider.instance;
-      expect(instance).not.toEqual(null);
-      const result = instance.isNetworkEnabled();
-      expect(result).toEqual(true);
-    });
   });
 });

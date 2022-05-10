@@ -344,7 +344,14 @@ export class Screencast {
     private onUrlKeyDown(event: KeyboardEvent): void {
         let url = this.urlInput.value;
         if (event.key === 'Enter' && url) {
-            if (!url.startsWith('http') && !url.startsWith('file')) {
+            if (url.startsWith('/') || url[1] === ':') {
+                try {
+                    url = new URL(`file://${url}`).href;
+                } catch (e) {
+                    // Try the original URL if it can't be converted to a file URL.
+                }
+            }
+            if (!url.startsWith('http:') && !url.startsWith('file:')) {
                 url = 'http://' + url;
             }
 
