@@ -51,32 +51,6 @@ describe("launchDebugProvider", () => {
             expect(attach).toHaveBeenCalled();
         });
 
-        it("calls attach on edge debugger", async () => {
-            jest.useFakeTimers();
-
-            // Mock out the settings
-            const expectedSettings = {
-                autoAttachViaDebuggerForEdge: true,
-                debugAttachTimeoutMs: 3000,
-            };
-            const configMock = {
-                get: (name: string) => (expectedSettings as any)[name],
-            };
-            const vscodeMock = await jest.requireMock("vscode");
-            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
-
-            // Use an edge debugger config
-            const mockConfig = {
-                name: "config",
-                request: "launch",
-                type: "edge",
-                urlFilter: "http://localhost/index.html",
-            };
-            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
-            jest.runAllTimers();
-            expect(attach).toHaveBeenCalledWith(expect.any(Object), mockConfig.urlFilter, mockConfig, true);
-        });
-
         it("calls launch", async () => {
             const mockConfig = {
                 name: "config",
