@@ -27,12 +27,6 @@ export class SettingsProvider {
 
   private static singletonInstance: SettingsProvider;
 
-  isNetworkEnabled(): boolean {
-    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const networkEnabled: boolean = settings.get('enableNetwork') || false;
-    return networkEnabled;
-  }
-
   // This function returns the theme for the new frame hosted DevTools by:
   // 1. Fetching the User configured Global VSCode theme, return it if supported
   // 2. Fall back to the extension Theme setting selector (light, dark, system preference)
