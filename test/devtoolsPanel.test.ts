@@ -671,7 +671,7 @@ describe("devtoolsPanel", () => {
             it("calls getVscodeSettings", async () => {
                 jest.dontMock("../src/common/settingsProvider.ts");
                 const expectedId = { id: 0 };
-                const expectedState = { welcome: true, isHeadless: false};
+                const expectedState = { isHeadless: false };
                 (context.workspaceState.get as jest.Mock).mockReturnValue(expectedState);
                 const mockUtils = {
                     isHeadlessEnabled: jest.fn(),
@@ -685,7 +685,6 @@ describe("devtoolsPanel", () => {
                     expect.any(Function),
                     "getVscodeSettings",
                     {
-                        welcome: expectedState.welcome,
                         isHeadless: expectedState.isHeadless,
                         id: expectedId.id,
                     },

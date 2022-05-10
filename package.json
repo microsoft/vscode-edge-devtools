@@ -244,11 +244,6 @@
                     "description": "Show service and shared workers in the target list.",
                     "default": false
                 },
-                "vscode-edge-devtools.welcome": {
-                    "type": "boolean",
-                    "description": "Enable Welcome panel (requires relaunching extension)",
-                    "default": true
-                },
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
                     "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",
