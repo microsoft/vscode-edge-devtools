@@ -79,10 +79,6 @@ export function activate(context: vscode.ExtensionContext): void {
         },
     });
 
-    // enable/disable standalone screencast target panel icon.
-    const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
-    void vscode.commands.executeCommand('setContext', 'standaloneScreencast', standaloneScreencast);
-
     // Check if launch.json exists and has supported config to populate side pane welcome message
     LaunchConfigManager.instance.updateLaunchConfig();
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attach`, (): void => {
@@ -99,12 +95,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
     // Register the launch provider
     vscode.debug.registerDebugConfigurationProvider(`${SETTINGS_STORE_NAME}.debug`,
-        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
-
-    // Register the Microsoft Edge debugger types
-    vscode.debug.registerDebugConfigurationProvider('edge',
-        new LaunchDebugProvider(context, telemetryReporter, attach, launch));
-    vscode.debug.registerDebugConfigurationProvider('msedge',
         new LaunchDebugProvider(context, telemetryReporter, attach, launch));
 
     // Register the side-panel view and its commands
@@ -403,7 +393,7 @@ export async function attach(
     } while (useRetry && Date.now() - startTime < timeout);
 
     // If there is no response after the timeout then throw an exception (unless for legacy Edge targets which we warned about separately)
-    if (responseArray.length === 0 && config?.type !== 'edge' && config?.type !== 'msedge') {
+    if (responseArray.length === 0) {
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while fetching list of available targets',

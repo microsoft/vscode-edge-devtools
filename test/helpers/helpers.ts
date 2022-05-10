@@ -99,8 +99,6 @@ export function createFakeVSCode() {
                 return {
                     get: (name: string) => {
                         switch(name) {
-                            case "welcome":
-                                return true;
                             case "isHeadless":
                                 return false;
                             case "mirrorEdits":
@@ -111,8 +109,6 @@ export function createFakeVSCode() {
                     },
                     inspect: (name: string) => {
                         switch(name) {
-                            case "welcome":
-                                return {defaultValue: false};
                             case "isHeadless":
                                 return {defaultValue: false};
                             default:

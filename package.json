@@ -212,11 +212,6 @@
                     },
                     "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
                 },
-                "vscode-edge-devtools.standaloneScreencast": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "When selected, screencast will be rendered in an individual screen and enable device emulation."
-                },
                 "vscode-edge-devtools.sourceMapPathOverrides": {
                     "type": "object",
                     "description": "A set of mappings to override the locations of source map files.",
@@ -234,11 +229,6 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
-                "vscode-edge-devtools.autoAttachViaDebuggerForEdge": {
-                    "type": "boolean",
-                    "description": "Auto attach the Microsoft Edge Tools extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",
-                    "default": true
-                },
                 "vscode-edge-devtools.enableNetwork": {
                     "type": "boolean",
                     "description": "Enable network panel (requires relaunching extension)",
@@ -248,11 +238,6 @@
                     "type": "boolean",
                     "description": "Show service and shared workers in the target list.",
                     "default": false
-                },
-                "vscode-edge-devtools.welcome": {
-                    "type": "boolean",
-                    "description": "Enable Welcome panel (requires relaunching extension)",
-                    "default": true
                 },
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
@@ -551,7 +536,7 @@
             "view/item/context": [
                 {
                     "command": "vscode-edge-devtools-view.toggleScreencast",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget && standaloneScreencast",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
                     "group": "inline@0"
                 },
                 {

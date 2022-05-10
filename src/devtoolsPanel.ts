@@ -290,9 +290,9 @@ export class DevToolsPanel {
     private onSocketGetVscodeSettings(message: string) {
         const { id } = JSON.parse(message) as { id: number };
         encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'getVscodeSettings', {
-            welcome: SettingsProvider.instance.getWelcomeSettings(),
             isHeadless: SettingsProvider.instance.getHeadlessSettings(),
-            id });
+            id,
+        });
     }
 
     private onSocketSetState(message: string) {
@@ -486,12 +486,6 @@ export class DevToolsPanel {
 
         const theme = SettingsProvider.instance.getThemeFromUserSetting();
         const cssMirrorContent = SettingsProvider.instance.getCSSMirrorContentSettings();
-        const standaloneScreencast = SettingsProvider.instance.getScreencastSettings();
-
-        // The headless query param is used to show/hide the DevTools screencast on launch
-        // If the standalone screencast is enabled, we want to hide the DevTools screencast
-        // regardless of the headless setting.
-        const enableScreencast = standaloneScreencast ? false : this.isHeadless;
 
         // the added fields for "Content-Security-Policy" allow resource loading for other file types
         return `
@@ -512,7 +506,7 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&headless=${enableScreencast}&standaloneScreencast=${standaloneScreencast}&cssMirrorContent=${cssMirrorContent}"></iframe>
+                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&standaloneScreencast=true&cssMirrorContent=${cssMirrorContent}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>

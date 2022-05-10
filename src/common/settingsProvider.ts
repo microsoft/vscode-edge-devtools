@@ -49,23 +49,10 @@ export class SettingsProvider {
       return theme;
   }
 
-  getWelcomeSettings(): boolean {
-    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const welcomeEnabled: boolean = settings.get('welcome') || false;
-    return welcomeEnabled;
-  }
-
   getHeadlessSettings(): boolean {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const isHeadless: boolean = settings.get('headless') || false;
     return isHeadless;
-  }
-
-  getScreencastSettings(): boolean {
-    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const screencastSetting = settings.get('standaloneScreencast');
-    const standaloneScreencast: boolean = screencastSetting !== undefined ? !!screencastSetting : false;
-    return standaloneScreencast;
   }
 
   getCSSMirrorContentSettings(): boolean {

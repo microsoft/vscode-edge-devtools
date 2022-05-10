@@ -102,7 +102,6 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
 };
 export const SETTINGS_DEFAULT_WEB_ROOT = '${workspaceFolder}';
 export const SETTINGS_DEFAULT_SOURCE_MAPS = true;
-export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT = 2015;
 export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
 export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
