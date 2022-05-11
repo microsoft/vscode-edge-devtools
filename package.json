@@ -229,11 +229,6 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
-                "vscode-edge-devtools.enableNetwork": {
-                    "type": "boolean",
-                    "description": "Enable network panel (requires relaunching extension)",
-                    "default": true
-                },
                 "vscode-edge-devtools.showWorkers": {
                     "type": "boolean",
                     "description": "Show service and shared workers in the target list.",
