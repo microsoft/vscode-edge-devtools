@@ -34,6 +34,10 @@ import {
     reportChangedExtensionSetting,
     reportExtensionSettings,
     reportUrlType,
+    getWehbhintConfigPath,
+    ignoreProblemInHints,
+    ignoreCategoryPerProject,
+    ignoreCategoryGlobally,
 } from './utils';
 import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
@@ -45,17 +49,20 @@ import {
     ServerOptions,
     TransportKind,
 } from 'vscode-languageclient/node';
-import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
-import { activationEvents } from '../package.json';
+import { installFailed, showOutput, reloadAllProjectsConfig } from 'vscode-webhint/dist/src/utils/notifications';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
+let globalStoragePath: string | undefined;
 
-// List of document types the extension will run against.
-const supportedDocuments = activationEvents.map((event: string) => {
-    return event.split(':')[1];
-});
+// List of document types the extension will run against, supported documents
+// need a scheme, so adding support for 'file' and 'untitled'(in memory)
+const supportedFiles = getSupportedStaticAnalysisFileTypes().map(item => { return { language: item, scheme: 'file' }; });
+const supportedUntitled = getSupportedStaticAnalysisFileTypes().map(item => { return { language: item, scheme: 'untitled' }; });
+const supportedDocuments = [...supportedFiles, ...supportedUntitled];
+const reloadAllProjectsConfigNotification: typeof reloadAllProjectsConfig = 'vscode-webhint/reload-hint-config';
+
 // Keep a reference to the client to stop it when deactivating.
 let client: LanguageClient;
 const languageServerName = 'Microsoft Edge Tools';
@@ -259,6 +266,7 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 function startWebhint(context: vscode.ExtensionContext): void {
+    globalStoragePath = context.globalStoragePath;
     const args = [context.globalStoragePath, languageServerName];
     const module = context.asAbsolutePath('node_modules/vscode-webhint/dist/src/server.js');
     const transport = TransportKind.ipc;
@@ -282,6 +290,34 @@ function startWebhint(context: vscode.ExtensionContext): void {
             // Notify the server if a webhint-related configuration changes.
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
         },
+        middleware: {
+            executeCommand: (command, args, next) => {
+                if (args && args[0]) {
+                    switch (command) {
+                        case 'vscode-webhint/ignore-category-project': {
+                            void ignoreCategoryPerProject(args[0]);
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-category-global': {
+                            void ignoreCategoryGlobally(args[0], globalStoragePath || '', client);
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-hint-project': {
+                            const configFilePath = getWehbhintConfigPath([vscode.workspace.rootPath || '']);
+                            void ignoreProblemInHints(args[0], configFilePath);
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-hint-global': {
+                            const configFilePath = getWehbhintConfigPath([ globalStoragePath || '']);
+                            void ignoreProblemInHints(args[0], configFilePath);
+                            break;
+                        }
+                    }
+            }
+
+               return next(command, args); // eslint-disable-line @typescript-eslint/no-unsafe-return
+            },
+        },
     };
 
     // Create and start the client (also starts the server).
@@ -304,6 +340,9 @@ function startWebhint(context: vscode.ExtensionContext): void {
             client.outputChannel.clear();
             client.outputChannel.show(true);
         });
+
+        // Once client is ready reload any present configuration.
+        client.sendNotification(reloadAllProjectsConfigNotification);
     });
 
     client.start();
