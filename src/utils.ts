@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
@@ -12,12 +13,17 @@ import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
+import type { UserConfig as WebhintUserConfig } from '@hint/utils';
 
 import puppeteer from 'puppeteer-core';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
+import { Diagnostic, LanguageClient } from 'vscode-languageclient/node';
+import { reloadAllProjectsConfig } from 'vscode-webhint/dist/src/utils/notifications';
 
 export type BrowserFlavor = 'Default' | 'Stable' | 'Beta' | 'Dev' | 'Canary';
+
+const reloadAllProjectsConfigNotification: typeof reloadAllProjectsConfig = 'vscode-webhint/reload-hint-config';
 
 interface IBrowserPath {
     debianLinux: string;
@@ -827,6 +833,163 @@ export function getSupportedStaticAnalysisFileTypes(): string[] {
         }
     }
     return supportedFileTypes;
+}
+
+export async function getWebhintUserConfig(path: vscode.Uri): Promise<WebhintUserConfig | undefined> {
+    if (!path) {
+        return;
+    }
+
+    // start with an empty file
+    let userConfigByteArray: Uint8Array = Buffer.from('', 'utf8');
+
+    try {
+        // verify if .hintrc exists
+        await vscode.workspace.fs.stat(path);
+    } catch (error) {
+        if ((error as vscode.FileSystemError).code === vscode.FileSystemError.FileNotFound.name) {
+
+            // .hintrc does not exists so create one with the default config
+            const defaultConfig = { extends: ['development'] };
+            await vscode.workspace.fs.writeFile(path, Buffer.from(JSON.stringify(defaultConfig), 'utf8'));
+        } else {
+            throw error;
+        }
+    }
+
+    // user config file is guaranteed to exist at this point, now read it.
+    userConfigByteArray = await vscode.workspace.fs.readFile(path);
+    const rawUserConfig = Buffer.from(userConfigByteArray).toString('utf8');
+    const userConfig = JSON.parse(rawUserConfig) as WebhintUserConfig;
+    return userConfig;
+}
+
+export function getWehbhintConfigPath(directory: string[]): vscode.Uri {
+    const absolutePath = path.join(...directory, '.hintrc');
+    const encodedUri = vscode.Uri.parse(vscode.Uri.file(absolutePath).toString(), true);
+    return encodedUri;
+}
+
+export function getRuleNameFromURI(ruleURL: string): string {
+    const parsedPath = path.parse(ruleURL);
+    return parsedPath.name;
+}
+
+export async function ignoreProblemInHints(diagnostic: Diagnostic, configFilePath: vscode.Uri): Promise<void> {
+    const userConfig = await getWebhintUserConfig(configFilePath);
+    const hintCategory = diagnostic.code;
+
+    if (!userConfig || !hintCategory || !configFilePath.toString()) {
+        return;
+    }
+
+    if (!diagnostic.codeDescription?.href){
+        return;
+    }
+
+    const ruleName = getRuleNameFromURI(diagnostic.codeDescription?.href);
+    await addProblemToIgnoredHintsConfig(configFilePath, userConfig, hintCategory.toString(), ruleName);
+}
+
+export async function addProblemToIgnoredHintsConfig(configFilePath: vscode.Uri, userConfig: WebhintUserConfig, hintCategory: string, ruleName: string): Promise<void> {
+
+    if (!userConfig || !ruleName) {
+        return;
+    }
+
+    if (!userConfig.hints) {
+        userConfig.hints = {};
+    }
+
+    const hintWrapper = Object.getOwnPropertyDescriptor(userConfig.hints, hintCategory);
+    const ignore = {'ignore': [ruleName]};
+    const defaultObject = ['default', ignore];
+
+    if (hintWrapper && hintWrapper.value) {
+
+        // hint value is a configuration array e.g "hints": { "compat-api/css": [] }
+        if (typeof hintWrapper.value === typeof []){
+            const typedHintWrapper: [] = hintWrapper.value as [];
+
+            // search for the 'ignore' key inside each item, start from position [1] (zero-index based)
+            // as position [0] should always be a severity.
+            for (let i = 1; i < typedHintWrapper.length; i++) {
+                const ignoreProperty = Object.getOwnPropertyDescriptor(typedHintWrapper[i], 'ignore');
+
+                if (ignoreProperty && typeof ignoreProperty.value === typeof []) {
+
+                    // a list of ignored properties was found, use that one.
+                    ignore.ignore = ignoreProperty.value as [];
+                    defaultObject[0] = typedHintWrapper[i - 1];
+                    ignore.ignore.push(ruleName);
+                    break;
+                }
+            }
+        } else if (typeof hintWrapper.value === 'string'){
+            defaultObject[0] = hintWrapper.value;
+        }
+    }
+
+    Object.defineProperty(userConfig.hints, hintCategory, {
+        enumerable: true,
+        value: defaultObject,
+        writable: true,
+    });
+
+    await vscode.workspace.fs.writeFile(configFilePath, Buffer.from(JSON.stringify(userConfig), 'utf-8'));
+}
+
+async function ignoreCategory(diagnostic: vscode.Diagnostic, configFilePath: vscode.Uri) {
+    try {
+        const userConfig = await getWebhintUserConfig(configFilePath);
+        if (!userConfig) {
+            return;
+        }
+
+        if (!userConfig.hints) {
+            userConfig.hints = {};
+        }
+
+        // get category from diagnostic and apply it to the config
+        const hintCategory = typeof diagnostic.code === 'string' ? diagnostic.code : null;
+        if (hintCategory && userConfig.hints) {
+            userConfig.hints = Object.defineProperty(userConfig.hints, hintCategory, {
+                value: 'off',
+                writable: true,
+                enumerable: true,
+              });
+        }
+
+        // save new config
+        const serializedConfig = JSON.stringify(userConfig);
+        return vscode.workspace.fs.writeFile(configFilePath, Buffer.from(serializedConfig, 'utf8'));
+    } catch (error) {
+        void vscode.window.showErrorMessage(
+            `Error happened while creating configuration in ${configFilePath} file.\nError: ${error} `);
+    }
+}
+
+export async function ignoreCategoryPerProject(diagnostic: vscode.Diagnostic): Promise<void> {
+    const workspacePath = vscode.workspace.rootPath;
+    if (!workspacePath){
+        return;
+    }
+
+    const configFilePath = getWehbhintConfigPath([workspacePath]);
+    return ignoreCategory(diagnostic, configFilePath);
+}
+
+export async function ignoreCategoryGlobally(diagnostic: vscode.Diagnostic, globalStoragePath: string, client: LanguageClient): Promise<void> {
+    if (!globalStoragePath){
+        return;
+    }
+
+    const configFilePath = getWehbhintConfigPath([globalStoragePath]);
+    await ignoreCategory(diagnostic, configFilePath);
+
+    // As vscode only can monitor folders inside the workspace when we have a change in the hintrc file for all projects
+    // we reload the config.
+    client.sendNotification(reloadAllProjectsConfigNotification);
 }
 
 (function initialize() {
