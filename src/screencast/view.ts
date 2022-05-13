@@ -8,7 +8,8 @@ export class ScreencastView {
     private cssPath: Uri
     private codiconsUri: Uri;
     private inspectorUri: Uri
-    private htmlTemplate = (webviewCSP: string, cssPath: Uri, codiconsUri: Uri, inspectorUri: Uri) => `<!doctype html>
+    private isDevToolsOpen: boolean;
+    private htmlTemplate = (webviewCSP: string, cssPath: Uri, codiconsUri: Uri, inspectorUri: Uri, isDevToolsOpen: boolean) => `<!doctype html>
   <html>
   <head>
       <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -39,8 +40,8 @@ export class ScreencastView {
                   <i class="codicon codicon-refresh"></i>
               </button>
               <input id="url" />
-              <button id="inspect" title="Open DevTools">
-                  <i class="codicon codicon-inspect"></i>
+              <button id="inspect" title="Toggle DevTools">
+                  <i class="codicon codicon-inspect ${isDevToolsOpen ? 'devtools-open' : ''}"></i>
               </button>
           </div>
           <div id="canvas-wrapper">
@@ -59,14 +60,15 @@ export class ScreencastView {
   </html>
   `;
 
-    constructor(webviewCSP: string, cssPath: Uri, codiconsUri: Uri, inspectorUri: Uri) {
+    constructor(webviewCSP: string, cssPath: Uri, codiconsUri: Uri, inspectorUri: Uri, isDevToolsOpen: boolean) {
         this.webviewCSP = webviewCSP;
         this.cssPath = cssPath;
         this.codiconsUri = codiconsUri;
         this.inspectorUri = inspectorUri;
+        this.isDevToolsOpen = isDevToolsOpen;
     }
 
     render(): string {
-        return this.htmlTemplate(this.webviewCSP, this.cssPath, this.codiconsUri, this.inspectorUri);
+        return this.htmlTemplate(this.webviewCSP, this.cssPath, this.codiconsUri, this.inspectorUri, this.isDevToolsOpen);
     }
 }
