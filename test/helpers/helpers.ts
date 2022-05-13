@@ -39,6 +39,12 @@ export function createFakeVSCode() {
         Disposable: jest.fn(),
         version: '1.60.0',
         EventEmitter: jest.fn(),
+        FileSystemError: {
+            FileNotFound: {
+                name: 'FileNotFound',
+            },
+            code: '',
+        },
         Range: function Range() { /* constructor */ },
         TreeDataProvider: jest.fn(),
         TreeItem: jest.fn(),
@@ -86,6 +92,7 @@ export function createFakeVSCode() {
             showWarningMessage: jest.fn().mockResolvedValue({}),
         },
         workspace: {
+            rootPath: 'user/test/path/',
             createFileSystemWatcher: jest.fn(),
             findFiles: jest.fn(() => {
                 return [
@@ -135,7 +142,9 @@ export function createFakeVSCode() {
                 }
             ],
             fs: {
-                writeFile: jest.fn()
+                writeFile: jest.fn(),
+                stat: jest.fn(),
+                readFile: jest.fn(),
             }
         },
     };
@@ -202,8 +211,14 @@ export function createFakeDebugCore() {
             launch: jest.fn(),
             fixSource: jest.fn(),
         }
-    });
+    })
     return { UrlPathTransformer: urlPathTransformerMock }
+}
+
+export function createFakeLanguageClient() {
+    return {
+        sendNotification: jest.fn(),
+    };
 }
 
 /**
@@ -235,6 +250,17 @@ export function getTextFromFile(uri: string) {
     }
 
     return null;
+}
+
+export function getFakeWebhintConfigContent(){
+    return `{
+        "extends": ["development"],
+        "hints": {
+          "compat-api/css": ["default", {
+            "ignore": ["box-flex"]
+          }]
+        }
+      }`;
 }
 
 /**

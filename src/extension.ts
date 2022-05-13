@@ -34,11 +34,13 @@ import {
     reportChangedExtensionSetting,
     reportExtensionSettings,
     reportUrlType,
+} from './utils';
+import {
     getWehbhintConfigPath,
     ignoreProblemInHints,
-    ignoreCategoryPerProject,
-    ignoreCategoryGlobally,
-} from './utils';
+    ignoreHintPerProject,
+    ignoreHintGlobally,
+} from './webhintUtils';
 import { LaunchConfigManager } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { SettingsProvider } from './common/settingsProvider';
@@ -292,28 +294,39 @@ function startWebhint(context: vscode.ExtensionContext): void {
         },
         middleware: {
             executeCommand: (command, args, next) => {
-                if (args && args[0]) {
+                    const hintName = args[0] as string | undefined;
+                    const problemName = args[1] as string | undefined;
+
                     switch (command) {
-                        case 'vscode-webhint/ignore-category-project': {
-                            void ignoreCategoryPerProject(args[0]);
-                            break;
-                        }
-                        case 'vscode-webhint/ignore-category-global': {
-                            void ignoreCategoryGlobally(args[0], globalStoragePath || '', client);
-                            break;
-                        }
                         case 'vscode-webhint/ignore-hint-project': {
-                            const configFilePath = getWehbhintConfigPath([vscode.workspace.rootPath || '']);
-                            void ignoreProblemInHints(args[0], configFilePath);
+                            void ignoreHintPerProject(hintName);
                             break;
                         }
                         case 'vscode-webhint/ignore-hint-global': {
+                            void ignoreHintGlobally(hintName, globalStoragePath || '', client);
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-problem-project': {
+                            const configFilePath = getWehbhintConfigPath([vscode.workspace.rootPath || '']);
+                            void ignoreProblemInHints(problemName, hintName, configFilePath);
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-problem-global': {
                             const configFilePath = getWehbhintConfigPath([ globalStoragePath || '']);
-                            void ignoreProblemInHints(args[0], configFilePath);
+                            void ignoreProblemInHints(problemName, hintName, configFilePath);
+                            break;
+                        }
+                        case 'vscode-webhint/edit-hintrc-project': {
+                            const configFilePath = getWehbhintConfigPath([ vscode.workspace.rootPath || '']);
+                            void vscode.commands.executeCommand('vscode.openWith', configFilePath, 'default');
+                            break;
+                        }
+                        case 'vscode-webhint/edit-hintrc-global': {
+                            const configFilePath = getWehbhintConfigPath([ globalStoragePath || '']);
+                            void vscode.commands.executeCommand('vscode.openWith', configFilePath, 'default');
                             break;
                         }
                     }
-            }
 
                return next(command, args); // eslint-disable-line @typescript-eslint/no-unsafe-return
             },
