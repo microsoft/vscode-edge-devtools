@@ -282,9 +282,9 @@ function startWebhint(context: vscode.ExtensionContext): void {
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
         },
         middleware: {
-            executeCommand: (command, args, next) => {
-                    const hintName = args[0] as string | undefined;
-                    const problemName = args[1] as string | undefined;
+            executeCommand: async (command, args, next) => {
+                    const problemName = args[0] as string | undefined;
+                    const hintName = args[1] as string | undefined;
 
                     switch (command) {
                         case 'vscode-webhint/ignore-hint-project': {
@@ -292,7 +292,8 @@ function startWebhint(context: vscode.ExtensionContext): void {
                             break;
                         }
                         case 'vscode-webhint/ignore-hint-global': {
-                            void ignoreHintGlobally(hintName, globalStoragePath || '', client);
+                            await ignoreHintGlobally(hintName, globalStoragePath || '');
+                            client.sendNotification(reloadAllProjectsConfigNotification);
                             break;
                         }
                         case 'vscode-webhint/ignore-problem-project': {
@@ -302,7 +303,8 @@ function startWebhint(context: vscode.ExtensionContext): void {
                         }
                         case 'vscode-webhint/ignore-problem-global': {
                             const configFilePath = getWehbhintConfigPath([ globalStoragePath || '']);
-                            void ignoreProblemInHints(problemName, hintName, configFilePath);
+                            await ignoreProblemInHints(problemName, hintName, configFilePath);
+                            client.sendNotification(reloadAllProjectsConfigNotification);
                             break;
                         }
                         case 'vscode-webhint/edit-hintrc-project': {

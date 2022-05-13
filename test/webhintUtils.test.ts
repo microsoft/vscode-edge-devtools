@@ -1,11 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { createFakeLanguageClient, createFakeVSCode, getFakeWebhintConfigContent } from "./helpers/helpers";
+import { createFakeVSCode, getFakeWebhintConfigContent } from "./helpers/helpers";
 
 import { Uri } from "vscode";
 import type { UserConfig } from "@hint/utils";
-import { LanguageClient } from "vscode-languageclient/node";
 
 jest.mock("vscode", () => null, { virtual: true });
 describe("webhintUtils", () => {
@@ -223,11 +222,6 @@ describe("webhintUtils", () => {
 
   describe("ignoreHintGlobally", () => {
     it("successfully ignores a hint in the globalStoragePath folder", async () => {
-      const mockLanguageClient = createFakeLanguageClient();
-      mockLanguageClient.sendNotification.mockImplementation((value) => {
-        expect(value).toBe('vscode-webhint/reload-hint-config');
-                });
-      jest.mock("vscode-languageclient/node", () => mockLanguageClient);
       const vscodeMock = await jest.requireMock("vscode");
       const expectedValue = 'file:///global/storage/path/.hintrc';
       vscodeMock.workspace.fs.writeFile.mockImplementationOnce((args1: string, args2: Buffer)=>{
@@ -240,7 +234,7 @@ describe("webhintUtils", () => {
       const documentArray = Buffer.from(getFakeWebhintConfigContent());
       vscodeMock.workspace.fs.readFile.mockImplementationOnce(jest.fn().mockResolvedValue(documentArray));
       vscodeMock.Uri.parse.mockReturnValue(expectedValue);
-      await webhintUtils.ignoreHintGlobally('compat-api/css',expectedValue, mockLanguageClient as unknown as LanguageClient);
+      await webhintUtils.ignoreHintGlobally('compat-api/css',expectedValue);
       expect(vscodeMock.workspace.fs.readFile).toHaveBeenCalledWith('file:///global/storage/path/.hintrc')
     });
   });

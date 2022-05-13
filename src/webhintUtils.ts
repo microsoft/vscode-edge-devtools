@@ -5,10 +5,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import type { UserConfig as WebhintUserConfig } from '@hint/utils';
-import { LanguageClient } from 'vscode-languageclient/node';
-import { reloadAllProjectsConfig } from 'vscode-webhint/dist/src/utils/notifications';
-
-const reloadAllProjectsConfigNotification: typeof reloadAllProjectsConfig = 'vscode-webhint/reload-hint-config';
 
 export async function getWebhintUserConfig(path: vscode.Uri): Promise<WebhintUserConfig | undefined> {
   if (!path || !path.toString()) {
@@ -139,15 +135,11 @@ export async function ignoreHintPerProject(hintName: string | undefined): Promis
   return ignoreHint(hintName, configFilePath);
 }
 
-export async function ignoreHintGlobally(hintName: string | undefined, globalStoragePath: string, client: LanguageClient): Promise<void> {
+export async function ignoreHintGlobally(hintName: string | undefined, globalStoragePath: string): Promise<void> {
   if (!globalStoragePath || !hintName){
       return;
   }
 
   const configFilePath = getWehbhintConfigPath([globalStoragePath]);
   await ignoreHint(hintName, configFilePath);
-
-  // As vscode only can monitor folders inside the workspace when we have a change in the hintrc file for all projects
-  // we reload the config.
-  client.sendNotification(reloadAllProjectsConfigNotification);
 }

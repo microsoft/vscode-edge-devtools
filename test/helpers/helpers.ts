@@ -207,12 +207,6 @@ export function createFakeDebugCore() {
     return { UrlPathTransformer: urlPathTransformerMock }
 }
 
-export function createFakeLanguageClient() {
-    return {
-        sendNotification: jest.fn(),
-    };
-}
-
 /**
  * Get a callable function from the first invocation of a mock function
  * @param mock The mock function that got passed the callback as an argument
