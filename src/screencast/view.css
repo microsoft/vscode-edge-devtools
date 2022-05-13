@@ -39,7 +39,12 @@ body {
   cursor: pointer;
 }
 
-#toolbar>button:hover {
+#toolbar>button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+#toolbar>button:hover:not(:disabled) {
   background-color: var(--vscode-toolbar-hoverBackground);
 }
 
@@ -110,6 +115,11 @@ body {
   appearance: none;
 }
 
+#emulation-bar input:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 #emulation-bar-right,
 #emulation-bar-center,
 #emulation-bar-left {
@@ -125,6 +135,10 @@ body {
   color: var(--vscode-editor-foreground);
   cursor: pointer;
   border-radius: 4px;
+}
+
+#emulation-bar .codicon-close {
+  padding: 0px 4px;
 }
 
 #emulation-bar button:last-child {

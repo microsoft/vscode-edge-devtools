@@ -108,7 +108,6 @@ export const SETTINGS_DEFAULT_PATH_OVERRIDES: IStringDictionary<string> = {
 };
 export const SETTINGS_DEFAULT_WEB_ROOT = '${workspaceFolder}';
 export const SETTINGS_DEFAULT_SOURCE_MAPS = true;
-export const SETTINGS_DEFAULT_EDGE_DEBUGGER_PORT = 2015;
 export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
 export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
@@ -116,8 +115,8 @@ export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
 
-// Current Revision: 94.0.992.31
-export const CDN_FALLBACK_REVISION = '@fd65e6bbedc86a22f2393b7cd8d1585c54cada42';
+// Current Revision: 102.0.1235.1
+export const CDN_FALLBACK_REVISION = '@a41122be052fe9616f0def5fe6842fa942930d46';
 
 /** Build-specified flags. */
 declare const DEBUG: boolean;
@@ -347,6 +346,14 @@ export function createTelemetryReporter(_context: vscode.ExtensionContext): Read
         // Fallback to a fake telemetry reporter
         return new DebugTelemetryReporter();
 
+}
+
+export function getCSSMirrorContentEnabled(context: vscode.ExtensionContext): boolean {
+    return context.globalState.get<boolean>('cssMirrorContent') ?? true;
+}
+
+export function setCSSMirrorContentEnabled(context: vscode.ExtensionContext, isEnabled: boolean): Thenable<void> {
+    return context.globalState.update('cssMirrorContent', isEnabled);
 }
 
 /**

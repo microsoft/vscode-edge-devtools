@@ -1,3 +1,24 @@
+## 2.0.0
+* **[Feature]**: Screencast V2 - adds media feature emulation, vision deficiency emulation, and updates the Screencast UI - [PR #983](https://github.com/microsoft/vscode-edge-devtools/pull/983)
+* **[Feature]**: Better sourcemap support for CSS Mirroring
+* **[Bug Fix]**: Fix mapping input coordinates when VS Code is zoomed [#978](https://github.com/microsoft/vscode-edge-devtools/pull/978)
+* **[Bug Fix]**: Fix scaling down emulated devices to fit available space [#981](https://github.com/microsoft/vscode-edge-devtools/pull/981)
+* **[Bug Fix]**: Forward keyboard shortcuts via screencast [#984](https://github.com/microsoft/vscode-edge-devtools/pull/984)
+* **[Bug Fix]**: Add Edge icon to webviews and s/Screencast/Browser/ [#995](https://github.com/microsoft/vscode-edge-devtools/pull/995)
+* **[Bug Fix]**: Add an inspect button to open DevTools from the screencast [#991](https://github.com/microsoft/vscode-edge-devtools/pull/991)
+
+## 1.4.8
+* **[Feature]**: Support CSS Mirroring Enablement from DevTools frontend - [PR #932](https://github.com/microsoft/vscode-edge-devtools/pull/932)
+* **[Bug Fix]**: Stop debugging session on a headless target when both DevToolsPanel and Screencast are closed - [PR #966](https://github.com/microsoft/vscode-edge-devtools/pull/966)
+* **[Feature]**: Warn and pause mirroring CSS if it would override local edits - [PR #963](https://github.com/microsoft/vscode-edge-devtools/pull/963)
+* **[Bug Fix]**: Remove theme settings + add auto-detection for light/dark theme for unsupported vscode themes - [PR #975](https://github.com/microsoft/vscode-edge-devtools/pull/975)
+* **[Feature]**: Add telemetry for webhint hover events - [PR #986](https://github.com/microsoft/vscode-edge-devtools/pull/986)
+* **[Bug Fix]**: Updating webhint version - [PR #992](https://github.com/microsoft/vscode-edge-devtools/pull/992)
+
+## 1.4.7
+* **[Bug Fix]**: Update vscode-webhint to version 1.6.6. Fixes "Unable to start webhint" errors - [PR #951](https://github.com/microsoft/vscode-edge-devtools/pull/951)
+* **[Bug Fix]**: Improve logic for configuring existing launch.json - [PR #945](https://github.com/microsoft/vscode-edge-devtools/pull/945)
+
 ## 1.4.6
 * **[Feature]**: Enable console tool in DevTools (Only available on Edge version 101.0.1193.0+) - [PR #905](https://github.com/microsoft/vscode-edge-devtools/pull/905)
 * **[Feature]**: Updated auto-generated launch.json configs to use JSDebug workflows - [PR #927](https://github.com/microsoft/vscode-edge-devtools/pull/927)

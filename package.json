@@ -2,7 +2,7 @@
     "name": "vscode-edge-devtools",
     "displayName": "Microsoft Edge Tools for VS Code",
     "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
-    "version": "1.4.6",
+    "version": "2.0.0",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
     "preview": false,
@@ -160,7 +160,7 @@
                 "command": "vscode-edge-devtools-view.cssMirrorContent",
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
-                "title": "Toggle mirror editing on for CSS files in workspace"
+                "title": "Toggle CSS mirror editing on/off"
             }
         ],
         "configuration": {
@@ -212,11 +212,6 @@
                     },
                     "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
                 },
-                "vscode-edge-devtools.standaloneScreencast": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "When selected, screencast will be rendered in an individual screen and enable device emulation."
-                },
                 "vscode-edge-devtools.sourceMapPathOverrides": {
                     "type": "object",
                     "description": "A set of mappings to override the locations of source map files.",
@@ -234,25 +229,10 @@
                     "description": "Use JavaScript source maps (if they exist)",
                     "default": true
                 },
-                "vscode-edge-devtools.autoAttachViaDebuggerForEdge": {
-                    "type": "boolean",
-                    "description": "Auto attach the Microsoft Edge Tools extension when you launch a browser with the Debugger For Microsoft Edge debug adapter extension",
-                    "default": true
-                },
-                "vscode-edge-devtools.enableNetwork": {
-                    "type": "boolean",
-                    "description": "Enable network panel (requires relaunching extension)",
-                    "default": true
-                },
                 "vscode-edge-devtools.showWorkers": {
                     "type": "boolean",
                     "description": "Show service and shared workers in the target list.",
                     "default": false
-                },
-                "vscode-edge-devtools.welcome": {
-                    "type": "boolean",
-                    "description": "Enable Welcome panel (requires relaunching extension)",
-                    "default": true
                 },
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
@@ -289,20 +269,10 @@
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                     ]
                 },
-                "vscode-edge-devtools.cssMirrorContent": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Enable edits in the styles pane to be automatically applied to the corresponding stylesheet in the workspace. (Only works when targeting Edge Browser versions 94.0.988.0+)"
-                },
                 "vscode-edge-devtools.webhint": {
                     "type": "boolean",
                     "default": true,
                     "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
-                },
-                "vscode-edge-devtools.fallbackRevision": {
-                    "type": "string",
-                    "default": "@c438621746b2932668109129d137a7e3a22ef4fd",
-                    "description": "Last known good revision used for when we fail to connect to the CDN with the current target revision."
                 }
             }
         },
@@ -556,7 +526,7 @@
             "view/item/context": [
                 {
                     "command": "vscode-edge-devtools-view.toggleScreencast",
-                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget && standaloneScreencast",
+                    "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTarget",
                     "group": "inline@0"
                 },
                 {

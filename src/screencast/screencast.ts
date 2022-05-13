@@ -9,6 +9,8 @@ import DimensionComponent from './dimensionComponent';
 import { getEmulatedDeviceDetails, groupEmulatedDevicesByType } from './emulatedDeviceHelpers';
 import FlyoutMenuComponent, {OffsetDirection} from './flyoutMenuComponent';
 
+import { encodeMessageForChannel } from '../common/webviewEvents';
+
 type NavigationEntry = {
     id: number;
     url: string;
@@ -59,6 +61,7 @@ export class Screencast {
 
         FlyoutMenuComponent.render({
             iconName: 'codicon-chevron-down',
+            title: 'Emulate devices',
             globalSelectedItem: 'responsive',
             displayCurrentSelection: true,
             menuItemSections: [
@@ -92,6 +95,7 @@ export class Screencast {
         render(html`
             ${new FlyoutMenuComponent({
                 iconName: 'codicon-wand',
+                title: 'Emulate CSS media features',
                 offsetDirection: OffsetDirection.Right,
                 menuItemSections: [
                     {
@@ -122,6 +126,7 @@ export class Screencast {
             }).template()}
             ${new FlyoutMenuComponent({
                 iconName: 'codicon-eye',
+                title: 'Emulate vision deficiencies',
                 offsetDirection: OffsetDirection.Right,
                 menuItemSections: [
                     {
@@ -253,25 +258,30 @@ export class Screencast {
         DimensionComponent.setDimensionState(
             this.emulatedWidth, this.emulatedHeight, isResponsive, !isResponsive);
         this.updateEmulation();
+        this.sendEmulationTelemetry('device', value);
     };
 
     private onVisionDeficiencySelected = (value: string) => {
         this.cdpConnection.sendMessageToBackend('Emulation.setEmulatedVisionDeficiency', {type: value});
+        this.sendEmulationTelemetry('visionDeficiency', value);
     };
 
     private onEmulatedMediaSelected = (value: string) => {
         this.emulatedMedia = value;
         this.updateMediaFeatures();
+        this.sendEmulationTelemetry('emulatedMedia', value);
     };
 
     private onForcedColorsSelected = (value: string) => {
         this.mediaFeatureConfig.set('forced-colors', value);
         this.updateMediaFeatures();
+        this.sendEmulationTelemetry('forcedColors', value);
     };
 
     private onPrefersColorSchemeSelected = (value: string) => {
         this.mediaFeatureConfig.set('prefers-color-scheme', value);
         this.updateMediaFeatures();
+        this.sendEmulationTelemetry('prefersColorScheme', value);
     };
 
     private onUpdateDimensions = (width: number, height: number) => {
@@ -334,7 +344,14 @@ export class Screencast {
     private onUrlKeyDown(event: KeyboardEvent): void {
         let url = this.urlInput.value;
         if (event.key === 'Enter' && url) {
-            if (!url.startsWith('http') && !url.startsWith('file')) {
+            if (url.startsWith('/') || url[1] === ':') {
+                try {
+                    url = new URL(`file://${url}`).href;
+                } catch (e) {
+                    // Try the original URL if it can't be converted to a file URL.
+                }
+            }
+            if (!url.startsWith('http:') && !url.startsWith('file:')) {
                 url = 'http://' + url;
             }
 
@@ -358,6 +375,17 @@ export class Screencast {
 
     private onToggleInspect({ enabled }: any): void {
         this.setTouchMode(!enabled as boolean);
+    }
+
+    private sendEmulationTelemetry(event: string, value: string) {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', {
+            event: 'screencast',
+            name: 'Screencast.Emulation',
+            data: {
+                event,
+                value
+            }
+        });
     }
 
     private setTouchMode(enabled: boolean): void {
