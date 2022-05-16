@@ -194,3 +194,7 @@ body {
 #popover li:last-child {
   margin-bottom: 5px;
 }
+
+.devtools-open {
+  color: #7dbae9;
+}

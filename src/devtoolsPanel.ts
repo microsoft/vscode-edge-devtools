@@ -157,6 +157,7 @@ export class DevToolsPanel {
         if (!ScreencastPanel.instance && vscode.debug.activeDebugSession?.name.includes(providedHeadlessDebugConfig.name)) {
             void vscode.commands.executeCommand('workbench.action.debug.stop');
         }
+        ScreencastPanel.instance && ScreencastPanel.instance.update();
     }
 
     private postToDevTools(e: WebSocketEvent, message?: string) {
@@ -556,6 +557,7 @@ export class DevToolsPanel {
             });
             panel.iconPath = vscode.Uri.joinPath(context.extensionUri, 'icon.png');
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
+            ScreencastPanel.instance && ScreencastPanel.instance.update();
         }
     }
 }

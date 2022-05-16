@@ -75,7 +75,7 @@ export class ScreencastPanel {
             if (typeof message === 'string') {
                 this.panelSocket.onMessageFromWebview(message);
             } else if ('type' in message && (message as {type:string}).type === 'open-devtools') {
-                this.openDevTools();
+                this.toggleDevTools();
             }
         }, this);
 
@@ -109,9 +109,13 @@ export class ScreencastPanel {
         }
     }
 
-    private openDevTools() {
+    private toggleDevTools() {
         const websocketUrl = this.targetUrl;
-        void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.attach`, { websocketUrl }, this.isJsDebugProxiedCDPConnection);
+        if (DevToolsPanel.instance) {
+            DevToolsPanel.instance.dispose();
+        } else {
+            void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.attach`, { websocketUrl }, this.isJsDebugProxiedCDPConnection);
+        }
     }
 
     toggleInspect(enabled: boolean): void {
@@ -122,7 +126,7 @@ export class ScreencastPanel {
         this.dispose();
     }
 
-    private update() {
+    update(): void {
         this.panel.webview.html = this.getHtmlForWebview();
     }
 
@@ -135,7 +139,7 @@ export class ScreencastPanel {
         const inspectorUri = this.panel.webview.asWebviewUri(inspectorPath);
 		const codiconsUri = this.panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', '@vscode/codicons', 'dist', 'codicon.css'));
         const cssPath = this.panel.webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'out/screencast', 'view.css'));
-        const view = new ScreencastView(this.panel.webview.cspSource, cssPath, codiconsUri, inspectorUri);
+        const view = new ScreencastView(this.panel.webview.cspSource, cssPath, codiconsUri, inspectorUri, !!DevToolsPanel.instance);
         return view.render();
     }
 
