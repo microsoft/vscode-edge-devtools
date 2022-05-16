@@ -53,6 +53,7 @@ export class ScreencastPanel {
         }
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('telemetry', message => this.onSocketTelemetry(message));
+        this.panelSocket.on('clipboard', message => this.onSaveToClipboard(message));
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -153,6 +154,11 @@ export class ScreencastPanel {
             `devtools/${telemetry.name}/${telemetry.data.event}`, {
                 'value': telemetry.data.value as string,
             });
+    }
+
+    private onSaveToClipboard(message: string): void {
+        const clipboardMessage = JSON.parse(message) as {data: {message: string}};
+        void vscode.env.clipboard.writeText(clipboardMessage.data.message);
     }
 
     static createOrShow(context: vscode.ExtensionContext,

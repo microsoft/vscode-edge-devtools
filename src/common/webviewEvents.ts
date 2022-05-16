@@ -3,7 +3,7 @@
 
 export type WebviewEvent = 'getState' | 'getUrl' | 'openInEditor' | 'cssMirrorContent' | 'ready' | 'setState' | 'telemetry' | 'websocket'
 | 'getVscodeSettings' | 'copyText' | 'focusEditor' | 'focusEditorGroup' | 'openUrl' | 'toggleScreencast' | 'toggleInspect' | 'replayConsoleMessages'
-| 'devtoolsConnection' | 'toggleCSSMirrorContent';
+| 'devtoolsConnection' | 'toggleCSSMirrorContent' | 'clipboard';
 export const webviewEventNames: WebviewEvent[] = [
     'getState',
     'getUrl',
@@ -23,6 +23,7 @@ export const webviewEventNames: WebviewEvent[] = [
     'replayConsoleMessages',
     'devtoolsConnection',
     'toggleCSSMirrorContent',
+    'clipboard',
 ];
 
 export type FrameToolsEvent = 'sendMessageToBackend' | 'openInNewTab' | 'recordEnumeratedHistogram' |

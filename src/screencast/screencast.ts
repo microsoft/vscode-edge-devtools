@@ -150,6 +150,7 @@ export class Screencast {
 
         // This message comes from the DevToolsPanel instance.
         this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
+        this.cdpConnection.registerClipboardFunction(result => this.onSaveToClipboard(result));
 
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
@@ -375,6 +376,14 @@ export class Screencast {
 
     private onToggleInspect({ enabled }: any): void {
         this.setTouchMode(!enabled as boolean);
+    }
+
+    private onSaveToClipboard(message: string): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'clipboard', {
+            data: {
+                message,
+            },
+        });
     }
 
     private sendEmulationTelemetry(event: string, value: string) {

@@ -196,6 +196,7 @@ describe("devtoolsPanel", () => {
             // We need to account for webview events that are not used in the DevTools panel.
             const screencastOnlyWebviewEvents = [
                 'toggleInspect',
+                'clipboard',
             ]
             const hookedEvents: string[] = [];
             mockPanelSocket.on.mockImplementation(((name: string | symbol, ...args: any) => {
