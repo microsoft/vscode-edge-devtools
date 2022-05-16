@@ -40,7 +40,7 @@ export class ScreencastView {
                   <i class="codicon codicon-refresh"></i>
               </button>
               <input id="url" />
-              <button id="inspect" title="Toggle DevTools">
+              <button id="inspect" title="${isDevToolsOpen ? 'Close DevTools' : 'Open DevTools'}">
                   <i class="codicon codicon-inspect ${isDevToolsOpen ? 'devtools-open' : ''}"></i>
               </button>
           </div>
