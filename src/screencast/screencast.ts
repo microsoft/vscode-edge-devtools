@@ -152,11 +152,7 @@ export class Screencast {
         this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
         this.cdpConnection.registerWriteToClipboardFunction(result => this.onSaveToClipboard(result));
         this.cdpConnection.registerReadClipboardAndPasteFunction(() => this.getClipboardContents());
-        this.cdpConnection.registerForEvent('readClipboard', clipboardText => {
-            this.cdpConnection.sendMessageToBackend('Runtime.evaluate', {
-                expression: `document.execCommand("insertText", false, "${clipboardText}");`,
-            });
-        });
+        this.cdpConnection.registerForEvent('readClipboard', clipboardContents => this.pasteClipboardContents(clipboardContents));
 
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
@@ -405,6 +401,12 @@ export class Screencast {
 
     private getClipboardContents(): void {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'readClipboard');
+    }
+
+    private pasteClipboardContents(message: string) {
+        this.cdpConnection.sendMessageToBackend('Runtime.evaluate', {
+            expression: `document.execCommand("insertText", false, "${message}");`,
+        });
     }
 
     private setTouchMode(enabled: boolean): void {
