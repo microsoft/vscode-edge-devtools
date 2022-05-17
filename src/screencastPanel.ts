@@ -53,7 +53,8 @@ export class ScreencastPanel {
         }
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('telemetry', message => this.onSocketTelemetry(message));
-        this.panelSocket.on('clipboard', message => this.onSaveToClipboard(message));
+        this.panelSocket.on('writeToClipboard', message => this.onSaveToClipboard(message));
+        this.panelSocket.on('readClipboard', () => this.onGetClipboardText());
 
         // Handle closing
         this.panel.onDidDispose(() => {
@@ -159,6 +160,12 @@ export class ScreencastPanel {
     private onSaveToClipboard(message: string): void {
         const clipboardMessage = JSON.parse(message) as {data: {message: string}};
         void vscode.env.clipboard.writeText(clipboardMessage.data.message);
+    }
+
+    private onGetClipboardText(): void {
+        void vscode.env.clipboard.readText().then(clipboardText => {
+            encodeMessageForChannel(msg => this.panel.webview.postMessage(msg) as unknown as void, 'readClipboard', { clipboardText });
+        });
     }
 
     static createOrShow(context: vscode.ExtensionContext,

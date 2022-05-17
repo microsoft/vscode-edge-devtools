@@ -55,11 +55,11 @@ export class ScreencastInputHandler {
         if (keyboardEvent.ctrlKey && (keyboardEvent.key === 'c' || keyboardEvent.key === 'x') && keyboardEvent.type === 'keydown') {
             this.cdpConnection.sendMessageToBackend('Runtime.evaluate', {
                 expression: 'document.getSelection().toString()',
-            }, (text: {result: {value: string}}): string => {
-                return text.result.value;
-            }, true);
+            }, undefined, true);
         }
-        if (keyboardEvent.type === 'keydown' || keyboardEvent.type === 'keyup') {
+        if (keyboardEvent.ctrlKey && keyboardEvent.key === 'v' && keyboardEvent.type === 'keydown') {
+            this.cdpConnection.readClipboardAndPasteRequest();
+        } else if (keyboardEvent.type === 'keydown' || keyboardEvent.type === 'keyup') {
             const text = hasNonShiftModifier ? '' : this.textFromEvent(keyboardEvent);
             this.cdpConnection.sendMessageToBackend('Input.dispatchKeyEvent', {
                 type: keyboardEvent.type === 'keyup' ? 'keyUp' : (text ? 'keyDown' : 'rawKeyDown'),

@@ -22,6 +22,7 @@ export class ScreencastCDPConnection {
     private methodCallbackMap: Map<number, CdpMethodCallback> = new Map();
     private clipboardRequests: Set<number> = new Set();
     private saveToClipboard?: (message: string)=>void;
+    private readClipboardAndPaste?: ()=>void;
 
     constructor() {
         // Handle CDP messages/events routed from the extension through post message
@@ -54,6 +55,12 @@ export class ScreencastCDPConnection {
                         callback(enabled);
                     }
                 }
+                if (eventName === 'readClipboard') {
+                    const { clipboardText } = JSON.parse(args) as { clipboardText: string };
+                    for (const callback of this.eventCallbackMap.get('readClipboard') || []) {
+                        callback(clipboardText);
+                    }
+                }
                 return false;
             });
         });
@@ -82,7 +89,15 @@ export class ScreencastCDPConnection {
         this.eventCallbackMap.set(method, [callback]);
     }
 
-    registerClipboardFunction(saveToClipboard: (message: string) => void): void {
+    registerWriteToClipboardFunction(saveToClipboard: (message: string) => void): void {
         this.saveToClipboard = saveToClipboard;
+    }
+
+    registerReadClipboardAndPasteFunction(readClipboardAndPaste: () => void): void {
+        this.readClipboardAndPaste = readClipboardAndPaste;
+    }
+
+    readClipboardAndPasteRequest(): void {
+        this.readClipboardAndPaste && this.readClipboardAndPaste();
     }
 }
