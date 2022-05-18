@@ -56,6 +56,7 @@ export class DevToolsPanel {
     private consoleMessages: string[] = [];
     private collectConsoleMessages = true;
     private currentRevision: string | undefined;
+    private cssWarningActive: boolean;
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -72,6 +73,7 @@ export class DevToolsPanel {
         this.timeStart = null;
         this.devtoolsBaseUri = this.config.devtoolsBaseUri || null;
         this.isHeadless = false;
+        this.cssWarningActive = false;
 
         // Hook up the socket events
         if (this.config.isJsDebugProxiedCDPConnection) {
@@ -378,7 +380,7 @@ export class DevToolsPanel {
                 }
                 else
                 {
-                    void vscode.window.showWarningMessage('DevTools will not mirror CSS changes while there are unsaved direct edits. Save your changes then refresh the target page to re-enable.');
+                    this.showCssMirroringWarning();
                 }
             }
         } else {
@@ -472,6 +474,14 @@ export class DevToolsPanel {
             title: 'Unable to open file in editor.',
             message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
         });
+    }
+
+    private async showCssMirroringWarning() {
+        if (!this.cssWarningActive) {
+            this.cssWarningActive = true;
+            await vscode.window.showWarningMessage('DevTools will not mirror CSS changes while there are unsaved direct edits. Save your changes then refresh the target page to re-enable.', ...[]);
+            this.cssWarningActive = false;
+        }
     }
 
     private update() {
