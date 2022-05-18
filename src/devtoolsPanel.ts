@@ -380,7 +380,7 @@ export class DevToolsPanel {
                 }
                 else
                 {
-                    this.showCssMirroringWarning();
+                    void this.showCssMirroringWarning();
                 }
             }
         } else {
