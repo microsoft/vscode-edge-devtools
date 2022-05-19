@@ -150,6 +150,9 @@ export class Screencast {
 
         // This message comes from the DevToolsPanel instance.
         this.cdpConnection.registerForEvent('DevTools.toggleInspect', result => this.onToggleInspect(result));
+        this.cdpConnection.registerWriteToClipboardFunction(result => this.onSaveToClipboard(result));
+        this.cdpConnection.registerReadClipboardAndPasteFunction(() => this.getClipboardContents());
+        this.cdpConnection.registerForEvent('readClipboard', clipboardContents => this.pasteClipboardContents(clipboardContents));
 
         this.inputHandler = new ScreencastInputHandler(this.cdpConnection);
 
@@ -377,6 +380,14 @@ export class Screencast {
         this.setTouchMode(!enabled as boolean);
     }
 
+    private onSaveToClipboard(message: string): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'writeToClipboard', {
+            data: {
+                message,
+            },
+        });
+    }
+
     private sendEmulationTelemetry(event: string, value: string) {
         encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'telemetry', {
             event: 'screencast',
@@ -385,6 +396,16 @@ export class Screencast {
                 event,
                 value
             }
+        });
+    }
+
+    private getClipboardContents(): void {
+        encodeMessageForChannel(msg => vscode.postMessage(msg, '*'), 'readClipboard');
+    }
+
+    private pasteClipboardContents(message: string) {
+        this.cdpConnection.sendMessageToBackend('Runtime.evaluate', {
+            expression: `document.execCommand("insertText", false, "${message.replace(/"/g,'\\"')}");`,
         });
     }
 
