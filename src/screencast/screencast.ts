@@ -405,7 +405,7 @@ export class Screencast {
 
     private pasteClipboardContents(message: string) {
         this.cdpConnection.sendMessageToBackend('Runtime.evaluate', {
-            expression: `document.execCommand("insertText", false, "${message}");`,
+            expression: `document.execCommand("insertText", false, "${message.replace(/"/g,'\\"')}");`,
         });
     }
 
