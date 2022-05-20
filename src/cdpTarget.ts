@@ -21,6 +21,7 @@ export class CDPTarget extends vscode.TreeItem {
         this.propertyName = propertyName;
         this.extensionPath = extensionPath;
         this.contextValue = (this.propertyName ? 'cdpTargetProperty' : 'cdpTarget');
+        this.accessibilityInformation = {label: `${this.label}: ${this.description}`, role: 'treegrid'};
 
         // Get the icon for this type of target
         if (this.extensionPath) {
