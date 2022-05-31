@@ -228,6 +228,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchHtml`, (fileUri: vscode.Uri): void => {
+        telemetryReporter.sendTelemetryEvent('contextMenu/launchHtml');
         const edgeDebugConfig = providedHeadlessDebugConfig;
         const devToolsAttachConfig = providedLaunchDevToolsConfig;
         edgeDebugConfig.url = fileUri.fsPath;
