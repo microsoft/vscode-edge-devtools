@@ -38,7 +38,7 @@ export const providedHeadlessDebugConfig: vscode.DebugConfiguration = {
     },
 };
 
-const providedLaunchDevToolsConfig: vscode.DebugConfiguration = {
+export const providedLaunchDevToolsConfig: vscode.DebugConfiguration = {
     type: 'vscode-edge-devtools.debug',
     name: 'Open Edge DevTools',
     request: 'attach',

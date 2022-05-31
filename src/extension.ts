@@ -37,7 +37,7 @@ import {
     getCSSMirrorContentEnabled,
     setCSSMirrorContentEnabled,
 } from './utils';
-import { LaunchConfigManager } from './launchConfigManager';
+import { LaunchConfigManager, providedHeadlessDebugConfig, providedLaunchDevToolsConfig } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 import {
@@ -225,6 +225,14 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.cssMirrorContent`, () => {
         const cssMirrorContent = getCSSMirrorContentEnabled(context);
         void setCSSMirrorContentEnabled(context, !cssMirrorContent);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchHtml`, (fileUri: vscode.Uri): void => {
+        const edgeDebugConfig = providedHeadlessDebugConfig;
+        const devToolsAttachConfig = providedLaunchDevToolsConfig;
+        edgeDebugConfig.url = fileUri.fsPath;
+        devToolsAttachConfig.url = fileUri.fsPath;
+        void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
     }));
 
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);

@@ -161,6 +161,11 @@
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
                 "title": "Toggle CSS mirror editing on/off"
+            },
+            {
+                "command": "vscode-edge-devtools-view.launchHtml",
+                "title": "Open with Edge DevTools",
+                "category": "Microsoft Edge Tools"
             }
         ],
         "configuration": {
@@ -548,7 +553,12 @@
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTargetProperty",
                     "group": "2_contextMenu"
                 }
-            ]
+            ],
+            "explorer/context": [{
+                "when": "resourceLangId == html",
+                "command": "vscode-edge-devtools-view.launchHtml",
+                "group": "navigation"
+            }]
         },
         "viewsContainers": {
             "activitybar": [
