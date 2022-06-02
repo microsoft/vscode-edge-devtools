@@ -406,9 +406,9 @@ export async function attach(
                 if (selection && selection.detail) {
                     const runtimeConfig = getRuntimeConfig(config);
                     if (screencastOnly) {
-                        ScreencastPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, false);
+                        ScreencastPanel.createOrShow(context, telemetryReporter, selection.detail, false);
                     } else {
-                        DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+                        DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
                     }
                 }
             }

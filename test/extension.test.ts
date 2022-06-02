@@ -83,8 +83,8 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(18);
-            expect(commandMock).toHaveBeenCalledTimes(17);
+            expect(context.subscriptions.length).toBe(19);
+            expect(commandMock).toHaveBeenCalledTimes(18);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
             expect(commandMock)
@@ -119,6 +119,8 @@ describe("extension", () => {
                 .toHaveBeenNthCalledWith(16, `${SETTINGS_VIEW_NAME}.cssMirrorContent`, expect.any(Function));
             expect(commandMock)
                 .toHaveBeenNthCalledWith(17, `${SETTINGS_VIEW_NAME}.launchHtml`, expect.any(Function));
+            expect(commandMock)
+                .toHaveBeenNthCalledWith(18, `${SETTINGS_VIEW_NAME}.launchScreencast`, expect.any(Function));
             expect(mockRegisterTree)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_VIEW_NAME}.targets`, expect.any(Object));
         });
