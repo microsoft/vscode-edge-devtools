@@ -21,6 +21,14 @@ export class CDPTarget extends vscode.TreeItem {
         this.propertyName = propertyName;
         this.extensionPath = extensionPath;
         this.contextValue = (this.propertyName ? 'cdpTargetProperty' : 'cdpTarget');
+        const treeItemLabel = `${this.label}: ${this.description}.`;
+
+        // collapsibleState = 1 means the treeItem is the base CDPTarget treeItem.
+        // collapsibleState = 0 means the treeItem is a child description treeItem (e.g. id, title, type, etc.)
+        const label = this.collapsibleState ?
+            `${treeItemLabel}. 'Press tab to access action button list. Use left and right arrow keys to navigate action button list.'`
+            : treeItemLabel;
+        this.accessibilityInformation = {label, role: 'treeitem'};
 
         // Get the icon for this type of target
         if (this.extensionPath) {
