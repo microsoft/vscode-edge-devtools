@@ -37,23 +37,7 @@
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "main": "./out/extension",
     "activationEvents": [
-        "onCommand:vscode-edge-devtools.attach",
-        "onCommand:vscode-edge-devtools.launch",
-        "onCommand:vscode-edge-devtools.attachToCurrentDebugTarget",
-        "onWebviewPanel:vscode-edge-devtools",
-        "onView:vscode-edge-devtools-view.targets",
-        "onDebug",
-        "onLanguage:css",
-        "onLanguage:html",
-        "onLanguage:javascript",
-        "onLanguage:javascriptreact",
-        "onLanguage:json",
-        "onLanguage:jsonc",
-        "onLanguage:less",
-        "onLanguage:sass",
-        "onLanguage:scss",
-        "onLanguage:typescript",
-        "onLanguage:typescriptreact"
+        "onStartupFinished"
     ],
     "capabilities": {
         "untrustedWorkspaces": {
@@ -165,6 +149,11 @@
             {
                 "command": "vscode-edge-devtools-view.launchHtml",
                 "title": "Open with Edge DevTools",
+                "category": "Microsoft Edge Tools"
+            },
+            {
+                "command": "vscode-edge-devtools-view.launchScreencast",
+                "title": "Open page in VS Code",
                 "category": "Microsoft Edge Tools"
             }
         ],
@@ -554,11 +543,18 @@
                     "group": "2_contextMenu"
                 }
             ],
-            "explorer/context": [{
-                "when": "resourceLangId == html",
-                "command": "vscode-edge-devtools-view.launchHtml",
-                "group": "navigation"
-            }]
+            "explorer/context": [
+                {
+                    "when": "resourceLangId == html",
+                    "command": "vscode-edge-devtools-view.launchHtml",
+                    "group": "navigation"
+                },
+                {
+                    "when": "resourceLangId == html",
+                    "command": "vscode-edge-devtools-view.launchScreencast",
+                    "group": "navigation"
+                }
+            ]
         },
         "viewsContainers": {
             "activitybar": [
