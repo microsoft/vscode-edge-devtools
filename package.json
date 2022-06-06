@@ -148,12 +148,12 @@
             },
             {
                 "command": "vscode-edge-devtools-view.launchHtml",
-                "title": "Open with Edge DevTools",
+                "title": "Open Browser with DevTools",
                 "category": "Microsoft Edge Tools"
             },
             {
                 "command": "vscode-edge-devtools-view.launchScreencast",
-                "title": "Open page in VS Code",
+                "title": "Open Browser",
                 "category": "Microsoft Edge Tools"
             }
         ],
@@ -546,16 +546,27 @@
             "explorer/context": [
                 {
                     "when": "resourceLangId == html",
-                    "command": "vscode-edge-devtools-view.launchHtml",
+                    "submenu": "devtoolsContextMenu",
                     "group": "navigation"
+                }
+            ],
+            "devtoolsContextMenu":[
+                {
+                  "command":"vscode-edge-devtools-view.launchHtml",
+                  "group":"navigation"
                 },
                 {
-                    "when": "resourceLangId == html",
-                    "command": "vscode-edge-devtools-view.launchScreencast",
-                    "group": "navigation"
+                  "command":"vscode-edge-devtools-view.launchScreencast",
+                  "group":"navigation"
                 }
             ]
         },
+        "submenus": [
+            {
+              "id": "devtoolsContextMenu",
+              "label": "Open with Edge"
+            }
+        ],
         "viewsContainers": {
             "activitybar": [
                 {
