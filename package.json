@@ -37,12 +37,7 @@
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "main": "./out/extension",
     "activationEvents": [
-        "onCommand:vscode-edge-devtools.attach",
-        "onCommand:vscode-edge-devtools.launch",
-        "onCommand:vscode-edge-devtools.attachToCurrentDebugTarget",
-        "onWebviewPanel:vscode-edge-devtools",
-        "onView:vscode-edge-devtools-view.targets",
-        "onDebug",
+        "onStartupFinished",
         "onLanguage:css",
         "onLanguage:html",
         "onLanguage:javascript",
@@ -161,6 +156,16 @@
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
                 "title": "Toggle CSS mirror editing on/off"
+            },
+            {
+                "command": "vscode-edge-devtools-view.launchHtml",
+                "title": "Open Browser with DevTools",
+                "category": "Microsoft Edge Tools"
+            },
+            {
+                "command": "vscode-edge-devtools-view.launchScreencast",
+                "title": "Open Browser",
+                "category": "Microsoft Edge Tools"
             }
         ],
         "configuration": {
@@ -548,8 +553,31 @@
                     "when": "view == vscode-edge-devtools-view.targets && viewItem == cdpTargetProperty",
                     "group": "2_contextMenu"
                 }
+            ],
+            "explorer/context": [
+                {
+                    "when": "resourceLangId == html",
+                    "submenu": "devtoolsContextMenu",
+                    "group": "navigation"
+                }
+            ],
+            "devtoolsContextMenu":[
+                {
+                  "command":"vscode-edge-devtools-view.launchHtml",
+                  "group":"navigation"
+                },
+                {
+                  "command":"vscode-edge-devtools-view.launchScreencast",
+                  "group":"navigation"
+                }
             ]
         },
+        "submenus": [
+            {
+              "id": "devtoolsContextMenu",
+              "label": "Open with Edge"
+            }
+        ],
         "viewsContainers": {
             "activitybar": [
                 {

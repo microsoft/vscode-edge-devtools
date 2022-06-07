@@ -37,7 +37,7 @@ import {
     getCSSMirrorContentEnabled,
     setCSSMirrorContentEnabled,
 } from './utils';
-import { LaunchConfigManager } from './launchConfigManager';
+import { LaunchConfigManager, providedHeadlessDebugConfig, providedLaunchDevToolsConfig } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 import {
@@ -244,6 +244,22 @@ export function activate(context: vscode.ExtensionContext): void {
         void setCSSMirrorContentEnabled(context, !cssMirrorContent);
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchHtml`, (fileUri: vscode.Uri): void => {
+        telemetryReporter.sendTelemetryEvent('contextMenu/launchHtml');
+        const edgeDebugConfig = providedHeadlessDebugConfig;
+        const devToolsAttachConfig = providedLaunchDevToolsConfig;
+        edgeDebugConfig.url = fileUri.fsPath;
+        devToolsAttachConfig.url = fileUri.fsPath;
+        void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, (fileUri: vscode.Uri): void => {
+        telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
+        const edgeDebugConfig = providedHeadlessDebugConfig;
+        edgeDebugConfig.url = fileUri.fsPath;
+        void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, fileUri.fsPath, undefined, true, true));
+    }));
+
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
     void reportFileExtensionTypes(telemetryReporter);
     reportExtensionSettings(telemetryReporter);
@@ -326,7 +342,7 @@ export const deactivate = (): Thenable<void> => {
 };
 
 export async function attach(
-    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean): Promise<void> {
+    context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean, screencastOnly?: boolean): Promise<void> {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
@@ -379,7 +395,11 @@ export async function attach(
                 // Auto connect to found target
                 useRetry = false;
                 const runtimeConfig = getRuntimeConfig(config);
-                DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+                if (screencastOnly) {
+                    ScreencastPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, false);
+                } else {
+                    DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
+                }
             } else if (useRetry) {
                 // Wait for a little bit until we retry
                 await new Promise<void>(resolve => {
@@ -402,7 +422,11 @@ export async function attach(
                 const selection = await vscode.window.showQuickPick(items);
                 if (selection && selection.detail) {
                     const runtimeConfig = getRuntimeConfig(config);
-                    DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
+                    if (screencastOnly) {
+                        ScreencastPanel.createOrShow(context, telemetryReporter, selection.detail, false);
+                    } else {
+                        DevToolsPanel.createOrShow(context, telemetryReporter, selection.detail, runtimeConfig);
+                    }
                 }
             }
         }
