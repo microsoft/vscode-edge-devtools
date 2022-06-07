@@ -212,9 +212,26 @@ export function activate(context: vscode.ExtensionContext): void {
         () => {
             telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchProject });
             LaunchConfigManager.instance.updateLaunchConfig();
-            if (vscode.workspace.workspaceFolders && LaunchConfigManager.instance.isValidLaunchConfig) {
-                void vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], LaunchConfigManager.instance.getLaunchConfig());
+            if (vscode.workspace.workspaceFolders) {
+                const workspaceFolder = vscode.workspace.workspaceFolders[0];
+                if (LaunchConfigManager.instance.isValidLaunchConfig()) {
+                    void vscode.debug.startDebugging(workspaceFolder, LaunchConfigManager.instance.getLaunchConfig());
+                } else {
+                    const autoConfigButtonText = 'Auto-configure launch.json and launch project';
+                    void vscode.window.showErrorMessage('Cannot launch a project without a valid launch.json. Please open a folder in the editor.', autoConfigButtonText).then(value => {
+                        if (value === autoConfigButtonText) {
+                            void LaunchConfigManager.instance.configureLaunchJson().then(() => vscode.debug.startDebugging(workspaceFolder, LaunchConfigManager.instance.getLaunchConfig()));
+                        }
+                    });
+                }
                 cdpTargetsProvider.refresh();
+            } else {
+                const openFolderText = 'Open Folder';
+                void vscode.window.showErrorMessage('Cannot launch a project for an empty workspace. Please open a folder in the editor and try again.', openFolderText).then(value => {
+                    if (value === openFolderText) {
+                        void vscode.commands.executeCommand('workbench.action.files.openFolder');
+                    }
+                });
             }
         }));
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewDocumentation`, () => {
