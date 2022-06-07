@@ -19,6 +19,7 @@ import {
     getListOfTargets,
     getRemoteEndpointSettings,
     getRuntimeConfig,
+    getSupportedStaticAnalysisFileTypes,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
@@ -27,7 +28,6 @@ import {
     SETTINGS_DEFAULT_URL,
     SETTINGS_STORE_NAME,
     SETTINGS_VIEW_NAME,
-    SUPPORTED_WEBHINT_FILETYPES,
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
     reportFileExtensionTypes,
@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext): void {
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    vscode.languages.registerHoverProvider(SUPPORTED_WEBHINT_FILETYPES, {
+    vscode.languages.registerHoverProvider(getSupportedStaticAnalysisFileTypes(), {
         provideHover(document, position) {
             const documentDiagnostics = vscode.languages.getDiagnostics(document.uri);
             for (const diagnostic of documentDiagnostics) {

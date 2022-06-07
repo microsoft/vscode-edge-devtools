@@ -105,19 +105,6 @@ export const SETTINGS_DEFAULT_SOURCE_MAPS = true;
 export const SETTINGS_DEFAULT_ATTACH_TIMEOUT = 10000;
 export const SETTINGS_DEFAULT_ATTACH_INTERVAL = 200;
 export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
-export const SUPPORTED_WEBHINT_FILETYPES = [
-    'css',
-    'html',
-    'javascript',
-    'javascriptreact',
-    'json',
-    'jsonc',
-    'less',
-    'sass',
-    'scss',
-    'typescript',
-    'typescriptreact',
-];
 
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
@@ -830,6 +817,16 @@ export function checkWithinHoverRange(position: vscode.Position, range: vscode.R
         return true;
     }
     return false;
+}
+
+export function getSupportedStaticAnalysisFileTypes(): string[] {
+    const supportedFileTypes = [];
+    for (const event of packageJson.activationEvents) {
+        if (event.startsWith('onLanguage:')) {
+            supportedFileTypes.push(event.substring(11));
+        }
+    }
+    return supportedFileTypes;
 }
 
 (function initialize() {
