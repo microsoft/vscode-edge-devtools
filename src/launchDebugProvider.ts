@@ -48,12 +48,17 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
         vscode.ProviderResult<vscode.DebugConfiguration> {
         const userConfig = config as Partial<IUserConfig>;
 
-        if (config && config.type === `${SETTINGS_STORE_NAME}.debug`) {
+        // In the case where the launch.json is missing or empty and the user attempts to launch
+        // a Microsoft Edge Tools debug session, the extension will defer to the default launch
+        // experience.
+        const debugWithoutConfig = config && !config.type && !config.request && !config.name;
+
+        if ((config && config.type === `${SETTINGS_STORE_NAME}.debug`) || debugWithoutConfig) {
             const targetUri: string = this.getUrlFromConfig(folder, config);
             if (config.request && config.request === 'attach') {
                 this.telemetryReporter.sendTelemetryEvent('debug/attach');
                 void this.attach(this.context, targetUri, userConfig, true);
-            } else if (config.request && config.request === 'launch') {
+            } else if ((config.request && config.request === 'launch') || debugWithoutConfig) {
                 this.telemetryReporter.sendTelemetryEvent('debug/launch');
                 void this.launch(this.context, targetUri, userConfig);
             }
