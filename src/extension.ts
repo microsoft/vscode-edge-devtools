@@ -248,15 +248,15 @@ export function activate(context: vscode.ExtensionContext): void {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchHtml');
         const edgeDebugConfig = providedHeadlessDebugConfig;
         const devToolsAttachConfig = providedLaunchDevToolsConfig;
-        edgeDebugConfig.url = 'file://' + fileUri.fsPath;
-        devToolsAttachConfig.url = 'file://' + fileUri.fsPath;
+        edgeDebugConfig.url = `file://${fileUri.fsPath}`;
+        devToolsAttachConfig.url = `file://${fileUri.fsPath}`;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, (fileUri: vscode.Uri): void => {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
         const edgeDebugConfig = providedHeadlessDebugConfig;
-        edgeDebugConfig.url = 'file://' + fileUri.fsPath;
+        edgeDebugConfig.url = `file://${fileUri.fsPath}`;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, fileUri.fsPath, undefined, true, true));
     }));
 
