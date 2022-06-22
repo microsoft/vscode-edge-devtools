@@ -1,3 +1,14 @@
+## 2.1.0
+* **[Feature]**: Add context menu option to open html file with Edge DevTools - [PR #1057](https://github.com/microsoft/vscode-edge-devtools/pull/1057)
+* **[Feature]**: Add text-only clipboard functionality - [PR #1035](https://github.com/microsoft/vscode-edge-devtools/pull/1035)
+* **[Feature]**: Bump min DevTools version to include the Application panel - [PR #1030](https://github.com/microsoft/vscode-edge-devtools/pull/1030)
+* **[Feature]**: Support file system paths in screencast address bar - [PR #1015](https://github.com/microsoft/vscode-edge-devtools/pull/1015)
+* **[Bug Fix]**: Fix CSS mirroring for CRLF - [PR #1085](https://github.com/microsoft/vscode-edge-devtools/pull/1085)
+* **[Bug Fix]**: Route no config debug session to default launch experience - [PR #1040](https://github.com/microsoft/vscode-edge-devtools/pull/1040)
+* **[Bug Fix]**: Stop CSS Mirroring warning from re-firing if active - [PR #1037](https://github.com/microsoft/vscode-edge-devtools/pull/1037)
+* **[Bug Fix]**: Change Open DevTools button to Toggle DevTools - [PR #1032](https://github.com/microsoft/vscode-edge-devtools/pull/1032)
+* **[Bug Fix]**: Clean up obsolete settings and debugger types - [PR #1026](https://github.com/microsoft/vscode-edge-devtools/pull/1026), [PR #1024](https://github.com/microsoft/vscode-edge-devtools/pull/1024), [PR #1022](https://github.com/microsoft/vscode-edge-devtools/pull/1022), [PR #1021](https://github.com/microsoft/vscode-edge-devtools/pull/1021), [PR #1020](https://github.com/microsoft/vscode-edge-devtools/pull/1020), [PR #1017](https://github.com/microsoft/vscode-edge-devtools/pull/1017), [PR #1016](https://github.com/microsoft/vscode-edge-devtools/pull/1016)
+
 ## 2.0.0
 * **[Feature]**: Screencast V2 - adds media feature emulation, vision deficiency emulation, and updates the Screencast UI - [PR #983](https://github.com/microsoft/vscode-edge-devtools/pull/983)
 * **[Feature]**: Better sourcemap support for CSS Mirroring
