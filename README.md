@@ -1,16 +1,18 @@
 # Microsoft Edge Developer Tools for Visual Studio Code
 
-**Show the browser's Elements and Network tool inside the Visual Studio Code editor and use it to fix CSS issues with your site and inspect network activity.**
+This extension allows you to use the Developer Tools of Microsoft Edge inside Visual Studio Code. 
 
-A Visual Studio Code extension that allows you to use the browser's Elements and Network tool from within the editor. The DevTools will connect to an instance of Microsoft Edge giving you the ability to see the runtime HTML structure, alter layout, fix styling issues, read console messages and view network requests. All without leaving Visual Studio Code.
+![Walkthrough of the extension](img/edge-for-vscode-context-walkthrough.gif)
 
-**Note**: This extension _only_ supports Microsoft Edge (version greater than 80.0.361.48)
+Features:
 
-You can use the extension either in an own window or embedded in your editor.
+* Live analysis of issues in your source code - find out about problems while you develop
+* Browser preview with built in toolbar for device and mode emulation
+* Changes in the Styles tool sync live with your source code - including abstractions like Sass and React using Sourcemaps
+* Console and Application tool
+* Breakpoint support
 
-![Microsoft Edge Tools - Full window demo](img/devtools-for-code-demo-full-window.gif)
-
-![Microsoft Edge Tools - Embedded headless demo](img/devtools-for-code-demo-headless.gif)
+**Note**: This extension needs Microsoft Edge to be on your computer. Windows machines already come with it, for Mac and Linux, please [download and install a version of Edge](https://www.microsoft.com/en-us/edge).
 
 ## Documentation
 
