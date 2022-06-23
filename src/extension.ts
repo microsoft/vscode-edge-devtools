@@ -47,15 +47,10 @@ import {
     TransportKind,
 } from 'vscode-languageclient/node';
 import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
-import { activationEvents } from '../package.json';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
-
-// List of document types the extension will run against.
-const supportedDocuments = activationEvents.map((event: string) => {
-    return event.split(':')[1];
 
 // Keep a reference to the client to stop it when deactivating.
 let client: LanguageClient;
