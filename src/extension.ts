@@ -47,16 +47,14 @@ import {
     TransportKind,
 } from 'vscode-languageclient/node';
 import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
-import { activationEvents } from '../package.json';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
 // List of document types the extension will run against.
-const supportedDocuments = activationEvents.map((event: string) => {
-    return event.split(':')[1];
-});
+const supportedDocuments = getSupportedStaticAnalysisFileTypes();
+
 // Keep a reference to the client to stop it when deactivating.
 let client: LanguageClient;
 const languageServerName = 'Microsoft Edge Tools';
@@ -298,11 +296,43 @@ function startWebhint(context: vscode.ExtensionContext): void {
         },
     };
 
+    const reportWebhintQuickfixTelemetry = (hint: string, problem: string, action: string) => {
+        if (!telemetryReporter) {
+            telemetryReporter = createTelemetryReporter(context);
+        }
+
+        telemetryReporter.sendTelemetryEvent(`user/webhint/quickfix/${problem}`, { action, value: hint });
+        return telemetryReporter;
+    };
+
     const clientOptions: LanguageClientOptions = {
         documentSelector: supportedDocuments,
         synchronize: {
             // Notify the server if a webhint-related configuration changes.
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
+        },
+        middleware: {
+            executeCommand: (command, args, next) => {
+                    const hintName = args[0] as string;
+                    const problemName = args[1] as string;
+
+                    switch (command) {
+                        case 'vscode-webhint/ignore-hint-project': {
+                            reportWebhintQuickfixTelemetry(hintName, problemName, 'off');
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-problem-project': {
+                            reportWebhintQuickfixTelemetry(hintName, problemName, 'ignore');
+                            break;
+                        }
+                        case 'vscode-webhint/edit-hintrc-project': {
+                            reportWebhintQuickfixTelemetry('.hintrc', 'project-config', 'edit');
+                            break;
+                        }
+                    }
+
+               return next(command, args); // eslint-disable-line @typescript-eslint/no-unsafe-return
+            },
         },
     };
 
