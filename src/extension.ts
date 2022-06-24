@@ -47,16 +47,11 @@ import {
     TransportKind,
 } from 'vscode-languageclient/node';
 import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
-import { activationEvents } from '../package.json';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
-// List of document types the extension will run against.
-const supportedDocuments = activationEvents.map((event: string) => {
-    return event.split(':')[1];
-});
 // Keep a reference to the client to stop it when deactivating.
 let client: LanguageClient;
 const languageServerName = 'Microsoft Edge Tools';
@@ -299,7 +294,7 @@ function startWebhint(context: vscode.ExtensionContext): void {
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: supportedDocuments,
+        documentSelector: getSupportedStaticAnalysisFileTypes(),
         synchronize: {
             // Notify the server if a webhint-related configuration changes.
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
