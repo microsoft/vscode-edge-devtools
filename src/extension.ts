@@ -293,12 +293,12 @@ function startWebhint(context: vscode.ExtensionContext): void {
         },
     };
 
-    const reportWebhintQuickfixTelemetry = (hint: string, problem: string, action: string) => {
+    const reportWebhintQuickfixTelemetry = (hint: string, feature: string, action: string) => {
         if (!telemetryReporter) {
             telemetryReporter = createTelemetryReporter(context);
         }
 
-        telemetryReporter.sendTelemetryEvent(`user/webhint/quickfix/${problem}`, { action, value: hint });
+        telemetryReporter.sendTelemetryEvent(`user/webhint/quickfix/${feature}`, { action, value: hint });
         return telemetryReporter;
     };
 
@@ -311,15 +311,15 @@ function startWebhint(context: vscode.ExtensionContext): void {
         middleware: {
             executeCommand: (command, args, next) => {
                     const hintName = args[0] as string;
-                    const problemName = args[1] as string;
+                    const featureName = args[1] as string;
 
                     switch (command) {
                         case 'vscode-webhint/ignore-hint-project': {
-                            reportWebhintQuickfixTelemetry(hintName, problemName, 'off');
+                            reportWebhintQuickfixTelemetry(hintName, featureName, 'off');
                             break;
                         }
-                        case 'vscode-webhint/ignore-problem-project': {
-                            reportWebhintQuickfixTelemetry(hintName, problemName, 'ignore');
+                        case 'vscode-webhint/ignore-feature-project': {
+                            reportWebhintQuickfixTelemetry(hintName, featureName, 'ignore');
                             break;
                         }
                         case 'vscode-webhint/edit-hintrc-project': {
