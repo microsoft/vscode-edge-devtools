@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { SETTINGS_STORE_NAME } from '../utils';
 
+// Map of VS Code theme to Edge DevTools theme
 const SUPPORTED_THEMES = new Map<string, string>([
   ['Default Light+', 'default'],
   ['Visual Studio Light', 'default'],
@@ -27,10 +28,10 @@ export class SettingsProvider {
 
   private static singletonInstance: SettingsProvider;
 
-  // This function returns the theme for the new frame hosted DevTools by:
-  // 1. Fetching the User configured Global VSCode theme, return it if supported
-  // 2. Fall back to the extension Theme setting selector (light, dark, system preference)
-  // 3. Fall back to system preference
+  // Determine the new frame hosted DevTools theme in the following order of preference:
+  // 1. Map current VS Code theme setting (workbench.colorTheme) to DevTools theme
+  // 2. Set DevTools theme based on current VS Code ColorThemeKind (enum: Light, Dark, HighContrast, HighContrastLight)
+  // 3. Use the system theme
   getThemeFromUserSetting(): string {
       const themeSetting = vscode.workspace.getConfiguration().get('workbench.colorTheme') as string;
       let theme = SUPPORTED_THEMES.get(themeSetting);
@@ -39,9 +40,11 @@ export class SettingsProvider {
           case 1: // Light theme
           case 4: // Light high contrast theme
             theme = 'default';
+            break;
           case 2: // Dark theme
           case 3: // Dark high contrast theme
             theme = 'dark';
+            break;
           default:
             theme = 'systemPreferred';
         }
