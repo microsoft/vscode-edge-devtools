@@ -370,8 +370,17 @@ export class DevToolsPanel {
             const textEditor = await this.openEditorFromUri(uri);
             if (textEditor) {
                 const fullRange = this.getDocumentFullRange(textEditor);
-                const isSnapshotSameAsLastMirroredCSS = this.mirroredCSS.get(url) === textEditor.document.getText();
-                if (!textEditor.document.isDirty || isSnapshotSameAsLastMirroredCSS)
+                const mirroredCSSText = this.mirroredCSS.get(url);
+                const textEditorCSSText = textEditor.document.getText();
+                const isSnapshotSameAsLastMirroredCSS = mirroredCSSText === textEditorCSSText;
+                let canMirror = !textEditor.document.isDirty || isSnapshotSameAsLastMirroredCSS;
+                if (!canMirror) {
+                    // Standardize line endings to ignore CRLF/LF differences
+                    const standardizedMirroredCSStext = mirroredCSSText && mirroredCSSText.replace(/\r\n/g, '\n');
+                    const standardizedTextEditorCSSText = textEditorCSSText && textEditorCSSText.replace(/\r\n/g, '\n');
+                    canMirror = standardizedMirroredCSStext === standardizedTextEditorCSSText;
+                }
+                if (canMirror)
                 {
                     this.mirroredCSS.set(url, newContent);
                     void textEditor.edit(editBuilder => {
