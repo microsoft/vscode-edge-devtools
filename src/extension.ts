@@ -299,6 +299,45 @@ function startWebhint(context: vscode.ExtensionContext): void {
             // Notify the server if a webhint-related configuration changes.
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
         },
+        middleware: {
+            executeCommand: (command, args, next) => {
+                    const hintName = args[0] as string;
+                    const featureName = args[1] as string;
+
+                    if (!telemetryReporter) {
+                        telemetryReporter = createTelemetryReporter(context);
+                    }
+
+                    switch (command) {
+                        case 'vscode-webhint/ignore-hint-project': {
+                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/disable-hint', { hint: hintName });
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-feature-project': {
+                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/disable-rule', { hint: hintName, value: featureName });
+                            break;
+                        }
+                        case 'vscode-webhint/edit-hintrc-project': {
+                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/edit-hintrc');
+                            break;
+                        }
+                        case 'vscode-webhint/ignore-browsers-project': {
+                            if (args.length > 1) {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                const browserList = args[2]['browsers'] as any[]; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+                                telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/ignore-browsers', { hint: hintName, value: browserList.join(',') });
+                            }
+                            break;
+                        }
+                        case 'vscode-webhint/apply-code-fix': {
+                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/apply-code-fix', {value: featureName });
+                            break;
+                        }
+                    }
+
+               return next(command, args); // eslint-disable-line @typescript-eslint/no-unsafe-return
+            },
+        },
     };
 
     // Create and start the client (also starts the server).
