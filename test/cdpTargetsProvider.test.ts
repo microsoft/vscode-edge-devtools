@@ -120,7 +120,7 @@ describe("CDPTargetsProvider", () => {
             url: '',
             webSocketDebuggerUrl: ''
         }
-        template.url = "https://docs.microsoft.com/en-us/microsoft-edge/";
+        template.url = "https://learn.microsoft.com/en-us/microsoft-edge/";
         await provider.downloadFaviconFromSitePromise(template);
         const microsoftIcon = template.faviconUrl;
         template.url = "https://www.bing.com/";
