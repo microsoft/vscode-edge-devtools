@@ -354,7 +354,7 @@ export class Screencast {
                     // Try the original URL if it can't be converted to a file URL.
                 }
             }
-            if (!url.startsWith('http:') && !url.startsWith('file:')) {
+            if (!url.startsWith('http:') && !url.startsWith('https:') && !url.startsWith('file:')) {
                 url = 'http://' + url;
             }
 
