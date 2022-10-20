@@ -12,11 +12,11 @@ Features:
 * Console and Application tool
 * Breakpoint support
 
-**Note**: This extension needs Microsoft Edge to be on your computer. Windows machines already come with it, for Mac and Linux, please [download and install a version of Edge](https://www.microsoft.com/en-us/edge).
+**Note**: This extension needs Microsoft Edge to be on your computer. Windows machines already come with it, for Mac and Linux, please [download and install a version of Edge](https://www.microsoft.com/edge).
 
 ## Documentation
 
-For more details on how to use and customize the extension, [refer to the documentation](https://docs.microsoft.com/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension).
+For more details on how to use and customize the extension, [refer to the documentation](https://learn.microsoft.com/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension).
 
 ## Contributing
 

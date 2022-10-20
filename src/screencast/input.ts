@@ -34,7 +34,7 @@ export class ScreencastInputHandler {
         }
         this.cdpConnection.sendMessageToBackend('Input.dispatchMouseEvent', {
             type: eventType,
-            clickCount: mouseEvent.detail, // per https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail
+            clickCount: mouseEvent.detail, // per https://developer.mozilla.org/docs/Web/API/UIEvent/detail
             x: Math.round(mouseEvent.offsetX / scale),
             y: Math.round(mouseEvent.offsetY / scale),
             modifiers: this.modifiersForEvent(mouseEvent),
