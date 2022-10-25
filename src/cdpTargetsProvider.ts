@@ -107,7 +107,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
         }
         const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
 
-        // Example regex match: https://docs.microsoft.com/en-us/microsoft-edge/
+        // Example regex match: https://learn.microsoft.com/en-us/microsoft-edge/
         // urlMatch[0] = .microsoft.com/en-us/microsoft-edge/
         // urlMatch[1] = .microsoft.com/
         // urlMatch[2] = microsoft
