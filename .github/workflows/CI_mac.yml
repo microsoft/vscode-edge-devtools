@@ -1,4 +1,4 @@
-name: CI_Integration
+name: CI_Integration_MacOS
 
 on:
   push:
