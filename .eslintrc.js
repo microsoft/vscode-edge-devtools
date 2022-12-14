@@ -108,7 +108,7 @@ module.exports = {
         'no-multiple-empty-lines': [2, {'max': 2}],
         'no-mixed-spaces-and-tabs': 2,
         'no-trailing-spaces': 2,
-        'linebreak-style': [2, 'unix'],
+        'linebreak-style': [2, process.platform === 'win32' ? 'windows' : 'unix'],
     
         /**
          * Disabled, aspirational rules
