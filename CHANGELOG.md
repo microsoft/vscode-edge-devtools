@@ -1,3 +1,6 @@
+## 2.1.2
+* **[Bug Fix]**: Updating fallback version for the devtools revision - [PR #1290](https://github.com/microsoft/vscode-edge-devtools/pull/1290)
+
 ## 2.1.1
 * **[Feature]**: Add Code Actions and Autofix - [PR #1086](https://github.com/microsoft/vscode-edge-devtools/pull/1086), [PR #1122](https://github.com/microsoft/vscode-edge-devtools/pull/1122), [PR #1173](https://github.com/microsoft/vscode-edge-devtools/pull/1173)
 
