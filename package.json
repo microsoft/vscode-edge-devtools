@@ -112,7 +112,7 @@
             {
                 "command": "vscode-edge-devtools-view.toggleScreencast",
                 "category": "Microsoft Edge Tools",
-                "title": "Toggle screencast",
+                "title": "Toggle browser",
                 "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/screencast.svg",
