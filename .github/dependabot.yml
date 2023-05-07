@@ -10,3 +10,4 @@ updates:
     schedule:
       interval: "weekly"
 a
+b
