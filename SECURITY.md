@@ -32,7 +32,7 @@ If you are reporting for a bug bounty, more complete reports can contribute to a
 
 ## Preferred Languages
 
-We prefer all communications to be in English.
+We prefer all communications to be in English please.
 
 ## Policy
 
