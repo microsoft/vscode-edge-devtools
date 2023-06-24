@@ -1,7 +1,11 @@
-import copyPlugin from 'copy-webpack-plugin';
-import path from 'path';
-import { DefinePlugin } from 'webpack';
+// @ts-check
+/* eslint-disable @typescript-eslint/no-var-requires */
 
+const copyPlugin = require('copy-webpack-plugin');
+const path = require('path');
+const { DefinePlugin } = require('webpack');
+
+/** @type {Partial<import('webpack').Configuration>} */
 const commonConfig = {
     devtool: 'source-map',
     mode: 'production',
@@ -19,7 +23,11 @@ const commonConfig = {
     },
 };
 
-module.exports = (env: any) => {
+/**
+ * @param {Record<string, unknown>} env
+ * @returns {import('webpack').Configuration | import('webpack').Configuration[]}
+ * */
+module.exports = env => {
     return [
         {
             ...commonConfig,
@@ -72,10 +80,10 @@ module.exports = (env: any) => {
                 }),
                 // These must also be defined in the jest section of package.json for tests to pass
                 new DefinePlugin({
-                    DEBUG: JSON.stringify(env && env.debug || false),
-                    DEVTOOLS_BASE_URI: JSON.stringify(env && env.devtoolsBaseUri || undefined),
+                    DEBUG: JSON.stringify(env.debug ?? false),
+                    DEVTOOLS_BASE_URI: JSON.stringify(env.devtoolsBaseUri ?? undefined),
                 })
             ],
         },
-    ]
+    ];
 };
