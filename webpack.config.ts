@@ -4,7 +4,7 @@ import { DefinePlugin } from 'webpack';
 
 const commonConfig = {
     devtool: 'source-map',
-    mode: 'development',
+    mode: 'production',
     module: {
         rules: [
             {
