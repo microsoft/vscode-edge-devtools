@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        // VS Code 1.53 is based on Node 12.18.3 which has compat up to ES2020.
+        "module": "ES2020",
+        "target": "ES2020",
         "esModuleInterop": true,
-        "target": "es2017",
         "noImplicitAny": true,
         "moduleResolution": "node",
         "sourceMap": true,

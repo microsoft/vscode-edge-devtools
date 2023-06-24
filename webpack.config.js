@@ -26,7 +26,7 @@ const commonConfig = {
 /**
  * @param {Record<string, unknown>} env
  * @returns {import('webpack').Configuration | import('webpack').Configuration[]}
- * */
+ */
 module.exports = env => {
     return [
         {

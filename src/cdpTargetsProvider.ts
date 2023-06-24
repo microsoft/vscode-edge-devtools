@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import { CDPTarget } from './cdpTarget';
 import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemoteTargetJson, isLocalResource, SETTINGS_STORE_NAME } from './utils';
 import { IncomingMessage } from 'http';
-import https = require('https');
+import * as https from 'https';
 import { LaunchConfigManager } from './launchConfigManager';
 
 export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
