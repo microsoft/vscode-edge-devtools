@@ -58,6 +58,7 @@ module.exports = env => {
             },
             externals: {
                 vscode: 'commonjs vscode',
+                'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics', // We're not native
             },
             name: 'extension',
             output: {
@@ -66,16 +67,14 @@ module.exports = env => {
                 libraryTarget: 'commonjs2',
                 path: path.resolve(__dirname, 'out'),
             },
-            stats: 'errors-only', // Bug ws package includes dev-dependencies which webpack will report as warnings
-            target: 'node',
             // Copy startpage html to output bundle
             plugins: [
                 new copyPlugin({
                     patterns: [
-                    { from: 'startpage', to: 'startpage'},
-                    { from: './src/common/styles.css', to: 'common/styles.css'},
-                    { from: 'icon.png', to: 'icon.png'},
-                    { from: 'src/screencast/view.css', to: 'screencast/view.css'},
+                        { from: 'startpage', to: 'startpage' },
+                        { from: 'src/common/styles.css', to: 'common/styles.css' },
+                        { from: 'icon.png', to: 'icon.png' },
+                        { from: 'src/screencast/view.css', to: 'screencast/view.css' },
                     ],
                 }),
                 // These must also be defined in the jest section of package.json for tests to pass
