@@ -61,6 +61,7 @@ module.exports = env => {
                 'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics', // We're not native
             },
             name: 'extension',
+            target: 'node',
             output: {
                 devtoolModuleFilenameTemplate: '../[resource-path]',
                 filename: '[name].js',
