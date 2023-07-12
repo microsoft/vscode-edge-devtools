@@ -278,6 +278,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
+                },
+                "vscode-edge-devtools.webhintInstallNotification": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Turn off notification for webhint installation failures."
                 }
             }
         },
