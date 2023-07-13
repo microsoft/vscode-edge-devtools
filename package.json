@@ -28,14 +28,14 @@
         "dom"
     ],
     "engines": {
-        "node": ">=8.0.0",
-        "vscode": "^1.48.0"
+        "vscode": "^1.53.0"
     },
     "categories": [
         "Debuggers"
     ],
     "aiKey": "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
     "main": "./out/extension",
+    "sideEffects": false,
     "activationEvents": [
         "onStartupFinished",
         "onLanguage:css",
@@ -661,9 +661,9 @@
         "package": "vsce package --out vscode-edge-devtools.vsix",
         "vscode:prepublish": "npm run build && npm run lint",
         "build": "webpack",
-        "build-debug": "npm run build debug",
-        "build-edge-watch": "webpack --env debug --env devtoolsBaseUri=http://localhost:3000/vscode_app.html",
-        "build-watch": "npm run build && npm run watch",
+        "build-debug": "npm run build --mode development --env debug",
+        "build-edge-watch": "npm run build-debug -- --env devtoolsBaseUri=http://localhost:3000/vscode_app.html",
+        "build-watch": "npm run build --mode development && npm run watch",
         "build-and-lint": "npm run build && npm run lint",
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
@@ -702,7 +702,6 @@
         "jest": "27.2.2",
         "ts-jest": "27.0.5",
         "ts-loader": "9.2.6",
-        "ts-node": "10.2.1",
         "typescript": "4.4.3",
         "uglify-js": "3.14.2",
         "unzipper": "0.10.11",

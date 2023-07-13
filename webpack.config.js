@@ -1,10 +1,14 @@
-import copyPlugin from 'copy-webpack-plugin';
-import path from 'path';
-import { DefinePlugin } from 'webpack';
+// @ts-check
+/* eslint-disable @typescript-eslint/no-var-requires */
 
+const copyPlugin = require('copy-webpack-plugin');
+const path = require('path');
+const { DefinePlugin } = require('webpack');
+
+/** @type {Partial<import('webpack').Configuration>} */
 const commonConfig = {
     devtool: 'source-map',
-    mode: 'development',
+    mode: 'production',
     module: {
         rules: [
             {
@@ -19,7 +23,11 @@ const commonConfig = {
     },
 };
 
-module.exports = (env: any) => {
+/**
+ * @param {Record<string, unknown>} env
+ * @returns {import('webpack').Configuration | import('webpack').Configuration[]}
+ */
+module.exports = env => {
     return [
         {
             ...commonConfig,
@@ -50,32 +58,32 @@ module.exports = (env: any) => {
             },
             externals: {
                 vscode: 'commonjs vscode',
+                'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics', // We're not native
             },
             name: 'extension',
+            target: 'node',
             output: {
                 devtoolModuleFilenameTemplate: '../[resource-path]',
                 filename: '[name].js',
                 libraryTarget: 'commonjs2',
                 path: path.resolve(__dirname, 'out'),
             },
-            stats: 'errors-only', // Bug ws package includes dev-dependencies which webpack will report as warnings
-            target: 'node',
             // Copy startpage html to output bundle
             plugins: [
                 new copyPlugin({
                     patterns: [
-                    { from: 'startpage', to: 'startpage'},
-                    { from: './src/common/styles.css', to: 'common/styles.css'},
-                    { from: 'icon.png', to: 'icon.png'},
-                    { from: 'src/screencast/view.css', to: 'screencast/view.css'},
+                        { from: 'startpage', to: 'startpage' },
+                        { from: 'src/common/styles.css', to: 'common/styles.css' },
+                        { from: 'icon.png', to: 'icon.png' },
+                        { from: 'src/screencast/view.css', to: 'screencast/view.css' },
                     ],
                 }),
                 // These must also be defined in the jest section of package.json for tests to pass
                 new DefinePlugin({
-                    DEBUG: JSON.stringify(env && env.debug || false),
-                    DEVTOOLS_BASE_URI: JSON.stringify(env && env.devtoolsBaseUri || undefined),
+                    DEBUG: JSON.stringify(env.debug ?? false),
+                    DEVTOOLS_BASE_URI: JSON.stringify(env.devtoolsBaseUri ?? undefined),
                 })
             ],
         },
-    ]
+    ];
 };
