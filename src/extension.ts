@@ -346,13 +346,23 @@ function startWebhint(context: vscode.ExtensionContext): void {
     void client.onReady().then(() => {
         // Listen for notification that the webhint install failed.
         const installFailedNotification: typeof installFailed = 'vscode-webhint/install-failed';
+        const disableInstallFailedNotification = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhintInstallNotification');
         client.onNotification(installFailedNotification, () => {
-            const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
-            void vscode.window.showInformationMessage(message, 'OK', 'Disable').then(button => {
-                if (button === 'Disable') {
-                    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
-                }
-            });
+            if (!telemetryReporter) {
+                telemetryReporter = createTelemetryReporter(context);
+            }
+            telemetryReporter.sendTelemetryEvent('user/webhint/install-failed');
+            if (!disableInstallFailedNotification) {
+                const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
+                void vscode.window.showInformationMessage(message, 'Remind me Later', 'Don\'t show again', 'Disable Extension').then(button => {
+                    if (button === 'Disable Extension') {
+                        void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
+                    }
+                    if (button === 'Don\'t show again') {
+                        void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhintInstallNotification', true, vscode.ConfigurationTarget.Global);
+                    }
+                });
+            }
         });
         // Listen for requests to show the output panel for this extension.
         const showOutputNotification: typeof showOutput = 'vscode-webhint/show-output';
