@@ -85,7 +85,7 @@ export function activate(context: vscode.ExtensionContext): void {
         void launch(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId, config): void => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId: string | undefined, config: Partial<IUserConfig>): void => {
         void attachToCurrentDebugTarget(context, debugSessionId, config);
     }));
 
@@ -133,7 +133,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.toggleScreencast`,
-        (target?: CDPTarget, isJsDebugProxiedCDPConnection = false) => {
+        (target?: CDPTarget, isJsDebugProxiedCDPConnection: boolean = false) => {
             if (!target){
                 const errorMessage = 'No target selected';
                 telemetryReporter.sendTelemetryErrorEvent('command/screencast/target', {message: errorMessage});

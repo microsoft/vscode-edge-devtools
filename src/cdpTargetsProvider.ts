@@ -128,7 +128,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
             https.get(faviconUrl, (response: IncomingMessage) => {
                 if (response.headers['content-type'] && response.headers['content-type'].includes('icon')) {
                     const buffer: Uint8Array[] = [];
-                    response.on('data', data => {
+                    response.on('data', (data: Uint8Array) => {
                         buffer.push(data);
                     });
 

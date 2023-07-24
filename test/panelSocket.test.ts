@@ -7,7 +7,7 @@ import { Mocked } from "./helpers/helpers";
 
 describe("panelSocket", () => {
     const readyMessage = "ready:args";
-    let mockWebSocket: Mocked<WebSocket>;
+    let mockWebSocket: WebSocket;
 
     beforeEach(() => {
         mockWebSocket = {
@@ -17,8 +17,7 @@ describe("panelSocket", () => {
             onmessage: jest.fn(),
             onopen: jest.fn(),
             send: jest.fn(),
-        } as Mocked<WebSocket>;
-
+        } as unknown as Mocked<WebSocket>;
         // We need to use a non-arrow function here as it is used as a constructor.
         // tslint:disable-next-line: object-literal-shorthand only-arrow-functions
         jest.doMock("ws", () => function() { return mockWebSocket; });
@@ -75,7 +74,7 @@ describe("panelSocket", () => {
         const panelSocket = new ps.PanelSocket("", jest.fn());
 
         panelSocket.onMessageFromWebview(readyMessage);
-        mockWebSocket.onopen.call(mockWebSocket);
+        mockWebSocket.onopen?.call({}, {type:'', target: mockWebSocket});
         expect(panelSocket.isConnectedToTarget).toEqual(true);
 
         panelSocket.dispose();
@@ -102,7 +101,7 @@ describe("panelSocket", () => {
         expect(mockWebSocket.send).not.toBeCalled();
 
         // Connect the websocket and ensure the messages are now pumped through
-        mockWebSocket.onopen.call(mockWebSocket);
+        mockWebSocket.onopen?.call({}, {type:'', target: mockWebSocket});
         expect(mockWebSocket.send).toHaveBeenCalledTimes(expectedMessages.length);
         expectedMessages.forEach((msg, index) => {
             expect(mockWebSocket.send).toHaveBeenNthCalledWith(index + 1, msg);
@@ -115,7 +114,7 @@ describe("panelSocket", () => {
     });
 
     it("posts back messages once connected", async () => {
-        const expectedMessage = { data: "hello world" };
+        const expectedMessage = { type:'', data: "hello world" , target: mockWebSocket};
         const mockPost = jest.fn();
         const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", mockPost);
@@ -124,17 +123,17 @@ describe("panelSocket", () => {
         panelSocket.onMessageFromWebview(readyMessage);
 
         // Should ignore messages before the socket is open
-        mockWebSocket.onmessage.call(mockWebSocket, expectedMessage);
+        mockWebSocket.onmessage?.call({}, expectedMessage);
         expect(mockPost).not.toHaveBeenCalled();
         expect(panelSocket.isConnectedToTarget).toEqual(false);
 
         // Opening should post a message to say it was connected
-        mockWebSocket.onopen.call(mockWebSocket);
+        mockWebSocket.onopen?.call({}, {type:'', target: mockWebSocket});
         expect(mockPost).toHaveBeenNthCalledWith(1, "open");
         expect(panelSocket.isConnectedToTarget).toEqual(true);
 
         // Once open we should get the message posted
-        mockWebSocket.onmessage.call(mockWebSocket, expectedMessage);
+        mockWebSocket.onmessage?.call({}, expectedMessage);
         expect(mockPost).toHaveBeenNthCalledWith(2, "message", expectedMessage.data);
     });
 
@@ -147,12 +146,12 @@ describe("panelSocket", () => {
         panelSocket.onMessageFromWebview(readyMessage);
 
         // Should ignore messages before the socket is open
-        mockWebSocket.onerror.call(mockWebSocket);
+        mockWebSocket.onerror?.call({}, {type:'' ,target: mockWebSocket, error: '', message:''});
         expect(mockPost).not.toHaveBeenCalled();
 
         // Once open we should get the error message posted
-        mockWebSocket.onopen.call(mockWebSocket);
-        mockWebSocket.onerror.call(mockWebSocket);
+        mockWebSocket.onopen?.call({}, {type:'', target: mockWebSocket});
+        mockWebSocket.onerror?.call({}, {type:'' ,target: mockWebSocket, error: '', message:''});
         expect(mockPost).toHaveBeenNthCalledWith(2, "error");
     });
 
@@ -160,21 +159,20 @@ describe("panelSocket", () => {
         const mockPost = jest.fn();
         const ps = await import("../src/panelSocket");
         const panelSocket = new ps.PanelSocket("", mockPost);
-
         // Create the websocket
         panelSocket.onMessageFromWebview(readyMessage);
 
         // Should ignore messages before the socket is open
-        mockWebSocket.onclose.call(mockWebSocket);
+        mockWebSocket.onclose?.call({}, {type:'', target: mockWebSocket, wasClean: true, code:0, reason:''});
         expect(mockPost).not.toHaveBeenCalled();
 
         // Once open we should get the error message posted
-        mockWebSocket.onopen.call(mockWebSocket);
-        mockWebSocket.onclose.call(mockWebSocket);
+        mockWebSocket.onopen?.call({}, {type:'', target: mockWebSocket});
+        mockWebSocket.onclose?.call({}, {type:'', target: mockWebSocket, wasClean: true, code:0, reason:''});
         expect(mockPost).toHaveBeenNthCalledWith(2, "close");
 
         // Should ignore messages once closed
-        mockWebSocket.onclose.call(mockWebSocket);
+        mockWebSocket.onclose?.call({}, {type:'', target: mockWebSocket, wasClean: true, code:0, reason:''});
         expect(mockPost).toHaveBeenCalledTimes(2);
     });
 
