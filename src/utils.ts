@@ -724,6 +724,7 @@ export function reportExtensionSettings(telemetryReporter: Readonly<TelemetryRep
                         }
                     }
                 } else {
+                    // eslint-disable-next-line @typescript-eslint/no-base-to-string
                     changedSettingsMap.set(settingName, settingValue.toString());
                 }
             }

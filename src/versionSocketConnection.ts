@@ -57,6 +57,7 @@ export class BrowserVersionDetectionSocket extends EventEmitter {
 
     private onMessage(message: { data: WebSocket.Data }) {
         // Determine if this is the browser.getVersion response and send revision hash to devtoolsPanel
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         const data = JSON.parse(message.data.toString()) as BrowserVersionCdpResponse;
         this.emit('setCdnParameters', this.calcBrowserRevision(data));
         // Dispose socket after version is determined

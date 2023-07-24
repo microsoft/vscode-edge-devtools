@@ -664,7 +664,7 @@
     },
     "scripts": {
         "package": "vsce package --out vscode-edge-devtools.vsix",
-        "vscode:prepublish": "npm run build",
+        "vscode:prepublish": "npm run build && npm run lint",
         "build": "webpack",
         "build-debug": "npm run build -- --mode development --env debug",
         "build-edge-watch": "npm run build-debug -- --env devtoolsBaseUri=http://localhost:3000/vscode_app.html",
@@ -673,7 +673,7 @@
         "watch": "npm run watch-wp",
         "watch-wp": "webpack --watch",
         "lint": "eslint -c .eslintrc.js */*.ts",
-        "test": "jest --config package.json --runInBand --env=jsdom"
+        "test": "npm run lint && jest --config package.json --runInBand --env=jsdom"
     },
     "dependencies": {
         "@vscode/codicons": "0.0.33",
