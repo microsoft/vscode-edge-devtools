@@ -37,6 +37,9 @@ export function createFakeVSCode() {
         CallHierarchyItem: jest.fn(),
         CodeActionKind: jest.fn(),
         Disposable: jest.fn(),
+        ExtensionMode: {
+            Production: 1
+        },
         version: '1.60.0',
         EventEmitter: jest.fn(),
         Range: function Range() { /* constructor */ },
