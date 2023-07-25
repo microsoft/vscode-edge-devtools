@@ -421,7 +421,7 @@ export async function attach(
                     void ErrorReporter.showErrorDialog({
                         errorCode: ErrorCodes.Error,
                         title: 'Error while getting a debug connection to the target',
-                        message: e,
+                        message: e instanceof Error && e.message ? e.message : `Unexpected error ${e}`,
                     });
 
                     matchedTargets = undefined;
@@ -481,8 +481,9 @@ export async function attach(
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while fetching list of available targets',
-            message: exceptionStack || 'No available targets to attach.',
+            message: exceptionStack as string || 'No available targets to attach.',
         });
+
         telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
     }
 }

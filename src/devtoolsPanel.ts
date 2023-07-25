@@ -424,7 +424,7 @@ export class DevToolsPanel {
             await ErrorReporter.showErrorDialog({
                 errorCode: ErrorCodes.Error,
                 title: 'Error while opening file in editor.',
-                message: e,
+                message: e instanceof Error && e.message ? e.message : `Unexpected error ${e}`,
             });
         }
     }
