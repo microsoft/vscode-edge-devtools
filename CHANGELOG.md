@@ -1,3 +1,9 @@
+## 2.1.3
+* **[Bug Fix]**: Adding dashes for passing arguments to scripts  - [PR #1624](https://github.com/microsoft/vscode-edge-devtools/pull/1624)
+* **[Feature]**: Reducing size of extension bundle (Produce production builds by default) - [PR #1598](https://github.com/microsoft/vscode-edge-devtools/pull/1598)
+* **[Feature]**: Updating vscode-webhint version to 2.1.10  - [PR #1560](https://github.com/microsoft/vscode-edge-devtools/pull/1560)
+* **[Bug Fix]**: Changed screencast label to toggle browser to comply with docs  - [PR #1331](https://github.com/microsoft/vscode-edge-devtools/pull/1331)
+
 ## 2.1.2
 * **[Bug Fix]**: Updating fallback version for the devtools revision - [PR #1290](https://github.com/microsoft/vscode-edge-devtools/pull/1290)
 
