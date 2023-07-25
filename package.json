@@ -566,21 +566,21 @@
                     "group": "navigation"
                 }
             ],
-            "devtoolsContextMenu":[
+            "devtoolsContextMenu": [
                 {
-                  "command":"vscode-edge-devtools-view.launchHtml",
-                  "group":"navigation"
+                    "command": "vscode-edge-devtools-view.launchHtml",
+                    "group": "navigation"
                 },
                 {
-                  "command":"vscode-edge-devtools-view.launchScreencast",
-                  "group":"navigation"
+                    "command": "vscode-edge-devtools-view.launchScreencast",
+                    "group": "navigation"
                 }
             ]
         },
         "submenus": [
             {
-              "id": "devtoolsContextMenu",
-              "label": "Open with Edge"
+                "id": "devtoolsContextMenu",
+                "label": "Open with Edge"
             }
         ],
         "viewsContainers": {
@@ -710,7 +710,7 @@
         "typescript": "4.4.3",
         "uglify-js": "3.17.4",
         "unzipper": "0.10.14",
-        "vsce": "2.15.0",
+        "@vscode/vsce": "^2.19.0",
         "vscode-languageclient": "7.0.0",
         "vscode-test": "1.6.1",
         "webpack": "5.88.2",
