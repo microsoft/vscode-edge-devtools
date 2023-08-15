@@ -237,7 +237,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while parsing the list of targets.',
-            message: e,
+            message: e instanceof Error && e.message ? e.message : `Unexpected error ${e}`,
         });
     }
     return result;
@@ -318,11 +318,12 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
         if (e instanceof Error) {
             return e;
         }
+
         // Throw remaining unhandled exceptions
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while creating the debug socket for CDP target.',
-            message: e,
+            message: `Unexpected error ${e}`,
         });
     }
 }
@@ -333,7 +334,7 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
  * @param context The vscode context
  */
 export function createTelemetryReporter(_context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
-    if (packageJson && _context.extensionMode === 1 /* Production */) {
+    if (packageJson && (_context.extensionMode === vscode.ExtensionMode.Production)) {
         // Use the real telemetry reporter
         return new TelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
     }
@@ -724,6 +725,7 @@ export function reportExtensionSettings(telemetryReporter: Readonly<TelemetryRep
                         }
                     }
                 } else {
+                    // eslint-disable-next-line @typescript-eslint/no-base-to-string
                     changedSettingsMap.set(settingName, settingValue.toString());
                 }
             }

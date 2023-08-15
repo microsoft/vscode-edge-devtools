@@ -7,7 +7,6 @@ import {
     SETTINGS_STORE_NAME,
     SETTINGS_DEFAULT_URL,
 } from './utils';
-export type LaunchConfig = 'None' | 'Unsupported' | string;
 export type CompoundConfig = {
     name: string,
     configurations: string[],
@@ -76,7 +75,7 @@ export const extensionConfigs: vscode.DebugConfiguration[] = [
 ];
 
 export class LaunchConfigManager {
-    private launchConfig: LaunchConfig;
+    private launchConfig: string;
     private isValidConfig: boolean;
     private static launchConfigManagerInstance: LaunchConfigManager;
 
@@ -93,7 +92,7 @@ export class LaunchConfigManager {
         return LaunchConfigManager.launchConfigManagerInstance;
     }
 
-    getLaunchConfig(): LaunchConfig {
+    getLaunchConfig(): string {
         this.updateLaunchConfig();
         return this.launchConfig;
     }

@@ -27,7 +27,7 @@ export class ScreencastPanel {
     private readonly panel: vscode.WebviewPanel;
     private readonly telemetryReporter: TelemetryReporter;
     private isJsDebugProxiedCDPConnection = false;
-    private targetUrl: string
+    private targetUrl: string;
     private panelSocket: PanelSocket;
     private screencastStartTime;
     static instance: ScreencastPanel | undefined;
@@ -52,8 +52,8 @@ export class ScreencastPanel {
             this.panelSocket = new PanelSocket(this.targetUrl, (e, msg) => this.postToWebview(e, msg));
         }
         this.panelSocket.on('close', () => this.onSocketClose());
-        this.panelSocket.on('telemetry', message => this.onSocketTelemetry(message));
-        this.panelSocket.on('writeToClipboard', message => this.onSaveToClipboard(message));
+        this.panelSocket.on('telemetry', (message: string) => this.onSocketTelemetry(message));
+        this.panelSocket.on('writeToClipboard', (message: string) => this.onSaveToClipboard(message));
         this.panelSocket.on('readClipboard', () => this.onGetClipboardText());
 
         // Handle closing

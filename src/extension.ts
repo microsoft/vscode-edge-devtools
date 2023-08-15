@@ -85,7 +85,7 @@ export function activate(context: vscode.ExtensionContext): void {
         void launch(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId, config): void => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.attachToCurrentDebugTarget`, (debugSessionId: string | undefined, config: Partial<IUserConfig>): void => {
         void attachToCurrentDebugTarget(context, debugSessionId, config);
     }));
 
@@ -133,7 +133,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.toggleScreencast`,
-        (target?: CDPTarget, isJsDebugProxiedCDPConnection = false) => {
+        (target?: CDPTarget, isJsDebugProxiedCDPConnection: boolean = false) => {
             if (!target){
                 const errorMessage = 'No target selected';
                 telemetryReporter.sendTelemetryErrorEvent('command/screencast/target', {message: errorMessage});
@@ -421,7 +421,7 @@ export async function attach(
                     void ErrorReporter.showErrorDialog({
                         errorCode: ErrorCodes.Error,
                         title: 'Error while getting a debug connection to the target',
-                        message: e,
+                        message: e instanceof Error && e.message ? e.message : `Unexpected error ${e}`,
                     });
 
                     matchedTargets = undefined;
@@ -481,8 +481,9 @@ export async function attach(
         void ErrorReporter.showErrorDialog({
             errorCode: ErrorCodes.Error,
             title: 'Error while fetching list of available targets',
-            message: exceptionStack || 'No available targets to attach.',
+            message: exceptionStack as string || 'No available targets to attach.',
         });
+
         telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
     }
 }

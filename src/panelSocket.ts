@@ -93,6 +93,7 @@ export class PanelSocket extends EventEmitter {
     private onMessage(message: { data: WebSocket.Data }) {
         if (this.isConnected) {
             // Forward the message onto the devtools
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
             this.postMessageToDevTools('message', message.data.toString());
         }
     }
