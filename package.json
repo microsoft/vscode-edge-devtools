@@ -711,9 +711,4 @@
         "uglify-js": "3.17.4",
         "unzipper": "0.10.14",
         "@vscode/vsce": "^2.19.0",
-        "vscode-languageclient": "7.0.0",
-        "vscode-test": "1.6.1",
-        "webpack": "5.88.2",
-        "webpack-cli": "5.1.4"
-    }
-}
+
