@@ -28,3 +28,31 @@ jobs:
         ado_bypassrules: false
         ado_set_labels: false
         create_on_tagging: true
+Run captainbrosset/github-actions-issue-to-work-item@master
+  env:
+    github_token: ***
+    ado_token: ***
+    ado_organization: microsoft
+    ado_project: Edge
+    ado_area_path: Edge\Web Experience\Developer Tools\F12 Tools\VSCode Extension
+    ado_tags: DevToolsVSCodeExtension_GitHub
+    ado_tag_on_close: DevToolsVSCodeExtension_GitHub_Closed
+    ado_bypassrules: false
+    ado_set_labels: false
+    create_on_tagging: true
+Set values from payload & env
+Check to see if work item already exists
+Finding workitem
+ADO query: SELECT [System.Id], [System.WorkItemType], [System.Description], [System.Title], [System.AssignedTo], [System.State], [System.Tags] FROM workitems WHERE [System.TeamProject] = @project AND [System.Title] CONTAINS '[GitHub #1516]' AND [System.AreaPath] = 'Edge\Web Experience\Developer Tools\F12 Tools\VSCode Extension'
+Error: queryByWiql failure
+Error: Request timeout: /Edge/_apis/wit/wiql
+    at ClientRequest.<anonymous> (/home/runner/work/_actions/captainbrosset/github-actions-issue-to-work-item/master/node_modules/typed-rest-client/HttpClient.js:313:26)
+    at Object.onceWrapper (events.js:420:28)
+    at ClientRequest.emit (events.js:314:20)
+    at TLSSocket.emitRequestTimeout (_http_client.js:715:9)
+    at Object.onceWrapper (events.js:420:28)
+    at TLSSocket.emit (events.js:326:22)
+    at TLSSocket.Socket._onTimeout (net.js:483:8)
+    at listOnTimeout (internal/timers.js:554:17)
+    at processTimers (internal/timers.js:497:7)
+Error: TypeError: (s || "").replace is not a function
