@@ -257,7 +257,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async(fileUri: vscode.Uri): Promise<void> => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async (fileUri: vscode.Uri): Promise<void> => {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
         const edgeDebugConfig = providedHeadlessDebugConfig;
         const { defaultUrl } = getRemoteEndpointSettings();
