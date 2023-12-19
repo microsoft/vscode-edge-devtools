@@ -243,32 +243,32 @@ export function activate(context: vscode.ExtensionContext): void {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchHtml');
         const edgeDebugConfig = providedHeadlessDebugConfig;
         const devToolsAttachConfig = providedLaunchDevToolsConfig;
-        const { defaultUrl } = getRemoteEndpointSettings();
         if (typeof vscode.env.remoteName === 'undefined') {
             edgeDebugConfig.url = `file://${fileUri.fsPath}`;
             devToolsAttachConfig.url = `file://${fileUri.fsPath}`;
             void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
         } else {
-            edgeDebugConfig.url = defaultUrl;
-            devToolsAttachConfig.url = defaultUrl;
+            const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
+            edgeDebugConfig.url = url;
+            devToolsAttachConfig.url = url;
             const { port, userDataDir } = getRemoteEndpointSettings();
             const browserPath = await getBrowserPath();
-            await launchBrowser(browserPath, port,  defaultUrl, userDataDir).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
+            await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
         }
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async (fileUri: vscode.Uri): Promise<void> => {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
         const edgeDebugConfig = providedHeadlessDebugConfig;
-        const { defaultUrl } = getRemoteEndpointSettings();
         if (typeof vscode.env.remoteName === 'undefined') {
             edgeDebugConfig.url = `file://${fileUri.fsPath}`;
             void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, fileUri.fsPath, undefined, true, true));
         } else {
-            edgeDebugConfig.url = defaultUrl;
+            const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
+            edgeDebugConfig.url = url;
             const { port, userDataDir } = getRemoteEndpointSettings();
             const browserPath = await getBrowserPath();
-            await launchBrowser(browserPath, port,  defaultUrl, userDataDir).then(() => attach(context, defaultUrl, undefined, true, true));
+            await launchBrowser(browserPath, port,  url, userDataDir, /** headless */ true).then(() => attach(context, url, undefined, true, true));
         }
     }));
 
