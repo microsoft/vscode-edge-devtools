@@ -74,7 +74,7 @@ export function createFakeVSCode() {
         env: {
             clipboard: { writeText: jest.fn() },
             machineId: "someValue.machineId",
-            remoteName: 'remote',
+            remoteName: '',
         },
         languages: {
             createDiagnosticCollection: jest.fn(),

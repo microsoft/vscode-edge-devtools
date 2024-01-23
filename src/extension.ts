@@ -278,6 +278,7 @@ export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
         devToolsAttachConfig.url = `file://${fileUri.fsPath}`;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
     } else {
+        // Parse the filename from the remoteName, file authority and path e.g. file://wsl.localhost/ubuntu-20.04/test/index.html
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
         devToolsAttachConfig.url = url;
@@ -293,6 +294,7 @@ export async function launchScreencast(context: vscode.ExtensionContext, fileUri
         edgeDebugConfig.url = `file://${fileUri.fsPath}`;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, fileUri.fsPath, undefined, true, true));
     } else {
+        // Parse the filename from the remoteName, file authority and path e.g. file://wsl.localhost/ubuntu-20.04/test/index.html
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
         const { port, userDataDir } = getRemoteEndpointSettings();
