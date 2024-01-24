@@ -472,7 +472,6 @@ describe("extension", () => {
             }));
         });
 
-
         it("can launch html files in non-remote contexts", async () => {
             mockVSCode.env.remoteName = undefined;
             const testFileUri = {

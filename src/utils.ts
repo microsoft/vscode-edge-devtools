@@ -390,9 +390,9 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @param port The port on which to enable remote debugging
  * @param targetUrl The url of the page to open
  * @param userDataDir The user data directory for the launched instance
- * @param headleassOverride This overrides the --headless arg for browser launch
+ * @param forceHeadless This force overrides the --headless arg for browser launch
  */
-export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string, headleassOverride?: boolean): Promise<puppeteer.Browser> {
+export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean): Promise<puppeteer.Browser> {
     const args = [
         '--no-first-run',
         '--no-default-browser-check',
@@ -400,7 +400,7 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
         targetUrl,
     ];
 
-    const headless: boolean = headleassOverride ?? isHeadlessEnabled();
+    const headless: boolean = forceHeadless ?? isHeadlessEnabled();
 
     let browserArgs: string[] = getBrowserArgs();
     browserArgs = browserArgs.filter(arg => !arg.startsWith('--remote-debugging-port') && arg !== targetUrl);
