@@ -61,7 +61,8 @@ export function createFakeVSCode() {
             activeDebugSession: {
                 id: 'vscode-session-debug-id',
                 name: 'someName',
-            }
+            },
+            startDebugging: jest.fn().mockResolvedValue(true),
         },
         extensions: {
             getExtension: jest.fn().mockReturnValue({ 
@@ -73,6 +74,7 @@ export function createFakeVSCode() {
         env: {
             clipboard: { writeText: jest.fn() },
             machineId: "someValue.machineId",
+            remoteName: '',
         },
         languages: {
             createDiagnosticCollection: jest.fn(),
