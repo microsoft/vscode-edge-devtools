@@ -1,4 +1,5 @@
 ## 2.1.4
+* **[Bug Fix]**: Extension fails to relaunch an instance (headless) - [PR #1978](https://github.com/microsoft/vscode-edge-devtools/pull/1978)
 * **[Bug Fix]**: Error while fetching list of available targets No available targets to attach - [PR #1804](https://github.com/microsoft/vscode-edge-devtools/pull/1804)
 * **[Bug Fix]**: Updates most dependencies to latest versions - [PR #1642](https://github.com/microsoft/vscode-edge-devtools/pull/1642)
 
