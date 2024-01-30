@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import fs from "fs";
-import path from "path";
 import { ExtensionContext } from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
@@ -213,59 +211,4 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
     // tslint:disable-next-line: ban-types
     { callback: Function, thisObj: object } {
     return { callback: mock.mock.calls[0][callbackArgIndex], thisObj: mock.mock.instances[0] };
-}
-
-/**
- * Returns the contents of the specified file, if the file is not found returns null
- * @param uri The uri relative to the 'gen' folder.
- */
-export function getTextFromFile(uri: string) {
-    // Grabbing the vscode-edge-devtools root directory path
-    const dirName = removeLastTwoDirectories(__dirname);
-    const sourceFilesPath = dirName + '/out/edge/src';
-
-    const toolsGenDir =
-        `${sourceFilesPath}/out/Release/gen/devtools/`;
-    const filePath = path.normalize(`${toolsGenDir}${uri}`);
-    if (fs.existsSync(filePath)) {
-        return fs.readFileSync(filePath, "utf8");
-    }
-
-    return null;
-}
-
-/**
- * This helper test function grabs the source code, applies the given patch, checks to see if the patch is applied, and checks for expected and unexpected strings.
- * @param filePath Path to the source file (e.g. elements/elements.js)
- * @param patchFunction The patch function that replaces source code
- * @param expectedStrings An array of expected strings after running the patchFunction
- * @param unexpectedStrings An array of non-expected strings after running the patchFunction
- */
-export async function testPatch(filePath: string, patch: (content:string)=>string|null, expectedStrings?: string[], unexpectedStrings?: string[]) {
-    const fileContents = getTextFromFile(filePath);
-    if (!fileContents) {
-        throw new Error(`Could not find file: ${filePath}`);
-    }
-
-    const result = patch(fileContents);
-    expect(result).not.toEqual(null);
-    if (expectedStrings) {
-        for (const expectedString of expectedStrings) {
-            expect(result).toEqual(expect.stringContaining(expectedString));
-        }
-    }
-    if (unexpectedStrings) {
-        for (const unexpectedString of unexpectedStrings) {
-            expect(result).not.toEqual(expect.stringContaining(unexpectedString));
-        }
-    }
-}
-
-/**
- * @param filepath
- */
-function removeLastTwoDirectories(filepath: string) {
-    const arr = filepath.split(path.sep);
-    arr.splice(-2);
-    return arr.join(path.sep);
 }
