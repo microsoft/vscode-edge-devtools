@@ -17,11 +17,6 @@ Contributions are always welcome! We only ask that you open an issue first so we
 ## Development setup
 * Clone this repo
 * Run `npm install` in '/vscode-edge-devtools'
-* Download and Extract Edge source files
-  * run `npm run download-edge`
-    * If this step fails, see [Legacy Source File Setup](#legacy-source-file-setup)
-    * See [Building with different Edge versions](#building-with-different-edge-versions) to target other versions of Edge
-  * The files will be saved at `\vscode-edge-debug\out\edge`
 * Run `npm run build` or `npm run watch` in '/vscode-edge-devtools'
 * Open the directory in VS Code
 * Select `Launch Extension` debug configuration
@@ -32,27 +27,6 @@ Here are a list of recommended VS Code extensions to use when developing for vsc
 * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
 * [TSLint](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-typescript-tslint-plugin)
 
-## Building with different Edge versions
-* Navigate to the root extension directory
-* Run `node scripts/downloadAndExtractEdge [VERSION_NUMBER]` where `[VERSION_NUMBER]` is a version of Edge
-  * The current set of accepted `[VERSION_NUMBER]` values is 83, 84 and 85.  Other numbers will target the currently supported version.
-  * To target other versions that this script does not support, see [Legacy Source File Setup](#legacy-source-file-setup).
-* This replaces the `npm run download-edge` script in the setup instructions, follow the rest of the instructions to complete setup.
-
-## Legacy Source File Setup
-Use this method if the automated methods fail or if the desired version is not supported by the download script.
-* Download a copy of the Microsoft Edge build from [https://thirdpartysource.microsoft.com](https://thirdpartysource.microsoft.com), current extension version builds from version 87.0.668.0.
-  * Note: Download the 'Microsoft Edge DevTools' zip if available in the desired version and platform - it will be much faster.
-* Extract the necessary files from the zip
-  * On an administrator prompt execute the following commands (assuming your drive is located at C:\)
-    * **Windows**: `mkdir [PATH_TO_EXTENSION]\vscode-edge-devtools\out\edge\src\out\Release\gen\devtools&&mkdir [PATH_TO_EXTENSION]\out\edge\src\third_party\devtools-frontend\src\front_end`
-    * **Mac/Linux**: `mkdir -p [PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/out/Release/gen/devtools&&mkdir -p [PATH_TO_EXTENSION]/out/edge/src/third_party/devtools-frontend/src/front_end`
-  * **Open** the zip file and (inside the zip file) navigate to:
-    * `[COMPRESSED_FILE]\src\third_party\devtools-frontend\src\front_end`
-    * copy the contents of the "front_end" folder and paste them into `[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/third_party/devtools-frontend/src/front_end`
-  * **Open** the zip file and (inside the zip file) navigate to:
-    * `[COMPRESSED_FILE]\src\out\Release\gen\devtools`
-    * copy the contents of the "devtools" folder and paste them into `[PATH_TO_EXTENSION]/vscode-edge-devtools/out/edge/src/out/Release/gen/devtools`
 
 ## Testing
 * There are a set of jest tests which can be run with `npm run test`.
