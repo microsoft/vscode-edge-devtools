@@ -158,6 +158,7 @@ export function fetchUri(uri: string, options: https.RequestOptions = {}): Promi
             rejectUnauthorized: false,
             ...parsedUrl,
             ...options,
+            method: 'PUT',
         } as http.RequestOptions;
 
         get(options, response => {
