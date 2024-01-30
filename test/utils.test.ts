@@ -79,6 +79,25 @@ describe("utils", () => {
             expect(fake.on).toHaveBeenNthCalledWith(2, "end", expect.any(Function));
         });
 
+        it("options passed to 'get' uses PUT as HTTP verb", async () => {
+            // Chrome headless require 'PUT' instead of 'GET' for /json/new otherwise we get
+            // 'Using unsafe HTTP verb GET to invoke /json/new. The recommended way is to use PUT'
+            const httpGetMock = mockGetHttp;
+            const customError = new Error('customError');
+            const fakeGet = (_options: any, callback: (resp: object) => void) => {
+                expect(_options.method).not.toBeUndefined();
+                expect(_options.method).toEqual('PUT');
+
+                // after validation we can halt execution to resolve the promise chain.
+                return { on: () => { throw customError } }
+            };
+
+            httpGetMock.mockImplementation(fakeGet);
+            await utils.fetchUri("http://somedomain.com/json/list").catch((error: any) => {
+                expect(error).toEqual(customError);
+            })
+        });
+
         it("requests http url correctly", async () => {
             const expectedHttpResponse = "[{},{}]";
             mockGetHttp.mockImplementation(
