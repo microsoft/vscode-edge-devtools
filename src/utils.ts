@@ -762,6 +762,16 @@ export function getPostcssRootValue(): number | undefined {
     return rootValue;
 }
 
+export function toOriginalPx(text:string, rootSize:number|undefined):string {
+    if (rootSize) {
+        return text.replace(/(\d*\.?\d+)rem/g, (match, remValue:string) => {
+            const pxValue = Math.round(parseFloat(remValue) * rootSize);
+            return `${pxValue}px`;
+        });
+    }
+    return text;
+}
+
 export function reportUrlType(url: string, telemetryReporter: Readonly<TelemetryReporter>): void {
     const localhostPattern = /^https?:\/\/localhost:/;
     const ipPattern = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
