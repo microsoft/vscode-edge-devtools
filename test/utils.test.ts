@@ -7,7 +7,7 @@
 import * as path from "path";
 
 import { createFakeExtensionContext, createFakeGet, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
-import { BrowserFlavor, IRemoteTargetJson, IUserConfig } from "../src/utils";
+import { BrowserFlavor, IRemoteTargetJson, IUserConfig, toOriginalPx } from "../src/utils";
 import { ConfigurationChangeEvent } from "vscode";
 
 jest.mock("vscode", () => null, { virtual: true });
@@ -1062,4 +1062,22 @@ describe("utils", () => {
             expect(reporter.sendTelemetryEvent).toBeCalledWith('user/settingsChanged', { isHeadless: 'false' });
         });
     });
+
+    describe('PostCSS Utilities Tests', () => {
+    
+        it('converts rem to original px correctly with rootSize 3.75', async () => {
+            const text = `.example { margin: 2rem; }`;
+            const convertedText = toOriginalPx(text, 3.75);
+            const expectedPx = Math.round(2 * 3.75);
+            expect(convertedText).toBe(`.example { margin: ${expectedPx}px; }`);
+        });
+    
+        it('returns original text if rootSize is undefined', async () => {
+            const text = `.example { margin: 2rem; }`;
+            const convertedText = toOriginalPx(text, undefined);
+            expect(convertedText).toBe(text);
+        });
+    });
 });
+
+

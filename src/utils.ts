@@ -850,8 +850,6 @@ export function getSupportedStaticAnalysisFileTypes(): string[] {
 }
 
 (function initialize() {
-   const aaa = getPostcssRootValue();
-   console.log('getPostcssRootValue',aaa);
     // insertion order matters.
     msEdgeBrowserMapping.set('Stable', {
         debianLinux: '/opt/microsoft/msedge/msedge',
