@@ -283,6 +283,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Turn off notification for webhint installation failures."
+                },
+                "vscode-edge-devtools.postcssRootValue": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Specifies the root value used by PostCSS."
                 }
             }
         },

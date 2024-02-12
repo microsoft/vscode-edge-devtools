@@ -756,6 +756,12 @@ export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeE
     }
 }
 
+export function getPostcssRootValue(): number | undefined {
+    const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
+    const rootValue: number | undefined = settings.get('postcssRootValue');
+    return rootValue;
+}
+
 export function reportUrlType(url: string, telemetryReporter: Readonly<TelemetryReporter>): void {
     const localhostPattern = /^https?:\/\/localhost:/;
     const ipPattern = /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
@@ -834,6 +840,8 @@ export function getSupportedStaticAnalysisFileTypes(): string[] {
 }
 
 (function initialize() {
+   const aaa = getPostcssRootValue();
+   console.log('getPostcssRootValue',aaa);
     // insertion order matters.
     msEdgeBrowserMapping.set('Stable', {
         debianLinux: '/opt/microsoft/msedge/msedge',
