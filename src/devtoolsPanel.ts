@@ -32,7 +32,7 @@ import {
     CDN_FALLBACK_REVISION,
     getCSSMirrorContentEnabled,
     setCSSMirrorContentEnabled,
-    getPostcssRootValue,
+    getPostCSSRootValue,
     toOriginalPx,
 } from './utils';
 import { ErrorReporter } from './errorReporter';
@@ -384,10 +384,10 @@ export class DevToolsPanel {
                 }
                 if (canMirror)
                 {
-                    const postcssRootValue = getPostcssRootValue();
-                    this.mirroredCSS.set(url, toOriginalPx(newContent, postcssRootValue));
+                    const postCSSRootValue = getPostCSSRootValue();
+                    this.mirroredCSS.set(url, toOriginalPx(newContent, postCSSRootValue));
                     void textEditor.edit(editBuilder => {
-                        editBuilder.replace(fullRange, toOriginalPx(newContent, postcssRootValue));
+                        editBuilder.replace(fullRange, toOriginalPx(newContent, postCSSRootValue));
                     });
                 }
                 else

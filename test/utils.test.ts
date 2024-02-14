@@ -1066,7 +1066,7 @@ describe("utils", () => {
     describe('PostCSS Utilities Tests', () => {
         it("returns the stored settings", async () => {
             const expected = {
-                postcssRootValue: 3.75,
+                postCSSRootValue: 3.75,
             };
 
             // Override the configuration mock to return our custom test values
@@ -1077,8 +1077,8 @@ describe("utils", () => {
             vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
 
             // Ensure the new values are returned
-            const postcssRootValue = utils.getPostcssRootValue();
-            expect(postcssRootValue).toBe(expected.postcssRootValue);
+            const postCSSRootValue = utils.getPostCSSRootValue();
+            expect(postCSSRootValue).toBe(expected.postCSSRootValue);
         });
 
         it('converts rem to original px correctly with rootSize 3.75', async () => {

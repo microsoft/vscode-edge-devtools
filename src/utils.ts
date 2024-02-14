@@ -756,9 +756,9 @@ export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeE
     }
 }
 
-export function getPostcssRootValue(): number | undefined {
+export function getPostCSSRootValue(): number | undefined {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    const rootValue: number | undefined = settings.get('postcssRootValue');
+    const rootValue: number | undefined = settings.get('postCSSRootValue');
     return rootValue;
 }
 
