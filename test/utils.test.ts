@@ -1064,7 +1064,23 @@ describe("utils", () => {
     });
 
     describe('PostCSS Utilities Tests', () => {
-    
+        it("returns the stored settings", async () => {
+            const expected = {
+                postcssRootValue: 3.75,
+            };
+
+            // Override the configuration mock to return our custom test values
+            const configMock = {
+                get: (name: string) => (expected as any)[name],
+            };
+            const vscodeMock = await jest.requireMock("vscode");
+            vscodeMock.workspace.getConfiguration.mockImplementationOnce(() => configMock);
+
+            // Ensure the new values are returned
+            const postcssRootValue = utils.getPostcssRootValue();
+            expect(postcssRootValue).toBe(expected.postcssRootValue);
+        });
+
         it('converts rem to original px correctly with rootSize 3.75', async () => {
             const text = `.example { margin: 2rem; }`;
             const convertedText = toOriginalPx(text, 3.75);
