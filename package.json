@@ -1,7 +1,7 @@
 {
     "name": "vscode-edge-devtools",
-    "displayName": "Microsoft Edge Tools for VS Code",
-    "description": "Use the Microsoft Edge Tools from within VS Code to see your site's runtime HTML structure, alter its layout, fix styling issues as well as see your site's network requests.",
+    "displayName": "%displayName%",
+    "description": "%description%",
     "version": "2.1.4",
     "license": "SEE LICENSE IN LICENSE",
     "publisher": "ms-edgedevtools",
@@ -61,18 +61,18 @@
         "commands": [
             {
                 "command": "vscode-edge-devtools.attach",
-                "title": "Attach to a target",
+                "title": "%commands.0.title%",
                 "category": "Microsoft Edge Tools"
             },
             {
                 "command": "vscode-edge-devtools.launch",
-                "title": "Launch Edge and then attach to a target",
+                "title": "%commands.1.title%",
                 "category": "Microsoft Edge Tools"
             },
             {
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "Microsoft Edge Tools",
-                "title": "Open a new tab",
+                "title": "%commands.2.title%",
                 "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/launch.svg",
@@ -82,7 +82,7 @@
             {
                 "command": "vscode-edge-devtools-view.refresh",
                 "category": "Microsoft Edge Tools",
-                "title": "Refresh Targets",
+                "title": "%commands.3.title%",
                 "enablement": "titleCommandsRegistered",
                 "icon": {
                     "light": "resources/light/refresh.svg",
@@ -92,7 +92,7 @@
             {
                 "command": "vscode-edge-devtools-view.attach",
                 "category": "Microsoft Edge Tools",
-                "title": "Attach and open Microsoft Edge Tools",
+                "title": "%commands.4.title%",
                 "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/attach.svg",
@@ -102,7 +102,7 @@
             {
                 "command": "vscode-edge-devtools-view.close-instance",
                 "category": "Microsoft Edge Tools",
-                "title": "Close instance",
+                "title": "%commands.5.title%",
                 "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/close_browser_page.svg",
@@ -112,7 +112,7 @@
             {
                 "command": "vscode-edge-devtools-view.toggleScreencast",
                 "category": "Microsoft Edge Tools",
-                "title": "Toggle browser",
+                "title": "%commands.6.title%",
                 "enablement": "viewItem != cdpTargetClosing",
                 "icon": {
                     "light": "resources/light/screencast.svg",
@@ -122,80 +122,80 @@
             {
                 "command": "vscode-edge-devtools-view.copyItem",
                 "category": "Microsoft Edge Tools",
-                "title": "Copy Value"
+                "title": "%commands.7.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.openSettings",
                 "category": "Microsoft Edge Tools",
-                "title": "Open Settings"
+                "title": "%commands.8.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.viewChangelog",
                 "category": "Microsoft Edge Tools",
-                "title": "View Changelog"
+                "title": "%commands.9.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.viewDocumentation",
                 "category": "Microsoft Edge Tools",
-                "title": "View Documentation"
+                "title": "%commands.10.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.configureLaunchJson",
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered && isWorkspaceTrusted",
-                "title": "Configure launch.json file"
+                "title": "%commands.11.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.launchProject",
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered && isWorkspaceTrusted",
-                "title": "Launch project"
+                "title": "%commands.12.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.cssMirrorContent",
                 "category": "Microsoft Edge Tools",
                 "enablement": "titleCommandsRegistered",
-                "title": "Toggle CSS mirror editing on/off"
+                "title": "%commands.13.title%"
             },
             {
                 "command": "vscode-edge-devtools-view.launchHtml",
-                "title": "Open Browser with DevTools",
+                "title": "%commands.14.title%",
                 "category": "Microsoft Edge Tools"
             },
             {
                 "command": "vscode-edge-devtools-view.launchScreencast",
-                "title": "Open Browser",
+                "title": "%commands.15.title%",
                 "category": "Microsoft Edge Tools"
             }
         ],
         "configuration": {
-            "title": "Microsoft Edge Tools",
+            "title": "%configuration.title%",
             "type": "object",
             "properties": {
                 "vscode-edge-devtools.hostname": {
                     "type": "string",
                     "default": "localhost",
-                    "description": "The hostname on which to search for remote debuggable instances"
+                    "description": "%configuration.properties.vscode-edge-devtools.hostname.description%"
                 },
                 "vscode-edge-devtools.port": {
                     "type": "number",
                     "default": 9222,
-                    "description": "The port on which to search for remote debuggable instances"
+                    "description": "%configuration.properties.vscode-edge-devtools.port.description%"
                 },
                 "vscode-edge-devtools.useHttps": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Should we request the remote target list using https rather than http"
+                    "description": "%configuration.properties.vscode-edge-devtools.useHttps.description%"
                 },
                 "vscode-edge-devtools.defaultUrl": {
                     "type": "string",
                     "default": "",
-                    "description": "The default url to open when launching the browser without a target"
+                    "description": "%configuration.properties.vscode-edge-devtools.defaultUrl.description%"
                 },
                 "vscode-edge-devtools.defaultEntrypoint": {
                     "type": "string",
                     "default": "index.html",
-                    "description": "The default entrypoint into your webpage. Used to resolve debugging urls without a pathname"
+                    "description": "%configuration.properties.vscode-edge-devtools.defaultEntrypoint.description%"
                 },
                 "vscode-edge-devtools.userDataDir": {
                     "type": [
@@ -203,11 +203,11 @@
                         "boolean"
                     ],
                     "default": true,
-                    "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead."
+                    "description": "%configuration.properties.vscode-edge-devtools.userDataDir.description%"
                 },
                 "vscode-edge-devtools.webRoot": {
                     "type": "string",
-                    "description": "The absolute path to the webserver root. Used to resolve paths like `/app.js` to files on disk",
+                    "description": "%configuration.properties.vscode-edge-devtools.webRoot.description%",
                     "default": "${workspaceFolder}"
                 },
                 "vscode-edge-devtools.pathMapping": {
@@ -215,11 +215,11 @@
                     "default": {
                         "/": "${workspaceFolder}"
                     },
-                    "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk"
+                    "description": "%configuration.properties.vscode-edge-devtools.pathMapping.description%"
                 },
                 "vscode-edge-devtools.sourceMapPathOverrides": {
                     "type": "object",
-                    "description": "A set of mappings to override the locations of source map files.",
+                    "description": "%configuration.properties.vscode-edge-devtools.sourceMapPathOverrides.description%",
                     "default": {
                         "webpack:///./*": "${webRoot}/*",
                         "webpack:///src/*": "${webRoot}/*",
@@ -231,22 +231,22 @@
                 },
                 "vscode-edge-devtools.sourceMaps": {
                     "type": "boolean",
-                    "description": "Use JavaScript source maps (if they exist)",
+                    "description": "%configuration.properties.vscode-edge-devtools.sourceMaps.description%",
                     "default": true
                 },
                 "vscode-edge-devtools.showWorkers": {
                     "type": "boolean",
-                    "description": "Show service and shared workers in the target list.",
+                    "description": "%configuration.properties.vscode-edge-devtools.showWorkers.description%",
                     "default": false
                 },
                 "vscode-edge-devtools.headless": {
                     "type": "boolean",
-                    "description": "Launch Microsoft Edge in headless mode. (requires relaunching Visual Studio Code)",
+                    "description": "%configuration.properties.vscode-edge-devtools.headless.description%",
                     "default": true
                 },
                 "vscode-edge-devtools.browserArgs": {
                     "type": "array",
-                    "description": "Launch Microsoft Edge with specified args. (requires relaunching Visual Studio Code)",
+                    "description": "%configuration.properties.vscode-edge-devtools.browserArgs.description%",
                     "items": {
                         "type": "string"
                     },
@@ -254,7 +254,7 @@
                 },
                 "vscode-edge-devtools.timeout": {
                     "type": "number",
-                    "description": "The number of milliseconds that the Microsoft Edge Tools will keep trying to attach the browser before timing out",
+                    "description": "%configuration.properties.vscode-edge-devtools.timeout.description%",
                     "default": 10000
                 },
                 "vscode-edge-devtools.browserFlavor": {
@@ -267,48 +267,48 @@
                         "Canary"
                     ],
                     "enumDescriptions": [
-                        "Microsoft Edge Tools for VS Code will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
-                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Stable version",
-                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Beta version",
-                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
-                        "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
+                        "%configuration.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.0%",
+                        "%configuration.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.1%",
+                        "%configuration.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.2%",
+                        "%configuration.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.3%",
+                        "%configuration.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.4%"
                     ]
                 },
                 "vscode-edge-devtools.webhint": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
+                    "description": "%configuration.properties.vscode-edge-devtools.webhint.description%"
                 },
                 "vscode-edge-devtools.webhintInstallNotification": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Turn off notification for webhint installation failures."
+                    "description": "%configuration.properties.vscode-edge-devtools.webhintInstallNotification.description%"
                 }
             }
         },
         "debuggers": [
             {
                 "type": "vscode-edge-devtools.debug",
-                "label": "Microsoft Edge Tools",
+                "label": "%debuggers.0.label%",
                 "configurationSnippets": [
                     {
-                        "label": "Microsoft Edge Tools: Launch",
-                        "description": "Launch Microsoft Edge to a URL",
+                        "label": "%debuggers.0.configurationSnippets.0.label%",
+                        "description": "%debuggers.0.configurationSnippets.0.description%",
                         "body": {
                             "type": "vscode-edge-devtools.debug",
                             "request": "launch",
-                            "name": "Launch Microsoft Edge and open the Edge DevTools",
+                            "name": "%debuggers.0.configurationSnippets.0.body.name%",
                             "url": "http://localhost:8080",
                             "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
                         }
                     },
                     {
-                        "label": "Microsoft Edge Tools: Attach",
-                        "description": "Attach to an instance of Microsoft Edge already in debug mode",
+                        "label": "%debuggers.0.configurationSnippets.1.label%",
+                        "description": "%debuggers.0.configurationSnippets.1.description%",
                         "body": {
                             "type": "vscode-edge-devtools.debug",
                             "request": "attach",
-                            "name": "Attach to Microsoft Edge and open the Edge DevTools",
+                            "name": "%debuggers.0.configurationSnippets.1.body.name%",
                             "url": "http://localhost:8080",
                             "webRoot": "^\"${2:\\${workspaceFolder\\}}\""
                         }
@@ -319,52 +319,52 @@
                         "properties": {
                             "url": {
                                 "type": "string",
-                                "description": "Absolute uri to launch",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.url.description%",
                                 "default": "http://localhost:8080"
                             },
                             "file": {
                                 "type": "string",
-                                "description": "File path to launch",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.file.description%",
                                 "default": "${workspaceFolder}/index.html"
                             },
                             "hostname": {
                                 "type": "string",
                                 "default": "localhost",
-                                "description": "The hostname on which to search for remote debuggable instances"
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.hostname.description%"
                             },
                             "port": {
                                 "type": "number",
                                 "default": 9222,
-                                "description": "The port on which to search for remote debuggable instances"
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.port.description%"
                             },
                             "userDataDir": {
                                 "type": [
                                     "string",
                                     "boolean"
                                 ],
-                                "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead.",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.userDataDir.description%",
                                 "default": true
                             },
                             "useHttps": {
                                 "type": "boolean",
                                 "default": false,
-                                "description": "Should we request the remote target list using https rather than http"
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.useHttps.description%"
                             },
                             "webRoot": {
                                 "type": "string",
-                                "description": "The absolute path to the webserver root. Used to resolve paths like `/app.js` to files on disk",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.webRoot.description%",
                                 "default": "${workspaceFolder}"
                             },
                             "pathMapping": {
                                 "type": "object",
-                                "description": "A mapping of URLs/paths to local folders, to resolve scripts in Microsoft Edge to scripts on disk",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.pathMapping.description%",
                                 "default": {
                                     "/": "${workspaceFolder}"
                                 }
                             },
                             "sourceMapPathOverrides": {
                                 "type": "object",
-                                "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.sourceMapPathOverrides.description%",
                                 "default": {
                                     "webpack:///./*": "${webRoot}/*",
                                     "webpack:///src/*": "${webRoot}/*",
@@ -376,7 +376,7 @@
                             },
                             "sourceMaps": {
                                 "type": "boolean",
-                                "description": "Use JavaScript source maps (if they exist)",
+                                "description": "%debuggers.0.configurationAttributes.launch.properties.sourceMaps.description%",
                                 "default": true
                             },
                             "vscode-edge-devtools.browserFlavor": {
@@ -389,11 +389,11 @@
                                     "Canary"
                                 ],
                                 "enumDescriptions": [
-                                    "Microsoft Edge Tools for VS Code will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Stable version",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Beta version",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
+                                    "%debuggers.0.configurationAttributes.launch.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.0%",
+                                    "%debuggers.0.configurationAttributes.launch.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.1%",
+                                    "%debuggers.0.configurationAttributes.launch.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.2%",
+                                    "%debuggers.0.configurationAttributes.launch.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.3%",
+                                    "%debuggers.0.configurationAttributes.launch.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.4%"
                                 ]
                             }
                         }
@@ -402,52 +402,52 @@
                         "properties": {
                             "url": {
                                 "type": "string",
-                                "description": "Absolute uri to launch.",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.url.description%",
                                 "default": "http://localhost:8080"
                             },
                             "file": {
                                 "type": "string",
-                                "description": "File path to launch.",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.file.description%",
                                 "default": "${workspaceFolder}/index.html"
                             },
                             "hostname": {
                                 "type": "string",
                                 "default": "localhost",
-                                "description": "The hostname on which to search for remote debuggable instances"
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.hostname.description%"
                             },
                             "port": {
                                 "type": "number",
                                 "default": 9222,
-                                "description": "The port on which to search for remote debuggable instances"
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.port.description%"
                             },
                             "userDataDir": {
                                 "type": [
                                     "string",
                                     "boolean"
                                 ],
-                                "description": "By default, Microsoft Edge is launched with a separate user profile in a temp folder. Use this option to override the path. You can also set to false to launch with your default user profile instead.",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.userDataDir.description%",
                                 "default": true
                             },
                             "useHttps": {
                                 "type": "boolean",
                                 "default": false,
-                                "description": "Should we request the remote target list using https rather than http"
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.useHttps.description%"
                             },
                             "webRoot": {
                                 "type": "string",
-                                "description": "The absolute path to the webserver root. Used to resolve paths like `/app.js` to files on disk",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.webRoot.description%",
                                 "default": "${workspaceFolder}"
                             },
                             "pathMapping": {
                                 "type": "object",
-                                "description": "A mapping of URLs/paths to local folders, to resolve scripts in Microsoft Edge to scripts on disk",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.pathMapping.description%",
                                 "default": {
                                     "/": "${workspaceFolder}"
                                 }
                             },
                             "sourceMapPathOverrides": {
                                 "type": "object",
-                                "description": "A set of mappings for rewriting the locations of source files from what the sourcemap says, to their locations on disk",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.sourceMapPathOverrides.description%",
                                 "default": {
                                     "webpack:///./*": "${webRoot}/*",
                                     "webpack:///src/*": "${webRoot}/*",
@@ -459,7 +459,7 @@
                             },
                             "sourceMaps": {
                                 "type": "boolean",
-                                "description": "Use JavaScript source maps (if they exist)",
+                                "description": "%debuggers.0.configurationAttributes.attach.properties.sourceMaps.description%",
                                 "default": true
                             },
                             "vscode-edge-devtools.browserFlavor": {
@@ -472,11 +472,11 @@
                                     "Canary"
                                 ],
                                 "enumDescriptions": [
-                                    "Microsoft Edge Tools for VS Code will try to open the Microsoft Edge flavors in the following order: Stable, Beta, Dev and Canary",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Stable version",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Beta version",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
-                                    "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
+                                    "%debuggers.0.configurationAttributes.attach.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.0%",
+                                    "%debuggers.0.configurationAttributes.attach.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.1%",
+                                    "%debuggers.0.configurationAttributes.attach.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.2%",
+                                    "%debuggers.0.configurationAttributes.attach.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.3%",
+                                    "%debuggers.0.configurationAttributes.attach.properties.vscode-edge-devtools.browserFlavor.enumDescriptions.4%"
                                 ]
                             }
                         }
@@ -580,14 +580,14 @@
         "submenus": [
             {
                 "id": "devtoolsContextMenu",
-                "label": "Open with Edge"
+                "label": "%submenus.0.label%"
             }
         ],
         "viewsContainers": {
             "activitybar": [
                 {
                     "id": "vscode-edge-devtools-view",
-                    "title": "Microsoft Edge Tools",
+                    "title": "%viewsContainers.activitybar.0.title%",
                     "icon": "resources/viewIcon.svg"
                 }
             ]
@@ -596,51 +596,51 @@
             "vscode-edge-devtools-view": [
                 {
                     "id": "vscode-edge-devtools-view.targets",
-                    "name": "Targets"
+                    "name": "%views.vscode-edge-devtools-view.0.name%"
                 },
                 {
                     "id": "vscode-edge-devtools-view.help-links",
-                    "name": "Helpful links"
+                    "name": "%views.vscode-edge-devtools-view.1.name%"
                 }
             ]
         },
         "viewsWelcome": [
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying webpages.\n[Launch Instance](command:vscode-edge-devtools-view.launch?[true])",
+                "contents": "%viewsWelcome.0.contents%",
                 "when": "launchJsonStatus != Supported"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "To customize your launch experience, open a folder and create a launch.json file. \n[Open Folder](command:vscode.openFolder)",
+                "contents": "%viewsWelcome.1.contents%",
                 "when": "workbenchState == empty"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Customize your launch experience by adding a launch.json file to your project.\n[Generate launch.json](command:vscode-edge-devtools-view.configureLaunchJson)",
+                "contents": "%viewsWelcome.2.contents%",
                 "when": "workbenchState != empty && launchJsonStatus == None && isWorkspaceTrusted"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Customize your launch experience by adding a debug configuration to your launch.json file.\n[Configure launch.json](command:vscode-edge-devtools-view.configureLaunchJson)",
+                "contents": "%viewsWelcome.3.contents%",
                 "when": "launchJsonStatus == Unsupported && isWorkspaceTrusted"
             },
             {
                 "view": "vscode-edge-devtools-view.targets",
-                "contents": "Launch an instance of Microsoft Edge to begin inspecting and modifying your site.\n[Launch Project](command:vscode-edge-devtools-view.launchProject)",
+                "contents": "%viewsWelcome.4.contents%",
                 "when": "launchJsonStatus == Supported && isWorkspaceTrusted"
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
-                "contents": "[Documentation](command:vscode-edge-devtools-view.viewDocumentation)"
+                "contents": "%viewsWelcome.5.contents%"
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
-                "contents": "[Report a Bug](https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.md)"
+                "contents": "%viewsWelcome.6.contents%"
             },
             {
                 "view": "vscode-edge-devtools-view.help-links",
-                "contents": "[Request a Feature](https://github.com/microsoft/vscode-edge-devtools/issues/new?template=feature_request.md)"
+                "contents": "%viewsWelcome.7.contents%"
             }
         ]
     },
