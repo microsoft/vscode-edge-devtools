@@ -79,7 +79,7 @@ export class BrowserVersionDetectionSocket extends EventEmitter {
 
         // TODO: Workaround https://github.com/microsoft/vscode-edge-devtools/issues/1992
         // remove when it has been fixed
-        if (parseFloat(versionNum) > 120) {
+        if (parseFloat(versionNum) > 121) {
             return {revision: '@d550f77b048ac142a3292397c64cdb693e4aca08', isHeadless};
         }
 
