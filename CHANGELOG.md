@@ -1,3 +1,8 @@
+## 2.1.5
+* **[Bug Fix]**: Fixing relaunch scenario on headless - [PR #1979](https://github.com/microsoft/vscode-edge-devtools/pull/1979)
+* **[Bug Fix]**: Patch for missing icons - [PR #2045](https://github.com/microsoft/vscode-edge-devtools/pull/2045)
+* **[Bug Fix]**: Updating fallback version to 120 - [PR #2046](https://github.com/microsoft/vscode-edge-devtools/pull/2046)
+
 ## 2.1.4
 * **[Bug Fix]**: Extension fails to relaunch an instance (headless) - [PR #1978](https://github.com/microsoft/vscode-edge-devtools/pull/1978)
 * **[Bug Fix]**: Error while fetching list of available targets No available targets to attach - [PR #1804](https://github.com/microsoft/vscode-edge-devtools/pull/1804)
