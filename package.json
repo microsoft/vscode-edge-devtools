@@ -684,7 +684,7 @@
         "vscode-chrome-debug-core": "6.8.11",
         "vscode-extension-telemetry": "0.4.1",
         "vscode-webhint": "2.1.11",
-        "ws": "8.13.0",
+        "ws": "8.17.1",
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
