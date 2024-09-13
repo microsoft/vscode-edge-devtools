@@ -683,7 +683,7 @@
         "utf-8-validate": "6.0.3",
         "vscode-chrome-debug-core": "6.8.11",
         "vscode-extension-telemetry": "0.4.1",
-        "vscode-webhint": "2.1.11",
+        "vscode-webhint": "2.1.15",
         "ws": "8.13.0",
         "xmlhttprequest": "1.8.0"
     },
@@ -711,7 +711,7 @@
         "uglify-js": "3.17.4",
         "unzipper": "0.10.14",
         "@vscode/vsce": "^2.19.0",
-        "vscode-languageclient": "7.0.0",
+        "vscode-languageclient": "9.0.1",
         "vscode-test": "1.6.1",
         "webpack": "5.94.0",
         "webpack-cli": "5.1.4"
