@@ -589,7 +589,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             if (!exeName) { return; }
             const match = exeName.match(/(chrome|edge)/gi) || [];
             const knownBrowser = match.length > 0 ? match[0] : 'other';
-            const browserProps = { exe: `${knownBrowser.toLowerCase()}` };
+            const browserProps = { exe: `${knownBrowser?.toLowerCase()}` };
             telemetryReporter.sendTelemetryEvent('command/launch/browser', browserProps);
 
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
