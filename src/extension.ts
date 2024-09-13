@@ -257,12 +257,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     if (settingsConfig.get('webhint')) {
-        startWebhint(context);
+        void startWebhint(context);
     }
     vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.webhint`)) {
             if (vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhint')) {
-                startWebhint(context);
+                void startWebhint(context);
             } else {
                 void stopWebhint();
             }
