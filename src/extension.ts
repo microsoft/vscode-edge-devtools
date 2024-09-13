@@ -303,7 +303,7 @@ export async function launchScreencast(context: vscode.ExtensionContext, fileUri
     }
 }
 
-function startWebhint(context: vscode.ExtensionContext): void {
+async function startWebhint(context: vscode.ExtensionContext): Promise<void> {
     const args = [context.globalStoragePath, languageServerName];
     const module = context.asAbsolutePath('node_modules/vscode-webhint/dist/src/server.js');
     const transport = TransportKind.ipc;
@@ -370,37 +370,34 @@ function startWebhint(context: vscode.ExtensionContext): void {
 
     // Create and start the client (also starts the server).
     client = new LanguageClient('Microsoft Edge Tools', serverOptions, clientOptions);
-
-    void client.onReady().then(() => {
-        // Listen for notification that the webhint install failed.
-        const installFailedNotification: typeof installFailed = 'vscode-webhint/install-failed';
-        const disableInstallFailedNotification = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhintInstallNotification');
-        client.onNotification(installFailedNotification, () => {
-            if (!telemetryReporter) {
-                telemetryReporter = createTelemetryReporter(context);
-            }
-            telemetryReporter.sendTelemetryEvent('user/webhint/install-failed');
-            if (!disableInstallFailedNotification) {
-                const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
-                void vscode.window.showInformationMessage(message, 'Remind me Later', 'Don\'t show again', 'Disable Extension').then(button => {
-                    if (button === 'Disable Extension') {
-                        void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
-                    }
-                    if (button === 'Don\'t show again') {
-                        void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhintInstallNotification', true, vscode.ConfigurationTarget.Global);
-                    }
-                });
-            }
-        });
-        // Listen for requests to show the output panel for this extension.
-        const showOutputNotification: typeof showOutput = 'vscode-webhint/show-output';
-        client.onNotification(showOutputNotification, () => {
-            client.outputChannel.clear();
-            client.outputChannel.show(true);
-        });
+    // Listen for notification that the webhint install failed.
+    const installFailedNotification: typeof installFailed = 'vscode-webhint/install-failed';
+    const disableInstallFailedNotification = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhintInstallNotification');
+    client.onNotification(installFailedNotification, () => {
+        if (!telemetryReporter) {
+            telemetryReporter = createTelemetryReporter(context);
+        }
+        telemetryReporter.sendTelemetryEvent('user/webhint/install-failed');
+        if (!disableInstallFailedNotification) {
+            const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
+            void vscode.window.showInformationMessage(message, 'Remind me Later', 'Don\'t show again', 'Disable Extension').then(button => {
+                if (button === 'Disable Extension') {
+                    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
+                }
+                if (button === 'Don\'t show again') {
+                    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhintInstallNotification', true, vscode.ConfigurationTarget.Global);
+                }
+            });
+        }
     });
 
-    client.start();
+    // Listen for requests to show the output panel for this extension.
+    const showOutputNotification: typeof showOutput = 'vscode-webhint/show-output';
+    client.onNotification(showOutputNotification, () => {
+        client.outputChannel.clear();
+        client.outputChannel.show(true);
+    });
+    await client.start();
 }
 
 async function stopWebhint(): Promise<void> {
