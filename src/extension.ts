@@ -40,10 +40,12 @@ import {
 import { LaunchConfigManager, providedHeadlessDebugConfig, providedLaunchDevToolsConfig } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
-import {
-    LanguageClient,
+import type {
     LanguageClientOptions,
     ServerOptions,
+} from 'vscode-languageclient/node';
+import {
+    LanguageClient,
     TransportKind,
 } from 'vscode-languageclient/node';
 import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
