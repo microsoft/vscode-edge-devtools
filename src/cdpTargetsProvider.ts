@@ -138,11 +138,13 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
                             await fs.promises.writeFile(filePath, Buffer.concat(buffer));
                             actualTarget.faviconUrl = filePath;
                             resolve(actualTarget);
-                        } catch (e) {
+                        } catch {
+                            // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
                             reject(actualTarget);
                         }
                     });
                 } else {
+                    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
                     resolve(actualTarget);
                 }
             });

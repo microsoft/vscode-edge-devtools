@@ -153,7 +153,7 @@ export class LaunchConfigManager {
         for (const missingConfig of missingConfigs) {
             configs.push((missingConfig as vscode.DebugConfiguration));
         }
-        await launchJson.update('configurations', configs) as unknown as Promise<void>;
+        void await launchJson.update('configurations', configs);
 
         // Add compound configs
         let compounds = launchJson.get('compounds') as CompoundConfig[];
@@ -162,7 +162,7 @@ export class LaunchConfigManager {
         for (const missingCompoundConfig of missingCompoundConfigs) {
             compounds.push((missingCompoundConfig as CompoundConfig));
         }
-        await launchJson.update('compounds', compounds) as unknown as Promise<void>;
+        void await launchJson.update('compounds', compounds);
 
         // Insert instruction comment
         let launchText = fse.readFileSync(workspaceUri.fsPath + relativePath).toString();

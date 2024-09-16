@@ -64,7 +64,7 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
             }
         } else {
             this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
-            vscode.window.showErrorMessage('No supported launch config was found.') as Promise<void>;
+            void vscode.window.showErrorMessage('No supported launch config was found.');
         }
 
         return undefined;
