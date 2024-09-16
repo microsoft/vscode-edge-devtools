@@ -3,7 +3,7 @@
 
 import { ExtensionContext, Uri} from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
+import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, createFakeLanguageClient, Mocked } from "./helpers/helpers";
 import {
     buttonCode,
     IRemoteTargetJson,
@@ -14,6 +14,7 @@ import {
 } from "../src/utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
+jest.mock("vscode-languageclient/node", () => createFakeLanguageClient(), { virtual: true });
 
 describe("extension", () => {
     const fakeRuntimeConfig: Partial<IRuntimeConfig> = {};
@@ -59,6 +60,9 @@ describe("extension", () => {
                     CDPTargetsProvider: mockProviderConstructor,
                 };
             });
+
+            const mockLanguageClient = createFakeLanguageClient()
+            jest.doMock("vscode-languageclient/node", () => mockLanguageClient, { virtual: true });
 
             // Mock out vscode command registration
             const mockVSCode = createFakeVSCode();

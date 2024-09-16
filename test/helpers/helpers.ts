@@ -212,3 +212,19 @@ export function getFirstCallback(mock: jest.Mock, callbackArgIndex: number = 0):
     { callback: Function, thisObj: object } {
     return { callback: mock.mock.calls[0][callbackArgIndex], thisObj: mock.mock.instances[0] };
 }
+
+export function createFakeLanguageClient() {
+    const createFakeLanguageClient = jest.fn().mockImplementation(() => {
+        return {
+            LanguageClient: function LanguageClient() { /* constructor */ }
+        }
+    });
+    const createFakeLTransportKind = jest.fn().mockImplementation(() => {
+        return {
+            TransportKind: function TransportKind() { /* constructor */ }
+        }
+    });
+    return { LanguageClient: createFakeLanguageClient,
+            TransportKind: createFakeLTransportKind
+     }
+}
