@@ -225,7 +225,7 @@ export async function getListOfTargets(hostname: string, port: number, useHttps:
             if (jsonResponse) {
                 break;
             }
-        } catch (e) {
+        } catch {
             // localhost might not be ready as the user might not have a server running
             // user may also have changed settings making the endpoint invalid
         }

@@ -159,6 +159,8 @@ export class DevToolsPanel {
         if (!ScreencastPanel.instance && vscode.debug.activeDebugSession?.name.includes(providedHeadlessDebugConfig.name)) {
             void vscode.commands.executeCommand('workbench.action.debug.stop');
         }
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         ScreencastPanel.instance && ScreencastPanel.instance.update();
     }
 
@@ -210,7 +212,7 @@ export class DevToolsPanel {
                         void vscode.commands.executeCommand(`${SETTINGS_VIEW_NAME}.toggleInspect`, { enabled: true });
                     }
                 }
-            } catch (e) {
+            } catch {
                 // Ignore
             }
         }
@@ -446,7 +448,7 @@ export class DevToolsPanel {
                 const oldSourePath = sourcePath;
                 sourcePath = addEntrypointIfNeeded(sourcePath, this.config.defaultEntrypoint);
                 appendedEntryPoint = oldSourePath !== sourcePath;
-            } catch (e) {
+            } catch {
                 await ErrorReporter.showInformationDialog({
                     errorCode: ErrorCodes.Error,
                     title: 'Unable to open file in editor.',
@@ -576,6 +578,8 @@ export class DevToolsPanel {
             });
             panel.iconPath = vscode.Uri.joinPath(context.extensionUri, 'icon.png');
             DevToolsPanel.instance = new DevToolsPanel(panel, context, telemetryReporter, targetUrl, config);
+
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             ScreencastPanel.instance && ScreencastPanel.instance.update();
         }
     }
