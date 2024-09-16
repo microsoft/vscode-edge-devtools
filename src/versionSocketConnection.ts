@@ -77,12 +77,6 @@ export class BrowserVersionDetectionSocket extends EventEmitter {
         const minSupportedVersion = MIN_SUPPORTED_VERSION.split('.').map(part => Number(part));
         const currentRevision = data.result.revision || '';
 
-        // TODO: Workaround https://github.com/microsoft/vscode-edge-devtools/issues/1992
-        // remove when it has been fixed
-        if (parseFloat(versionNum) > 121) {
-            return {revision: '@d550f77b048ac142a3292397c64cdb693e4aca08', isHeadless};
-        }
-
         for (let i = 0; i < currentVersion.length; i++) {
             // Loop through from Major to minor numbers
             if (currentVersion[i] > minSupportedVersion[i]) {
