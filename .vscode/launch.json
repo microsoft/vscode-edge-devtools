@@ -6,25 +6,25 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "autoAttachChildProcesses": true,
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
-            "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "npm: build"
+            "preLaunchTask": "npm: build-debug"
         },
         {
             "name": "Launch Extension Edge Watch",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "autoAttachChildProcesses": true,
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
-            "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
@@ -36,10 +36,10 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "autoAttachChildProcesses": true,
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
-            "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
