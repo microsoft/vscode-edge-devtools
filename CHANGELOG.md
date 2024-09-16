@@ -1,3 +1,10 @@
+## 2.1.6
+* **[Bug Fix]**: Fixing an issue where webhint was not being loaded - [PR #2418](https://github.com/microsoft/vscode-edge-devtools/pull/2418)
+* **[Bug Fix]**: Updating fallback version to 127 - [PR #2425](https://github.com/microsoft/vscode-edge-devtools/pull/2425)
+* **[Upgrade]**: Bump puppeteer to v18 - [PR #2423](https://github.com/microsoft/vscode-edge-devtools/pull/2423)
+* **[Upgrade]**: Bumping several dependencies to newer versions - [PR #2417](https://github.com/microsoft/vscode-edge-devtools/pull/2417)
+
+
 ## 2.1.5
 * **[Bug Fix]**: Fixing relaunch scenario on headless - [PR #1979](https://github.com/microsoft/vscode-edge-devtools/pull/1979)
 * **[Bug Fix]**: Patch for missing icons - [PR #2045](https://github.com/microsoft/vscode-edge-devtools/pull/2045)
