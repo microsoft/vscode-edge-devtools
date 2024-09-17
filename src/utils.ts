@@ -110,7 +110,7 @@ const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
 
 // Current Revision: 127.0.2594.0
-export const CDN_FALLBACK_REVISION = '@xxf163ae219c3b08cda5aafa6b262442715a8a9893';
+export const CDN_FALLBACK_REVISION = '@f163ae219c3b08cda5aafa6b262442715a8a9893';
 
 /** Build-specified flags. */
 declare const DEBUG: boolean;
