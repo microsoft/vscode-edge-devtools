@@ -179,6 +179,13 @@ export function activate(context: vscode.ExtensionContext): void {
             const normalizedPath = new URL(target.description).toString();
             if (browserInstance) {
                 const browserPages = await browserInstance.pages();
+
+                // First we validate we have pages to close, some non-visual targets could keep the browser
+                // instance alive.
+                if(!browserPages || browserPages.length === 0){
+                    browserInstance.close();
+                }
+
                 for (const page of browserPages) {
                     // URL needs to be accessed through the target as the page could be handling errors in a different way.
                     // e.g redirecting to chrome-error: protocol

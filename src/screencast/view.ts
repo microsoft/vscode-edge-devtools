@@ -29,6 +29,7 @@ export class ScreencastView {
   </head>
   <body>
       <div id="main">
+          <div id="infobar"></div>
           <div id="toolbar">
               <button id="back" title="Back">
                   <i class="codicon codicon-arrow-left"></i>
