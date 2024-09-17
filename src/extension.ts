@@ -182,8 +182,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
                 // First we validate we have pages to close, some non-visual targets could keep the browser
                 // instance alive.
-                if(!browserPages || browserPages.length === 0){
-                    browserInstance.close();
+                if (!browserPages || browserPages.length === 0){
+                    void browserInstance.close();
+                    return;
                 }
 
                 for (const page of browserPages) {
