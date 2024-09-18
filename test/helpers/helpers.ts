@@ -87,6 +87,9 @@ export function createFakeVSCode() {
             showTextDocument: jest.fn(),
             showInformationMessage: jest.fn(),
             showWarningMessage: jest.fn().mockResolvedValue({}),
+            activeColorTheme: {
+                kind: 1
+            }
         },
         workspace: {
             createFileSystemWatcher: jest.fn(),
@@ -140,9 +143,11 @@ export function createFakeVSCode() {
  * Create a fake VS Code extension context that can be used in tests
  */
 export function createFakeExtensionContext() {
+    const mockedGlobalState = new Map();
     return {
         extensionPath: "",
         subscriptions: [],
+        globalState: mockedGlobalState,
         workspaceState: {
             get: jest.fn(),
             update: jest.fn(),
