@@ -174,6 +174,7 @@ describe("devtoolsPanel", () => {
     describe("update", () => {
         it("adds attempts to detect browser version only when visible", async () => {
             const dtp = await import("../src/devtoolsPanel");
+            mockRuntimeConfig.browserFlavor = 'Stable';
             dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
             expect(mockPanel.onDidChangeViewState).toHaveBeenCalled();
 
