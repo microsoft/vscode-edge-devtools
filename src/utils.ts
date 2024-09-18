@@ -63,6 +63,7 @@ export interface IRuntimeConfig {
     useLocalEdgeWatch: boolean;
     devtoolsBaseUri?: string;
     defaultEntrypoint?: string;
+    browserFlavor: BrowserFlavor;
 }
 export interface IStringDictionary<T> {
     [name: string]: T;
@@ -110,7 +111,7 @@ const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
 
 // Current Revision: 127.0.2594.0
-export const CDN_FALLBACK_REVISION = '@xxf163ae219c3b08cda5aafa6b262442715a8a9893';
+export const CDN_FALLBACK_REVISION = '@f163ae219c3b08cda5aafa6b262442715a8a9893';
 
 /** Build-specified flags. */
 declare const DEBUG: boolean;
@@ -454,6 +455,7 @@ export function removeTrailingSlash(uri: string): string {
 export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeConfig {
     const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
     const pathMapping = config.pathMapping || settings.get('pathMapping') || SETTINGS_DEFAULT_PATH_MAPPING;
+    const browserFlavor = config.browserFlavor || settings.get('browserFlavor') || 'Default';
     const sourceMapPathOverrides =
         config.sourceMapPathOverrides || settings.get('sourceMapPathOverrides') || SETTINGS_DEFAULT_PATH_OVERRIDES;
     const webRoot = config.webRoot || settings.get('webRoot') || SETTINGS_DEFAULT_WEB_ROOT;
@@ -499,6 +501,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
     return {
         pathMapping: resolvedMappingOverrides,
         sourceMapPathOverrides: resolvedOverrides,
+        browserFlavor,
         sourceMaps,
         webRoot: resolvedWebRoot,
         isJsDebugProxiedCDPConnection: false,
