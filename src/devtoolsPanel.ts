@@ -57,8 +57,8 @@ export class DevToolsPanel {
     private collectConsoleMessages = true;
     private currentRevision: string | undefined;
     private cssWarningActive: boolean;
-    private fallbackChain: Function[] = [];
-    private getFallbackRevisionFunction: Function = () => {};
+    private fallbackChain: (() => void)[] = [];
+    private getFallbackRevisionFunction: (() => void) = () => {};
 
     private constructor(
         panel: vscode.WebviewPanel,
@@ -109,7 +109,7 @@ export class DevToolsPanel {
         // Gets an array of functions that will be tried to get the right Devtools revision.
         this.fallbackChain = this.determineVersionFallback();
         if (this.fallbackChain.length > 0) {
-            this.getFallbackRevisionFunction = this.fallbackChain.pop()|| this.getFallbackRevisionFunction;
+            this.getFallbackRevisionFunction = this.fallbackChain.pop() || this.getFallbackRevisionFunction;
         }
 
         // Handle closing
@@ -153,16 +153,16 @@ export class DevToolsPanel {
         const storedRevision = this.context.globalState.get<string>('fallbackRevision') || '';
         const callWrapper = (revision: string) => {
             this.setCdnParameters({revision, isHeadless: this.isHeadless});
-        }
+        };
 
         // Use version socket to determine which Webview/Tools to use
         const detectedVersion = () => {
             this.versionDetectionSocket.on('setCdnParameters', (msg: {revision: string; isHeadless: boolean}) => {
-                this.setCdnParameters(msg)
+                this.setCdnParameters(msg);
             });
 
             this.versionDetectionSocket.detectVersion.bind(this.versionDetectionSocket)();
-        }
+        };
 
         // we reverse the array so that it behaves like a stack.
         switch (browserFlavor) {
@@ -461,7 +461,7 @@ export class DevToolsPanel {
             // We failed trying to retrieve the specified revision
             // we fallback to the next option if available.
             if (this.fallbackChain.length > 0) {
-                this.getFallbackRevisionFunction = this.fallbackChain.pop() || Function;
+                this.getFallbackRevisionFunction = this.fallbackChain.pop() || (() => {});
                 this.getFallbackRevisionFunction();
             }
         }
