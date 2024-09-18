@@ -198,3 +198,31 @@ body {
 .devtools-open {
   color: #7dbae9;
 }
+
+.infobar {
+  flex-direction: row;
+  width: 100vw;
+  color: black;
+  background-color: rgb(254 246 213 / 100%);
+  height: 30px;
+}
+
+.infobar-message {
+  text-align: left;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: small;
+  padding: 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.infobar-close-button {
+  background-image: url('../../resources/Images/cross.svg');
+  background-repeat: no-repeat;
+  align-self: right;
+  background-size: 18px;
+  width: 20px;
+  height: 20px;
+  margin: 5px 10px 5px auto;
+}
