@@ -40,14 +40,14 @@ describe("launchDebugProvider", () => {
         });
     });
 
-    describe("resolveDebugConfiguration", () => {
+    describe("resolveDebugConfigurationWithSubstitutedVariables", () => {
         it("calls attach", async () => {
             const mockConfig = {
                 name: "config",
                 request: "attach",
                 type: `${SETTINGS_STORE_NAME}.debug`,
             };
-            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
+            await host.resolveDebugConfigurationWithSubstitutedVariables(undefined, mockConfig, undefined);
             expect(attach).toHaveBeenCalled();
         });
 
@@ -57,7 +57,7 @@ describe("launchDebugProvider", () => {
                 request: "launch",
                 type: `${SETTINGS_STORE_NAME}.debug`,
             };
-            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
+            await host.resolveDebugConfigurationWithSubstitutedVariables(undefined, mockConfig, undefined);
             expect(launch).toHaveBeenCalled();
         });
 
@@ -68,11 +68,11 @@ describe("launchDebugProvider", () => {
                 request: "launch",
                 type: `${SETTINGS_STORE_NAME}.debug`,
             };
-            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
+            await host.resolveDebugConfigurationWithSubstitutedVariables(undefined, mockConfig, undefined);
             expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///index.html", mockConfig);
 
             mockConfig.file = "/index.html";
-            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
+            await host.resolveDebugConfigurationWithSubstitutedVariables(undefined, mockConfig, undefined);
             expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///index.html", mockConfig);
 
             const mockFolder = {
@@ -81,7 +81,7 @@ describe("launchDebugProvider", () => {
                 uri: { path: "path" },
             };
             mockConfig.file = "${workspaceFolder}/index.html";
-            await host.resolveDebugConfiguration(mockFolder as any, mockConfig, undefined);
+            await host.resolveDebugConfigurationWithSubstitutedVariables(mockFolder as any, mockConfig, undefined);
             expect(launch).toHaveBeenCalledWith(expect.any(Object), "file:///path/index.html", mockConfig);
         });
 
@@ -92,12 +92,12 @@ describe("launchDebugProvider", () => {
                 type: `${SETTINGS_STORE_NAME}.debug`,
                 url: "http://localhost/index.html",
             };
-            await host.resolveDebugConfiguration(undefined, mockConfig, undefined);
+            await host.resolveDebugConfigurationWithSubstitutedVariables(undefined, mockConfig, undefined);
             expect(launch).toHaveBeenCalledWith(expect.any(Object), mockConfig.url, mockConfig);
         });
 
         it("reports error on no config", async () => {
-            const result = await host.resolveDebugConfiguration(undefined, null as any, undefined);
+            const result = await host.resolveDebugConfigurationWithSubstitutedVariables(undefined, null as any, undefined);
             expect(result).toBeUndefined();
             expect(mockReporter.sendTelemetryEvent).toHaveBeenCalled();
         });
