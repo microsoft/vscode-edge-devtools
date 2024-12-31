@@ -14,6 +14,25 @@ Features:
 
 **Note**: This extension needs Microsoft Edge to be on your computer. Windows machines already come with it, for Mac and Linux, please [download and install a version of Edge](https://www.microsoft.com/edge).
 
+## Cloning the Repository
+
+To clone this repository, you can use the following command:
+
+```sh
+gh repo clone microsoft/vscode-edge-devtools
+```
+
+### Prerequisites
+
+Before running the above command, ensure you have the following prerequisites:
+
+- [GitHub CLI](https://cli.github.com/) installed on your machine.
+- A GitHub account.
+
+### Repository Overview
+
+This repository contains the source code for the Microsoft Edge Tools for Visual Studio Code extension. The extension allows you to use the Developer Tools of Microsoft Edge inside Visual Studio Code, providing features such as live analysis of issues in your source code, browser preview, and more.
+
 ## Documentation
 
 For more details on how to use and customize the extension, [refer to the documentation](https://learn.microsoft.com/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension).
