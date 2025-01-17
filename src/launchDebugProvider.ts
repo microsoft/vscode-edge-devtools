@@ -42,7 +42,7 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
         return Promise.resolve([providedDebugConfig]);
     }
 
-    resolveDebugConfiguration(
+    resolveDebugConfigurationWithSubstitutedVariables(
         folder: vscode.WorkspaceFolder | undefined,
         config: vscode.DebugConfiguration, _token?: vscode.CancellationToken):
         vscode.ProviderResult<vscode.DebugConfiguration> {
