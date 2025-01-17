@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Browser, Target } from 'puppeteer-core';
+import { Browser, Target, TargetType } from 'puppeteer-core';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import TelemetryReporter from 'vscode-extension-telemetry';
@@ -610,7 +610,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             cdpTargetsProvider.refresh();
         });
         browserInstance.on('targetchanged',  (target: Target) => {
-            if (target.type() === 'page') {
+            if (target.type() === TargetType.PAGE) {
                 reportUrlType(target.url(), telemetryReporter);
             }
         });
