@@ -13,7 +13,7 @@ import TelemetryReporter from 'vscode-extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
 
-import puppeteer from 'puppeteer-core';
+import puppeteer, {Browser} from 'puppeteer-core';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 
@@ -394,7 +394,7 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @param userDataDir The user data directory for the launched instance
  * @param forceHeadless This force overrides the --headless arg for browser launch
  */
-export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean): Promise<puppeteer.Browser> {
+export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean): Promise<Browser> {
     const args = [
         '--no-first-run',
         '--no-default-browser-check',
