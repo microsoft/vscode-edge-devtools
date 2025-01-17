@@ -5,7 +5,7 @@
 // tslint:disable: variable-name
 
 import { ExtensionContext } from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import TelemetryReporter from "@vscode/extension-telemetry";
 import { CDPTarget } from "../src/cdpTarget";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
 import { IRemoteTargetJson } from "../src/utils";

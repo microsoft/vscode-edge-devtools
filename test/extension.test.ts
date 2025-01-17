@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { ExtensionContext, Uri} from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import TelemetryReporter from "@vscode/extension-telemetry";
 import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, createFakeLanguageClient, Mocked } from "./helpers/helpers";
 import {
     buttonCode,

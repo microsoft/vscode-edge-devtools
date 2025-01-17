@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as url from 'url';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
 
@@ -338,7 +338,7 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
 export function createTelemetryReporter(_context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
     if (packageJson && (_context.extensionMode === vscode.ExtensionMode.Production)) {
         // Use the real telemetry reporter
-        return new TelemetryReporter(packageJson.name, packageJson.version, packageJson.aiKey);
+        return new TelemetryReporter(packageJson.aiKey);
     }
         // Fallback to a fake telemetry reporter
         return new DebugTelemetryReporter();

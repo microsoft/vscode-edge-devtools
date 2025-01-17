@@ -7,7 +7,7 @@ import { createFakeVSCode } from "./helpers/helpers";
 // eslint-disable no-console
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
-jest.mock("vscode-extension-telemetry");
+jest.mock("@vscode/extension-telemetry");
 
 describe("debugTelemetryReporter", () => {
     it("gets created successfully", async () => {

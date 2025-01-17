@@ -5,7 +5,7 @@
 // tslint:disable: variable-name
 
 import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
-import TelemetryReporter from "vscode-extension-telemetry";
+import TelemetryReporter from "@vscode/extension-telemetry";
 import { TelemetryData, webviewEventNames } from "../src/common/webviewEvents";
 import { PanelSocket } from "../src/panelSocket";
 import { JsDebugProxyPanelSocket } from "../src/JsDebugProxyPanelSocket";

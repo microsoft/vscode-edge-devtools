@@ -17,7 +17,7 @@ import {
     SETTINGS_SCREENCAST_WEBVIEW_NAME,
     SETTINGS_VIEW_NAME,
 } from './utils';
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 import { DevToolsPanel } from './devtoolsPanel';
 import { providedHeadlessDebugConfig } from './launchConfigManager';
 

@@ -429,7 +429,7 @@ describe("utils", () => {
 
         it("returns a retail version when valid package in retail env", async () => {
             const retailReporter = {};
-            jest.doMock("vscode-extension-telemetry", () => function retail() { return retailReporter; });
+            jest.doMock("@vscode/extension-telemetry", () => function retail() { return retailReporter; });
             jest.resetModules();
             jest.requireMock("vscode").env.machineId = "12345";
 
