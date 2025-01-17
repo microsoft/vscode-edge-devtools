@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import { performance } from 'perf_hooks';
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,

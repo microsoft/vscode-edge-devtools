@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 
 export class DebugTelemetryReporter extends TelemetryReporter {
     constructor() {
-        super('extensionId', 'extensionVersion', 'key');
+        super('key');
     }
 
     sendTelemetryEvent(
