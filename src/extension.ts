@@ -83,7 +83,7 @@ export function activate(context: vscode.ExtensionContext): void {
         void attach(context);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, ( opts: {launchUrl: string} = {launchUrl: ""} ): void => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_STORE_NAME}.launch`, (opts: {launchUrl: string} = {launchUrl: ''}): void => {
         void launch(context, opts.launchUrl);
     }));
 
