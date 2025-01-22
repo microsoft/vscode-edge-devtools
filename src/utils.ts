@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 import * as fse from 'fs-extra';
 import * as http from 'http';
 import * as https from 'https';
@@ -834,6 +831,14 @@ export function getSupportedStaticAnalysisFileTypes(): string[] {
         }
     }
     return supportedFileTypes;
+}
+
+export function openBugReportTemplate(): void {
+    const bugReportTemplatePath = path.join(__dirname, '..', '.github', 'ISSUE_TEMPLATE', 'bug_report.md');
+    const bugReportTemplateUri = vscode.Uri.file(bugReportTemplatePath);
+    vscode.workspace.openTextDocument(bugReportTemplateUri).then((document) => {
+        vscode.window.showTextDocument(document);
+    });
 }
 
 (function initialize() {

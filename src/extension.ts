@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 import { Browser, Target, TargetType } from 'puppeteer-core';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
@@ -36,6 +33,7 @@ import {
     reportUrlType,
     getCSSMirrorContentEnabled,
     setCSSMirrorContentEnabled,
+    openBugReportTemplate
 } from './utils';
 import { LaunchConfigManager, providedHeadlessDebugConfig, providedLaunchDevToolsConfig } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
@@ -258,6 +256,10 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async (fileUri: vscode.Uri): Promise<void> => {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
         await launchScreencast(context, fileUri);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openBugReportTemplate`, () => {
+        openBugReportTemplate();
     }));
 
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
