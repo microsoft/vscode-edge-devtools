@@ -581,7 +581,9 @@ export class DevToolsPanel {
                 ">
             </head>
             <body>
-                <iframe id="devtools-frame" frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&standaloneScreencast=true&cssMirrorContent=${cssMirrorContent}"></iframe>
+                <iframe id="devtools-frame"
+                allow="clipboard-read; clipboard-write *"
+                frameBorder="0" src="${cdnBaseUri}?experiments=true&theme=${theme}&standaloneScreencast=true&cssMirrorContent=${cssMirrorContent}"></iframe>
                 <div id="error-message" class="hidden">
                     <h1>Unable to download DevTools for the current target.</h1>
                     <p>Try these troubleshooting steps:</p>
