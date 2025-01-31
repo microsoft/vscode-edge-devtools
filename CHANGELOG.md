@@ -1,9 +1,17 @@
+## 2.1.7
+* **[Bug Fix]**: Use substituted config instead of raw - [PR #2485](https://github.com/microsoft/vscode-edge-devtools/pull/2485)
+* **[Upgrade]**: Updating puppeteer-core and jest dependencies - [PR #2702](https://github.com/microsoft/vscode-edge-devtools/pull/2702)
+* **[Upgrade]**: Upgrading typescript and vscode-extension-telemetry - [PR #2704](https://github.com/microsoft/vscode-edge-devtools/pull/2704)
+* **[Feature]**: Adding launchURL argument for the vscode-edge-devtools.launch command - [PR #2721](https://github.com/microsoft/vscode-edge-devtools/pull/2721)
+* **[Upgrade]**: Bump undici from 6.19.8 to 6.21.1 - [PR #2714](https://github.com/microsoft/vscode-edge-devtools/pull/2714)
+* **[Bug Fix]**: Copy element as any selector is not working ( > 134.0.3109.0) - [PR #2727](https://github.com/microsoft/vscode-edge-devtools/pull/2727)
+* **[Upgrade]**:Ramping up fallback version - [PR #2740](https://github.com/microsoft/vscode-edge-devtools/pull/2740)
+
 ## 2.1.6
 * **[Bug Fix]**: Fixing an issue where webhint was not being loaded - [PR #2418](https://github.com/microsoft/vscode-edge-devtools/pull/2418)
 * **[Bug Fix]**: Updating fallback version to 127 - [PR #2425](https://github.com/microsoft/vscode-edge-devtools/pull/2425)
 * **[Upgrade]**: Bump puppeteer to v18 - [PR #2423](https://github.com/microsoft/vscode-edge-devtools/pull/2423)
 * **[Upgrade]**: Bumping several dependencies to newer versions - [PR #2417](https://github.com/microsoft/vscode-edge-devtools/pull/2417)
-
 
 ## 2.1.5
 * **[Bug Fix]**: Fixing relaunch scenario on headless - [PR #1979](https://github.com/microsoft/vscode-edge-devtools/pull/1979)
