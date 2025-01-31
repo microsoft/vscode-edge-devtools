@@ -338,7 +338,7 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
 export function createTelemetryReporter(_context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
     if (packageJson && (_context.extensionMode === vscode.ExtensionMode.Production)) {
         // Use the real telemetry reporter
-        return new TelemetryReporter(packageJson.aiKey);
+        return new TelemetryReporter(packageJson.oneDSKey);
     }
         // Fallback to a fake telemetry reporter
         return new DebugTelemetryReporter();
