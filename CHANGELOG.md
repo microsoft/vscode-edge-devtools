@@ -1,3 +1,6 @@
+## 2.1.8
+* **[Bug Fix]**: Updating application insights key - [PR #2743](https://github.com/microsoft/vscode-edge-devtools/pull/2743)
+
 ## 2.1.7
 * **[Bug Fix]**: Use substituted config instead of raw - [PR #2485](https://github.com/microsoft/vscode-edge-devtools/pull/2485)
 * **[Upgrade]**: Updating puppeteer-core and jest dependencies - [PR #2702](https://github.com/microsoft/vscode-edge-devtools/pull/2702)
