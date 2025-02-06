@@ -20,5 +20,8 @@
         "userdatadir",
         "vsce",
         "vsix"
+    ],
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
     ]
 }
