@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "c:",
+			"path": "../../.."
+		},
+		{
+			"path": "../../../fallback"
+		},
+		{
+			"path": "../../../Users/Owner/tree"
+		},
+		{
+			"path": "../../../branch-network/workspace"
+		}
+	],
+	"settings": {}
+}
