@@ -1,3 +1,7 @@
+## 2.1.9
+* **[Bug Fix]**: Fixing CDN and ramping up fallback version - [PR #3140](https://github.com/microsoft/vscode-edge-devtools/pull/3140)
+* **[Bug Fix]**: Updating dependencies - [PR #3141](https://github.com/microsoft/vscode-edge-devtools/pull/3141)
+
 ## 2.1.8
 * **[Bug Fix]**: Updating application insights key - [PR #2743](https://github.com/microsoft/vscode-edge-devtools/pull/2743)
 
