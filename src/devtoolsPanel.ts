@@ -600,7 +600,7 @@ export class DevToolsPanel {
 
     private setCdnParameters(msg: {revision: string, isHeadless: boolean}) {
         this.currentRevision = msg.revision;
-        this.devtoolsBaseUri = `https://devtools.azureedge.net/serve_file/${this.currentRevision}/vscode_app.html`;
+        this.devtoolsBaseUri = `https://msedgedevtools.microsoft.com/serve_file/${this.currentRevision}/vscode_app.html`;
         this.isHeadless = msg.isHeadless;
         this.update();
 

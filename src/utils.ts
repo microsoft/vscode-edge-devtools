@@ -110,8 +110,8 @@ export const SETTINGS_DEFAULT_ENTRY_POINT = 'index.html';
 const WIN_APP_DATA = process.env.LOCALAPPDATA || '/';
 const msEdgeBrowserMapping: Map<BrowserFlavor, IBrowserPath> = new Map<BrowserFlavor, IBrowserPath>();
 
-// Current Revision: 132.0.2957.140
-export const CDN_FALLBACK_REVISION = '@a81e27b375d4f113f79997ac7f2bb49b93fbb84d';
+// Current Revision: 137.0.7151.69
+export const CDN_FALLBACK_REVISION = '@f3affdcf267b3645b45a2fc38dcf44cb11cc4091';
 
 /** Build-specified flags. */
 declare const DEBUG: boolean;
