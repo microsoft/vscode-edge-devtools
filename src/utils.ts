@@ -311,7 +311,7 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
         const addr: IRequestCDPProxyResult|undefined = await vscode.commands.executeCommand(
         'extension.js-debug.requestCDPProxy',
         debugSessionId,
-        forwardToUi,
+        forwardToUi
         );
         if (addr) {
             return `ws://${addr.host}:${addr.port}${addr.path || ''}`;
@@ -474,7 +474,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
     // Resolve the paths with the webRoot set by the user
     const resolvedOverrides: IStringDictionary<string> = {};
     for (const pattern in sourceMapPathOverrides) {
-        if (Object.hasOwn(sourceMapPathOverrides, pattern)) {
+        if (sourceMapPathOverrides.hasOwnProperty(pattern)) {
             const replacePattern = replaceWebRootInSourceMapPathOverridesEntry(webRoot, pattern);
             const replacePatternValue = replaceWebRootInSourceMapPathOverridesEntry(
                 webRoot, sourceMapPathOverrides[pattern]);
@@ -491,7 +491,7 @@ export function getRuntimeConfig(config: Partial<IUserConfig> = {}): IRuntimeCon
     // replace workspaceFolder with local paths
     const resolvedMappingOverrides: IStringDictionary<string> = {};
     for (const customPathMapped in pathMapping) {
-        if (Object.hasOwn(pathMapping, customPathMapped)) {
+        if (pathMapping.hasOwnProperty(customPathMapped)) {
             resolvedMappingOverrides[customPathMapped] =
                 replaceWorkSpaceFolderPlaceholder(pathMapping[customPathMapped]);
         }
