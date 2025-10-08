@@ -55,7 +55,7 @@ describe("launchConfigManager", () => {
             });
             const launchConfigManager = LaunchConfigManager.instance;
             expect(launchConfigManager.getLaunchConfig()).toEqual('Launch Edge Headless and attach DevTools');
-            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith ('setContext', 'launchJsonStatus', 'Supported');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'Supported');
         });
 
         it('updates launchJsonStatus with "None" when there is no folder open', async () => {
@@ -63,7 +63,7 @@ describe("launchConfigManager", () => {
             const launchConfigManager = LaunchConfigManager.instance;
             vscodeMock.workspace.workspaceFolders = null;
             expect(launchConfigManager.getLaunchConfig()).toEqual('None');
-            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith ('setContext', 'launchJsonStatus', 'None');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'None');
         });
     });
 
@@ -87,7 +87,7 @@ describe("launchConfigManager", () => {
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
             await launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith ('configurations', expect.arrayContaining([...extensionConfigs]));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', expect.arrayContaining([...extensionConfigs]));
             expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('compounds', expect.arrayContaining([...extensionCompoundConfigs]));
         });
 
@@ -119,7 +119,7 @@ describe("launchConfigManager", () => {
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
             launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith ('configurations', Array(3).fill(expect.anything()));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', Array(3).fill(expect.anything()));
         });
 
         it('retains user config', async () => {
