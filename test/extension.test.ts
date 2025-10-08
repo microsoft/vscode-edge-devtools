@@ -375,7 +375,7 @@ describe("extension", () => {
 
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext(), expectedMissingUrl);
-            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith (expect.stringContaining(expectedMissingUrl));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining(expectedMissingUrl));
         });
 
         it("shows error if it can't find given target due to missing urls", async () => {
@@ -384,7 +384,7 @@ describe("extension", () => {
 
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext(), expectedUrl);
-            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith (expect.stringContaining(expectedUrl));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining(expectedUrl));
         });
 
         it("reports telemetry if failed to get targets", async () => {
@@ -709,7 +709,7 @@ describe("extension", () => {
             const newExtension = await import("../src/extension");
 
             await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
-            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith (expect.stringContaining(expectedErrorMessage));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining(expectedErrorMessage));
         });
 
         it("creates a panel with a constructed url", async () => {

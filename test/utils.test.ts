@@ -1037,14 +1037,14 @@ describe("utils", () => {
                 }
             });
 
-            jest.doMock("vscode", () => typeof import("vscode"), { virtual: true });
+            jest.doMock("vscode", () => vscodeMock, { virtual: true });
             jest.resetModules();
         });
 
         it('correctly records all changed extension settings', async () => {
             const reporter = createFakeTelemetryReporter();
             utils.reportExtensionSettings(reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith ('user/settingsChangedAtLaunch', { isHeadless: 'false' });
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user/settingsChangedAtLaunch', { isHeadless: 'false' });
         });
 
         it('correctly sends telemetry event for changed event', async () => {
@@ -1057,7 +1057,7 @@ describe("utils", () => {
                 }
             }};
             utils.reportChangedExtensionSetting(configurationChangedEvent, reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith ('user/settingsChanged', { isHeadless: 'false' });
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user/settingsChanged', { isHeadless: 'false' });
         });
     });
 });

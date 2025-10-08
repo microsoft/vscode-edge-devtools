@@ -21,7 +21,7 @@ describe("launchConfigManager", () => {
             fse.pathExistsSync.mockImplementation(() => false);
             const launchConfigManager = LaunchConfigManager.instance;
             expect(launchConfigManager.getLaunchConfig()).toEqual('None');
-            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith ('setContext', 'launchJsonStatus', 'None');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'None');
         });
 
         it('updates launchJsonStatus with "Unsupported" when there is no supported debug config', async () => {
@@ -35,7 +35,7 @@ describe("launchConfigManager", () => {
             });
             const launchConfigManager = LaunchConfigManager.instance;
             expect(launchConfigManager.getLaunchConfig()).toEqual('Unsupported');
-            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith ('setContext', 'launchJsonStatus', 'Unsupported');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'Unsupported');
         });
 
         it('returns a supported debug config when one exists', async () => {
@@ -141,7 +141,7 @@ describe("launchConfigManager", () => {
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
             launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith ('configurations', Array(4).fill(expect.anything()));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', Array(4).fill(expect.anything()));
         });
     });
 
