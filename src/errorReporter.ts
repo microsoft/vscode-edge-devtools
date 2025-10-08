@@ -17,7 +17,7 @@ export class ErrorReporter {
     const answer = await vscode.window
       .showWarningMessage(
         `${error.title} ${error.message}`,
-        ...['Check settings', 'Search issues'],
+        ...['Check settings', 'Search issues']
       );
 
     if (answer === 'Check settings') {
@@ -34,7 +34,7 @@ export class ErrorReporter {
     // cannot do multiline due to:
     // https://github.com/Microsoft/vscode/issues/48900
     await vscode.window.showInformationMessage(
-      `${error.title} ${error.message}`,
+      `${error.title} ${error.message}`
     );
   }
 }
