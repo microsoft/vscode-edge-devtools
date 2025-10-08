@@ -731,7 +731,7 @@ describe("extension", () => {
 
             await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
             expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
-            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith (expect.stringContaining('Error Message'));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining('Error Message'));
         });
 
         it("shows an error if JsDebugCDPProxyWebSocketUrl is undefined", async () => {
@@ -740,7 +740,7 @@ describe("extension", () => {
 
             await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
             expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
-            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith (expect.stringContaining('Unable to attach DevTools to current debug session.'));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining('Unable to attach DevTools to current debug session.'));
         });
     });
 });

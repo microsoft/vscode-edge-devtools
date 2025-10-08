@@ -232,7 +232,7 @@ describe("devtoolsPanel", () => {
             const expectedMessage = "some message that should be passed through";
             const { callback, thisObj } = getFirstCallback(mockPanel.webview.onDidReceiveMessage);
             callback.call(thisObj, expectedMessage);
-            expect(mockPanelSocket.onMessageFromWebview).toHaveBeenCalledWith (expectedMessage);
+            expect(mockPanelSocket.onMessageFromWebview).toHaveBeenCalledWith(expectedMessage);
         });
 
         it("forwards panel socket messages to the webview", async () => {
@@ -440,7 +440,7 @@ describe("devtoolsPanel", () => {
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
-                expect(mockUtils.fetchUri).toHaveBeenCalledWith (expectedRequest.url);
+                expect(mockUtils.fetchUri).toHaveBeenCalledWith(expectedRequest.url);
 
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
@@ -471,7 +471,7 @@ describe("devtoolsPanel", () => {
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
-                expect(mockUtils.fetchUri).toHaveBeenCalledWith (expectedRequest.url);
+                expect(mockUtils.fetchUri).toHaveBeenCalledWith(expectedRequest.url);
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
                     "getUrl",

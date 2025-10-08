@@ -146,7 +146,7 @@ describe("utils", () => {
             // Ensure that the fetchUri call rejects with the expected reason
             await expect(responsePromise).rejects.toBe(expectedErrorReason);
             expect(promiseRejectCount).toEqual(1);
-            expect(mockOnReturn).toHaveBeenCalledWith ("error", expect.any(Function));
+            expect(mockOnReturn).toHaveBeenCalledWith("error", expect.any(Function));
         });
 
         it("rejects 'statusCode' errors correctly", async () => {
@@ -321,7 +321,7 @@ describe("utils", () => {
             expect(useHttps).toBe(expected.useHttps);
             expect(defaultUrl).toBe(expected.defaultUrl);
             expect(userDataDir).toBe(expected.userDataDir);
-            expect(vscodeMock.workspace.getConfiguration).toHaveBeenCalledWith (utils.SETTINGS_STORE_NAME);
+            expect(vscodeMock.workspace.getConfiguration).toHaveBeenCalledWith(utils.SETTINGS_STORE_NAME);
         });
 
         it("uses user config", async () => {
@@ -1013,7 +1013,7 @@ describe("utils", () => {
 
             for (let i = 0; i < input.length; i++) {
                 utils.reportUrlType(input[i], reporter);
-                expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith ('user/browserNavigation', { 'urlType': expected[i] });
+                expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user/browserNavigation', { 'urlType': expected[i] });
             }
         });
     });
@@ -1022,7 +1022,7 @@ describe("utils", () => {
         it('correctly lists extension types in the workspace', async () => {
             const reporter = createFakeTelemetryReporter();
             await utils.reportFileExtensionTypes(reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith ('workspace/metadata', undefined, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "other": 0, "scss": 0, "total": 4, "ts": 0});
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('workspace/metadata', undefined, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "other": 0, "scss": 0, "total": 4, "ts": 0});
         });
     });
 
