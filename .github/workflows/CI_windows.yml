@@ -1,5 +1,8 @@
 name: CI_Integration_Windows
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main" ]
