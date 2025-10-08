@@ -98,7 +98,7 @@ describe("panelSocket", () => {
         for (const m of expectedMessages) {
             panelSocket.onMessageFromWebview(`websocket:${JSON.stringify({ message: m })}`);
         }
-        expect(mockWebSocket.send).not.toBeCalled();
+        expect(mockWebSocket.send).not.toHaveBeenCalled();
 
         // Connect the websocket and ensure the messages are now pumped through
         mockWebSocket.onopen?.call({}, {type:'', target: mockWebSocket});
