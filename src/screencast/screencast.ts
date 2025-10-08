@@ -58,6 +58,9 @@ export class Screencast {
         this.reloadButton.addEventListener('click', () => this.onReloadClick());
         this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
 
+        this.reloadButton.setAttribute('role', "Button");
+
+
         const emulatedDevices = groupEmulatedDevicesByType();
         InfobarComponent.render({message:  "This is a simulated preview with limited functionality. Deactivate 'Headless mode' in extension settings for a full experience."}, 'infobar');
         FlyoutMenuComponent.render({
