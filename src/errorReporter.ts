@@ -1,3 +1,6 @@
+/* eslint-disable linebreak-style */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 import * as vscode from 'vscode';
 import { ErrorCodes } from './common/errorCodes';
