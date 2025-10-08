@@ -166,7 +166,7 @@ export class LaunchConfigManager {
 
         // Insert instruction comment
         let launchText = fse.readFileSync(workspaceUri.fsPath + relativePath).toString();
-        const re = /("url":.*startpage[\/\\]+index\.html",)/gm;
+        const re = /("url":.*startpage[/\\]+index\.html",)/gm;
         const match = re.exec(launchText);
         const instructions = ' // Provide your project\'s url to finish configuring';
         launchText = launchText.replace(re, `${match ? match[0] : ''}${instructions}`);
