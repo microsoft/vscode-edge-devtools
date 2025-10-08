@@ -8,6 +8,7 @@ import { IRemoteTargetJson } from './utils';
 export class CDPTarget extends vscode.TreeItem {
     readonly targetJson: IRemoteTargetJson;
     readonly propertyName: string | null = null;
+    readonly iconPath: { dark: string, light: string } | undefined;
     contextValue: 'cdpTarget' | 'cdpTargetProperty' | 'cdpTargetClosing';
 
     private readonly extensionPath: string | undefined;
@@ -20,9 +21,7 @@ export class CDPTarget extends vscode.TreeItem {
         this.propertyName = propertyName;
         this.extensionPath = extensionPath;
         this.contextValue = (this.propertyName ? 'cdpTargetProperty' : 'cdpTarget');
-
-        const treeLabel = typeof this.label === 'object' && this.label && 'label' in this.label ? this.label.label : this.label as string;
-        const treeItemLabel = `${treeLabel}: ${this.description}.`;
+        const treeItemLabel = `${this.label}: ${this.description}.`;
 
         // collapsibleState = 1 means the treeItem is the base CDPTarget treeItem.
         // collapsibleState = 0 means the treeItem is a child description treeItem (e.g. id, title, type, etc.)
@@ -35,14 +34,14 @@ export class CDPTarget extends vscode.TreeItem {
         if (this.extensionPath) {
             if (iconPath) {
                 this.iconPath = {
-                    dark: vscode.Uri.file(iconPath),
-                    light: vscode.Uri.file(iconPath),
+                    dark: iconPath,
+                    light: iconPath,
                 };
             } else {
                 const icon = `${this.targetJson.type}.svg`;
                 this.iconPath = {
-                    dark: vscode.Uri.file(path.join(this.extensionPath, 'resources', 'dark', icon)),
-                    light: vscode.Uri.file(path.join(this.extensionPath, 'resources', 'light', icon)),
+                    dark: path.join(this.extensionPath, 'resources', 'dark', icon),
+                    light: path.join(this.extensionPath, 'resources', 'light', icon),
                 };
             }
         }
@@ -60,8 +59,7 @@ export class CDPTarget extends vscode.TreeItem {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     get tooltip(): string {
-        const treeLabel = typeof this.label === 'object' && this.label && 'label' in this.label ? this.label.label : this.label as string;
-        return `${treeLabel} - ${this.description}`;
+        return `${this.label} - ${this.description}`;
     }
 
     get websocketUrl(): string {
