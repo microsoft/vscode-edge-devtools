@@ -35,7 +35,7 @@ export default class InfobarComponent {
         return html`
             <div class="infobar" style=${styleMap(styles)}>
                 <div class="infobar-message">${this.#message}</div>
-                <button class="infobar-close-button" ${ref(this.#buttonRef)} @click=${this.#onClick}></button>
+                <button role="button" aria-label="Close infobar" class="infobar-close-button" ${ref(this.#buttonRef)} @click=${this.#onClick}></button>
             </div>
         `;
     }

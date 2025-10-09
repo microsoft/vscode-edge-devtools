@@ -58,6 +58,8 @@ export class Screencast {
         this.reloadButton.addEventListener('click', () => this.onReloadClick());
         this.urlInput.addEventListener('keydown', event => this.onUrlKeyDown(event));
 
+        this.reloadButton.setAttribute('role', "button");
+
         const emulatedDevices = groupEmulatedDevicesByType();
         InfobarComponent.render({message:  "This is a simulated preview with limited functionality. Deactivate 'Headless mode' in extension settings for a full experience."}, 'infobar');
         FlyoutMenuComponent.render({
@@ -406,7 +408,7 @@ export class Screencast {
 
     private pasteClipboardContents(message: string) {
         this.cdpConnection.sendMessageToBackend('Runtime.evaluate', {
-            expression: `document.execCommand("insertText", false, "${message.replace(/"/g,'\\"')}");`,
+            expression: `document.execCommand("insertText", false, "${message.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}");`,
         });
     }
 
