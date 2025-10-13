@@ -164,7 +164,7 @@ describe("devtoolsPanel", () => {
             const { callback, thisObj } = getFirstCallback(mockPanel.onDidDispose);
             callback.call(thisObj);
             expect(mockPanel.dispose).toHaveBeenCalled();
-            expect(mockPanelSocket.dispose).toBeCalled();
+            expect(mockPanelSocket.dispose).toHaveBeenCalled();
             for (const d of expectedDisposables) {
                 expect(d.dispose).toHaveBeenCalled();
             }
@@ -232,7 +232,7 @@ describe("devtoolsPanel", () => {
             const expectedMessage = "some message that should be passed through";
             const { callback, thisObj } = getFirstCallback(mockPanel.webview.onDidReceiveMessage);
             callback.call(thisObj, expectedMessage);
-            expect(mockPanelSocket.onMessageFromWebview).toBeCalledWith(expectedMessage);
+            expect(mockPanelSocket.onMessageFromWebview).toHaveBeenCalledWith(expectedMessage);
         });
 
         it("forwards panel socket messages to the webview", async () => {
@@ -369,7 +369,7 @@ describe("devtoolsPanel", () => {
                 const dtp = await import("../src/devtoolsPanel");
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
                 hookedEvents.get("close")!();
-                expect(mockPanelSocket.dispose).toBeCalled();
+                expect(mockPanelSocket.dispose).toHaveBeenCalled();
             });
 
             it("posts defaults for get state", async () => {
@@ -440,7 +440,7 @@ describe("devtoolsPanel", () => {
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
-                expect(mockUtils.fetchUri).toBeCalledWith(expectedRequest.url);
+                expect(mockUtils.fetchUri).toHaveBeenCalledWith(expectedRequest.url);
 
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
@@ -471,7 +471,7 @@ describe("devtoolsPanel", () => {
                 dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
 
                 await hookedEvents.get("getUrl")!(JSON.stringify(expectedRequest));
-                expect(mockUtils.fetchUri).toBeCalledWith(expectedRequest.url);
+                expect(mockUtils.fetchUri).toHaveBeenCalledWith(expectedRequest.url);
                 expect(mockWebviewEvents.encodeMessageForChannel).toHaveBeenCalledWith(
                     expect.any(Function),
                     "getUrl",

@@ -21,7 +21,7 @@ describe("launchConfigManager", () => {
             fse.pathExistsSync.mockImplementation(() => false);
             const launchConfigManager = LaunchConfigManager.instance;
             expect(launchConfigManager.getLaunchConfig()).toEqual('None');
-            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'None');
         });
 
         it('updates launchJsonStatus with "Unsupported" when there is no supported debug config', async () => {
@@ -35,7 +35,7 @@ describe("launchConfigManager", () => {
             });
             const launchConfigManager = LaunchConfigManager.instance;
             expect(launchConfigManager.getLaunchConfig()).toEqual('Unsupported');
-            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Unsupported');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'Unsupported');
         });
 
         it('returns a supported debug config when one exists', async () => {
@@ -55,7 +55,7 @@ describe("launchConfigManager", () => {
             });
             const launchConfigManager = LaunchConfigManager.instance;
             expect(launchConfigManager.getLaunchConfig()).toEqual('Launch Edge Headless and attach DevTools');
-            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'Supported');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'Supported');
         });
 
         it('updates launchJsonStatus with "None" when there is no folder open', async () => {
@@ -63,7 +63,7 @@ describe("launchConfigManager", () => {
             const launchConfigManager = LaunchConfigManager.instance;
             vscodeMock.workspace.workspaceFolders = null;
             expect(launchConfigManager.getLaunchConfig()).toEqual('None');
-            expect(vscodeMock.commands.executeCommand).toBeCalledWith('setContext', 'launchJsonStatus', 'None');
+            expect(vscodeMock.commands.executeCommand).toHaveBeenCalledWith('setContext', 'launchJsonStatus', 'None');
         });
     });
 
@@ -87,7 +87,7 @@ describe("launchConfigManager", () => {
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
             await launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', expect.arrayContaining([...extensionConfigs]));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', expect.arrayContaining([...extensionConfigs]));
             expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('compounds', expect.arrayContaining([...extensionCompoundConfigs]));
         });
 
@@ -119,7 +119,7 @@ describe("launchConfigManager", () => {
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
             launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', Array(3).fill(expect.anything()));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', Array(3).fill(expect.anything()));
         });
 
         it('retains user config', async () => {
@@ -141,7 +141,7 @@ describe("launchConfigManager", () => {
             vscodeMock.Uri.joinPath = jest.fn();
             const launchConfigManager = LaunchConfigManager.instance;
             launchConfigManager.configureLaunchJson();
-            expect(vscodeMock.WorkspaceConfiguration.update).toBeCalledWith('configurations', Array(4).fill(expect.anything()));
+            expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', Array(4).fill(expect.anything()));
         });
     });
 

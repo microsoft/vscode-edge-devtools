@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
@@ -105,7 +106,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
         if (!actualTarget.url || !actualTarget.url.startsWith('https')) {
             return Promise.resolve(actualTarget);
         }
-        const faviconRegex = /((?:\/\/|\.)([^\.]*)\.[^\.^\/]+\/).*/;
+        const faviconRegex = /((?:\/\/|\.)([^.]*)\.[^.^/]+\/).*/;
 
         // Example regex match: https://learn.microsoft.com/en-us/microsoft-edge/
         // urlMatch[0] = .microsoft.com/en-us/microsoft-edge/
@@ -144,7 +145,6 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
                         }
                     });
                 } else {
-                    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
                     resolve(actualTarget);
                 }
             });

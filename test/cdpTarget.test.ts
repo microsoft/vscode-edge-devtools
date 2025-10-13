@@ -37,9 +37,9 @@ describe("CDPTarget", () => {
         const ct = await import("../src/cdpTarget");
         const target = new ct.CDPTarget(json, "", "path");
         expect(target.iconPath).toBeDefined();
-        expect(target.iconPath!.dark).toEqual(
+        expect((target.iconPath! as any).dark.fsPath).toEqual(
             expect.stringMatching(/path(\\|\/)resources(\\|\/)dark(\\|\/)extension.svg/g));
-        expect(target.iconPath!.light).toEqual(
+        expect((target.iconPath! as any).light.fsPath).toEqual(
             expect.stringMatching(/path(\\|\/)resources(\\|\/)light(\\|\/)extension.svg/g));
     });
 

@@ -155,7 +155,7 @@ describe("extension", () => {
             });
             mockUtils.getListOfTargets!.mockResolvedValue([]);
             attachCommand!();
-            expect(mockUtils.getListOfTargets).toBeCalled();
+            expect(mockUtils.getListOfTargets).toHaveBeenCalled();
         });
 
         it("performs registered commands correctly", async () => {
@@ -265,13 +265,13 @@ describe("extension", () => {
 
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext());
-            expect(mocks.utils.fixRemoteWebSocket).toBeCalledTimes(expectedCount);
+            expect(mocks.utils.fixRemoteWebSocket).toHaveBeenCalledTimes(expectedCount);
         });
 
         it("shows quick pick window if no target", async () => {
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext());
-            expect(mocks.vscode.window.showQuickPick).toBeCalledTimes(1);
+            expect(mocks.vscode.window.showQuickPick).toHaveBeenCalledTimes(1);
         });
 
         it("opens devtools against quick pick target", async () => {
@@ -375,7 +375,7 @@ describe("extension", () => {
 
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext(), expectedMissingUrl);
-            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedMissingUrl));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining(expectedMissingUrl));
         });
 
         it("shows error if it can't find given target due to missing urls", async () => {
@@ -384,7 +384,7 @@ describe("extension", () => {
 
             const newExtension = await import("../src/extension");
             await newExtension.attach(createFakeExtensionContext(), expectedUrl);
-            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedUrl));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining(expectedUrl));
         });
 
         it("reports telemetry if failed to get targets", async () => {
@@ -709,7 +709,7 @@ describe("extension", () => {
             const newExtension = await import("../src/extension");
 
             await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
-            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining(expectedErrorMessage));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining(expectedErrorMessage));
         });
 
         it("creates a panel with a constructed url", async () => {
@@ -731,7 +731,7 @@ describe("extension", () => {
 
             await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
             expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
-            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining('Error Message'));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining('Error Message'));
         });
 
         it("shows an error if JsDebugCDPProxyWebSocketUrl is undefined", async () => {
@@ -740,7 +740,7 @@ describe("extension", () => {
 
             await newExtension.attachToCurrentDebugTarget(createFakeExtensionContext());
             expect(mocks.utils.getJsDebugCDPProxyWebsocketUrl).toHaveBeenCalled();
-            expect(mocks.vscode.window.showErrorMessage).toBeCalledWith(expect.stringContaining('Unable to attach DevTools to current debug session.'));
+            expect(mocks.vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining('Unable to attach DevTools to current debug session.'));
         });
     });
 });

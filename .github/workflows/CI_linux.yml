@@ -1,5 +1,8 @@
 name: CI_Integration_Linux
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ "main" ]
@@ -12,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
 
     steps:
     - uses: actions/checkout@v3

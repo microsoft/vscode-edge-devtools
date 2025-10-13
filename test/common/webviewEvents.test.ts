@@ -23,7 +23,7 @@ describe("webviewEvents", () => {
                 // Ensure parsing it calls the correct emit event
                 const mockEmit = jest.fn();
                 parseMessageFromChannel(data, mockEmit);
-                expect(mockEmit).toBeCalledWith(e, JSON.stringify(expectedArgs));
+                expect(mockEmit).toHaveBeenCalledWith(e, JSON.stringify(expectedArgs));
             }
         });
 
@@ -31,7 +31,7 @@ describe("webviewEvents", () => {
             const mockEmit = jest.fn();
             const result = parseMessageFromChannel("some unknown event", mockEmit);
             expect(result).toBe(false);
-            expect(mockEmit).not.toBeCalled();
+            expect(mockEmit).not.toHaveBeenCalled();
         });
     });
 

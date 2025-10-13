@@ -45,7 +45,16 @@ export function createFakeVSCode() {
         TreeItem: jest.fn(),
         TreeItemCollapsibleState: { None: 0, Collapsed: 1 },
         Uri: {
-            file: jest.fn().mockReturnValue({ with: jest.fn() }),
+            file: jest.fn().mockImplementation((filePath: string) => ({
+                scheme: 'file',
+                authority: '',
+                path: filePath.replace(/\\/g, '/'),
+                query: '',
+                fragment: '',
+                fsPath: filePath,
+                toString: () => `file:///${filePath.replace(/\\/g, '/')}`,
+                with: jest.fn()
+            })),
             parse: jest.fn().mockReturnValue({ with: jest.fn() }),
             joinPath: jest.fn().mockReturnValue({ with: jest.fn() })
         },
