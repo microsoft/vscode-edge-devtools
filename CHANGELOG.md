@@ -1,3 +1,8 @@
+## 2.1.10
+* **[Bug Fix]**: Ramping up CDN Version - [PR #3665](https://github.com/microsoft/vscode-edge-devtools/pull/3665)
+* **[Bug Fix]**: Fixing A11y issues in screencast - [PR #3594](https://github.com/microsoft/vscode-edge-devtools/pull/3594)
+* **[Bug Fix]**: Updating dependencies - [PR #3600](https://github.com/microsoft/vscode-edge-devtools/pull/3600)
+
 ## 2.1.9
 * **[Bug Fix]**: Fixing CDN and ramping up fallback version - [PR #3140](https://github.com/microsoft/vscode-edge-devtools/pull/3140)
 * **[Bug Fix]**: Updating dependencies - [PR #3141](https://github.com/microsoft/vscode-edge-devtools/pull/3141)
