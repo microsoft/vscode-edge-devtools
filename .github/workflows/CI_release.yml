@@ -13,9 +13,7 @@ stages:
     - task: Npm@1
       inputs:
         command: 'install'
-- stage: Package
-  jobs: 
-  - job: package
+  - job: Package
     steps:
     - task: Npm@1
       inputs:
