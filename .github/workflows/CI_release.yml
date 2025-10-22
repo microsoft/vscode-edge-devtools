@@ -1,1 +1,23 @@
-name: CI_Release
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Setup
+  jobs: 
+  - job: npminstall
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSource: 'spec'
+        versionSpec: '22.x'
+    - task: Npm@1
+      inputs:
+        command: 'install'
+- stage: Package
+  jobs: 
+  - job: package
+    steps:
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'run package'
