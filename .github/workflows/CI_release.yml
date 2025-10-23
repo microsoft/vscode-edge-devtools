@@ -2,9 +2,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-- stage: Setup
+- stage: BuildAndPackage
   jobs: 
-  - job: npminstall
+  - job: Package
     steps:
     - task: NodeTool@0
       inputs:
@@ -13,8 +13,6 @@ stages:
     - task: Npm@1
       inputs:
         command: 'install'
-  - job: Package
-    steps:
     - task: Npm@1
       inputs:
         command: 'custom'
