@@ -399,7 +399,7 @@ export class DevToolsPanel {
             await ErrorReporter.showErrorDialog({
                 errorCode: ErrorCodes.Error,
                 title: 'Error while opening file in editor.',
-                message: `Could not open document. No workspace mapping was found for '${url}'.`,
+                message: `Could not open document. No workspace mapping was found for '${url}'. Please configure the 'pathMapping' in your 'launch.json' file.`,
             });
         }
     }
@@ -491,6 +491,9 @@ export class DevToolsPanel {
     }
 
     private async parseUrlToUri(url: string): Promise<vscode.Uri | undefined> {
+        if (vscode.debug.activeDebugSession) {
+            console.log(`Original URL: ${url}`);
+        }
         // Convert the devtools url into a local one
         let sourcePath = url;
         let appendedEntryPoint = false;
@@ -513,6 +516,10 @@ export class DevToolsPanel {
             sourcePath = applyPathMapping(sourcePath, this.config.sourceMapPathOverrides);
         }
 
+        if (vscode.debug.activeDebugSession) {
+            console.log(`Source path after entrypoint and source map path overrides: ${sourcePath}`);
+        }
+
         // Convert the local url to a workspace path
         const transformer = new debugCore.UrlPathTransformer();
         void transformer.launch({ pathMapping: this.config.pathMapping });
@@ -521,6 +528,10 @@ export class DevToolsPanel {
         // marking it explicitly as invalid to clarify intention.
         const localSource = { path: sourcePath, origin: 'invalid-origin://' };
         await transformer.fixSource(localSource);
+
+        if (vscode.debug.activeDebugSession) {
+            console.log(`Local source path after transformation: ${localSource.path}`);
+        }
 
         // per documentation if the file was correctly resolved origin will be cleared.
         // https://github.com/Microsoft/vscode-chrome-debug-core/blob/main/src/transformers/urlPathTransformer.ts
@@ -535,7 +546,7 @@ export class DevToolsPanel {
         await ErrorReporter.showInformationDialog({
             errorCode: ErrorCodes.Error,
             title: 'Unable to open file in editor.',
-            message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
+            message: `Could not open '${sourcePath}' in the editor. Make sure that the file is part of the workspace and that 'pathMapping' is configured correctly in your 'launch.json'.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
         });
     }
 
