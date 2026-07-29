@@ -479,14 +479,8 @@ describe("extension", () => {
 
         it("can launch html files in non-remote contexts", async () => {
             mockVSCode.env.remoteName = undefined;
-            const testFileUri = {
-                scheme: 'file',
-                authority: '',
-                fsPath: 'test/path.html',
-                query: '',
-                fragment: ''
-            } as Uri;
-            const expectedUrl = `file://test/path.html`;
+            const testFileUri = mockVSCode.Uri.file('test/path.html') as Uri;
+            const expectedUrl = `file:///test/path.html`;
 
             const newExtension = await import("../src/extension");
             await newExtension.launchHtml(testFileUri);

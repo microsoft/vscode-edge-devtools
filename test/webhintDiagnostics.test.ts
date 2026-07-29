@@ -2,23 +2,24 @@
 // Licensed under the MIT License.
 
 import { describe, expect, it } from '@jest/globals';
+import type { Diagnostic, Uri } from 'vscode';
 import { shouldSuppressWebhintDiagnostic } from '../src/webhintDiagnostics';
 
 describe('webhintDiagnostics', () => {
     const tsConfigUri = {
         fsPath: '/workspaces/project/tsconfig.node.json',
-    } as never;
+    } as unknown as Uri;
 
     const appConfigUri = {
         fsPath: '/workspaces/project/vite.config.ts',
-    } as never;
+    } as unknown as Uri;
 
     it('suppresses the stale ES2023 webhint diagnostic in tsconfig files', () => {
         expect(shouldSuppressWebhintDiagnostic(tsConfigUri, {
             source: 'Microsoft Edge Tools',
             message: "'compilerOptions/target' must be equal to one of the allowed values 'ES3, ES5, ES6, ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ES2021, ES2022, ESNext'. Value found '\"ES2023\"'.",
             code: { value: 'typescript-config/is-valid' },
-        } as never)).toBe(true);
+        } as Diagnostic)).toBe(true);
     });
 
     it('keeps the diagnostic when it does not mention ES2023', () => {
@@ -26,7 +27,7 @@ describe('webhintDiagnostics', () => {
             source: 'Microsoft Edge Tools',
             message: "'compilerOptions/target' must be equal to one of the allowed values 'ES3, ES5, ES6, ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ES2021, ES2022, ESNext'. Value found '\"ES2022\"'.",
             code: { value: 'typescript-config/is-valid' },
-        } as never)).toBe(false);
+        } as Diagnostic)).toBe(false);
     });
 
     it('keeps unrelated diagnostics in non-tsconfig files', () => {
@@ -34,6 +35,6 @@ describe('webhintDiagnostics', () => {
             source: 'Microsoft Edge Tools',
             message: "'compilerOptions/target' must be equal to one of the allowed values 'ES3, ES5, ES6, ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ES2021, ES2022, ESNext'. Value found '\"ES2023\"'.",
             code: { value: 'typescript-config/is-valid' },
-        } as never)).toBe(false);
+        } as Diagnostic)).toBe(false);
     });
 });

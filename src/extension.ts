@@ -286,7 +286,7 @@ export async function launchHtml(fileUri?: vscode.Uri): Promise<void> {
     const devToolsAttachConfig = providedLaunchDevToolsConfig;
     const { port, userDataDir, defaultUrl } = getRemoteEndpointSettings();
     if (!vscode.env.remoteName) {
-        const url = fileUri ? `file://${fileUri.fsPath}` : defaultUrl;
+        const url = fileUri ? fileUri.toString(true) : defaultUrl;
         edgeDebugConfig.url = url;
         devToolsAttachConfig.url = url;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
@@ -309,7 +309,7 @@ export async function launchScreencast(context: vscode.ExtensionContext, fileUri
     const edgeDebugConfig = providedHeadlessDebugConfig;
     const { port, userDataDir, defaultUrl } = getRemoteEndpointSettings();
     if (!vscode.env.remoteName) {
-        const url = fileUri ? `file://${fileUri.fsPath}` : defaultUrl;
+        const url = fileUri ? fileUri.toString(true) : defaultUrl;
         edgeDebugConfig.url = url;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, url, undefined, true, true));
     } else if (fileUri) {
