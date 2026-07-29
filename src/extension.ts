@@ -40,6 +40,7 @@ import {
 import { LaunchConfigManager, providedHeadlessDebugConfig, providedLaunchDevToolsConfig } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
+import { shouldSuppressWebhintDiagnostic } from './webhintDiagnostics';
 import type {
     LanguageClientOptions,
     ServerOptions,
@@ -249,13 +250,13 @@ export function activate(context: vscode.ExtensionContext): void {
         void setCSSMirrorContentEnabled(context, !cssMirrorContent);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchHtml`, async (fileUri: vscode.Uri): Promise<void> => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchHtml`, async (fileUri?: vscode.Uri): Promise<void> => {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchHtml');
         await launchHtml(fileUri);
     }));
 
 
-    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async (fileUri: vscode.Uri): Promise<void> => {
+    context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async (fileUri?: vscode.Uri): Promise<void> => {
         telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
         await launchScreencast(context, fileUri);
     }));
@@ -280,36 +281,47 @@ export function activate(context: vscode.ExtensionContext): void {
     });
 }
 
-export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
+export async function launchHtml(fileUri?: vscode.Uri): Promise<void> {
     const edgeDebugConfig = providedHeadlessDebugConfig;
     const devToolsAttachConfig = providedLaunchDevToolsConfig;
+    const { port, userDataDir, defaultUrl } = getRemoteEndpointSettings();
     if (!vscode.env.remoteName) {
-        edgeDebugConfig.url = `file://${fileUri.fsPath}`;
-        devToolsAttachConfig.url = `file://${fileUri.fsPath}`;
+        const url = fileUri ? fileUri.toString(true) : defaultUrl;
+        edgeDebugConfig.url = url;
+        devToolsAttachConfig.url = url;
         void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
-    } else {
+    } else if (fileUri) {
         // Parse the filename from the remoteName, file authority and path e.g. file://wsl.localhost/ubuntu-20.04/test/index.html
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
         devToolsAttachConfig.url = url;
-        const { port, userDataDir } = getRemoteEndpointSettings();
         const browserPath = await getBrowserPath();
         await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
+    } else {
+        edgeDebugConfig.url = defaultUrl;
+        devToolsAttachConfig.url = defaultUrl;
+        const browserPath = await getBrowserPath();
+        await launchBrowser(browserPath, port, defaultUrl, userDataDir, /** headless */ true).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
     }
 }
 
-export async function launchScreencast(context: vscode.ExtensionContext, fileUri: vscode.Uri): Promise<void> {
+export async function launchScreencast(context: vscode.ExtensionContext, fileUri?: vscode.Uri): Promise<void> {
     const edgeDebugConfig = providedHeadlessDebugConfig;
+    const { port, userDataDir, defaultUrl } = getRemoteEndpointSettings();
     if (!vscode.env.remoteName) {
-        edgeDebugConfig.url = `file://${fileUri.fsPath}`;
-        void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, fileUri.fsPath, undefined, true, true));
-    } else {
+        const url = fileUri ? fileUri.toString(true) : defaultUrl;
+        edgeDebugConfig.url = url;
+        void vscode.debug.startDebugging(undefined, edgeDebugConfig).then(() => attach(context, url, undefined, true, true));
+    } else if (fileUri) {
         // Parse the filename from the remoteName, file authority and path e.g. file://wsl.localhost/ubuntu-20.04/test/index.html
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
-        const { port, userDataDir } = getRemoteEndpointSettings();
         const browserPath = await getBrowserPath();
         await launchBrowser(browserPath, port,  url, userDataDir, /** headless */ true).then(() => attach(context, url, undefined, true, true));
+    } else {
+        edgeDebugConfig.url = defaultUrl;
+        const browserPath = await getBrowserPath();
+        await launchBrowser(browserPath, port, defaultUrl, userDataDir, /** headless */ true).then(() => attach(context, defaultUrl, undefined, true, true));
     }
 }
 
@@ -338,6 +350,10 @@ async function startWebhint(context: vscode.ExtensionContext): Promise<void> {
             fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
         },
         middleware: {
+            handleDiagnostics: (uri, diagnostics, next) => {
+                const filteredDiagnostics = diagnostics.filter(diagnostic => !shouldSuppressWebhintDiagnostic(uri, diagnostic));
+                next(uri, filteredDiagnostics);
+            },
             executeCommand: (command, args, next) => {
                     const hintName = args[0] as string;
                     const featureName = args[1] as string;
