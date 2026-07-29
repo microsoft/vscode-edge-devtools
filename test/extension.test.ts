@@ -653,6 +653,27 @@ describe("extension", () => {
                 );
             }
         });
+        it("can launch the browser with the default url when no file uri is provided", async () => {
+            mockVSCode.env.remoteName = undefined;
+            mockUtils.getRemoteEndpointSettings!.mockReturnValue({
+                defaultUrl: "http://localhost:3000",
+                hostname: "localhost",
+                port: 9222,
+                timeout: 10000,
+                useHttps: false,
+                userDataDir: "profile",
+            });
+
+            const newExtension = await import("../src/extension");
+            await newExtension.launchHtml(undefined);
+
+            expect(mockVSCode.debug.startDebugging).toHaveBeenNthCalledWith(1, undefined, expect.objectContaining({
+                url: "http://localhost:3000",
+            }));
+            expect(mockVSCode.debug.startDebugging).toHaveBeenNthCalledWith(2, undefined, expect.objectContaining({
+                url: "http://localhost:3000",
+            }));
+        });
     });
     describe("attachToCurrentDebugTarget", () => {
         let mocks: {
