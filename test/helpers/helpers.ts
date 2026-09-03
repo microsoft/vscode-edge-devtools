@@ -138,7 +138,10 @@ export function createFakeVSCode() {
             openTextDocument: jest.fn().mockResolvedValue(null),
             workspaceFolders: [
                 {
-                    uri:  'file:///g%3A/GIT/testPage'
+                    uri: {
+                        fsPath: 'g:\\GIT\\testPage',
+                        toString: () => 'file:///g%3A/GIT/testPage',
+                    }
                 }
             ],
             fs: {
