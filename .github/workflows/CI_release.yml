@@ -96,6 +96,7 @@ extends:
                       AuthAKVName: '$(esrpAuthAkvName)'
                       AuthSignCertName: '$(esrpAuthCertName)'
                       UseMSIAuthentication: true
+                      EsrpClientId: '$(esrpClientId)'
 
                       FolderPath: '$(STAGING_DIR)/tosign'
                       Pattern: '$(SignatureName)'
