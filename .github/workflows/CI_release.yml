@@ -37,7 +37,7 @@ extends:
       policheck:
         break: true
       codeSignValidation:
-        enabled: false
+        excludes: '-|**\*.vsix;-|**\*.vsix\**'
 
     stages:
       - stage: build
