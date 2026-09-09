@@ -90,11 +90,11 @@ extends:
                   - task: EsrpCodeSigning@5
                     displayName: "ESRP Codesigning - MI"
                     inputs:
-                      ConnectedServiceName: '$(ESRP_CONNECTION_NAME)'
-                      AppRegistrationClientId: '$(appRegistrationClientId)'
-                      AppRegistrationTenantId: '$(esrpTenantId)'
-                      AuthAKVName: '$(esrpAuthAkvName)'
-                      AuthSignCertName: '$(esrpAuthCertName)'
+                      ConnectedServiceName: '$(esrpServiceConnectionName)'
+                      AppRegistrationClientId: '$(esrpAppRegistrationClientId)'
+                      AppRegistrationTenantId: '$(esrpAppRegistrationTenantId)'
+                      AuthAKVName: '$(esrpAuthKeyVaultName)'
+                      AuthSignCertName: '$(esrpRequestSigningCertName)'
                       UseMSIAuthentication: true
                       EsrpClientId: '$(esrpClientId)'
 
@@ -108,8 +108,8 @@ extends:
                       inlineOperation: |
                         [
                           {
-                            "keyCode": "$(KEY_CODE)",
-                            "operationSetCode": "$(OPERATION_SET_CODE)",
+                            "keyCode": "$(esrpKeyCode)",
+                            "operationSetCode": "$(esrpOperationSetCode)",
                             "parameters": [],
                             "toolName": "sign",
                             "toolVersion": "1.0"
