@@ -5,7 +5,7 @@
         "target": "ES2022",
         "esModuleInterop": true,
         "noImplicitAny": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "sourceMap": true,
         "outDir": "out",
         "skipLibCheck": true,
