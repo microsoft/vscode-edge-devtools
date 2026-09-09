@@ -19,6 +19,13 @@ export type Writable<T> = {
 };
 
 /**
+ * Root folder used by the fake VS Code workspace.
+ * Uses forward slashes and no drive letter so that path operations in the code under
+ * test resolve identically on Windows, Linux and macOS test runners.
+ */
+export const FAKE_WORKSPACE_ROOT = '/git/testPage';
+
+/**
  * Create a fake VS Code API object that can be used in tests
  * Since the VS Code API is only available in the extension host you must use this as a virtual mock:
  * E.g. jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
@@ -139,7 +146,9 @@ export function createFakeVSCode() {
             workspaceFolders: [
                 {
                     uri: {
-                        fsPath: 'g:\\GIT\\testPage',
+                        // Forward slashes so that path.resolve/path.relative behave the same
+                        // way on Windows and on posix hosts.
+                        fsPath: FAKE_WORKSPACE_ROOT,
                         toString: () => 'file:///g%3A/GIT/testPage',
                     }
                 }

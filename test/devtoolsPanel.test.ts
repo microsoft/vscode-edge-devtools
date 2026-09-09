@@ -14,6 +14,7 @@ import {
     createFakeTelemetryReporter,
     createFakeVSCode,
     createFakeDebugCore,
+    FAKE_WORKSPACE_ROOT,
     getFirstCallback,
     Mocked,
     Writable,
@@ -643,7 +644,7 @@ describe("devtoolsPanel", () => {
 
             it("calls openTextDocument for onSocketCssMirrorContent", async () => {
                 const expectedRequest = {
-                    url: "g:\\GIT\\testPage\\styles.css",
+                    url: `${FAKE_WORKSPACE_ROOT}/styles.css`,
                     newContent: ".body{color: blue;}"
                 };
 
@@ -668,7 +669,7 @@ describe("devtoolsPanel", () => {
             it("does not mirror css to a path outside the workspace", async () => {
                 // The url originates from the inspected page via a `/*# sourceURL= */` comment.
                 const expectedRequest = {
-                    url: "c:\\Users\\test\\AppData\\Roaming\\Code\\User\\settings.json",
+                    url: "/home/test/.config/Code/User/settings.json",
                     newContent: ".body{color: blue;}"
                 };
 
@@ -692,7 +693,7 @@ describe("devtoolsPanel", () => {
 
             it("does not mirror css to a path that escapes the workspace via traversal", async () => {
                 const expectedRequest = {
-                    url: "g:\\GIT\\testPage\\..\\..\\..\\Windows\\system32\\drivers\\etc\\hosts",
+                    url: `${FAKE_WORKSPACE_ROOT}/../../../etc/hosts`,
                     newContent: ".body{color: blue;}"
                 };
 
