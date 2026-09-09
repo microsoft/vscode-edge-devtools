@@ -51,10 +51,11 @@ extends:
               ob_outputDirectory: '$(Build.ArtifactStagingDirectory)'
 
             steps:
-              - task: NodeTool@0
+              - task: UseNode@1
                 displayName: 'Use Node.js 22.x'
                 inputs:
-                  versionSpec: '22.x'
+                  versionSource: 'spec'
+                  version: '22.x'
 
               - script: git config --global core.autocrlf false
                 displayName: 'Configure Git LF settings'
@@ -87,7 +88,7 @@ extends:
                     displayName: 'Generate manifest and stage file to sign'
                     workingDirectory: '$(Build.SourcesDirectory)'
 
-                  - task: EsrpCodeSigning@5
+                  - task: EsrpCodeSigning@6
                     displayName: "ESRP Codesigning - MI"
                     inputs:
                       ConnectedServiceName: '$(esrpServiceConnectionName)'
