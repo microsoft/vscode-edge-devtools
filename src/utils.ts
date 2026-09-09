@@ -161,7 +161,7 @@ export function fetchUri(uri: string, options: https.RequestOptions = {}): Promi
             ...parsedUrl,
             ...options,
             method: 'PUT',
-        } as http.RequestOptions;
+        };
 
         get(options, response => {
             let responseData = '';

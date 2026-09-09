@@ -6,6 +6,12 @@
         "esModuleInterop": true,
         "noImplicitAny": true,
         "moduleResolution": "bundler",
+        // TypeScript 6 no longer includes every node_modules/@types package
+        // automatically, so the ambient globals used here must be listed.
+        "types": [
+            "node",
+            "jest"
+        ],
         "sourceMap": true,
         "outDir": "out",
         "skipLibCheck": true,

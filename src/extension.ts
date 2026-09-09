@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
@@ -494,7 +495,7 @@ export async function attach(
                         description: i.url,
                         detail: i.webSocketDebuggerUrl,
                         label: i.title,
-                    } as vscode.QuickPickItem;
+                    };
                 });
 
                 // Show the target list and allow the user to select one
