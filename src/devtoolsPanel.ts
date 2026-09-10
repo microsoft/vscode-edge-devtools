@@ -413,6 +413,12 @@ export class DevToolsPanel {
 
         const uri = await this.parseUrlToUri(url);
 
+        // The stylesheet url comes from the inspected page, so it must never be able to steer
+        // this write outside the developer's project.
+        if (uri && !this.isWithinTrustedRoot(uri)) {
+            return;
+        }
+
         // Finally open and edit the document if it exists
         if (uri) {
             const textEditor = await this.openEditorFromUri(uri);
@@ -535,6 +541,35 @@ export class DevToolsPanel {
             errorCode: ErrorCodes.Error,
             title: 'Unable to open file in editor.',
             message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
+        });
+    }
+
+    private getTrustedRoots(): string[] {
+        const folders = vscode.workspace.workspaceFolders;
+        if (folders && folders.length > 0) {
+            return folders.map(folder => folder.uri.fsPath).filter(fsPath => Boolean(fsPath));
+        }
+
+        // Single-file debugging (e.g. "Launch HTML file") has no workspace folder, so the
+        // developer-chosen target file's own directory is the only trusted root.
+        if (this.targetUrl.startsWith('file://')) {
+            try {
+                return [path.dirname(vscode.Uri.parse(this.targetUrl).fsPath)];
+            } catch {
+                return [];
+            }
+        }
+
+        return [];
+    }
+
+    private isWithinTrustedRoot(uri: vscode.Uri): boolean {
+        const target = path.resolve(uri.fsPath);
+        return this.getTrustedRoots().some(root => {
+            // path.relative escapes with '..' (or an absolute path) whenever target is outside root,
+            // and compares case-insensitively on Windows.
+            const relative = path.relative(path.resolve(root), target);
+            return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
         });
     }
 
