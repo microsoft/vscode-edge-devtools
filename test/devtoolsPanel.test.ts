@@ -5,7 +5,7 @@
 // tslint:disable: variable-name
 
 import { Disposable, ExtensionContext, WebviewPanel } from "vscode";
-import TelemetryReporter from "@vscode/extension-telemetry";
+import { TelemetryReporter } from "@vscode/extension-telemetry";
 import { TelemetryData, webviewEventNames } from "../src/common/webviewEvents";
 import { PanelSocket } from "../src/panelSocket";
 import { JsDebugProxyPanelSocket } from "../src/JsDebugProxyPanelSocket";
@@ -14,6 +14,7 @@ import {
     createFakeTelemetryReporter,
     createFakeVSCode,
     createFakeDebugCore,
+    FAKE_WORKSPACE_ROOT,
     getFirstCallback,
     Mocked,
     Writable,
@@ -643,7 +644,7 @@ describe("devtoolsPanel", () => {
 
             it("calls openTextDocument for onSocketCssMirrorContent", async () => {
                 const expectedRequest = {
-                    url: "app.js",
+                    url: `${FAKE_WORKSPACE_ROOT}/styles.css`,
                     newContent: ".body{color: blue;}"
                 };
 
@@ -663,6 +664,55 @@ describe("devtoolsPanel", () => {
 
                 await hookedEvents.get("cssMirrorContent")!(JSON.stringify(expectedRequest));
                 expect(mockVsCode.workspace.openTextDocument).toHaveBeenCalled();
+            });
+
+            it("does not mirror css to a path outside the workspace", async () => {
+                // The url originates from the inspected page via a `/*# sourceURL= */` comment.
+                const expectedRequest = {
+                    url: "/home/test/.config/Code/User/settings.json",
+                    newContent: ".body{color: blue;}"
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
+                    getCSSMirrorContentEnabled: jest.fn().mockImplementation(() => true),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+
+                const dtp = await import("../src/devtoolsPanel");
+                const { TextEncoder } = require('util');
+                global.TextEncoder = TextEncoder;
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("cssMirrorContent")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.workspace.openTextDocument).not.toHaveBeenCalled();
+            });
+
+            it("does not mirror css to a path that escapes the workspace via traversal", async () => {
+                const expectedRequest = {
+                    url: `${FAKE_WORKSPACE_ROOT}/../../../etc/hosts`,
+                    newContent: ".body{color: blue;}"
+                };
+
+                const mockVsCode = jest.requireMock("vscode");
+                const mockUtils = {
+                    applyPathMapping: jest.fn().mockImplementation((x) => x),
+                    fetchUri: jest.fn().mockRejectedValue(null),
+                    isHeadlessEnabled: jest.fn(),
+                    getCSSMirrorContentEnabled: jest.fn().mockImplementation(() => true),
+                };
+                jest.doMock("../src/utils", () => mockUtils);
+
+                const dtp = await import("../src/devtoolsPanel");
+                const { TextEncoder } = require('util');
+                global.TextEncoder = TextEncoder;
+                dtp.DevToolsPanel.createOrShow(context, mockTelemetry, "", mockRuntimeConfig);
+
+                await hookedEvents.get("cssMirrorContent")!(JSON.stringify(expectedRequest));
+                expect(mockVsCode.workspace.openTextDocument).not.toHaveBeenCalled();
             });
 
             it("calls getVscodeSettings", async () => {

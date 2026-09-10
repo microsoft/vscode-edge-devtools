@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { ExtensionContext } from "vscode";
-import TelemetryReporter from "@vscode/extension-telemetry";
+import { TelemetryReporter } from "@vscode/extension-telemetry";
 
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
@@ -17,6 +17,13 @@ export type Mocked<T> = {
 export type Writable<T> = {
     -readonly [P in keyof T]: T[P];
 };
+
+/**
+ * Root folder used by the fake VS Code workspace.
+ * Uses forward slashes and no drive letter so that path operations in the code under
+ * test resolve identically on Windows, Linux and macOS test runners.
+ */
+export const FAKE_WORKSPACE_ROOT = '/git/testPage';
 
 /**
  * Create a fake VS Code API object that can be used in tests
@@ -138,7 +145,12 @@ export function createFakeVSCode() {
             openTextDocument: jest.fn().mockResolvedValue(null),
             workspaceFolders: [
                 {
-                    uri:  'file:///g%3A/GIT/testPage'
+                    uri: {
+                        // Forward slashes so that path.resolve/path.relative behave the same
+                        // way on Windows and on posix hosts.
+                        fsPath: FAKE_WORKSPACE_ROOT,
+                        toString: () => 'file:///g%3A/GIT/testPage',
+                    }
                 }
             ],
             fs: {
@@ -176,6 +188,9 @@ export function createFakeTelemetryReporter(): Mocked<Readonly<TelemetryReporter
         sendDangerousTelemetryEvent: jest.fn(),
         sendTelemetryErrorEvent: jest.fn(),
         sendDangerousTelemetryErrorEvent: jest.fn(),
+        sendDangerousTelemetryException: jest.fn(),
+        setContextTag: jest.fn(),
+        getContextTag: jest.fn(),
         onDidChangeTelemetryLevel: jest.fn(),
         telemetryLevel: "all"
     };

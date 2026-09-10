@@ -1,11 +1,10 @@
-/* eslint-disable linebreak-style */
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import { performance } from 'perf_hooks';
-import TelemetryReporter from '@vscode/extension-telemetry';
+import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
@@ -91,9 +90,9 @@ export class DevToolsPanel {
         this.panelSocket.on('getVscodeSettings', (msg: string) => this.onSocketGetVscodeSettings(msg));
         this.panelSocket.on('setState', (msg: string) => this.onSocketSetState(msg));
         this.panelSocket.on('getUrl', (msg: string) => this.onSocketGetUrl(msg) as unknown as void);
-        this.panelSocket.on('openUrl', (msg: string) => this.onSocketOpenUrl(msg) as unknown as void);
+        this.panelSocket.on('openUrl', (msg: string) => this.onSocketOpenUrl(msg));
         this.panelSocket.on('openInEditor', (msg: string) => this.onSocketOpenInEditor(msg) as unknown as void);
-        this.panelSocket.on('toggleScreencast', () => this.toggleScreencast() as unknown as void);
+        this.panelSocket.on('toggleScreencast', () => this.toggleScreencast());
         this.panelSocket.on('cssMirrorContent', (msg: string) => this.onSocketCssMirrorContent(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', (msg: string) => this.onSocketCopyText(msg));
@@ -101,7 +100,7 @@ export class DevToolsPanel {
         this.panelSocket.on('focusEditorGroup', (msg: string) => this.onSocketFocusEditorGroup(msg));
         this.panelSocket.on('replayConsoleMessages', () => this.onSocketReplayConsoleMessages());
         this.panelSocket.on('devtoolsConnection', (success: string) => this.onSocketDevToolsConnection(success));
-        this.panelSocket.on('toggleCSSMirrorContent', (msg: string) => this.onToggleCSSMirrorContent(msg) as unknown as void);
+        this.panelSocket.on('toggleCSSMirrorContent', (msg: string) => this.onToggleCSSMirrorContent(msg));
 
         // This Websocket is only used on initial connection to determine the browser version.
         // The browser version is used to select the correct hashed version of the devtools
@@ -414,6 +413,12 @@ export class DevToolsPanel {
 
         const uri = await this.parseUrlToUri(url);
 
+        // The stylesheet url comes from the inspected page, so it must never be able to steer
+        // this write outside the developer's project.
+        if (uri && !this.isWithinTrustedRoot(uri)) {
+            return;
+        }
+
         // Finally open and edit the document if it exists
         if (uri) {
             const textEditor = await this.openEditorFromUri(uri);
@@ -536,6 +541,35 @@ export class DevToolsPanel {
             errorCode: ErrorCodes.Error,
             title: 'Unable to open file in editor.',
             message: `${sourcePath} does not map to a local file.${appendedEntryPoint ? entryPointErrorMessage : ''}`,
+        });
+    }
+
+    private getTrustedRoots(): string[] {
+        const folders = vscode.workspace.workspaceFolders;
+        if (folders && folders.length > 0) {
+            return folders.map(folder => folder.uri.fsPath).filter(fsPath => Boolean(fsPath));
+        }
+
+        // Single-file debugging (e.g. "Launch HTML file") has no workspace folder, so the
+        // developer-chosen target file's own directory is the only trusted root.
+        if (this.targetUrl.startsWith('file://')) {
+            try {
+                return [path.dirname(vscode.Uri.parse(this.targetUrl).fsPath)];
+            } catch {
+                return [];
+            }
+        }
+
+        return [];
+    }
+
+    private isWithinTrustedRoot(uri: vscode.Uri): boolean {
+        const target = path.resolve(uri.fsPath);
+        return this.getTrustedRoots().some(root => {
+            // path.relative escapes with '..' (or an absolute path) whenever target is outside root,
+            // and compares case-insensitively on Windows.
+            const relative = path.relative(path.resolve(root), target);
+            return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
         });
     }
 

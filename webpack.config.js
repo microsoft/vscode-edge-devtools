@@ -3,7 +3,7 @@
 
 const copyPlugin = require('copy-webpack-plugin');
 const path = require('path');
-const { DefinePlugin } = require('webpack');
+const { DefinePlugin, NormalModuleReplacementPlugin } = require('webpack');
 
 /** @type {Partial<import('webpack').Configuration>} */
 const commonConfig = {
@@ -62,6 +62,13 @@ module.exports = env => {
             },
             name: 'extension',
             target: 'node',
+            resolve: {
+                ...commonConfig.resolve,
+                fallback: {
+                    // Optional peer dependency of @puppeteer/browsers.
+                    'proxy-agent': false,
+                },
+            },
             output: {
                 devtoolModuleFilenameTemplate: '../[resource-path]',
                 filename: '[name].js',
@@ -82,7 +89,14 @@ module.exports = env => {
                 new DefinePlugin({
                     DEBUG: JSON.stringify(env.debug ?? false),
                     DEVTOOLS_BASE_URI: JSON.stringify(env.devtoolsBaseUri ?? undefined),
-                })
+                }),
+                // The unused @puppeteer/browsers CLI drags in yargs, whose ESM shim
+                // passes a bare `require` around and trips webpack's critical
+                // dependency warning. See build/puppeteerCliStub.js.
+                new NormalModuleReplacementPlugin(
+                    /[\\/]@puppeteer[\\/]browsers[\\/]lib[\\/]CLI\.js$/,
+                    path.resolve(__dirname, 'build/puppeteerCliStub.js'),
+                ),
             ],
         },
     ];

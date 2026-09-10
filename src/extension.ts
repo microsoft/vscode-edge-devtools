@@ -4,7 +4,7 @@
 import { Browser, Target, TargetType } from 'puppeteer-core';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
-import TelemetryReporter from '@vscode/extension-telemetry';
+import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
 import { DevToolsPanel } from './devtoolsPanel';
@@ -494,7 +494,7 @@ export async function attach(
                         description: i.url,
                         detail: i.webSocketDebuggerUrl,
                         label: i.title,
-                    } as vscode.QuickPickItem;
+                    };
                 });
 
                 // Show the target list and allow the user to select one
