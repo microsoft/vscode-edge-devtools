@@ -1,0 +1,26 @@
+# Normalize line endings for this repository.
+#
+# Without this file, the line endings of a committed file depend on the
+# contributor's local core.autocrlf setting, which caused files to flip
+# between LF and CRLF and broke the `linebreak-style` lint rule on CI.
+#
+# `text=auto eol=lf` means: detect text files automatically, store them with
+# LF in the repository, and check them out with LF on every platform.
+* text=auto eol=lf
+
+# Binary files must never be line-ending converted.
+*.png  binary
+*.gif  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.vsix binary
+
+# SVGs are left byte-for-byte as authored, since many are generated or
+# optimized assets. `-text` disables end-of-line conversion while keeping
+# them diffable as text (unlike `binary`, which would hide the diff).
+*.svg -text
+*.svg binary

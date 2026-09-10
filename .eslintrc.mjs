@@ -109,7 +109,7 @@ export default [
       'no-multiple-empty-lines': ['error', {'max': 2}],
       'no-mixed-spaces-and-tabs': 'error',
       'no-trailing-spaces': 'error',
-      'linebreak-style': ['error', process.platform === 'win32' ? 'windows' : 'unix'],
+      'linebreak-style': ['error', 'unix'],
 
       // Disabled rules
       'indent': 'off',
