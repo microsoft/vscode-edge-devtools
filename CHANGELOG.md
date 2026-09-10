@@ -1,3 +1,8 @@
+## 2.1.11
+* **[Bug Fix]**: Updating dependencies - [PR #4995](https://github.com/microsoft/vscode-edge-devtools/pull/4995)
+* **[Bug Fix]**: Restrict CSS mirror writes to workspace - [PR #4962](https://github.com/microsoft/vscode-edge-devtools/pull/4962)
+* **[Bug Fix]**: Adding ESRP Sign pipeline - [PR #4993](https://github.com/microsoft/vscode-edge-devtools/pull/4993)
+
 ## 2.1.10
 * **[Bug Fix]**: Ramping up CDN Version - [PR #3665](https://github.com/microsoft/vscode-edge-devtools/pull/3665)
 * **[Bug Fix]**: Fixing A11y issues in screencast - [PR #3594](https://github.com/microsoft/vscode-edge-devtools/pull/3594)
