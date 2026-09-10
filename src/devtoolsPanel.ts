@@ -1,11 +1,10 @@
-/* eslint-disable linebreak-style */
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as debugCore from 'vscode-chrome-debug-core';
 import { performance } from 'perf_hooks';
-import TelemetryReporter from '@vscode/extension-telemetry';
+import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
 import {
     encodeMessageForChannel,
@@ -91,9 +90,9 @@ export class DevToolsPanel {
         this.panelSocket.on('getVscodeSettings', (msg: string) => this.onSocketGetVscodeSettings(msg));
         this.panelSocket.on('setState', (msg: string) => this.onSocketSetState(msg));
         this.panelSocket.on('getUrl', (msg: string) => this.onSocketGetUrl(msg) as unknown as void);
-        this.panelSocket.on('openUrl', (msg: string) => this.onSocketOpenUrl(msg) as unknown as void);
+        this.panelSocket.on('openUrl', (msg: string) => this.onSocketOpenUrl(msg));
         this.panelSocket.on('openInEditor', (msg: string) => this.onSocketOpenInEditor(msg) as unknown as void);
-        this.panelSocket.on('toggleScreencast', () => this.toggleScreencast() as unknown as void);
+        this.panelSocket.on('toggleScreencast', () => this.toggleScreencast());
         this.panelSocket.on('cssMirrorContent', (msg: string) => this.onSocketCssMirrorContent(msg) as unknown as void);
         this.panelSocket.on('close', () => this.onSocketClose());
         this.panelSocket.on('copyText', (msg: string) => this.onSocketCopyText(msg));
@@ -101,7 +100,7 @@ export class DevToolsPanel {
         this.panelSocket.on('focusEditorGroup', (msg: string) => this.onSocketFocusEditorGroup(msg));
         this.panelSocket.on('replayConsoleMessages', () => this.onSocketReplayConsoleMessages());
         this.panelSocket.on('devtoolsConnection', (success: string) => this.onSocketDevToolsConnection(success));
-        this.panelSocket.on('toggleCSSMirrorContent', (msg: string) => this.onToggleCSSMirrorContent(msg) as unknown as void);
+        this.panelSocket.on('toggleCSSMirrorContent', (msg: string) => this.onToggleCSSMirrorContent(msg));
 
         // This Websocket is only used on initial connection to determine the browser version.
         // The browser version is used to select the correct hashed version of the devtools

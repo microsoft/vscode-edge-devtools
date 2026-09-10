@@ -15,6 +15,7 @@ node_modules/
 out/edge/
 src/
 scripts/
+build/
 startpage/
 !out/startpage/
 test/

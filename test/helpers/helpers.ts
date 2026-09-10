@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { ExtensionContext } from "vscode";
-import TelemetryReporter from "@vscode/extension-telemetry";
+import { TelemetryReporter } from "@vscode/extension-telemetry";
 
 // Allow unused variables in the mocks to have leading underscore
 // tslint:disable: variable-name
@@ -188,6 +188,9 @@ export function createFakeTelemetryReporter(): Mocked<Readonly<TelemetryReporter
         sendDangerousTelemetryEvent: jest.fn(),
         sendTelemetryErrorEvent: jest.fn(),
         sendDangerousTelemetryErrorEvent: jest.fn(),
+        sendDangerousTelemetryException: jest.fn(),
+        setContextTag: jest.fn(),
+        getContextTag: jest.fn(),
         onDidChangeTelemetryLevel: jest.fn(),
         telemetryLevel: "all"
     };
