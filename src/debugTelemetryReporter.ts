@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import TelemetryReporter from '@vscode/extension-telemetry';
+import { TelemetryReporter } from '@vscode/extension-telemetry';
 
 export class DebugTelemetryReporter extends TelemetryReporter {
     constructor() {
@@ -14,6 +14,14 @@ export class DebugTelemetryReporter extends TelemetryReporter {
         measurements?: { [key: string]: number; }): void {
         // eslint-disable-next-line no-console
         console.log(
+            `${eventName}: ${JSON.stringify(properties)}, ${JSON.stringify(measurements)}`);
+    }
+
+    sendTelemetryErrorEvent(
+        eventName: string,
+        properties?: { [key: string]: string; },
+        measurements?: { [key: string]: number; }): void {
+        console.error(
             `${eventName}: ${JSON.stringify(properties)}, ${JSON.stringify(measurements)}`);
     }
 
