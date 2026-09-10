@@ -5,6 +5,8 @@
 *ignore
 *.vsix
 package-lock.json
+.pipelines/
+.config/
 img/
 node_modules/
 !node_modules/vscode-webhint/dist/src/server.js

@@ -1,0 +1,8 @@
+{
+    "instanceUrl": "https://dev.azure.com/microsoft/",
+    "projectName": "Edge",
+    "template": "tsa.scrum",
+    "areaPath": "Edge\\Web Experience\\Developer Tools",
+    "notificationAliases": ["edgedevtools@microsoft.com"],
+    "codebaseName": "vscode-edge-devtools"
+}
