@@ -20,6 +20,9 @@ variables:
   CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)]
   WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
 
+  NodeVersion: '22.x'
+  NpmVersion: '11.19.1'
+
   VsixName: vscode-edge-devtools.vsix
   ManifestName: extension.manifest
   SignatureName: extension.signature.p7s
@@ -52,13 +55,19 @@ extends:
 
             steps:
               - task: UseNode@1
-                displayName: 'Use Node.js 22.x'
+                displayName: 'Use Node.js $(NodeVersion)'
                 inputs:
                   versionSource: 'spec'
-                  version: '22.x'
+                  version: '$(NodeVersion)'
 
               - script: git config --global core.autocrlf false
                 displayName: 'Configure Git LF settings'
+
+              - pwsh: |
+                  npm install -g npm@$(NpmVersion)
+                  if ($LASTEXITCODE -ne 0) { throw "npm self-update failed" }
+                  npm --version
+                displayName: 'Pin npm to $(NpmVersion)'
 
               - script: npm ci
                 displayName: 'Install dependencies (npm ci)'
