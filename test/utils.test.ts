@@ -428,17 +428,36 @@ describe("utils", () => {
         });
 
         it("returns a retail version when valid package in retail env", async () => {
-            const retailReporter = {};
-            jest.doMock("@vscode/extension-telemetry", () => ({ TelemetryReporter: function retail() { return retailReporter; } }));
+            const sendEventData = jest.fn();
+            jest.doMock("../package.json", () => ({
+                publisher: "ms-edgedevtools",
+                name: "vscode-edge-devtools",
+                oneDSKey: "key",
+            }), { virtual: true });
+            // Models the real base class: a constructor owning a telemetrySender.
+            jest.doMock("@vscode/extension-telemetry", () => ({
+                TelemetryReporter: class {
+                    telemetrySender = { sendEventData };
+                },
+            }));
             jest.resetModules();
             jest.requireMock("vscode").env.machineId = "12345";
 
             utils = await import("../src/utils");
+            const { AriaTelemetryReporter } = await import("../src/ariaTelemetryReporter");
 
             const mockContext = createFakeExtensionContext();
+            (mockContext as { extensionMode: number }).extensionMode = 1;
             const reporter = utils.createTelemetryReporter(mockContext);
             expect(reporter).toBeDefined();
-            expect(reporter).toEqual(retailReporter);
+            expect(reporter).toBeInstanceOf(AriaTelemetryReporter);
+
+            // The sender is wrapped, so names reach the collector sanitized.
+            const sender = (reporter as unknown as {
+                telemetrySender: { sendEventData: (name: string, data: unknown) => void };
+            }).telemetrySender;
+            sender.sendEventData("ms-edgedevtools.vscode-edge-devtools/user", {});
+            expect(sendEventData).toHaveBeenCalledWith("user", {});
         });
     });
 

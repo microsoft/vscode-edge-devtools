@@ -25,26 +25,23 @@ export function sanitizeEventName(eventName: string): string {
         .slice(0, 98);
 }
 
-// Rewrites names at the sender, the single point both the usage and error paths
-// pass through, so VS Code's opt-in check, common.* properties and scrubbing
-// are all preserved.
+function sanitizeSenderEventNames(reporter: unknown): void {
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+    const sender = (reporter as any)?.telemetrySender;
+    if (!sender || typeof sender.sendEventData !== 'function') {
+        return;
+    }
+
+    const sendEventData = sender.sendEventData.bind(sender) as (eventName: string, data: unknown) => void;
+    sender.sendEventData = (eventName: string, data: unknown): void => {
+        sendEventData(sanitizeEventName(eventName), data);
+    };
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+}
+
 export class AriaTelemetryReporter extends TelemetryReporter {
     constructor(key: string) {
         super(key);
-        this.sanitizeSenderEventNames();
-    }
-
-    private sanitizeSenderEventNames(): void {
-        /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-        const sender = (this as any).telemetrySender;
-        if (!sender || typeof sender.sendEventData !== 'function') {
-            return;
-        }
-
-        const sendEventData = sender.sendEventData.bind(sender) as (eventName: string, data: unknown) => void;
-        sender.sendEventData = (eventName: string, data: unknown): void => {
-            sendEventData(sanitizeEventName(eventName), data);
-        };
-        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+        sanitizeSenderEventNames(this);
     }
 }

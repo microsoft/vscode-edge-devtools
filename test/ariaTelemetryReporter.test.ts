@@ -8,11 +8,16 @@ jest.mock('vscode', () => createFakeVSCode(), { virtual: true });
 // Stands in for the real base class so the sender wrapping can be observed.
 jest.mock('@vscode/extension-telemetry', () => {
     class FakeTelemetryReporter {
-        telemetrySender: { sendEventData: jest.Mock };
+        telemetrySender: { sendEventData: jest.Mock; sendErrorData: jest.Mock };
         originalSendEventData: jest.Mock;
+        originalSendErrorData: jest.Mock;
         constructor(_key: string) {
             this.originalSendEventData = jest.fn();
-            this.telemetrySender = { sendEventData: this.originalSendEventData };
+            this.originalSendErrorData = jest.fn();
+            this.telemetrySender = {
+                sendEventData: this.originalSendEventData,
+                sendErrorData: this.originalSendErrorData,
+            };
         }
     }
     return { TelemetryReporter: FakeTelemetryReporter, default: FakeTelemetryReporter };
@@ -84,5 +89,42 @@ describe('AriaTelemetryReporter', () => {
         };
 
         expect(reporter.telemetrySender.sendEventData).not.toBe(reporter.originalSendEventData);
+    });
+
+    // sendTelemetryErrorEvent passes a string event name, and VS Code's
+    // logError(string) overload routes to sendEventData, so error events are
+    // sanitized by the same wrapper.
+    it('sanitizes error event names, which also travel via sendEventData', async () => {
+        const { AriaTelemetryReporter } = await import('../src/ariaTelemetryReporter');
+        const reporter = new AriaTelemetryReporter('key') as unknown as {
+            telemetrySender: { sendEventData: (name: string, data: unknown) => void };
+            originalSendEventData: jest.Mock;
+        };
+
+        reporter.telemetrySender.sendEventData(`${prefix}command`, { properties: { outcome: 'error' } });
+
+        expect(reporter.originalSendEventData).toHaveBeenCalledWith(
+            'command',
+            { properties: { outcome: 'error' } });
+    });
+
+    // sendErrorData takes an Exception, not an event name; the 1DS fallback
+    // hardcodes the already valid name 'unhandlederror'. Nothing to sanitize.
+    it('leaves sendErrorData alone because it carries no event name', async () => {
+        const { AriaTelemetryReporter } = await import('../src/ariaTelemetryReporter');
+        const reporter = new AriaTelemetryReporter('key') as unknown as {
+            telemetrySender: { sendErrorData: (error: Error, data?: unknown) => void };
+            originalSendErrorData: jest.Mock;
+        };
+
+        const error = new Error('boom');
+        reporter.telemetrySender.sendErrorData(error, { properties: {} });
+
+        expect(reporter.originalSendErrorData).toHaveBeenCalledWith(error, { properties: {} });
+    });
+
+    it('keeps a name the collector already accepts unchanged', async () => {
+        const { sanitizeEventName } = await import('../src/ariaTelemetryReporter');
+        expect(sanitizeEventName('unhandlederror')).toBe('unhandlederror');
     });
 });
