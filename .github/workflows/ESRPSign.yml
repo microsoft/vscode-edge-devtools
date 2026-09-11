@@ -19,6 +19,7 @@ resources:
 variables:
   CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)]
   WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
+  npm_config_registry: $[coalesce(variables['NpmRegistry'], 'https://registry.npmjs.org/')]
 
   VsixName: vscode-edge-devtools.vsix
   ManifestName: extension.manifest
