@@ -259,7 +259,9 @@ describe("devtoolsPanel", () => {
             // Ensure it posts telemetry
             callback.call(thisObj, "open");
             expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
-                "websocket/open",
+                "websocket",
+                { area: "websocket", feature: "connection", action: "open", outcome: "success" },
+                undefined,
             );
         });
 
@@ -281,13 +283,19 @@ describe("devtoolsPanel", () => {
 
                 // Ensure it sends connect initially
                 hookedEvents.get("ready")!();
-                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith("websocket/connect");
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                    "websocket",
+                    { area: "websocket", feature: "connection", action: "connect", outcome: "success" },
+                    undefined);
 
                 // Ensure it sends reconnect when already connected
                 const socket: Writable<PanelSocket> = mockPanelSocket;
                 socket.isConnectedToTarget = true;
                 hookedEvents.get("ready")!();
-                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith("websocket/reconnect");
+                expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
+                    "websocket",
+                    { area: "websocket", feature: "connection", action: "reconnect", outcome: "success" },
+                    undefined);
             });
 
             it("does nothing yet for websocket", async () => {
@@ -309,8 +317,8 @@ describe("devtoolsPanel", () => {
                 };
                 hookedEvents.get("telemetry")!(JSON.stringify(expectedPerf));
                 expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
-                    `devtools/${expectedPerf.name}`,
-                    undefined,
+                    "devtools",
+                    { area: "devtools", feature: expectedPerf.name, action: "measure", outcome: "success" },
                     expect.objectContaining({ "myHistogram.duration": 100 }),
                 );
 
@@ -321,8 +329,9 @@ describe("devtoolsPanel", () => {
                 };
                 hookedEvents.get("telemetry")!(JSON.stringify(expectedEnum));
                 expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
-                    `devtools/${expectedEnum.name}`,
-                    expect.objectContaining({ "myHistogram2.actionCode": "2" }),
+                    "devtools",
+                    expect.objectContaining({ area: "devtools", feature: expectedEnum.name, action: "enumerate", "myHistogram2.actionCode": "2" }),
+                    undefined,
                 );
 
                 const expectedError: TelemetryData = {
@@ -339,8 +348,9 @@ describe("devtoolsPanel", () => {
                 };
                 hookedEvents.get("telemetry")!(JSON.stringify(expectedError));
                 expect(mockTelemetry.sendTelemetryErrorEvent).toHaveBeenCalledWith(
-                    `devtools/${expectedError.name}`,
-                    expect.objectContaining({ "UnknownError.info": JSON.stringify(expectedError.data) }),
+                    "devtools",
+                    expect.objectContaining({ area: "devtools", feature: expectedError.name, action: "report", outcome: "error", "UnknownError.info": JSON.stringify(expectedError.data) }),
+                    undefined,
                 );
             });
 
@@ -496,8 +506,9 @@ describe("devtoolsPanel", () => {
 
                 await hookedEvents.get("openInEditor")!(JSON.stringify(expectedRequest));
                 expect(mockTelemetry.sendTelemetryEvent).toHaveBeenCalledWith(
-                    `extension/openInEditor`,
-                    expect.objectContaining({ sourceMaps: "true" }),
+                    "extension",
+                    expect.objectContaining({ area: "extension", feature: "editor", action: "openInEditor", sourceMaps: "true" }),
+                    undefined,
                 );
             });
 

@@ -10,6 +10,7 @@ import { fixRemoteWebSocket, getListOfTargets, getRemoteEndpointSettings, IRemot
 import { IncomingMessage } from 'http';
 import * as https from 'https';
 import { LaunchConfigManager } from './launchConfigManager';
+import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
 export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
     readonly onDidChangeTreeData: vscode.Event<CDPTarget | null>;
@@ -60,7 +61,7 @@ export class CDPTargetsProvider implements vscode.TreeDataProvider<CDPTarget> {
                     }
                 }
             } else {
-                this.telemetryReporter.sendTelemetryEvent('view/error/no_json_array');
+                sendTaxonomyEvent(this.telemetryReporter, { area: 'view', feature: 'targets', action: 'list', outcome: 'error', detail: 'no_json_array' });
             }
 
             // Sort the targets by type and then title, but keep 'page' types at the top

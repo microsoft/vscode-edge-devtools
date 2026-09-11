@@ -10,6 +10,7 @@ import { CDPTargetsProvider } from './cdpTargetsProvider';
 import { DevToolsPanel } from './devtoolsPanel';
 import { ScreencastPanel } from './screencastPanel';
 import { LaunchDebugProvider } from './launchDebugProvider';
+import { sendTaxonomyErrorEvent, sendTaxonomyEvent } from './telemetryTaxonomy';
 import {
     buttonCode,
     checkWithinHoverRange,
@@ -70,7 +71,7 @@ export function activate(context: vscode.ExtensionContext): void {
             const documentDiagnostics = vscode.languages.getDiagnostics(document.uri);
             for (const diagnostic of documentDiagnostics) {
                 if (diagnostic.source === languageServerName && checkWithinHoverRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
-                    telemetryReporter.sendTelemetryEvent('user/webhint/hover', { 'hint': (diagnostic.code as DiagnosticCodeType).value });
+                    sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'hover' }, { 'hint': (diagnostic.code as DiagnosticCodeType).value });
                 }
             }
             return null;
@@ -104,9 +105,9 @@ export function activate(context: vscode.ExtensionContext): void {
         `${SETTINGS_VIEW_NAME}.launch`,
         async (fromEmptyTargetView?: boolean) => {
             if (fromEmptyTargetView) {
-                telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.emptyTargetListLaunchBrowserInstance });
+                sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.emptyTargetListLaunchBrowserInstance });
             } else {
-                telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
+                sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.launchBrowserInstance });
             }
             await launch(context);
             cdpTargetsProvider.refresh();
@@ -114,18 +115,18 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.refresh`,
         () => {
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.refreshTargetList });
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.refreshTargetList });
             cdpTargetsProvider.refresh();
         }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.attach`,
         (target?: CDPTarget, isJsDebugProxiedCDPConnection = false) => {
             if (!target){
-                telemetryReporter.sendTelemetryEvent('command/attach/noTarget');
+                sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'target', action: 'attach', outcome: 'noTarget' });
                 return;
             }
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.attachToTarget });
-            telemetryReporter.sendTelemetryEvent('view/devtools');
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.attachToTarget });
+            sendTaxonomyEvent(telemetryReporter, { area: 'view', feature: 'devtools', action: 'open' });
             const runtimeConfig = getRuntimeConfig();
             if (isJsDebugProxiedCDPConnection) {
                 runtimeConfig.isJsDebugProxiedCDPConnection = true;
@@ -138,11 +139,11 @@ export function activate(context: vscode.ExtensionContext): void {
         (target?: CDPTarget, isJsDebugProxiedCDPConnection: boolean = false) => {
             if (!target){
                 const errorMessage = 'No target selected';
-                telemetryReporter.sendTelemetryErrorEvent('command/screencast/target', {message: errorMessage});
+                sendTaxonomyErrorEvent(telemetryReporter, { area: 'command', feature: 'screencast', action: 'toggle', outcome: 'noTarget' }, {message: errorMessage});
                 return;
             }
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.toggleScreencast });
-            telemetryReporter.sendTelemetryEvent('view/screencast');
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.toggleScreencast });
+            sendTaxonomyEvent(telemetryReporter, { area: 'view', feature: 'screencast', action: 'open' });
             ScreencastPanel.createOrShow(context,  telemetryReporter, target.websocketUrl, isJsDebugProxiedCDPConnection);
         }));
 
@@ -155,21 +156,21 @@ export function activate(context: vscode.ExtensionContext): void {
         }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.openSettings`, () => {
-        telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.openSettings });
+        sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.openSettings });
         void vscode.commands.executeCommand('workbench.action.openSettings', `${SETTINGS_STORE_NAME}`);
     }));
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewChangelog`, () => {
-        telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.viewChangelog });
+        sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.viewChangelog });
         void vscode.env.openExternal(vscode.Uri.parse('https://github.com/microsoft/vscode-edge-devtools/blob/main/CHANGELOG.md'));
     }));
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.close-instance`,
         async (target?: CDPTarget) => {
             if (!target) {
-                telemetryReporter.sendTelemetryEvent('command/close/noTarget');
+                sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'target', action: 'close', outcome: 'noTarget' });
                 return;
             }
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.closeTarget });
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.closeTarget });
             // disable buttons for this target
             target.contextValue = 'cdpTargetClosing';
             cdpTargetsProvider.changeDataEvent.fire(target);
@@ -207,7 +208,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.configureLaunchJson`,
         () => {
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', {
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, {
                 'VSCode.buttonCode': LaunchConfigManager.instance.getLaunchConfig() === 'None' ? buttonCode.generateLaunchJson : buttonCode.configureLaunchJson,
             });
             void LaunchConfigManager.instance.configureLaunchJson();
@@ -215,7 +216,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(vscode.commands.registerCommand(
         `${SETTINGS_VIEW_NAME}.launchProject`,
         () => {
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.launchProject });
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.launchProject });
             LaunchConfigManager.instance.updateLaunchConfig();
             if (vscode.workspace.workspaceFolders) {
                 const workspaceFolder = vscode.workspace.workspaceFolders[0];
@@ -240,7 +241,7 @@ export function activate(context: vscode.ExtensionContext): void {
             }
         }));
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.viewDocumentation`, () => {
-            telemetryReporter.sendTelemetryEvent('user/buttonPress', { 'VSCode.buttonCode': buttonCode.viewDocumentation });
+            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'ui', action: 'buttonPress' }, { 'VSCode.buttonCode': buttonCode.viewDocumentation });
             void vscode.env.openExternal(vscode.Uri.parse('https://learn.microsoft.com/microsoft-edge/visual-studio-code/microsoft-edge-devtools-extension'));
         }));
 
@@ -250,13 +251,13 @@ export function activate(context: vscode.ExtensionContext): void {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchHtml`, async (fileUri: vscode.Uri): Promise<void> => {
-        telemetryReporter.sendTelemetryEvent('contextMenu/launchHtml');
+        sendTaxonomyEvent(telemetryReporter, { area: 'contextMenu', feature: 'item', action: 'launchHtml' });
         await launchHtml(fileUri);
     }));
 
 
     context.subscriptions.push(vscode.commands.registerCommand(`${SETTINGS_VIEW_NAME}.launchScreencast`, async (fileUri: vscode.Uri): Promise<void> => {
-        telemetryReporter.sendTelemetryEvent('contextMenu/launchScreencast');
+        sendTaxonomyEvent(telemetryReporter, { area: 'contextMenu', feature: 'item', action: 'launchScreencast' });
         await launchScreencast(context, fileUri);
     }));
 
@@ -348,27 +349,27 @@ async function startWebhint(context: vscode.ExtensionContext): Promise<void> {
 
                     switch (command) {
                         case 'vscode-webhint/ignore-hint-project': {
-                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/disable-hint', { hint: hintName });
+                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'disable-hint' }, { hint: hintName });
                             break;
                         }
                         case 'vscode-webhint/ignore-feature-project': {
-                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/disable-rule', { hint: hintName, value: featureName });
+                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'disable-rule' }, { hint: hintName, value: featureName });
                             break;
                         }
                         case 'vscode-webhint/edit-hintrc-project': {
-                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/edit-hintrc');
+                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'edit-hintrc' });
                             break;
                         }
                         case 'vscode-webhint/ignore-browsers-project': {
                             if (args.length > 1) {
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 const browserList = args[2]['browsers'] as any[]; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-                                telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/ignore-browsers', { hint: hintName, value: browserList.join(',') });
+                                sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'ignore-browsers' }, { hint: hintName, value: browserList.join(',') });
                             }
                             break;
                         }
                         case 'vscode-webhint/apply-code-fix': {
-                            telemetryReporter.sendTelemetryEvent('user/webhint/quickfix/apply-code-fix', {value: featureName });
+                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'apply-code-fix' }, {value: featureName });
                             break;
                         }
                     }
@@ -387,7 +388,7 @@ async function startWebhint(context: vscode.ExtensionContext): Promise<void> {
         if (!telemetryReporter) {
             telemetryReporter = createTelemetryReporter(context);
         }
-        telemetryReporter.sendTelemetryEvent('user/webhint/install-failed');
+        sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'install', outcome: 'error' });
         if (!disableInstallFailedNotification) {
             const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
             void vscode.window.showInformationMessage(message, 'Remind me Later', 'Don\'t show again', 'Disable Extension').then(button => {
@@ -519,7 +520,7 @@ export async function attach(
             message: exceptionStack as string || 'No available targets to attach.',
         });
 
-        telemetryReporter.sendTelemetryEvent('command/attach/error/no_json_array', telemetryProps);
+        sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'target', action: 'attach', outcome: 'error', detail: 'no_json_array' }, telemetryProps);
     }
 }
 
@@ -528,12 +529,12 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
         telemetryReporter = createTelemetryReporter(context);
     }
 
-    telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget');
+    sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'currentDebugTarget', action: 'attach' });
     const sessionId = debugSessionId || getActiveDebugSessionId();
 
     if (!sessionId) {
         const errorMessage = 'No active debug session';
-        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        sendTaxonomyErrorEvent(telemetryReporter, { area: 'command', feature: 'currentDebugTarget', action: 'attach', detail: 'no_active_session' }, {message: errorMessage});
         void vscode.window.showErrorMessage(errorMessage);
         return;
     }
@@ -541,17 +542,17 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
     const targetWebsocketUrl = await getJsDebugCDPProxyWebsocketUrl(sessionId);
 
     if (targetWebsocketUrl instanceof Error) {
-        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: targetWebsocketUrl.message});
+        sendTaxonomyErrorEvent(telemetryReporter, { area: 'command', feature: 'currentDebugTarget', action: 'attach', detail: 'proxy_url_failed' }, {message: targetWebsocketUrl.message});
         void vscode.window.showErrorMessage(targetWebsocketUrl.message);
     } else if (targetWebsocketUrl) {
         // Auto connect to found target
-        telemetryReporter.sendTelemetryEvent('command/attachToCurrentDebugTarget/devtools');
+        sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'currentDebugTarget', action: 'attach', detail: 'devtools' });
         const runtimeConfig = getRuntimeConfig(config);
         runtimeConfig.isJsDebugProxiedCDPConnection = true;
         DevToolsPanel.createOrShow(context, telemetryReporter, targetWebsocketUrl, runtimeConfig);
     } else {
         const errorMessage = 'Unable to attach DevTools to current debug session.';
-        telemetryReporter.sendTelemetryErrorEvent('command/attachToCurrentDebugTarget/devtools', {message: errorMessage});
+        sendTaxonomyErrorEvent(telemetryReporter, { area: 'command', feature: 'currentDebugTarget', action: 'attach', detail: 'attach_failed' }, {message: errorMessage});
         void vscode.window.showErrorMessage(errorMessage);
     }
 }
@@ -566,21 +567,21 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
     const isHeadless: string = settings.get('headless') || 'false';
 
     const telemetryProps = { viaConfig: `${!!config}`, browserType, isHeadless};
-    telemetryReporter.sendTelemetryEvent('command/launch', telemetryProps);
+    sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch' }, telemetryProps);
 
     const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);
     const url = launchUrl || defaultUrl;
     const target = await openNewTab(hostname, port, url);
     if (target && target.webSocketDebuggerUrl) {
         // Show the devtools
-        telemetryReporter.sendTelemetryEvent('command/launch/devtools', telemetryProps);
+        sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch', detail: 'devtools' }, telemetryProps);
         const runtimeConfig = getRuntimeConfig(config);
         DevToolsPanel.createOrShow(context, telemetryReporter, target.webSocketDebuggerUrl, runtimeConfig);
     } else {
         // Launch a new instance
         const browserPath = await getBrowserPath(config);
         if (!browserPath) {
-            telemetryReporter.sendTelemetryEvent('command/launch/error/browser_not_found', telemetryProps);
+            sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch', outcome: 'error', detail: 'browser_not_found' }, telemetryProps);
             void vscode.window.showErrorMessage(
                 'Microsoft Edge could not be found. ' +
                 'Ensure you have installed Microsoft Edge ' +
@@ -597,7 +598,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             const match = exeName.match(/(chrome|edge)/gi) || [];
             const knownBrowser = match.length > 0 ? match[0] : 'other';
             const browserProps = { exe: `${knownBrowser?.toLowerCase()}` };
-            telemetryReporter.sendTelemetryEvent('command/launch/browser', browserProps);
+            sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch', detail: 'newInstance' }, browserProps);
 
         browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
         if (url !== SETTINGS_DEFAULT_URL) {
