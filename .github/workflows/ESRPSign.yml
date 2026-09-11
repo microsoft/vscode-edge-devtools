@@ -9,6 +9,14 @@ parameters:
     type: boolean
     default: true
 
+  # Set false for a diagnostic run: npm then resolves straight from the public
+  # registry, reproducing the Network Isolation failure so the blocked-connection
+  # report reflects npm's own traffic rather than a successful mirrored restore.
+  - name: redirectNpmToInternalFeed
+    displayName: Redirect npm to the 1ES internal mirror
+    type: boolean
+    default: true
+
 resources:
   repositories:
     - repository: templates
@@ -19,6 +27,23 @@ resources:
 variables:
   CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)]
   WindowsContainerImage: 'onebranch.azurecr.io/windows/ltsc2022/vse2022:latest'
+
+  # package-lock.json intentionally references the public npm registry so the repo
+  # works for external contributors. Network Isolation blocks registry.npmjs.org in
+  # the build container, so npm is redirected to the 1ES public mirror here. npm's
+  # default replace-registry-host=npmjs rewrites the public-registry tarball hosts
+  # in the lockfile to this feed, so no internal URLs are committed.
+  #
+  # Declared as a pipeline variable rather than step-level env so it applies at
+  # environment precedence (cli > env > project .npmrc > user .npmrc) to every step.
+  # That matters because restore is not driven by a single task -- the `npx vsce`
+  # invocations below inherit the agent environment too. Azure Pipelines exports
+  # this as NPM_CONFIG_REGISTRY, and npm matches npm_config_* case insensitively.
+  #
+  # Omitted entirely when redirectNpmToInternalFeed is false so npm falls back to
+  # its default registry for diagnostic runs.
+  ${{ if parameters.redirectNpmToInternalFeed }}:
+    npm_config_registry: 'https://ms-feed-25.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/'
 
   VsixName: vscode-edge-devtools.vsix
   ManifestName: extension.manifest
@@ -59,6 +84,48 @@ extends:
 
               - script: git config --global core.autocrlf false
                 displayName: 'Configure Git LF settings'
+
+              # TEMPORARY DIAGNOSTIC -- remove once the registry question is settled.
+              # Probes every tarball URL in package-lock.json from inside the isolated
+              # container and reports which are unreachable. This distinguishes a
+              # domain-wide block on registry.npmjs.org (all URLs fail) from a single
+              # offending dependency (only some fail). Runs before npm ci and never
+              # fails the build.
+              - pwsh: |
+                  $js = Join-Path $env:AGENT_TEMPDIRECTORY 'probe-registry.js'
+                  @'
+                  const fs = require('fs'), https = require('https'), { URL } = require('url');
+                  const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+                  const targets = [];
+                  for (const [name, v] of Object.entries(lock.packages || {}))
+                    if (v && typeof v.resolved === 'string' && v.resolved.startsWith('http'))
+                      targets.push({ name: name || '<root>', url: v.resolved, host: new URL(v.resolved).host });
+                  const tally = (arr) => arr.reduce((a, t) => ((a[t.host] = (a[t.host] || 0) + 1), a), {});
+                  console.log('=== lockfile tarball hosts ===');
+                  for (const [h, c] of Object.entries(tally(targets))) console.log('  ' + c + '  ' + h);
+                  console.log('\nnpm_config_registry = ' + (process.env.NPM_CONFIG_REGISTRY || '<unset>'));
+                  console.log('probing ' + targets.length + ' URLs...\n');
+                  const probe = (t) => new Promise((res) => {
+                    const req = https.get(t.url, { headers: { Range: 'bytes=0-0' } }, (r) => { r.destroy(); res({ ...t, status: r.statusCode }); });
+                    req.on('error', (e) => res({ ...t, status: 'ERR ' + (e.code || e.message) }));
+                    req.setTimeout(20000, () => { req.destroy(); res({ ...t, status: 'TIMEOUT' }); });
+                  });
+                  (async () => {
+                    const bad = [], q = targets.slice();
+                    await Promise.all(Array.from({ length: 10 }, async () => {
+                      while (q.length) { const r = await probe(q.shift()); if (!(typeof r.status === 'number' && r.status < 400)) bad.push(r); }
+                    }));
+                    console.log('=== UNREACHABLE: ' + bad.length + ' of ' + targets.length + ' ===');
+                    for (const [h, c] of Object.entries(tally(bad))) console.log('  ' + c + '  ' + h);
+                    console.log('');
+                    for (const b of bad.slice(0, 40)) console.log('  [' + b.status + '] ' + b.name);
+                    if (bad.length > 40) console.log('  ...and ' + (bad.length - 40) + ' more');
+                  })();
+                  '@ | Set-Content -Path $js -Encoding utf8
+                  node $js
+                displayName: 'TEMP: probe registry reachability'
+                workingDirectory: '$(Build.SourcesDirectory)'
+                continueOnError: true
 
               - script: npm ci
                 displayName: 'Install dependencies (npm ci)'
