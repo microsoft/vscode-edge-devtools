@@ -8,6 +8,7 @@ import {
     SETTINGS_STORE_NAME,
 } from './utils';
 import { providedDebugConfig } from './launchConfigManager';
+import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
 type AttachCallback = (
     context: vscode.ExtensionContext,
@@ -56,14 +57,14 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
         if ((config && config.type === `${SETTINGS_STORE_NAME}.debug`) || debugWithoutConfig) {
             const targetUri: string = this.getUrlFromConfig(folder, config);
             if (config.request && config.request === 'attach') {
-                this.telemetryReporter.sendTelemetryEvent('debug/attach');
+                sendTaxonomyEvent(this.telemetryReporter, { area: 'debug', feature: 'session', action: 'attach' });
                 void this.attach(this.context, targetUri, userConfig, true);
             } else if ((config.request && config.request === 'launch') || debugWithoutConfig) {
-                this.telemetryReporter.sendTelemetryEvent('debug/launch');
+                sendTaxonomyEvent(this.telemetryReporter, { area: 'debug', feature: 'session', action: 'launch' });
                 void this.launch(this.context, targetUri, userConfig);
             }
         } else {
-            this.telemetryReporter.sendTelemetryEvent('debug/error/config_not_found');
+            sendTaxonomyEvent(this.telemetryReporter, { area: 'debug', feature: 'config', action: 'resolve', outcome: 'error', detail: 'config_not_found' });
             void vscode.window.showErrorMessage('No supported launch config was found.');
         }
 

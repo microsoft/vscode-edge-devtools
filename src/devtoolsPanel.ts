@@ -37,6 +37,7 @@ import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 import { ScreencastPanel } from './screencastPanel';
 import { providedHeadlessDebugConfig } from './launchConfigManager';
+import { sendTaxonomyErrorEvent, sendTaxonomyEvent } from './telemetryTaxonomy';
 
 export class DevToolsPanel {
     private readonly config: IRuntimeConfig;
@@ -192,7 +193,7 @@ export class DevToolsPanel {
         if (this.timeStart !== null) {
             const timeEnd = performance.now();
             const sessionTime = timeEnd - this.timeStart;
-            this.telemetryReporter.sendTelemetryEvent('websocket/dispose', undefined, {sessionTime});
+            sendTaxonomyEvent(this.telemetryReporter, { area: 'websocket', feature: 'connection', action: 'dispose' }, undefined, {sessionTime});
             this.timeStart = null;
         }
 
@@ -215,7 +216,7 @@ export class DevToolsPanel {
             case 'open':
             case 'close':
             case 'error':
-                this.telemetryReporter.sendTelemetryEvent(`websocket/${e}`);
+                sendTaxonomyEvent(this.telemetryReporter, { area: 'websocket', feature: 'connection', action: e, outcome: e === 'error' ? 'error' : 'success' });
                 break;
         }
         if (this.collectConsoleMessages && message && message.includes('Runtime.consoleAPICalled')) {
@@ -235,8 +236,9 @@ export class DevToolsPanel {
 
     private onSocketReady() {
         // Report success telemetry
-        this.telemetryReporter.sendTelemetryEvent(
-            this.panelSocket.isConnectedToTarget ? 'websocket/reconnect' : 'websocket/connect');
+        sendTaxonomyEvent(
+            this.telemetryReporter,
+            { area: 'websocket', feature: 'connection', action: this.panelSocket.isConnectedToTarget ? 'reconnect' : 'connect' });
         this.timeStart = performance.now();
     }
 
@@ -307,8 +309,9 @@ export class DevToolsPanel {
             case 'performance': {
                 const measures: ITelemetryMeasures = {};
                 measures[`${telemetry.name}.duration`] = telemetry.data;
-                this.telemetryReporter.sendTelemetryEvent(
-                    `devtools/${telemetry.name}`,
+                sendTaxonomyEvent(
+                    this.telemetryReporter,
+                    { area: 'devtools', feature: telemetry.name, action: 'measure' },
                     undefined,
                     measures);
                 break;
@@ -317,8 +320,9 @@ export class DevToolsPanel {
             case 'enumerated': {
                 const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.actionCode`] = telemetry.data.toString();
-                this.telemetryReporter.sendTelemetryEvent(
-                    `devtools/${telemetry.name}`,
+                sendTaxonomyEvent(
+                    this.telemetryReporter,
+                    { area: 'devtools', feature: telemetry.name, action: 'enumerate' },
                     properties);
                 break;
             }
@@ -326,8 +330,9 @@ export class DevToolsPanel {
             case 'error': {
                 const properties: ITelemetryProps = {};
                 properties[`${telemetry.name}.info`] = JSON.stringify(telemetry.data);
-                this.telemetryReporter.sendTelemetryErrorEvent(
-                    `devtools/${telemetry.name}`,
+                sendTaxonomyErrorEvent(
+                    this.telemetryReporter,
+                    { area: 'devtools', feature: telemetry.name, action: 'report' },
                     properties);
                 break;
             }
@@ -377,7 +382,7 @@ export class DevToolsPanel {
 
     private async onSocketOpenInEditor(message: string) {
         // Report usage telemetry
-        this.telemetryReporter.sendTelemetryEvent('extension/openInEditor', {
+        sendTaxonomyEvent(this.telemetryReporter, { area: 'extension', feature: 'editor', action: 'openInEditor' }, {
             sourceMaps: `${this.config.sourceMaps}`,
         });
 
@@ -461,7 +466,7 @@ export class DevToolsPanel {
             this.fallbackChain = this.determineVersionFallback();
         } else {
             if (this.currentRevision) {
-                this.telemetryReporter.sendTelemetryEvent('websocket/failedConnection', {revision: this.currentRevision});
+                sendTaxonomyEvent(this.telemetryReporter, { area: 'websocket', feature: 'connection', action: 'connect', outcome: 'error', detail: 'failedConnection' }, {revision: this.currentRevision});
             }
 
             // We failed trying to retrieve the specified revision

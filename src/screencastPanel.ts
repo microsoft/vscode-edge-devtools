@@ -20,6 +20,7 @@ import {
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { DevToolsPanel } from './devtoolsPanel';
 import { providedHeadlessDebugConfig } from './launchConfigManager';
+import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
 export class ScreencastPanel {
     private readonly context: vscode.ExtensionContext;
@@ -87,16 +88,18 @@ export class ScreencastPanel {
     private recordEnumeratedHistogram(actionName: string, actionCode: number) {
         const properties: ITelemetryProps = {};
         properties[`${actionName}.actionCode`] = actionCode.toString();
-        this.telemetryReporter.sendTelemetryEvent(
-            `devtools/${actionName}`,
+        sendTaxonomyEvent(
+            this.telemetryReporter,
+            { area: 'devtools', feature: actionName, action: 'enumerate' },
             properties);
     }
 
     private recordPerformanceHistogram(actionName: string, duration: number) {
         const measures: ITelemetryMeasures = {};
         measures[`${actionName}.duration`] = duration;
-        this.telemetryReporter.sendTelemetryEvent(
-            `devtools/${actionName}`,
+        sendTaxonomyEvent(
+            this.telemetryReporter,
+            { area: 'devtools', feature: actionName, action: 'measure' },
             undefined,
             measures);
     }
@@ -151,8 +154,9 @@ export class ScreencastPanel {
             return;
         }
 
-        this.telemetryReporter.sendTelemetryEvent(
-            `devtools/${telemetry.name}/${telemetry.data.event}`, {
+        sendTaxonomyEvent(
+            this.telemetryReporter,
+            { area: 'devtools', feature: telemetry.name, action: 'screencast', detail: telemetry.data.event as string }, {
                 'value': telemetry.data.value as string,
             });
     }
