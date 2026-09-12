@@ -428,17 +428,36 @@ describe("utils", () => {
         });
 
         it("returns a retail version when valid package in retail env", async () => {
-            const retailReporter = {};
-            jest.doMock("@vscode/extension-telemetry", () => ({ TelemetryReporter: function retail() { return retailReporter; } }));
+            const sendEventData = jest.fn();
+            jest.doMock("../package.json", () => ({
+                publisher: "ms-edgedevtools",
+                name: "vscode-edge-devtools",
+                oneDSKey: "key",
+            }), { virtual: true });
+            // Models the real base class: a constructor owning a telemetrySender.
+            jest.doMock("@vscode/extension-telemetry", () => ({
+                TelemetryReporter: class {
+                    telemetrySender = { sendEventData };
+                },
+            }));
             jest.resetModules();
             jest.requireMock("vscode").env.machineId = "12345";
 
             utils = await import("../src/utils");
+            const { AriaTelemetryReporter } = await import("../src/ariaTelemetryReporter");
 
             const mockContext = createFakeExtensionContext();
+            (mockContext as { extensionMode: number }).extensionMode = 1;
             const reporter = utils.createTelemetryReporter(mockContext);
             expect(reporter).toBeDefined();
-            expect(reporter).toEqual(retailReporter);
+            expect(reporter).toBeInstanceOf(AriaTelemetryReporter);
+
+            // The sender is wrapped, so names reach the collector sanitized.
+            const sender = (reporter as unknown as {
+                telemetrySender: { sendEventData: (name: string, data: unknown) => void };
+            }).telemetrySender;
+            sender.sendEventData("ms-edgedevtools.vscode-edge-devtools/user", {});
+            expect(sendEventData).toHaveBeenCalledWith("user", {});
         });
     });
 
@@ -1013,7 +1032,7 @@ describe("utils", () => {
 
             for (let i = 0; i < input.length; i++) {
                 utils.reportUrlType(input[i], reporter);
-                expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user/browserNavigation', { 'urlType': expected[i] });
+                expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user', { area: 'user', feature: 'browser', action: 'navigate', outcome: 'success', 'urlType': expected[i] }, undefined);
             }
         });
     });
@@ -1022,7 +1041,7 @@ describe("utils", () => {
         it('correctly lists extension types in the workspace', async () => {
             const reporter = createFakeTelemetryReporter();
             await utils.reportFileExtensionTypes(reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('workspace/metadata', undefined, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "other": 0, "scss": 0, "total": 4, "ts": 0});
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('workspace', { area: 'workspace', feature: 'metadata', action: 'scan', outcome: 'success' }, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "other": 0, "scss": 0, "total": 4, "ts": 0});
         });
     });
 
@@ -1044,7 +1063,7 @@ describe("utils", () => {
         it('correctly records all changed extension settings', async () => {
             const reporter = createFakeTelemetryReporter();
             utils.reportExtensionSettings(reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user/settingsChangedAtLaunch', { isHeadless: 'false' });
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user', { area: 'user', feature: 'settings', action: 'changedAtLaunch', outcome: 'success', isHeadless: 'false' }, undefined);
         });
 
         it('correctly sends telemetry event for changed event', async () => {
@@ -1057,7 +1076,7 @@ describe("utils", () => {
                 }
             }};
             utils.reportChangedExtensionSetting(configurationChangedEvent, reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user/settingsChanged', { isHeadless: 'false' });
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('user', { area: 'user', feature: 'settings', action: 'changed', outcome: 'success', isHeadless: 'false' }, undefined);
         });
     });
 });

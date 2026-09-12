@@ -12,6 +12,8 @@ import * as debugCore from 'vscode-chrome-debug-core';
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
+import { AriaTelemetryReporter } from './ariaTelemetryReporter';
+import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
 import puppeteer, {Browser} from 'puppeteer-core';
 import { ErrorReporter } from './errorReporter';
@@ -142,7 +144,7 @@ export const buttonCode: Record<string, string> = {
     viewChangelog: '8',
     closeTarget: '9',
     emptyTargetListLaunchBrowserInstance: '10',
-    toggleScreencast: '10',
+    toggleScreencast: '11',
 };
 
 /**
@@ -338,7 +340,7 @@ export async function getJsDebugCDPProxyWebsocketUrl(debugSessionId: string): Pr
 export function createTelemetryReporter(_context: vscode.ExtensionContext): Readonly<TelemetryReporter> {
     if (packageJson && (_context.extensionMode === vscode.ExtensionMode.Production)) {
         // Use the real telemetry reporter
-        return new TelemetryReporter(packageJson.oneDSKey);
+        return new AriaTelemetryReporter(packageJson.oneDSKey);
     }
         // Fallback to a fake telemetry reporter
         return new DebugTelemetryReporter();
@@ -738,7 +740,7 @@ export function reportExtensionSettings(telemetryReporter: Readonly<TelemetryRep
     }
     const changedSettingsObject = {};
     Object.assign(changedSettingsObject, ...[...changedSettingsMap.entries()].map(([k, v]) => ({[k]: v})));
-    telemetryReporter.sendTelemetryEvent('user/settingsChangedAtLaunch', changedSettingsObject);
+    sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'settings', action: 'changedAtLaunch' }, changedSettingsObject);
 }
 
 export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeEvent, telemetryReporter: Readonly<TelemetryReporter>): void {
@@ -752,7 +754,7 @@ export function reportChangedExtensionSetting(event: vscode.ConfigurationChangeE
                     const telemetryObject: {[key: string]: string}  = {};
                     const objString = typeof settingValue !== 'object' ? settingValue.toString() : JSON.stringify(settingValue);
                     telemetryObject[settingName] = objString;
-                    telemetryReporter.sendTelemetryEvent('user/settingsChanged', telemetryObject);
+                    sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'settings', action: 'changed' }, telemetryObject);
                 }
             }
         }
@@ -771,7 +773,7 @@ export function reportUrlType(url: string, telemetryReporter: Readonly<Telemetry
     } else {
         urlType = 'other';
     }
-    telemetryReporter.sendTelemetryEvent('user/browserNavigation', { 'urlType': urlType });
+    sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'browser', action: 'navigate' }, { 'urlType': urlType });
 }
 
 export async function reportFileExtensionTypes(telemetryReporter: Readonly<TelemetryReporter>): Promise<void> {
@@ -808,7 +810,7 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
     // Creates Object from map
     const fileTypes: {[key: string]: number} = {};
     Object.assign(fileTypes, ...[...extensionMap.entries()].map(([k, v]) => ({[k]: v})));
-    telemetryReporter.sendTelemetryEvent('workspace/metadata', undefined, fileTypes);
+    sendTaxonomyEvent(telemetryReporter, { area: 'workspace', feature: 'metadata', action: 'scan' }, undefined, fileTypes);
 }
 
 export function checkWithinHoverRange(position: vscode.Position, range: vscode.Range): boolean {

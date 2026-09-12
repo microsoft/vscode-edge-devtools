@@ -648,8 +648,9 @@ describe("extension", () => {
                 await newExtension.launch(createFakeExtensionContext());
                 expect(mockReporter.sendTelemetryEvent).toHaveBeenNthCalledWith(
                     2,
-                    "command/launch/browser",
-                    expect.objectContaining({ exe: t.exe }),
+                    "command",
+                    expect.objectContaining({ area: "command", feature: "browser", action: "launch", detail: "newInstance", exe: t.exe }),
+                    undefined,
                 );
             }
         });
