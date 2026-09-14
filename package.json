@@ -37,18 +37,7 @@
     "main": "./out/extension",
     "sideEffects": false,
     "activationEvents": [
-        "onStartupFinished",
-        "onLanguage:css",
-        "onLanguage:html",
-        "onLanguage:javascript",
-        "onLanguage:javascriptreact",
-        "onLanguage:json",
-        "onLanguage:jsonc",
-        "onLanguage:less",
-        "onLanguage:sass",
-        "onLanguage:scss",
-        "onLanguage:typescript",
-        "onLanguage:typescriptreact"
+        "onStartupFinished"
     ],
     "capabilities": {
         "untrustedWorkspaces": {
@@ -273,16 +262,6 @@
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Dev version",
                         "Microsoft Edge Tools for VS Code will use Microsoft Edge Canary version"
                     ]
-                },
-                "vscode-edge-devtools.webhint": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enable feedback from webhint on source files to improve accessibility, compatibility, security and more."
-                },
-                "vscode-edge-devtools.webhintInstallNotification": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Turn off notification for webhint installation failures."
                 }
             }
         },
@@ -686,7 +665,6 @@
         "puppeteer-core": "25.9.0",
         "utf-8-validate": "6.0.6",
         "vscode-chrome-debug-core": "6.8.11",
-        "vscode-webhint": "2.1.15",
         "ws": "8.21.3",
         "xmlhttprequest": "1.8.0"
     },
@@ -713,7 +691,6 @@
         "uglify-js": "3.19.3",
         "unzipper": "0.12.5",
         "jest-environment-jsdom": "^30.5.1",
-        "vscode-languageclient": "10.1.1",
         "webpack": "5.110.3",
         "webpack-cli": "7.2.3"
     }

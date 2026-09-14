@@ -13,14 +13,12 @@ import { LaunchDebugProvider } from './launchDebugProvider';
 import { sendTaxonomyErrorEvent, sendTaxonomyEvent } from './telemetryTaxonomy';
 import {
     buttonCode,
-    checkWithinHoverRange,
     createTelemetryReporter,
     fixRemoteWebSocket,
     getBrowserPath,
     getListOfTargets,
     getRemoteEndpointSettings,
     getRuntimeConfig,
-    getSupportedStaticAnalysisFileTypes,
     IRemoteTargetJson,
     IUserConfig,
     launchBrowser,
@@ -41,42 +39,15 @@ import {
 import { LaunchConfigManager, providedHeadlessDebugConfig, providedLaunchDevToolsConfig } from './launchConfigManager';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
-import type {
-    LanguageClientOptions,
-    ServerOptions,
-} from 'vscode-languageclient/node';
-import {
-    LanguageClient,
-    TransportKind,
-} from 'vscode-languageclient/node';
-import type { installFailed, showOutput } from 'vscode-webhint/dist/src/utils/notifications';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
-// Keep a reference to the client to stop it when deactivating.
-let client: LanguageClient;
-const languageServerName = 'Microsoft Edge Tools';
-
-type DiagnosticCodeType = { value: string; target: vscode.Uri; };
-
 export function activate(context: vscode.ExtensionContext): void {
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
-
-    vscode.languages.registerHoverProvider(getSupportedStaticAnalysisFileTypes(), {
-        provideHover(document, position) {
-            const documentDiagnostics = vscode.languages.getDiagnostics(document.uri);
-            for (const diagnostic of documentDiagnostics) {
-                if (diagnostic.source === languageServerName && checkWithinHoverRange(position, diagnostic.range) && diagnostic.code as DiagnosticCodeType) {
-                    sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'hover' }, { 'hint': (diagnostic.code as DiagnosticCodeType).value });
-                }
-            }
-            return null;
-        },
-    });
 
     // Check if launch.json exists and has supported config to populate side pane welcome message
     LaunchConfigManager.instance.updateLaunchConfig();
@@ -265,20 +236,6 @@ export function activate(context: vscode.ExtensionContext): void {
     void reportFileExtensionTypes(telemetryReporter);
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
-
-    const settingsConfig = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-    if (settingsConfig.get('webhint')) {
-        void startWebhint(context);
-    }
-    vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration(`${SETTINGS_STORE_NAME}.webhint`)) {
-            if (vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhint')) {
-                void startWebhint(context);
-            } else {
-                void stopWebhint();
-            }
-        }
-    });
 }
 
 export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
@@ -313,113 +270,6 @@ export async function launchScreencast(context: vscode.ExtensionContext, fileUri
         await launchBrowser(browserPath, port,  url, userDataDir, /** headless */ true).then(() => attach(context, url, undefined, true, true));
     }
 }
-
-async function startWebhint(context: vscode.ExtensionContext): Promise<void> {
-    const args = [context.globalStoragePath, languageServerName];
-    const module = context.asAbsolutePath('node_modules/vscode-webhint/dist/src/server.js');
-    const transport = TransportKind.ipc;
-    const serverOptions: ServerOptions = {
-        debug: {
-            args,
-            module,
-            options: { execArgv: ['--nolazy', '--inspect=6009'] },
-            transport,
-        },
-        run: {
-            args,
-            module,
-            transport,
-        },
-    };
-
-    const clientOptions: LanguageClientOptions = {
-        documentSelector: getSupportedStaticAnalysisFileTypes(),
-        synchronize: {
-            // Notify the server if a webhint-related configuration changes.
-            fileEvents: vscode.workspace.createFileSystemWatcher('**/.hintrc'),
-        },
-        middleware: {
-            executeCommand: (command, args, next) => {
-                    const hintName = args[0] as string;
-                    const featureName = args[1] as string;
-
-                    if (!telemetryReporter) {
-                        telemetryReporter = createTelemetryReporter(context);
-                    }
-
-                    switch (command) {
-                        case 'vscode-webhint/ignore-hint-project': {
-                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'disable-hint' }, { hint: hintName });
-                            break;
-                        }
-                        case 'vscode-webhint/ignore-feature-project': {
-                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'disable-rule' }, { hint: hintName, value: featureName });
-                            break;
-                        }
-                        case 'vscode-webhint/edit-hintrc-project': {
-                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'edit-hintrc' });
-                            break;
-                        }
-                        case 'vscode-webhint/ignore-browsers-project': {
-                            if (args.length > 1) {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                const browserList = args[2]['browsers'] as any[]; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-                                sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'ignore-browsers' }, { hint: hintName, value: browserList.join(',') });
-                            }
-                            break;
-                        }
-                        case 'vscode-webhint/apply-code-fix': {
-                            sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'quickfix', detail: 'apply-code-fix' }, {value: featureName });
-                            break;
-                        }
-                    }
-
-               return next(command, args); // eslint-disable-line @typescript-eslint/no-unsafe-return
-            },
-        },
-    };
-
-    // Create and start the client (also starts the server).
-    client = new LanguageClient('Microsoft Edge Tools', serverOptions, clientOptions);
-    // Listen for notification that the webhint install failed.
-    const installFailedNotification: typeof installFailed = 'vscode-webhint/install-failed';
-    const disableInstallFailedNotification = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('webhintInstallNotification');
-    client.onNotification(installFailedNotification, () => {
-        if (!telemetryReporter) {
-            telemetryReporter = createTelemetryReporter(context);
-        }
-        sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'webhint', action: 'install', outcome: 'error' });
-        if (!disableInstallFailedNotification) {
-            const message = 'Ensure `node` and `npm` are installed to enable automatically reporting issues in source files pertaining to accessibility, compatibility, security, and more.';
-            void vscode.window.showInformationMessage(message, 'Remind me Later', 'Don\'t show again', 'Disable Extension').then(button => {
-                if (button === 'Disable Extension') {
-                    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhint', false, vscode.ConfigurationTarget.Global);
-                }
-                if (button === 'Don\'t show again') {
-                    void vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).update('webhintInstallNotification', true, vscode.ConfigurationTarget.Global);
-                }
-            });
-        }
-    });
-
-    // Listen for requests to show the output panel for this extension.
-    const showOutputNotification: typeof showOutput = 'vscode-webhint/show-output';
-    client.onNotification(showOutputNotification, () => {
-        client.outputChannel.clear();
-        client.outputChannel.show(true);
-    });
-    await client.start();
-}
-
-async function stopWebhint(): Promise<void> {
-    if (client) {
-        await client.stop();
-    }
-}
-
-export const deactivate = (): Thenable<void> => {
-    return stopWebhint();
-};
 
 export async function attach(
     context: vscode.ExtensionContext, attachUrl?: string, config?: Partial<IUserConfig>, useRetry?: boolean, screencastOnly?: boolean): Promise<void> {
