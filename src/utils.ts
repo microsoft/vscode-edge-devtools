@@ -813,31 +813,6 @@ export async function reportFileExtensionTypes(telemetryReporter: Readonly<Telem
     sendTaxonomyEvent(telemetryReporter, { area: 'workspace', feature: 'metadata', action: 'scan' }, undefined, fileTypes);
 }
 
-export function checkWithinHoverRange(position: vscode.Position, range: vscode.Range): boolean {
-    if (position.line >= range.start.line && position.line <= range.end.line) {
-        // We need to add a 1 char buffer on each side since hover events are triggered if the cursor is
-        // 1 char away from a diagnostic line.
-        if (position.line === range.start.line && position.character + 1 < range.start.character) {
-            return false;
-        }
-        if (position.line === range.end.line && position.character > range.end.character) {
-            return false;
-        }
-        return true;
-    }
-    return false;
-}
-
-export function getSupportedStaticAnalysisFileTypes(): string[] {
-    const supportedFileTypes = [];
-    for (const event of packageJson.activationEvents) {
-        if (event.startsWith('onLanguage:')) {
-            supportedFileTypes.push(event.substring(11));
-        }
-    }
-    return supportedFileTypes;
-}
-
 (function initialize() {
     // insertion order matters.
     msEdgeBrowserMapping.set('Stable', {
