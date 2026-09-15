@@ -1,0 +1,127 @@
+name: Validate issue submission
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate:
+    if: >-
+      contains(github.event.issue.labels.*.name, 'bug') ||
+      contains(github.event.issue.labels.*.name, 'enhancement')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close clearly incomplete submissions
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const association = context.payload.issue.author_association;
+            if (['OWNER', 'MEMBER', 'COLLABORATOR'].includes(association)) {
+              return;
+            }
+
+            const issue = context.payload.issue;
+            const labelNames = issue.labels.map(label =>
+              typeof label === 'string' ? label : label.name
+            );
+            const isBug = labelNames.includes('bug');
+            const requiredSections = isBug
+              ? [
+                  'Operating system',
+                  'Extension version',
+                  'Visual Studio Code version',
+                  'Bug description',
+                  'Steps to reproduce',
+                  'Expected behavior',
+                ]
+              : ['Problem', 'Proposed solution'];
+
+            const sections = new Map();
+            let currentSection;
+            for (const line of (issue.body || '').split(/\r?\n/)) {
+              const heading = line.match(/^###\s+(.+?)\s*$/);
+              if (heading) {
+                currentSection = heading[1];
+                sections.set(currentSection, []);
+              } else if (currentSection) {
+                sections.get(currentSection).push(line);
+              }
+            }
+
+            const values = requiredSections.map(section => {
+              const lines = sections.get(section);
+              return lines ? lines.join('\n').trim() : undefined;
+            });
+            const junkValues = new Set([
+              '',
+              '-',
+              '.',
+              'n/a',
+              'na',
+              'none',
+              'no',
+              'test',
+              'testing',
+              'todo',
+              '_no response_',
+            ]);
+            const isJunk = value => {
+              if (value === undefined) {
+                return true;
+              }
+
+              const normalized = value.toLowerCase().trim();
+              return junkValues.has(normalized) ||
+                normalized.length < 3 ||
+                /^([^\p{L}\p{N}])\1*$/u.test(normalized) ||
+                /^([\p{L}\p{N}])\1{2,}$/u.test(normalized);
+            };
+
+            const missingCount = values.filter(value => value === undefined).length;
+            const junkCount = values.filter(isJunk).length;
+
+            // Be deliberately conservative: close only malformed form submissions
+            // or submissions with multiple unmistakably meaningless answers.
+            const invalid = missingCount > 0 || junkCount >= 2;
+            if (!invalid) {
+              return;
+            }
+
+            const labels = [...new Set([...labelNames, 'invalid'])];
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed',
+              state_reason: 'not_planned',
+              labels,
+            });
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: [
+                'Closing this as it does not contain enough information to investigate.',
+                '',
+                'If this is a genuine request for Microsoft Edge Tools for VS Code, please open a new issue and complete all required fields with meaningful details.',
+                '',
+                ...(isBug
+                  ? [
+                      '- Your operating system, VS Code version, and extension version',
+                      '- A clear description of the bug',
+                      '- Steps to reproduce',
+                    ]
+                  : [
+                      '- The developer problem or limitation',
+                      '- The behavior or solution you are proposing',
+                    ]),
+                '',
+                'Thanks!',
+              ].join('\n'),
+            });
