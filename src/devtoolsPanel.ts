@@ -631,7 +631,7 @@ export class DevToolsPanel {
                     <li>Check your network connection</li>
                     <li>Close and re-launch the DevTools</li>
                     </ol>
-                    <p>If this problem continues, please <a target="_blank" href="https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.md">file an issue.</a></p>
+                    <p>If this problem continues, please <a target="_blank" href="https://github.com/microsoft/vscode-edge-devtools/issues/new?template=bug_report.yml">file an issue.</a></p>
                 </div>
             </body>
             </html>

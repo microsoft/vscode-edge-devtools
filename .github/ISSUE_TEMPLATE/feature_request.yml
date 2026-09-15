@@ -1,0 +1,51 @@
+name: Feature request
+description: Suggest an improvement to Microsoft Edge Tools for VS Code
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement.
+
+        Before submitting, search existing issues to avoid creating a duplicate and review the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the developer problem or limitation this request would address.
+      placeholder: I am unable to ... because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or experience you would like.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workarounds or alternative solutions you have tried.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add screenshots, examples, or other relevant details.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: This request is specifically about Microsoft Edge Tools for VS Code.
+          required: true
