@@ -116,6 +116,7 @@ jobs:
                       '- Your operating system, VS Code version, and extension version',
                       '- A clear description of the bug',
                       '- Steps to reproduce',
+                      '- Expected behavior',
                     ]
                   : [
                       '- The developer problem or limitation',
