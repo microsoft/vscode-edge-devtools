@@ -1,0 +1,84 @@
+name: Bug report
+description: Report a problem with Microsoft Edge Tools for VS Code
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem.
+
+        Before submitting, search existing issues to avoid creating a duplicate and review the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      description: Include the operating system name and version.
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+
+  - type: input
+    id: extension-version
+    attributes:
+      label: Extension version
+      description: Find this by selecting Microsoft Edge Tools in the VS Code Extensions view.
+      placeholder: 2.1.11
+    validations:
+      required: true
+
+  - type: input
+    id: vscode-version
+    attributes:
+      label: Visual Studio Code version
+      description: Find this under Help > About.
+      placeholder: 1.136.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug description
+      description: Clearly describe what went wrong.
+      placeholder: Describe the problem and when it occurs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest sequence of steps that reproduces the problem.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add logs, screenshots, or other relevant details. Remove sensitive information first.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checks
+      options:
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: I have provided enough information for someone else to reproduce or investigate the problem.
+          required: true
