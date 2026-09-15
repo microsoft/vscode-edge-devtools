@@ -1,3 +1,7 @@
+## 2.1.12
+* **[Bug Fix]**: Fixing telemetry message format - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5003)
+* **[Removal]**: Removed the webhint static analysis integration - [PR #5016](https://github.com/microsoft/vscode-edge-devtools/pull/5016)
+
 ## 2.1.11
 * **[Bug Fix]**: Updating dependencies - [PR #4995](https://github.com/microsoft/vscode-edge-devtools/pull/4995)
 * **[Bug Fix]**: Restrict CSS mirror writes to workspace - [PR #4962](https://github.com/microsoft/vscode-edge-devtools/pull/4962)
