@@ -3,7 +3,7 @@
 
 import { ExtensionContext, Uri} from "vscode";
 import { TelemetryReporter } from "@vscode/extension-telemetry";
-import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, createFakeLanguageClient, Mocked } from "./helpers/helpers";
+import { createFakeExtensionContext, createFakeTelemetryReporter, createFakeVSCode, Mocked } from "./helpers/helpers";
 import {
     buttonCode,
     IRemoteTargetJson,
@@ -15,7 +15,6 @@ import {
 } from "../src/utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
-jest.mock("vscode-languageclient/node", () => createFakeLanguageClient(), { virtual: true });
 
 describe("extension", () => {
     const fakeRuntimeConfig: Partial<IRuntimeConfig> = {};
@@ -38,12 +37,10 @@ describe("extension", () => {
                 buttonCode,
                 SETTINGS_STORE_NAME,
                 SETTINGS_VIEW_NAME,
-                checkWithinHoverRange: jest.fn(),
                 createTelemetryReporter: jest.fn((_: ExtensionContext) => createFakeTelemetryReporter()),
                 getListOfTargets: jest.fn().mockReturnValue([]),
                 getRemoteEndpointSettings: jest.fn(),
                 getRuntimeConfig: jest.fn(),
-                getSupportedStaticAnalysisFileTypes: jest.fn(),
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 getActiveDebugSessionId: jest.fn(),
@@ -61,9 +58,6 @@ describe("extension", () => {
                     CDPTargetsProvider: mockProviderConstructor,
                 };
             });
-
-            const mockLanguageClient = createFakeLanguageClient()
-            jest.doMock("vscode-languageclient/node", () => mockLanguageClient, { virtual: true });
 
             // Mock out vscode command registration
             const mockVSCode = createFakeVSCode();
@@ -418,7 +412,6 @@ describe("extension", () => {
                     useHttps: false,
                     userDataDir: "profile"
                 }),
-                getSupportedStaticAnalysisFileTypes: jest.fn(),
                 getRuntimeConfig: jest.fn().mockReturnValue(fakeRuntimeConfig),
                 launchBrowser: jest.fn().mockResolvedValue(fakeBrowser),
                 openNewTab: jest.fn().mockResolvedValue(null),
