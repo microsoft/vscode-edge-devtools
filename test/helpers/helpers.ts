@@ -108,6 +108,7 @@ export function createFakeVSCode() {
             }
         },
         workspace: {
+            isTrusted: true,
             createFileSystemWatcher: jest.fn(),
             findFiles: jest.fn(() => {
                 return [
