@@ -619,6 +619,28 @@ describe("extension", () => {
             expect(mockUtils.launchBrowser).toHaveBeenCalled();
         });
 
+        it("does not launch the browser in an untrusted workspace", async () => {
+            mockVSCode.workspace.isTrusted = false;
+            const newExtension = await import("../src/extension");
+
+            await newExtension.launch(createFakeExtensionContext());
+            expect(mockUtils.openNewTab).not.toHaveBeenCalled();
+            expect(mockUtils.launchBrowser).not.toHaveBeenCalled();
+            expect(mockVSCode.window.showWarningMessage).toHaveBeenCalled();
+        });
+
+        it("does not launch html files in an untrusted workspace", async () => {
+            mockVSCode.workspace.isTrusted = false;
+            mockVSCode.env.remoteName = 'wsl';
+            const newExtension = await import("../src/extension");
+            const testFileUri = { authority: 'wsl+ubuntu-20.04', fsPath: 'test/path.html' } as Uri;
+
+            await newExtension.launchHtml(testFileUri);
+            await newExtension.launchScreencast(createFakeExtensionContext(), testFileUri);
+            expect(mockUtils.launchBrowser).not.toHaveBeenCalled();
+            expect(startDebuggingMock).not.toHaveBeenCalled();
+        });
+
         it("reports the browser type", async () => {
             mockUtils.openNewTab!.mockResolvedValue(undefined);
             const newExtension = await import("../src/extension");

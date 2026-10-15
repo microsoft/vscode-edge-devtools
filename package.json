@@ -42,7 +42,14 @@
     "capabilities": {
         "untrustedWorkspaces": {
             "supported": "limited",
-            "description": "Workspace trust is needed to configure and debug projects"
+            "description": "Workspace trust is needed to configure and debug projects",
+            "restrictedConfigurations": [
+                "vscode-edge-devtools.browserArgs",
+                "vscode-edge-devtools.defaultUrl",
+                "vscode-edge-devtools.userDataDir",
+                "vscode-edge-devtools.hostname",
+                "vscode-edge-devtools.port"
+            ]
         },
         "virtualWorkspaces": false
     },
@@ -56,13 +63,14 @@
             {
                 "command": "vscode-edge-devtools.launch",
                 "title": "Launch Edge and then attach to a target",
-                "category": "Microsoft Edge Tools"
+                "category": "Microsoft Edge Tools",
+                "enablement": "isWorkspaceTrusted"
             },
             {
                 "command": "vscode-edge-devtools-view.launch",
                 "category": "Microsoft Edge Tools",
                 "title": "Open a new tab",
-                "enablement": "titleCommandsRegistered",
+                "enablement": "titleCommandsRegistered && isWorkspaceTrusted",
                 "icon": {
                     "light": "resources/light/launch.svg",
                     "dark": "resources/dark/launch.svg"
@@ -149,12 +157,14 @@
             {
                 "command": "vscode-edge-devtools-view.launchHtml",
                 "title": "Open Browser with DevTools",
-                "category": "Microsoft Edge Tools"
+                "category": "Microsoft Edge Tools",
+                "enablement": "isWorkspaceTrusted"
             },
             {
                 "command": "vscode-edge-devtools-view.launchScreencast",
                 "title": "Open Browser",
-                "category": "Microsoft Edge Tools"
+                "category": "Microsoft Edge Tools",
+                "enablement": "isWorkspaceTrusted"
             }
         ],
         "configuration": {

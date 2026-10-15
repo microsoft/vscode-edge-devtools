@@ -12,8 +12,12 @@ export type CompoundConfig = {
     configurations: string[],
 }
 
-const settings = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME);
-const defaultUrl: string = settings.get('defaultUrl') || SETTINGS_DEFAULT_URL;
+function getDefaultUrl(): string {
+    const defaultUrl = vscode.workspace.getConfiguration(SETTINGS_STORE_NAME).get('defaultUrl');
+    return typeof defaultUrl === 'string' && defaultUrl ? defaultUrl : SETTINGS_DEFAULT_URL;
+}
+
+const defaultUrl = getDefaultUrl();
 
 export const providedDebugConfig: vscode.DebugConfiguration = {
     type: 'pwa-msedge',
@@ -73,6 +77,17 @@ export const extensionConfigs: vscode.DebugConfiguration[] = [
     providedHeadlessDebugConfig,
     providedLaunchDevToolsConfig,
 ];
+
+/**
+ * Re-reads `defaultUrl` so templates reflect the current setting. The workspace value is hidden
+ * in Restricted Mode, so a value cached at activation would be stale once trust is granted.
+ */
+export function refreshProvidedConfigUrls(): void {
+    const url = getDefaultUrl();
+    for (const config of extensionConfigs) {
+        config.url = url;
+    }
+}
 
 export class LaunchConfigManager {
     private launchConfig: string;
@@ -138,6 +153,8 @@ export class LaunchConfigManager {
             void vscode.window.showErrorMessage('Cannot configure launch.json for an empty workspace. Please open a folder in the editor.');
             return;
         }
+
+        refreshProvidedConfigUrls();
 
         // Create ./.vscode/launch.json if it doesn't already exist
         const workspaceUri = vscode.workspace.workspaceFolders[0].uri;
