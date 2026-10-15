@@ -7,7 +7,7 @@ import {
     IUserConfig,
     SETTINGS_STORE_NAME,
 } from './utils';
-import { providedDebugConfig } from './launchConfigManager';
+import { providedDebugConfig, refreshProvidedConfigUrls } from './launchConfigManager';
 import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
 type AttachCallback = (
@@ -40,6 +40,7 @@ export class LaunchDebugProvider implements vscode.DebugConfigurationProvider {
     provideDebugConfigurations(
         _folder: vscode.WorkspaceFolder | undefined,
         _token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
+        refreshProvidedConfigUrls();
         return Promise.resolve([providedDebugConfig]);
     }
 

@@ -13,7 +13,7 @@ jobs:
       issues: write
     name: ADOSync workflow
     steps:
-    - uses: MicrosoftEdge/action-issue-to-workitem@main
+    - uses: MicrosoftEdge/action-issue-to-workitem@a1128cbce7f3c958bc26bd7b11a37bafb1234789 # main as of 2026-10-13
       env:
         ado_token: "${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}"
         github_token: "${{ secrets.GITHUB_TOKEN }}"

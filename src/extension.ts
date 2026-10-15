@@ -238,7 +238,18 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
 }
 
+function ensureWorkspaceTrusted(): boolean {
+    if (vscode.workspace.isTrusted) {
+        return true;
+    }
+    void vscode.window.showWarningMessage('Launching Microsoft Edge requires a trusted workspace.');
+    return false;
+}
+
 export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
+    if (!ensureWorkspaceTrusted()) {
+        return;
+    }
     const edgeDebugConfig = providedHeadlessDebugConfig;
     const devToolsAttachConfig = providedLaunchDevToolsConfig;
     if (!vscode.env.remoteName) {
@@ -257,6 +268,9 @@ export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
 }
 
 export async function launchScreencast(context: vscode.ExtensionContext, fileUri: vscode.Uri): Promise<void> {
+    if (!ensureWorkspaceTrusted()) {
+        return;
+    }
     const edgeDebugConfig = providedHeadlessDebugConfig;
     if (!vscode.env.remoteName) {
         edgeDebugConfig.url = `file://${fileUri.fsPath}`;
@@ -408,6 +422,9 @@ export async function attachToCurrentDebugTarget(context: vscode.ExtensionContex
 }
 
 export async function launch(context: vscode.ExtensionContext, launchUrl?: string, config?: Partial<IUserConfig>): Promise<void> {
+    if (!ensureWorkspaceTrusted()) {
+        return;
+    }
     if (!telemetryReporter) {
         telemetryReporter = createTelemetryReporter(context);
     }
