@@ -158,7 +158,6 @@ export function fetchUri(uri: string, options: https.RequestOptions = {}): Promi
         const parsedUrl = url.parse(uri);
         const get = (parsedUrl.protocol === 'https:' ? https.get : http.get);
         options = {
-            rejectUnauthorized: false,
             ...parsedUrl,
             ...options,
             method: 'PUT',
