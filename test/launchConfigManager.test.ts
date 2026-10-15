@@ -3,6 +3,7 @@
 
 import {createFakeVSCode} from "./helpers/helpers";
 import { extensionCompoundConfigs, extensionConfigs, LaunchConfigManager, providedDebugConfig } from "../src/launchConfigManager";
+import { SETTINGS_DEFAULT_URL } from "../src/utils";
 
 jest.mock("vscode", () => createFakeVSCode(), { virtual: true });
 jest.mock("fs-extra");
@@ -142,6 +143,38 @@ describe("launchConfigManager", () => {
             const launchConfigManager = LaunchConfigManager.instance;
             launchConfigManager.configureLaunchJson();
             expect(vscodeMock.WorkspaceConfiguration.update).toHaveBeenCalledWith('configurations', Array(4).fill(expect.anything()));
+        });
+
+        it('uses the current defaultUrl after workspace trust is granted', async () => {
+            const vscodeMock = jest.requireMock("vscode");
+            const fse = jest.requireMock("fs-extra");
+            // Module initialized in Restricted Mode, where the workspace defaultUrl is hidden.
+            expect(providedDebugConfig.url).toEqual(SETTINGS_DEFAULT_URL);
+
+            // Trust granted without reload: the workspace defaultUrl is now visible.
+            const workspaceUrl = 'http://localhost:3000';
+            fse.readFileSync.mockImplementation((() => ''));
+            vscodeMock.workspace.workspaceFolders = [{
+                uri:  'file:///g%3A/GIT/testPage'
+            }];
+            vscodeMock.WorkspaceConfiguration = {
+                update: jest.fn((name: string, value: any) => {}),
+            };
+            vscodeMock.workspace.getConfiguration.mockImplementation(() => {
+                return {
+                        get: jest.fn((name: string) => name === 'defaultUrl' ? workspaceUrl : []),
+                        update: vscodeMock.WorkspaceConfiguration.update,
+                }
+            });
+            vscodeMock.Uri.joinPath = jest.fn();
+            await LaunchConfigManager.instance.configureLaunchJson();
+
+            const configs = vscodeMock.WorkspaceConfiguration.update.mock.calls
+                .find(([name]: [string]) => name === 'configurations')[1];
+            expect(configs).toHaveLength(extensionConfigs.length);
+            for (const config of configs) {
+                expect(config.url).toEqual(workspaceUrl);
+            }
         });
     });
 
