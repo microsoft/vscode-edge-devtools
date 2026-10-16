@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -31,7 +31,7 @@ jobs:
 
     - name: Build and Test
       run: |
-        npm install
+        npm ci
         npm run build-and-lint
         npm run test
 
