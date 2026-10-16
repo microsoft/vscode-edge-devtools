@@ -1,3 +1,7 @@
+## 2.1.13
+* **[Bug Fix]**: Pinning workflow to a commit and fixing an https validation in utils - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5046)
+* **[Bug Fix]**: Restricting setting and launch of browser to trusted workspace - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5049)
+
 ## 2.1.12
 * **[Bug Fix]**: Fixing telemetry message format - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5003)
 * **[Removal]**: Removed the webhint static analysis integration - [PR #5016](https://github.com/microsoft/vscode-edge-devtools/pull/5016)
