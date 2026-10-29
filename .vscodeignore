@@ -8,9 +8,7 @@ package-lock.json
 .pipelines/
 .config/
 img/
-node_modules/
-!node_modules/@vscode/codicons/dist/codicon.css
-!node_modules/@vscode/codicons/dist/codicon.ttf
+# Keep production dependencies in their original layout for external debug-core imports and NLS.
 out/edge/
 src/
 scripts/

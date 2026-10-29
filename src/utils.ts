@@ -8,7 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as url from 'url';
 import * as vscode from 'vscode';
-import * as debugCore from 'vscode-chrome-debug-core';
+import { canonicalizeUrl, escapeRegexSpecialChars, properJoin } from 'vscode-chrome-debug-core/out/src/utils';
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import packageJson from '../package.json';
 import { DebugTelemetryReporter } from './debugTelemetryReporter';
@@ -575,7 +575,7 @@ export function applyPathMapping(
         }
 
         // Does it match?
-        const escapedLeftPattern = debugCore.utils.escapeRegexSpecialChars(leftPattern, '/*');
+        const escapedLeftPattern = escapeRegexSpecialChars(leftPattern, '/*');
         const leftRegexSegment = escapedLeftPattern
             .replace(/\*/g, '(.*)')
             .replace(/\\\\/g, '/');
@@ -595,7 +595,7 @@ export function applyPathMapping(
             return mappedPath;
         }
 
-        mappedPath = debugCore.utils.properJoin(mappedPath); // Fix any ..'s
+        mappedPath = properJoin(mappedPath); // Fix any ..'s
         mappedPath = replaceWorkSpaceFolderPlaceholder(mappedPath);
         return mappedPath;
     }
@@ -655,7 +655,7 @@ function replaceWorkSpaceFolderPlaceholder(customPath: string) {
          */
         parsedPath = vscode.workspace.workspaceFolders[0].uri.toString();
         const replacedPath = customPath.replace('${workspaceFolder}', parsedPath);
-        return debugCore.utils.canonicalizeUrl(replacedPath);
+        return canonicalizeUrl(replacedPath);
     }
         return parsedPath;
 
