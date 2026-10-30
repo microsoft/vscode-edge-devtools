@@ -463,7 +463,8 @@ describe("extension", () => {
                 expect.any(String) /** port */,
                 expectedUrl /** targetUrl */,
                 expect.any(String) /** userDataDir */,
-                expect.any(Boolean) /** headlessOverride */
+                expect.any(Boolean) /** headlessOverride */,
+                10000 /** timeout */
             );
             expect(startDebuggingMock).toHaveBeenCalledWith(undefined, expect.objectContaining({
                 url: expectedUrl
