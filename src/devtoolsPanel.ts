@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 import * as path from 'path';
 import * as vscode from 'vscode';
-import * as debugCore from 'vscode-chrome-debug-core';
+import { UrlPathTransformer } from 'vscode-chrome-debug-core/out/src/transformers/urlPathTransformer';
 import { performance } from 'perf_hooks';
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { SettingsProvider } from './common/settingsProvider';
@@ -524,7 +524,7 @@ export class DevToolsPanel {
         }
 
         // Convert the local url to a workspace path
-        const transformer = new debugCore.UrlPathTransformer();
+        const transformer = new UrlPathTransformer();
         void transformer.launch({ pathMapping: this.config.pathMapping });
 
         // origin in this case is trivial since we expect fixSource to take it out

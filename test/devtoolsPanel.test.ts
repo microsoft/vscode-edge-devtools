@@ -535,7 +535,7 @@ describe("devtoolsPanel", () => {
                     isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
-                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+                jest.mock("vscode-chrome-debug-core/out/src/transformers/urlPathTransformer", () => mockDebugCore);
 
                 const mockVsCode = jest.requireMock("vscode");
                 mockVsCode.Uri.file = jest.fn();
@@ -570,7 +570,7 @@ describe("devtoolsPanel", () => {
                     isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
-                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+                jest.mock("vscode-chrome-debug-core/out/src/transformers/urlPathTransformer", () => mockDebugCore);
 
                 const mockVsCode = jest.requireMock("vscode");
                 mockVsCode.Uri.file = jest.fn();
@@ -605,7 +605,7 @@ describe("devtoolsPanel", () => {
                     isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
-                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+                jest.mock("vscode-chrome-debug-core/out/src/transformers/urlPathTransformer", () => mockDebugCore);
 
                 const mockVsCode = jest.requireMock("vscode");
                 const dtp = await import("../src/devtoolsPanel");
@@ -638,7 +638,7 @@ describe("devtoolsPanel", () => {
                     isHeadlessEnabled: jest.fn(),
                 };
                 jest.doMock("../src/utils", () => mockUtils);
-                jest.mock("vscode-chrome-debug-core", () => mockDebugCore);
+                jest.mock("vscode-chrome-debug-core/out/src/transformers/urlPathTransformer", () => mockDebugCore);
 
                 const mockVsCode = jest.requireMock("vscode");
                 mockVsCode.Uri.file = jest.fn();

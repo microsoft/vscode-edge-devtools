@@ -3,7 +3,9 @@
 
 import { Browser, Target, TargetType } from 'puppeteer-core';
 import * as vscode from 'vscode';
-import * as debugCore from 'vscode-chrome-debug-core';
+import type { ITarget } from 'vscode-chrome-debug-core/out/src/chrome/chromeConnection';
+import { getMatchingTargets } from 'vscode-chrome-debug-core/out/src/chrome/chromeUtils';
+import { retryAsync } from 'vscode-chrome-debug-core/out/src/utils';
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
@@ -301,7 +303,7 @@ export async function attach(
     do {
         try {
             // Keep trying to attach to the list endpoint until timeout
-            responseArray = await debugCore.utils.retryAsync(
+            responseArray = await retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
                 /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL) as IRemoteTargetJson[];
@@ -314,9 +316,9 @@ export async function attach(
             let targetWebsocketUrl = '';
             if (attachUrl) {
                 // Match the targets using the edge debug adapter logic
-                let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
+                let matchedTargets: ITarget[] | undefined;
                 try {
-                    matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray as unknown as debugCore.chromeConnection.ITarget[], attachUrl);
+                    matchedTargets = getMatchingTargets(responseArray as unknown as ITarget[], attachUrl);
                 } catch (e) {
                     void ErrorReporter.showErrorDialog({
                         errorCode: ErrorCodes.Error,
