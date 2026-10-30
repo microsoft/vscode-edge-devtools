@@ -18,7 +18,7 @@ describe('launchAndConnectToBrowser', () => {
     beforeEach(() => {
         jest.useFakeTimers();
         jest.clearAllMocks();
-        browserProcess = new EventEmitter() as ChildProcess;
+        browserProcess = Object.assign(new EventEmitter(), { kill: jest.fn() }) as unknown as ChildProcess;
         jest.mocked(spawn).mockReturnValue(browserProcess);
         jest.mocked(puppeteer.defaultArgs).mockImplementation(async options => options?.args ?? []);
         waitForTarget = jest.fn().mockResolvedValue({});
@@ -82,9 +82,18 @@ describe('launchAndConnectToBrowser', () => {
         await rejection;
     });
 
-    it('disconnects when no page becomes available', async () => {
+    it('disconnects and stops the launched process when no page becomes available', async () => {
         waitForTarget.mockRejectedValue(new Error('Waiting for target failed'));
         await expect(launch()).rejects.toThrow('Waiting for target failed');
         expect(disconnect).toHaveBeenCalledTimes(1);
+        expect(browserProcess.kill).toHaveBeenCalledTimes(1);
+    });
+
+    it('times out when a connection attempt stalls past the deadline', async () => {
+        jest.mocked(puppeteer.connect).mockReturnValue(new Promise<Browser>(() => undefined));
+        const result = launch(500);
+        const rejection = expect(result).rejects.toThrow('Timed out waiting for Microsoft Edge on port 9222.');
+        await jest.advanceTimersByTimeAsync(500);
+        await rejection;
     });
 });
