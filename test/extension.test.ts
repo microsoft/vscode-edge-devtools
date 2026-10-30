@@ -44,7 +44,7 @@ describe("extension", () => {
                 removeTrailingSlash: jest.fn(removeTrailingSlash),
                 getJsDebugCDPProxyWebsocketUrl: jest.fn(),
                 getActiveDebugSessionId: jest.fn(),
-                reportFileExtensionTypes: jest.fn(),
+                trackOpenedFileTypes: jest.fn(),
                 reportChangedExtensionSetting: jest.fn(),
                 reportExtensionSettings: jest.fn(),
             };
@@ -82,7 +82,7 @@ describe("extension", () => {
             // Activation should add the commands as subscriptions on the context
             newExtension.activate(context);
 
-            expect(context.subscriptions.length).toBe(19);
+            expect(context.subscriptions.length).toBe(20);
             expect(commandMock).toHaveBeenCalledTimes(18);
             expect(commandMock)
                 .toHaveBeenNthCalledWith(1, `${SETTINGS_STORE_NAME}.attach`, expect.any(Function));
@@ -421,7 +421,7 @@ describe("extension", () => {
                 reportChangedExtensionSetting: jest.fn(),
                 reportExtensionSettings: jest.fn(),
                 reportUrlType: jest.fn(),
-                reportFileExtensionTypes: jest.fn(),
+                trackOpenedFileTypes: jest.fn(),
             };
 
             mockPanel = {
