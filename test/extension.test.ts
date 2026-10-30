@@ -76,6 +76,20 @@ describe("extension", () => {
             expect(mockUtils.createTelemetryReporter).toHaveBeenCalled();
         });
 
+        it("reports pending opened file types and flushes telemetry on deactivate", async () => {
+            const calls: string[] = [];
+            const reporter = createFakeTelemetryReporter();
+            reporter.dispose.mockImplementation(async () => { calls.push('reporter'); });
+            mockUtils.createTelemetryReporter!.mockReturnValue(reporter);
+            mockUtils.trackOpenedFileTypes!.mockReturnValue({ dispose: jest.fn(() => calls.push('tracker')) });
+            const newExtension = await import("../src/extension");
+
+            newExtension.activate(context);
+            await newExtension.deactivate();
+
+            expect(calls).toEqual(['tracker', 'reporter']);
+        });
+
         it("registers commands correctly", async () => {
             const newExtension = await import("../src/extension");
 

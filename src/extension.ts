@@ -41,6 +41,7 @@ import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
+let openedFileTypesTracker: vscode.Disposable | undefined;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
@@ -233,9 +234,17 @@ export function activate(context: vscode.ExtensionContext): void {
     }));
 
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
-    context.subscriptions.push(trackOpenedFileTypes(telemetryReporter));
+    openedFileTypesTracker = trackOpenedFileTypes(telemetryReporter);
+    context.subscriptions.push(openedFileTypesTracker);
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
+}
+
+export async function deactivate(): Promise<void> {
+    // Report pending opened-file counts, then flush the reporter so they aren't lost on shutdown.
+    openedFileTypesTracker?.dispose();
+    openedFileTypesTracker = undefined;
+    await telemetryReporter?.dispose();
 }
 
 function ensureWorkspaceTrusted(): boolean {
