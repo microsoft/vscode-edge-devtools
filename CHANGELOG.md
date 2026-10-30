@@ -1,6 +1,11 @@
+## 2.1.14
+* **[Bug Fix]**: Fix auto-attach failing when launching a new Edge instance - [PR #5081](https://github.com/microsoft/vscode-edge-devtools/pull/5081)
+* **[Bug Fix]**: Replace startup workspace file scan with opened-file telemetry to prevent crashes on large projects - [PR #5083](https://github.com/microsoft/vscode-edge-devtools/pull/5083)
+* **[Upgrade]**: Updating dependencies - [PR #5082](https://github.com/microsoft/vscode-edge-devtools/pull/5082)
+
 ## 2.1.13
-* **[Bug Fix]**: Pinning workflow to a commit and fixing an https validation in utils - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5046)
-* **[Bug Fix]**: Restricting setting and launch of browser to trusted workspace - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5049)
+* **[Bug Fix]**: Pinning workflow to a commit and fixing an https validation in utils - [PR #5046](https://github.com/microsoft/vscode-edge-devtools/pull/5046)
+* **[Bug Fix]**: Restricting setting and launch of browser to trusted workspace - [PR #5049](https://github.com/microsoft/vscode-edge-devtools/pull/5049)
 
 ## 2.1.12
 * **[Bug Fix]**: Fixing telemetry message format - [PR #5003](https://github.com/microsoft/vscode-edge-devtools/pull/5003)
