@@ -261,9 +261,9 @@ export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
         devToolsAttachConfig.url = url;
-        const { port, userDataDir } = getRemoteEndpointSettings();
+        const { port, userDataDir, timeout } = getRemoteEndpointSettings();
         const browserPath = await getBrowserPath();
-        await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
+        await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true, timeout).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
     }
 }
 
@@ -279,9 +279,9 @@ export async function launchScreencast(context: vscode.ExtensionContext, fileUri
         // Parse the filename from the remoteName, file authority and path e.g. file://wsl.localhost/ubuntu-20.04/test/index.html
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
-        const { port, userDataDir } = getRemoteEndpointSettings();
+        const { port, userDataDir, timeout } = getRemoteEndpointSettings();
         const browserPath = await getBrowserPath();
-        await launchBrowser(browserPath, port,  url, userDataDir, /** headless */ true).then(() => attach(context, url, undefined, true, true));
+        await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true, timeout).then(() => attach(context, url, undefined, true, true));
     }
 }
 
@@ -436,7 +436,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
     const telemetryProps = { viaConfig: `${!!config}`, browserType, isHeadless};
     sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch' }, telemetryProps);
 
-    const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);
+    const { hostname, port, defaultUrl, userDataDir, timeout } = getRemoteEndpointSettings(config);
     const url = launchUrl || defaultUrl;
     const target = await openNewTab(hostname, port, url);
     if (target && target.webSocketDebuggerUrl) {
@@ -467,7 +467,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             const browserProps = { exe: `${knownBrowser?.toLowerCase()}` };
             sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch', detail: 'newInstance' }, browserProps);
 
-        browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
+        browserInstance = await launchBrowser(browserPath, port, url, userDataDir, undefined, timeout);
         if (url !== SETTINGS_DEFAULT_URL) {
             reportUrlType(url, telemetryReporter);
         }
