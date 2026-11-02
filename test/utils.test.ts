@@ -1037,11 +1037,77 @@ describe("utils", () => {
         });
     });
 
-    describe('reportFileExtensionTypes', () => {
-        it('correctly lists extension types in the workspace', async () => {
+    describe('trackOpenedFileTypes', () => {
+        const openDocument = (uri: string): void => {
+            const vscodeMock = jest.requireMock("vscode");
+            const listener = vscodeMock.workspace.onDidOpenTextDocument.mock.calls[0][0];
+            const [, scheme, filePath = ''] = /^([a-z-]+):\/\/[^/]*(\/.*)?$/.exec(uri) as RegExpExecArray;
+            listener({ uri: { scheme, path: filePath, toString: () => uri } });
+        };
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it('reports batched counts of unique opened files after a quiet period', () => {
             const reporter = createFakeTelemetryReporter();
-            await utils.reportFileExtensionTypes(reporter);
-            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('workspace', { area: 'workspace', feature: 'metadata', action: 'scan', outcome: 'success' }, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "other": 0, "scss": 0, "total": 4, "ts": 0});
+            utils.trackOpenedFileTypes(reporter);
+
+            openDocument('file:///c:/test/main.js');
+            openDocument('file:///c:/test/main.js');
+            openDocument('file:///c:/test/styles.CSS');
+            openDocument('vscode-remote://ssh-remote+host/home/test/react/test.jsx');
+            openDocument('file:///c:/.vscode/launch.json');
+            openDocument('file:///c:/test/Makefile');
+            openDocument('file:///c:/test/.git/COMMIT_EDITMSG');
+            openDocument('git:///c:/test/main.js');
+            openDocument('output://extension-output');
+
+            expect(reporter.sendTelemetryEvent).not.toHaveBeenCalled();
+            jest.advanceTimersByTime(utils.OPENED_FILE_TYPES_REPORT_DELAY_MS);
+
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledTimes(1);
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('workspace', { area: 'workspace', feature: 'metadata', action: 'fileOpened', outcome: 'success' }, {"css": 1, "html": 0, "js": 1, "json": 1, "jsx": 1, "mjs": 0, "other": 1, "scss": 0, "total": 5, "ts": 0});
+        });
+
+        it('reports only newly opened files in subsequent batches', () => {
+            const reporter = createFakeTelemetryReporter();
+            utils.trackOpenedFileTypes(reporter);
+
+            openDocument('file:///c:/test/main.js');
+            jest.advanceTimersByTime(utils.OPENED_FILE_TYPES_REPORT_DELAY_MS);
+            openDocument('file:///c:/test/main.js');
+            openDocument('file:///c:/test/index.html');
+            jest.advanceTimersByTime(utils.OPENED_FILE_TYPES_REPORT_DELAY_MS);
+
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledTimes(2);
+            expect(reporter.sendTelemetryEvent).toHaveBeenLastCalledWith('workspace', expect.anything(), expect.objectContaining({ "html": 1, "js": 0, "total": 1 }));
+        });
+
+        it('flushes pending counts and stops listening on dispose', () => {
+            const reporter = createFakeTelemetryReporter();
+            const disposable = utils.trackOpenedFileTypes(reporter);
+            const listenerDisposable = jest.requireMock("vscode").workspace.onDidOpenTextDocument.mock.results[0].value;
+
+            openDocument('file:///c:/test/app.ts');
+            disposable.dispose();
+
+            expect(listenerDisposable.dispose).toHaveBeenCalled();
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledTimes(1);
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledWith('workspace', expect.anything(), expect.objectContaining({ "ts": 1, "total": 1 }));
+
+            jest.advanceTimersByTime(utils.OPENED_FILE_TYPES_REPORT_DELAY_MS);
+            expect(reporter.sendTelemetryEvent).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not report when no files were opened', () => {
+            const reporter = createFakeTelemetryReporter();
+            utils.trackOpenedFileTypes(reporter).dispose();
+            expect(reporter.sendTelemetryEvent).not.toHaveBeenCalled();
         });
     });
 
