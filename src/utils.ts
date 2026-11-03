@@ -15,7 +15,8 @@ import { DebugTelemetryReporter } from './debugTelemetryReporter';
 import { AriaTelemetryReporter } from './ariaTelemetryReporter';
 import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
-import puppeteer, {Browser} from 'puppeteer-core';
+import type { Browser } from 'puppeteer-core';
+import { launchAndConnectToBrowser } from './browserLauncher';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 
@@ -394,8 +395,12 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @param targetUrl The url of the page to open
  * @param userDataDir The user data directory for the launched instance
  * @param forceHeadless This force overrides the --headless arg for browser launch
+ * @param timeout Maximum time to wait for the browser to become ready
  */
-export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean): Promise<Browser> {
+export async function launchBrowser(
+    browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean,
+    timeout = SETTINGS_DEFAULT_ATTACH_TIMEOUT,
+): Promise<Browser> {
     const args = [
         '--no-first-run',
         '--no-default-browser-check',
@@ -417,8 +422,7 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
         args.unshift(...browserArgs);
     }
 
-    const browserInstance = await puppeteer.launch({executablePath: browserPath, args, headless});
-    return browserInstance;
+    return launchAndConnectToBrowser(browserPath, port, args, headless, timeout);
 }
 
 /**
