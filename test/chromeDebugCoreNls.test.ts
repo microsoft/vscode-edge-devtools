@@ -119,7 +119,39 @@ describe('external debug-core localization', () => {
         for (const name of fs.readdirSync(bundleRoot).filter(name => /^nls.*\.json$/.test(name))) {
             expect(files).toContain(packagedPath(path.join(bundleRoot, name)));
         }
-        expect(files).toContain('node_modules/@vscode/codicons/dist/codicon.css');
-        expect(files).toContain('node_modules/@vscode/codicons/dist/codicon.ttf');
+        const visited = new Set<string>();
+        function expectDependencyTree(name: string, from: string): void {
+            const manifestPath = require.resolve(`${name}/package.json`, { paths: [from] });
+            if (visited.has(manifestPath)) {
+                return;
+            }
+            visited.add(manifestPath);
+            expect(files).toContain(packagedPath(manifestPath));
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as {
+                dependencies?: Record<string, string>;
+            };
+            for (const dependency of Object.keys(manifest.dependencies ?? {})) {
+                expectDependencyTree(dependency, path.dirname(manifestPath));
+            }
+        }
+        expectDependencyTree('vscode-chrome-debug-core', extensionRoot);
+        expect(files.filter(file => file.startsWith('node_modules/@vscode/codicons/')).sort()).toEqual([
+            'node_modules/@vscode/codicons/dist/codicon.css',
+            'node_modules/@vscode/codicons/dist/codicon.ttf',
+        ]);
+        for (const dependency of [
+            'puppeteer-core',
+            '@puppeteer',
+            '@vscode/extension-telemetry',
+            '@microsoft',
+            '@opentelemetry',
+            'applicationinsights',
+            'bufferutil',
+            'lit-html',
+            'utf-8-validate',
+            'xmlhttprequest',
+        ]) {
+            expect(files.some(file => file.startsWith(`node_modules/${dependency}/`))).toBe(false);
+        }
     }, 30000);
 });

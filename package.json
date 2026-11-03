@@ -669,14 +669,7 @@
     },
     "dependencies": {
         "@vscode/codicons": "0.0.45",
-        "@vscode/extension-telemetry": "1.5.2",
-        "bufferutil": "4.1.0",
-        "lit-html": "^3.3.3",
-        "puppeteer-core": "25.16.0",
-        "utf-8-validate": "6.0.6",
-        "vscode-chrome-debug-core": "6.8.11",
-        "ws": "8.22.0",
-        "xmlhttprequest": "1.8.0"
+        "vscode-chrome-debug-core": "6.8.11"
     },
     "devDependencies": {
         "@opentelemetry/tracing": "0.24.0",
@@ -687,7 +680,9 @@
         "@types/ws": "8.18.2",
         "@typescript-eslint/eslint-plugin": "8.72.0",
         "@typescript-eslint/parser": "8.72.0",
+        "@vscode/extension-telemetry": "1.5.2",
         "@vscode/vsce": "^3.9.2",
+        "bufferutil": "4.1.0",
         "copy-webpack-plugin": "14.0.0",
         "eslint": "9.39.5",
         "eslint-plugin-import": "2.32.0",
@@ -695,13 +690,18 @@
         "eslint-plugin-prefer-arrow": "1.2.3",
         "fs-extra": "11.4.1",
         "jest": "30.5.2",
+        "lit-html": "^3.3.3",
+        "puppeteer-core": "25.16.0",
         "ts-jest": "29.4.15",
         "ts-loader": "9.6.2",
         "typescript": "6.0.3",
         "uglify-js": "3.19.3",
         "unzipper": "0.12.5",
+        "utf-8-validate": "6.0.6",
         "jest-environment-jsdom": "^30.5.2",
         "webpack": "5.112.2",
-        "webpack-cli": "7.2.3"
+        "webpack-cli": "7.2.3",
+        "ws": "8.22.0",
+        "xmlhttprequest": "1.8.0"
     }
 }
