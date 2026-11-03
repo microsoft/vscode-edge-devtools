@@ -15,7 +15,8 @@ import { DebugTelemetryReporter } from './debugTelemetryReporter';
 import { AriaTelemetryReporter } from './ariaTelemetryReporter';
 import { sendTaxonomyEvent } from './telemetryTaxonomy';
 
-import puppeteer, {Browser} from 'puppeteer-core';
+import type { Browser } from 'puppeteer-core';
+import { launchAndConnectToBrowser } from './browserLauncher';
 import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 
@@ -394,8 +395,12 @@ export async function getBrowserPath(config: Partial<IUserConfig> = {}): Promise
  * @param targetUrl The url of the page to open
  * @param userDataDir The user data directory for the launched instance
  * @param forceHeadless This force overrides the --headless arg for browser launch
+ * @param timeout Maximum time to wait for the browser to become ready
  */
-export async function launchBrowser(browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean): Promise<Browser> {
+export async function launchBrowser(
+    browserPath: string, port: number, targetUrl: string, userDataDir?: string, forceHeadless?: boolean,
+    timeout = SETTINGS_DEFAULT_ATTACH_TIMEOUT,
+): Promise<Browser> {
     const args = [
         '--no-first-run',
         '--no-default-browser-check',
@@ -417,8 +422,7 @@ export async function launchBrowser(browserPath: string, port: number, targetUrl
         args.unshift(...browserArgs);
     }
 
-    const browserInstance = await puppeteer.launch({executablePath: browserPath, args, headless});
-    return browserInstance;
+    return launchAndConnectToBrowser(browserPath, port, args, headless, timeout);
 }
 
 /**
@@ -775,41 +779,60 @@ export function reportUrlType(url: string, telemetryReporter: Readonly<Telemetry
     sendTaxonomyEvent(telemetryReporter, { area: 'user', feature: 'browser', action: 'navigate' }, { 'urlType': urlType });
 }
 
-export async function reportFileExtensionTypes(telemetryReporter: Readonly<TelemetryReporter>): Promise<void> {
-    const files = await vscode.workspace.findFiles('**/*.*', '**/node_modules/**');
-    const extensionMap: Map<string, number> = new Map<string, number>([
-        ['html', 0],
-        ['css', 0],
-        ['js', 0],
-        ['ts', 0],
-        ['jsx', 0],
-        ['scss', 0],
-        ['json', 0],
-        ['mjs', 0],
-        ['other', 0],
-    ]);
-    for (const file of files) {
-        const extension: string | undefined = file.path.split('.').pop();
-        if (extension) {
-            if (extensionMap.has(extension)) {
-                const currentValue = extensionMap.get(extension);
-                if (currentValue !== undefined) {
-                    extensionMap.set(extension, currentValue + 1);
-                }
-            } else {
-                const otherCount = extensionMap.get('other');
-                if (otherCount !== undefined) {
-                    extensionMap.set('other', otherCount + 1);
-                }
-            }
-        }
-    }
-    extensionMap.set('total', files.length);
+const TRACKED_FILE_EXTENSIONS = ['html', 'css', 'js', 'ts', 'jsx', 'scss', 'json', 'mjs'];
+const TRACKED_URI_SCHEMES = ['file', 'vscode-remote'];
+export const OPENED_FILE_TYPES_REPORT_DELAY_MS = 30000;
 
-    // Creates Object from map
-    const fileTypes: {[key: string]: number} = {};
-    Object.assign(fileTypes, ...[...extensionMap.entries()].map(([k, v]) => ({[k]: v})));
-    sendTaxonomyEvent(telemetryReporter, { area: 'workspace', feature: 'metadata', action: 'scan' }, undefined, fileTypes);
+/**
+ * Tracks the types of files the user opens and reports them as batched telemetry.
+ */
+export function trackOpenedFileTypes(telemetryReporter: Readonly<TelemetryReporter>): vscode.Disposable {
+    const seenFiles = new Set<string>();
+    let pendingCounts = new Map<string, number>();
+    let reportTimer: NodeJS.Timeout | undefined;
+
+    const report = (): void => {
+        if (reportTimer) {
+            clearTimeout(reportTimer);
+            reportTimer = undefined;
+        }
+        if (pendingCounts.size === 0) {
+            return;
+        }
+        const fileTypes: {[key: string]: number} = { total: 0 };
+        for (const extension of [...TRACKED_FILE_EXTENSIONS, 'other']) {
+            fileTypes[extension] = pendingCounts.get(extension) ?? 0;
+            fileTypes.total += fileTypes[extension];
+        }
+        pendingCounts = new Map<string, number>();
+        sendTaxonomyEvent(telemetryReporter, { area: 'workspace', feature: 'metadata', action: 'fileOpened' }, undefined, fileTypes);
+    };
+
+    const listener = vscode.workspace.onDidOpenTextDocument(document => {
+        const uri = document.uri;
+        if (!TRACKED_URI_SCHEMES.includes(uri.scheme) || uri.path.includes('/.git/')) {
+            return;
+        }
+        const key = uri.toString();
+        if (seenFiles.has(key)) {
+            return;
+        }
+        seenFiles.add(key);
+
+        const extension = path.posix.extname(uri.path).slice(1).toLowerCase();
+        const bucket = TRACKED_FILE_EXTENSIONS.includes(extension) ? extension : 'other';
+        pendingCounts.set(bucket, (pendingCounts.get(bucket) ?? 0) + 1);
+
+        if (reportTimer) {
+            clearTimeout(reportTimer);
+        }
+        reportTimer = setTimeout(report, OPENED_FILE_TYPES_REPORT_DELAY_MS);
+    });
+
+    return new vscode.Disposable(() => {
+        listener.dispose();
+        report();
+    });
 }
 
 (function initialize() {
