@@ -8,7 +8,8 @@ package-lock.json
 .pipelines/
 .config/
 img/
-node_modules/
+# VSCE includes npm production dependencies; bundled libraries are devDependencies.
+node_modules/@vscode/codicons/
 !node_modules/@vscode/codicons/dist/codicon.css
 !node_modules/@vscode/codicons/dist/codicon.ttf
 out/edge/
