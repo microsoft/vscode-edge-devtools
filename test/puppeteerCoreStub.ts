@@ -27,7 +27,8 @@ export enum TargetType {
     TAB = 'tab',
 }
 
-// `src/utils.ts` uses a default import and calls `puppeteer.launch(...)`.
+// The launcher uses Puppeteer's standard arguments and connects through CDP.
 export default {
-    launch: jest.fn(),
+    defaultArgs: jest.fn(async ({ args }: { args: string[] }) => args),
+    connect: jest.fn(),
 };

@@ -3,7 +3,9 @@
 
 import { Browser, Target, TargetType } from 'puppeteer-core';
 import * as vscode from 'vscode';
-import * as debugCore from 'vscode-chrome-debug-core';
+import type { ITarget } from 'vscode-chrome-debug-core/out/src/chrome/chromeConnection';
+import { getMatchingTargets } from 'vscode-chrome-debug-core/out/src/chrome/chromeUtils';
+import { retryAsync } from 'vscode-chrome-debug-core/out/src/utils';
 import { TelemetryReporter } from '@vscode/extension-telemetry';
 import { CDPTarget } from './cdpTarget';
 import { CDPTargetsProvider } from './cdpTargetsProvider';
@@ -29,7 +31,7 @@ import {
     SETTINGS_VIEW_NAME,
     getActiveDebugSessionId,
     getJsDebugCDPProxyWebsocketUrl,
-    reportFileExtensionTypes,
+    trackOpenedFileTypes,
     reportChangedExtensionSetting,
     reportExtensionSettings,
     reportUrlType,
@@ -41,6 +43,7 @@ import { ErrorReporter } from './errorReporter';
 import { ErrorCodes } from './common/errorCodes';
 
 let telemetryReporter: Readonly<TelemetryReporter>;
+let openedFileTypesTracker: vscode.Disposable | undefined;
 let browserInstance: Browser;
 let cdpTargetsProvider: CDPTargetsProvider;
 
@@ -233,9 +236,17 @@ export function activate(context: vscode.ExtensionContext): void {
     }));
 
     void vscode.commands.executeCommand('setContext', 'titleCommandsRegistered', true);
-    void reportFileExtensionTypes(telemetryReporter);
+    openedFileTypesTracker = trackOpenedFileTypes(telemetryReporter);
+    context.subscriptions.push(openedFileTypesTracker);
     reportExtensionSettings(telemetryReporter);
     vscode.workspace.onDidChangeConfiguration(event => reportChangedExtensionSetting(event, telemetryReporter));
+}
+
+export async function deactivate(): Promise<void> {
+    // Report pending opened-file counts, then flush the reporter so they aren't lost on shutdown.
+    openedFileTypesTracker?.dispose();
+    openedFileTypesTracker = undefined;
+    await telemetryReporter?.dispose();
 }
 
 function ensureWorkspaceTrusted(): boolean {
@@ -261,9 +272,9 @@ export async function launchHtml(fileUri: vscode.Uri): Promise<void> {
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
         devToolsAttachConfig.url = url;
-        const { port, userDataDir } = getRemoteEndpointSettings();
+        const { port, userDataDir, timeout } = getRemoteEndpointSettings();
         const browserPath = await getBrowserPath();
-        await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
+        await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true, timeout).then(() => vscode.debug.startDebugging(undefined, devToolsAttachConfig));
     }
 }
 
@@ -279,9 +290,9 @@ export async function launchScreencast(context: vscode.ExtensionContext, fileUri
         // Parse the filename from the remoteName, file authority and path e.g. file://wsl.localhost/ubuntu-20.04/test/index.html
         const url = `file://${vscode.env.remoteName}.localhost/${fileUri.authority.split('+')[1]}/${fileUri.fsPath.replace(/\\/g, '/')}`;
         edgeDebugConfig.url = url;
-        const { port, userDataDir } = getRemoteEndpointSettings();
+        const { port, userDataDir, timeout } = getRemoteEndpointSettings();
         const browserPath = await getBrowserPath();
-        await launchBrowser(browserPath, port,  url, userDataDir, /** headless */ true).then(() => attach(context, url, undefined, true, true));
+        await launchBrowser(browserPath, port, url, userDataDir, /** headless */ true, timeout).then(() => attach(context, url, undefined, true, true));
     }
 }
 
@@ -301,7 +312,7 @@ export async function attach(
     do {
         try {
             // Keep trying to attach to the list endpoint until timeout
-            responseArray = await debugCore.utils.retryAsync(
+            responseArray = await retryAsync(
                 () => getListOfTargets(hostname, port, useHttps),
                 timeout,
                 /* intervalDelay=*/ SETTINGS_DEFAULT_ATTACH_INTERVAL) as IRemoteTargetJson[];
@@ -314,9 +325,9 @@ export async function attach(
             let targetWebsocketUrl = '';
             if (attachUrl) {
                 // Match the targets using the edge debug adapter logic
-                let matchedTargets: debugCore.chromeConnection.ITarget[] | undefined;
+                let matchedTargets: ITarget[] | undefined;
                 try {
-                    matchedTargets = debugCore.chromeUtils.getMatchingTargets(responseArray as unknown as debugCore.chromeConnection.ITarget[], attachUrl);
+                    matchedTargets = getMatchingTargets(responseArray as unknown as ITarget[], attachUrl);
                 } catch (e) {
                     void ErrorReporter.showErrorDialog({
                         errorCode: ErrorCodes.Error,
@@ -436,7 +447,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
     const telemetryProps = { viaConfig: `${!!config}`, browserType, isHeadless};
     sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch' }, telemetryProps);
 
-    const { hostname, port, defaultUrl, userDataDir } = getRemoteEndpointSettings(config);
+    const { hostname, port, defaultUrl, userDataDir, timeout } = getRemoteEndpointSettings(config);
     const url = launchUrl || defaultUrl;
     const target = await openNewTab(hostname, port, url);
     if (target && target.webSocketDebuggerUrl) {
@@ -467,7 +478,7 @@ export async function launch(context: vscode.ExtensionContext, launchUrl?: strin
             const browserProps = { exe: `${knownBrowser?.toLowerCase()}` };
             sendTaxonomyEvent(telemetryReporter, { area: 'command', feature: 'browser', action: 'launch', detail: 'newInstance' }, browserProps);
 
-        browserInstance = await launchBrowser(browserPath, port, url, userDataDir);
+        browserInstance = await launchBrowser(browserPath, port, url, userDataDir, undefined, timeout);
         if (url !== SETTINGS_DEFAULT_URL) {
             reportUrlType(url, telemetryReporter);
         }

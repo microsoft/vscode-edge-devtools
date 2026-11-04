@@ -41,7 +41,7 @@ export function createFakeVSCode() {
         Diagnostic: jest.fn(),
         CallHierarchyItem: jest.fn(),
         CodeActionKind: jest.fn(),
-        Disposable: jest.fn(),
+        Disposable: jest.fn().mockImplementation((callOnDispose: () => void) => ({ dispose: callOnDispose })),
         ExtensionMode: {
             Production: 1
         },
@@ -110,14 +110,7 @@ export function createFakeVSCode() {
         workspace: {
             isTrusted: true,
             createFileSystemWatcher: jest.fn(),
-            findFiles: jest.fn(() => {
-                return [
-                    {path: '/c:/test/main.js'},
-                    {path: '/c:/test/styles.css'},
-                    {path: '/c:/test/react/test.jsx'},
-                    {path: '/c:/.vscode/launch.json'}
-                ];
-            }),
+            onDidOpenTextDocument: jest.fn(() => ({ dispose: jest.fn() })),
             getConfiguration: jest.fn(() => {
                 return {
                     get: (name: string) => {

@@ -6,6 +6,12 @@
         "esModuleInterop": true,
         "noImplicitAny": true,
         "moduleResolution": "bundler",
+        // The dependency publishes JavaScript under out/src and declarations under lib/src.
+        "paths": {
+            "vscode-chrome-debug-core/out/src/*": [
+                "./node_modules/vscode-chrome-debug-core/lib/src/*"
+            ]
+        },
         // TypeScript 6 no longer includes every node_modules/@types package
         // automatically, so the ambient globals used here must be listed.
         "types": [

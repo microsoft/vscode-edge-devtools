@@ -56,10 +56,15 @@ module.exports = env => {
             entry: {
                 extension: './src/extension.ts',
             },
-            externals: {
-                vscode: 'commonjs vscode',
-                'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics', // We're not native
-            },
+            externalsType: 'commonjs',
+            externals: [
+                {
+                    vscode: 'commonjs vscode',
+                    'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics', // We're not native
+                },
+                // Keep debug-core's original filenames so its adjacent NLS resources resolve normally.
+                /^vscode-chrome-debug-core(?:\/.*)?$/,
+            ],
             name: 'extension',
             target: 'node',
             resolve: {

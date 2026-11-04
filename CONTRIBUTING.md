@@ -35,6 +35,14 @@ Here are a list of recommended VS Code extensions to use when developing for vsc
 * Select `Launch Tests` debug configuration
 * Press `F5` to attach the debugger and start the tests
 
+## Packaging dependencies
+
+Libraries bundled by webpack belong in `devDependencies`: their code ships in the generated bundles,
+so their package directories do not need to be included in the VSIX. Keep packages in `dependencies`
+only when their files are needed at runtime. VSCE automatically includes their production dependency
+trees. This preserves the external `vscode-chrome-debug-core` modules and localization resources;
+`.vscodeignore` limits `@vscode/codicons` to the CSS and font used by the webviews.
+
 ## Issue tags
 * "Bug": Something that should work is broken
 * "Enhancement": AKA feature request - adds new functionality
